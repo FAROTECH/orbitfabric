@@ -52,3 +52,19 @@ jobs:
 
       - name: Build documentation site
         run: mkdocs build --strict
+
+      - name: Upload generated reports and logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbitfabric-generated-reports-${{ matrix.python-version }}
+          path: |
+            generated/reports/*.json
+            generated/logs/*.log
+          if-no-files-found: error
+
+      - name: Upload generated mission docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbitfabric-generated-docs-${{ matrix.python-version }}
+          path: generated/docs/
+          if-no-files-found: error
