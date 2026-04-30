@@ -1,8 +1,8 @@
 # OrbitFabric — Roadmap
 
-Version: 0.1-draft  
-Status: Draft  
-Scope: v0.1 to v0.5 planning  
+Version: 0.1.0.dev0  
+Status: Development preview  
+Scope: v0.1 to v0.5 planning   
 
 ---
 

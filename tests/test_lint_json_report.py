@@ -5,6 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from orbitfabric import __version__
 from orbitfabric.cli import app
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.lint.json_report import lint_report_to_dict
@@ -21,7 +22,7 @@ def test_lint_report_to_dict_for_clean_demo_mission() -> None:
     payload = lint_report_to_dict(model, report)
 
     assert payload["tool"] == "orbitfabric-lint"
-    assert payload["version"] == "0.1.0"
+    assert payload["version"] == __version__
     assert payload["mission"] == "demo-3u"
     assert payload["model_version"] == "0.1.0"
     assert payload["result"] == "passed"
