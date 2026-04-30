@@ -21,6 +21,8 @@ nav:
       - Demo Walkthrough: DEMO_WALKTHROUGH.md
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
+      - Lint Rules v0.1: reference/lint-rules-v0.1.md
+
   - ADR:
       - ADR-0001 Mission Model First: adr/ADR-0001-mission-model-first.md
       - ADR-0002 Python Toolchain First: adr/ADR-0002-python-toolchain-first.md
