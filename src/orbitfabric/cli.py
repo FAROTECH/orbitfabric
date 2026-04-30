@@ -63,6 +63,13 @@ def lint(
             help="Write a machine-readable lint report to this JSON file.",
         ),
     ] = None,
+    warnings_as_errors: Annotated[
+        bool,
+        typer.Option(
+            "--warnings-as-errors",
+            help="Fail lint when warning-level findings are present.",
+        ),
+    ] = False,
 ) -> None:
     """Validate and semantically lint a Mission Model."""
     typer.echo("OrbitFabric Mission Lint v0.1")
@@ -81,6 +88,10 @@ def lint(
     if json_output is not None:
         write_lint_report_json(model, report, json_output)
         typer.echo(f"\nJSON report written to: {json_output}")
+
+    if warnings_as_errors and report.warning_count > 0:
+        typer.echo("\nWarnings are treated as errors.")
+        raise typer.Exit(code=1)
 
     if report.has_errors:
         raise typer.Exit(code=1)

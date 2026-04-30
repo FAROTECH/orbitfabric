@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from typer.testing import CliRunner
 
 from orbitfabric.cli import app
@@ -29,3 +32,44 @@ def test_lint_loads_demo_mission() -> None:
     assert "Mission: demo-3u" in result.output
     assert "No findings." in result.output
     assert "Result: PASSED" in result.output
+
+def test_lint_with_warnings_passes_by_default(tmp_path: Path) -> None:
+    mission_dir = _copy_demo_mission_with_warning(tmp_path)
+
+    result = runner.invoke(app, ["lint", str(mission_dir)])
+
+    assert result.exit_code == 0
+    assert "OF-CMD-005" in result.output
+    assert "warnings: 1" in result.output
+    assert "Result: PASSED WITH WARNINGS" in result.output
+
+
+def test_lint_with_warnings_as_errors_fails(tmp_path: Path) -> None:
+    mission_dir = _copy_demo_mission_with_warning(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            "lint",
+            str(mission_dir),
+            "--warnings-as-errors",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "OF-CMD-005" in result.output
+    assert "warnings: 1" in result.output
+    assert "Warnings are treated as errors." in result.output
+
+
+def _copy_demo_mission_with_warning(tmp_path: Path) -> Path:
+    source = Path("examples/demo-3u/mission")
+    mission_dir = tmp_path / "mission"
+    shutil.copytree(source, mission_dir)
+
+    commands_path = mission_dir / "commands.yaml"
+    commands = commands_path.read_text(encoding="utf-8")
+    commands = commands.replace("    timeout_ms: 1000\n", "", 1)
+    commands_path.write_text(commands, encoding="utf-8")
+
+    return mission_dir
