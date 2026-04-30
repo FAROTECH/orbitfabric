@@ -31,6 +31,9 @@ app.add_typer(gen_app, name="gen")
 validate_app = typer.Typer(help="Validate OrbitFabric inputs without executing them.")
 app.add_typer(validate_app, name="validate")
 
+inspect_app = typer.Typer(help="Inspect OrbitFabric models and inputs.")
+app.add_typer(inspect_app, name="inspect")
+
 @app.callback()
 def main(
     version: Annotated[
@@ -146,6 +149,32 @@ def gen_docs(
 
     typer.echo("\nResult: PASSED")
 
+@inspect_app.command("mission")
+def inspect_mission(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory to inspect.",
+        ),
+    ],
+) -> None:
+    """Inspect a Mission Model without linting or generating artifacts."""
+    typer.echo("OrbitFabric Mission Inspection v0.1")
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    _print_loaded_model_summary(model)
+
+    typer.echo("\nResult: PASSED")
+    
 @validate_app.command("scenario")
 def validate_scenario(
     scenario_file: Annotated[
