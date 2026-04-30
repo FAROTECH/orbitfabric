@@ -17,6 +17,8 @@ nav:
       - Architecture: ARCHITECTURE.md
       - Roadmap: ROADMAP.md
       - Development Guide: DEVELOPMENT.md
+      - Quickstart: QUICKSTART.md
+      - Demo Walkthrough: DEMO_WALKTHROUGH.md
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
   - ADR:
