@@ -40,7 +40,7 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently published as a **v0.2.0 development preview**.
+OrbitFabric is currently published as a v0.2.0.dev0 development preview.
 
 The current vertical slice is functional:
 
@@ -112,7 +112,7 @@ OrbitFabric v0.2.0 development preview is not:
 - a CubeSat tutorial;
 - a ground segment.
 
-Those may become future integration targets or generated artifacts, but they are not the core of v0.1.
+Those may become future integration targets or generated artifacts, but they are not part of the current development preview.
 
 ---
 
@@ -300,7 +300,7 @@ Current expected baseline:
 
 ```text
 ruff check .  -> All checks passed
-pytest        -> 34 passed
+pytest        -> passing
 ```
 
 ---
