@@ -48,7 +48,7 @@ warning-level findings also make lint fail.
 
 ## Diagnostic shape
 
-OrbitFabric diagnostics generally expose:
+OrbitFabric diagnostics expose a common diagnostic shape across Mission Model loading, scenario loading, scenario reference validation and semantic lint findings.
 
 | Field | Meaning |
 |---|---|
@@ -59,6 +59,18 @@ OrbitFabric diagnostics generally expose:
 | `object_id` | Object affected by the diagnostic, when known. |
 | `message` | Human-readable explanation. |
 | `suggestion` | Suggested fix, when available. |
+
+The `suggestion` field is intentionally optional, but it should be provided whenever OrbitFabric can recommend a clear and safe corrective action.
+
+Examples:
+
+```text
+ERROR OF-SYN-002 telemetry.yaml required Mission Model file is missing Suggestion: Add the required Mission Model file 'telemetry.yaml'.
+
+ERROR OF-SCN-001 scenario.yaml battery_low_during_payload scenario command references unknown command 'payload.unknown_command' Suggestion: Use a command defined in commands.yaml.
+```
+
+Loader diagnostics and lint findings are implemented by different internal types, but they should remain aligned at the user-facing level.
 
 ---
 
