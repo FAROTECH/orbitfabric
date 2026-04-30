@@ -16,6 +16,7 @@ nav:
       - Clean-Room Policy: CLEAN_ROOM_POLICY.md
       - Architecture: ARCHITECTURE.md
       - Roadmap: ROADMAP.md
+      - Development Guide: DEVELOPMENT.md
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
   - ADR:

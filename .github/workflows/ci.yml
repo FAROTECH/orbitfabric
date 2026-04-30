@@ -6,7 +6,15 @@ on:
 
 jobs:
   test:
+    name: Python checks
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.11"
+          - "3.12"
 
     steps:
       - name: Checkout
@@ -15,15 +23,32 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .[dev]
+          python -m pip install -e ".[dev]"
 
       - name: Ruff
         run: ruff check .
 
       - name: Tests
         run: pytest
+
+      - name: OrbitFabric lint demo mission
+        run: |
+          orbitfabric lint examples/demo-3u/mission/ \
+            --json generated/reports/lint_report.json
+
+      - name: Generate demo mission docs
+        run: orbitfabric gen docs examples/demo-3u/mission/
+
+      - name: Run demo scenario
+        run: |
+          orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+            --json generated/reports/battery_low_during_payload_report.json \
+            --log generated/logs/battery_low_during_payload.log
+
+      - name: Build documentation site
+        run: mkdocs build --strict
