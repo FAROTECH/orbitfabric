@@ -21,6 +21,7 @@ nav:
       - Demo Walkthrough: DEMO_WALKTHROUGH.md
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
+      - Versioning Model: reference/versioning.md
       - Lint Rules v0.1: reference/lint-rules-v0.1.md
 
   - ADR:
