@@ -40,6 +40,7 @@ class MissionModelLoader:
                         code="OF-SYN-001",
                         file=str(mission_dir),
                         message="mission path does not exist or is not a directory",
+                        suggestion="Pass an existing Mission Model directory.",
                     )
                 ]
             )
@@ -54,6 +55,7 @@ class MissionModelLoader:
                         code="OF-SYN-002",
                         file=filename,
                         message="required Mission Model file is missing",
+                        suggestion=f"Add the required Mission Model file '{filename}'.",
                     )
                 )
                 continue
@@ -98,6 +100,7 @@ class MissionModelLoader:
                     code="OF-SYN-003",
                     file=display_name,
                     message=f"invalid YAML: {exc}",
+                    suggestion="Fix YAML syntax.",
                 )
             )
             return None
@@ -109,6 +112,7 @@ class MissionModelLoader:
                     code="OF-SYN-004",
                     file=display_name,
                     message="YAML file is empty",
+                    suggestion="Add the required top-level YAML mapping.",
                 )
             )
             return None
@@ -120,6 +124,7 @@ class MissionModelLoader:
                     code="OF-SYN-005",
                     file=display_name,
                     message="YAML file must contain a mapping at the top level",
+                    suggestion="Use a YAML mapping at the top level.",
                 )
             )
             return None
@@ -142,6 +147,7 @@ class MissionModelLoader:
                         file=filename,
                         domain=key,
                         message=f"missing required top-level key '{key}'",
+                        suggestion=f"Add the required top-level key '{key}'.",
                     )
                 )
 
@@ -154,6 +160,7 @@ class MissionModelLoader:
                         file=filename,
                         domain=key,
                         message=f"unexpected top-level key '{key}'",
+                        suggestion=f"Remove or rename the unexpected top-level key '{key}'.",
                     )
                 )
 
@@ -169,6 +176,7 @@ class MissionModelLoader:
                     code="OF-STR-003",
                     domain=location or None,
                     message=message,
+                    suggestion="Fix the invalid Mission Model field.",
                 )
             )
 
@@ -248,6 +256,7 @@ class MissionModelLoader:
                         domain=domain,
                         object_id=value,
                         message="duplicate ID is not allowed within a domain",
+                        suggestion=f"Rename or remove duplicate ID '{value}'.",
                     )
                 )
             seen.add(value)
