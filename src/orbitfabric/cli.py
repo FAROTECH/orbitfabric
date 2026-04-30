@@ -28,6 +28,8 @@ app = typer.Typer(
 gen_app = typer.Typer(help="Generate artifacts from a Mission Model.")
 app.add_typer(gen_app, name="gen")
 
+validate_app = typer.Typer(help="Validate OrbitFabric inputs without executing them.")
+app.add_typer(validate_app, name="validate")
 
 @app.callback()
 def main(
@@ -144,6 +146,35 @@ def gen_docs(
 
     typer.echo("\nResult: PASSED")
 
+@validate_app.command("scenario")
+def validate_scenario(
+    scenario_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Scenario YAML file to validate.",
+        ),
+    ],
+) -> None:
+    """Validate a scenario without executing it."""
+    typer.echo("OrbitFabric Scenario Validation v0.1")
+
+    try:
+        loaded = ScenarioLoader().load(scenario_file)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    typer.echo(f"\nScenario: {loaded.scenario.scenario.id}")
+    typer.echo(f"Mission: {loaded.mission_model.spacecraft.id}")
+    typer.echo(f"Model version: {loaded.mission_model.spacecraft.model_version}")
+    typer.echo(f"Initial mode: {loaded.scenario.initial_state.mode}")
+    typer.echo(f"Steps: {len(loaded.scenario.steps)}")
+
+    typer.echo("\nResult: PASSED")
 
 @app.command()
 def sim(
