@@ -1,0 +1,70 @@
+scenario:
+  id: battery_low_during_payload
+  name: Battery degradation during payload operation
+  description: Synthetic scenario where payload acquisition is active while EPS battery voltage drops below the warning threshold.
+
+mission:
+  path: ../mission
+
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    obc.mode: NOMINAL
+    eps.battery.voltage: 7.4
+    eps.battery.current: 0.4
+    payload.acquisition.active: false
+    radio.downlink.available: true
+
+steps:
+  - t: 0
+    expect_mode: NOMINAL
+
+  - t: 5
+    command: payload.start_acquisition
+    args:
+      duration_s: 300
+    expect:
+      command_status: ACCEPTED
+
+  - t: 6
+    expect_event: payload.acquisition_started
+
+  - t: 7
+    expect_mode: PAYLOAD_ACTIVE
+
+  - t: 30
+    inject:
+      telemetry: eps.battery.voltage
+      value: 6.7
+
+  - t: 31
+    inject:
+      telemetry: eps.battery.voltage
+      value: 6.7
+
+  - t: 32
+    inject:
+      telemetry: eps.battery.voltage
+      value: 6.7
+
+  - t: 33
+    expect_event: eps.battery_low
+
+  - t: 35
+    expect_mode: DEGRADED
+
+  - t: 36
+    expect_command:
+      id: payload.stop_acquisition
+      dispatch: AUTO
+
+  - t: 37
+    expect_event: payload.acquisition_stopped
+
+  - t: 38
+    expect_telemetry:
+      payload.acquisition.active: false
+
+  - t: 40
+    expect:
+      scenario_status: PASSED

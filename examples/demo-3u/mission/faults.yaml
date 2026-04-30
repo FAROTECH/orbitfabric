@@ -1,0 +1,32 @@
+faults:
+  - id: eps.battery_low_fault
+    source: eps
+    severity: warning
+    description: Battery voltage remains below synthetic warning threshold for three consecutive samples.
+    condition:
+      telemetry: eps.battery.voltage
+      operator: <
+      value: 6.8
+      debounce_samples: 3
+    emits:
+      - eps.battery_low
+    recovery:
+      mode_transition: DEGRADED
+      auto_commands:
+        - payload.stop_acquisition
+
+  - id: eps.battery_critical_fault
+    source: eps
+    severity: critical
+    description: Battery voltage remains below synthetic critical threshold for two consecutive samples.
+    condition:
+      telemetry: eps.battery.voltage
+      operator: <
+      value: 6.4
+      debounce_samples: 2
+    emits:
+      - eps.battery_critical
+    recovery:
+      mode_transition: SAFE
+      auto_commands:
+        - payload.stop_acquisition

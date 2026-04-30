@@ -1,0 +1,56 @@
+events:
+  - id: payload.acquisition_started
+    source: payload
+    severity: info
+    description: Synthetic payload acquisition started.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: payload.acquisition_stopped
+    source: payload
+    severity: info
+    description: Synthetic payload acquisition stopped.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: payload.command_timeout
+    source: payload
+    severity: error
+    description: Synthetic payload command timeout.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: eps.status_requested
+    source: eps
+    severity: info
+    description: EPS status command requested.
+    downlink_priority: low
+    persistence: store
+
+  - id: eps.battery_low
+    source: eps
+    severity: warning
+    description: Battery voltage below synthetic warning threshold.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: eps.battery_critical
+    source: eps
+    severity: critical
+    description: Battery voltage below synthetic critical threshold.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: obc.mode_changed
+    source: obc
+    severity: info
+    description: Operational mode changed.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: radio.housekeeping_downlink_requested
+    source: radio
+    severity: info
+    description: Housekeeping downlink was requested.
+    downlink_priority: medium
+    persistence: store

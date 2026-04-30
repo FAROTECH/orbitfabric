@@ -1,0 +1,35 @@
+policies:
+  persistence:
+    allowed_values:
+      - none
+      - store
+      - downlink_only
+      - store_and_downlink
+
+  downlink_priority:
+    allowed_values:
+      - low
+      - medium
+      - high
+      - critical
+
+  command_risk:
+    allowed_values:
+      - low
+      - medium
+      - high
+      - critical
+
+  event_severity:
+    allowed_values:
+      - info
+      - warning
+      - error
+      - critical
+
+  telemetry_criticality:
+    allowed_values:
+      - low
+      - medium
+      - high
+      - critical

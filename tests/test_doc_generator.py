@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from orbitfabric.cli import app
+from orbitfabric.gen.docs import generate_markdown_docs
+from orbitfabric.model.loader import MissionModelLoader
+
+DEMO_MISSION = Path("examples/demo-3u/mission")
+runner = CliRunner()
+
+
+def test_generate_markdown_docs(tmp_path: Path) -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+
+    generated_files = generate_markdown_docs(model, tmp_path)
+
+    generated_names = {path.name for path in generated_files}
+    assert generated_names == {
+        "telemetry.md",
+        "commands.md",
+        "events.md",
+        "faults.md",
+        "modes.md",
+        "packets.md",
+    }
+
+    telemetry_doc = (tmp_path / "telemetry.md").read_text(encoding="utf-8")
+    commands_doc = (tmp_path / "commands.md").read_text(encoding="utf-8")
+
+    assert "Telemetry Reference" in telemetry_doc
+    assert "eps.battery.voltage" in telemetry_doc
+    assert "Battery Voltage" in telemetry_doc
+    assert "Command Reference" in commands_doc
+    assert "payload.start_acquisition" in commands_doc
+
+
+def test_gen_docs_cli_writes_markdown_files(tmp_path: Path) -> None:
+    output_dir = tmp_path / "docs"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "docs",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "OrbitFabric Docs Generator v0.1" in result.output
+    assert "Generated files:" in result.output
+    assert "Result: PASSED" in result.output
+
+    assert (output_dir / "telemetry.md").exists()
+    assert (output_dir / "commands.md").exists()
+    assert (output_dir / "events.md").exists()
+    assert (output_dir / "faults.md").exists()
+    assert (output_dir / "modes.md").exists()
+    assert (output_dir / "packets.md").exists()

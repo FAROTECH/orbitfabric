@@ -1,0 +1,29 @@
+packets:
+  - id: hk_fast
+    name: Fast Housekeeping Packet
+    type: json
+    max_payload_bytes: 512
+    period: 1s
+    telemetry:
+      - obc.mode
+      - eps.battery.voltage
+      - eps.battery.current
+    description: Synthetic fast housekeeping packet for core health telemetry.
+
+  - id: payload_status
+    name: Payload Status Packet
+    type: json
+    max_payload_bytes: 512
+    period: 10s
+    telemetry:
+      - payload.acquisition.active
+    description: Synthetic payload status packet.
+
+  - id: comm_status
+    name: Communication Status Packet
+    type: json
+    max_payload_bytes: 256
+    period: on_change
+    telemetry:
+      - radio.downlink.available
+    description: Synthetic communication status packet.

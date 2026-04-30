@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "orbitfabric"
+version = "0.1.0"
+description = "A model-first Mission Data Fabric for small spacecraft."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "OrbitFabric Contributors" }
+]
+keywords = [
+  "spacecraft",
+  "cubesat",
+  "mission-data",
+  "telemetry",
+  "commands",
+  "faults",
+  "simulation",
+  "model-first"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development :: Code Generators"
+]
+dependencies = [
+  "pydantic>=2.7",
+  "typer>=0.12",
+  "PyYAML>=6.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+  "mkdocs-material>=9.5"
+]
+
+[project.scripts]
+orbitfabric = "orbitfabric.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orbitfabric"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = []

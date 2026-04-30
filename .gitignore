@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Generated OrbitFabric outputs
+generated/docs/*
+generated/reports/*
+generated/logs/*
+!generated/.gitkeep
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# MkDocs
+site/

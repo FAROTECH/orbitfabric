@@ -1,0 +1,50 @@
+modes:
+  BOOT:
+    description: Initial boot and system initialization.
+    initial: true
+
+  NOMINAL:
+    description: Standard spacecraft operational mode.
+
+  PAYLOAD_ACTIVE:
+    description: Payload acquisition is active.
+
+  DEGRADED:
+    description: Reduced capability mode after a non-critical fault or warning condition.
+
+  SAFE:
+    description: Protective mode with payload activity disabled and only essential commands allowed.
+
+  MAINTENANCE:
+    description: Ground-controlled maintenance mode for controlled diagnostic operations.
+
+mode_transitions:
+  - from: BOOT
+    to: NOMINAL
+    reason: boot_completed
+    description: Transition after successful initialization.
+
+  - from: NOMINAL
+    to: PAYLOAD_ACTIVE
+    reason: payload_acquisition_started
+    description: Transition after the payload acquisition command is accepted.
+
+  - from: PAYLOAD_ACTIVE
+    to: DEGRADED
+    reason: eps_warning_fault
+    description: Transition after EPS warning fault while payload is active.
+
+  - from: PAYLOAD_ACTIVE
+    to: SAFE
+    reason: eps_critical_fault
+    description: Transition after EPS critical fault while payload is active.
+
+  - from: DEGRADED
+    to: SAFE
+    reason: critical_fault
+    description: Transition from degraded to safe mode after a critical condition.
+
+  - from: SAFE
+    to: MAINTENANCE
+    reason: ground_authorized
+    description: Transition to maintenance mode after explicit ground authorization.

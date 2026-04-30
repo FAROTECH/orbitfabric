@@ -1,0 +1,83 @@
+telemetry:
+  - id: obc.mode
+    name: Current Operational Mode
+    type: enum
+    unit: none
+    source: obc
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - BOOT
+      - NOMINAL
+      - PAYLOAD_ACTIVE
+      - DEGRADED
+      - SAFE
+      - MAINTENANCE
+    quality:
+      required: true
+      default: good
+    description: Current high-level operational mode of the spacecraft.
+
+  - id: eps.battery.voltage
+    name: Battery Voltage
+    type: float32
+    unit: V
+    source: eps
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_low: 6.8
+      critical_low: 6.4
+    quality:
+      required: true
+      default: good
+    description: Synthetic battery bus voltage used for EPS warning and critical fault examples.
+
+  - id: eps.battery.current
+    name: Battery Current
+    type: float32
+    unit: A
+    source: eps
+    sampling: 1Hz
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    limits:
+      warning_high: 1.8
+      critical_high: 2.4
+    quality:
+      required: true
+      default: good
+    description: Synthetic battery current telemetry for housekeeping documentation.
+
+  - id: payload.acquisition.active
+    name: Payload Acquisition Active
+    type: bool
+    unit: none
+    source: payload
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Indicates whether the synthetic demo payload is acquiring data.
+
+  - id: radio.downlink.available
+    name: Downlink Available
+    type: bool
+    unit: none
+    source: radio
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Synthetic flag indicating whether a communication opportunity is available.

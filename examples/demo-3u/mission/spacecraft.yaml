@@ -1,0 +1,7 @@
+spacecraft:
+  id: demo-3u
+  name: Demo 3U Spacecraft
+  class: cubesat
+  form_factor: 3U
+  mission_type: technology_demonstrator
+  model_version: 0.1.0

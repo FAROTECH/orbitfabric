@@ -1,0 +1,67 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from orbitfabric.cli import app
+from orbitfabric.model.scenario_loader import ScenarioLoader
+from orbitfabric.sim.json_report import simulation_result_to_dict
+from orbitfabric.sim.runner import ScenarioRunner
+
+DEMO_SCENARIO = Path("examples/demo-3u/scenarios/battery_low_during_payload.yaml")
+runner = CliRunner()
+
+
+def test_simulation_result_to_dict_for_demo_scenario() -> None:
+    loaded = ScenarioLoader().load(DEMO_SCENARIO)
+    result = ScenarioRunner().run(loaded)
+
+    payload = simulation_result_to_dict(result)
+
+    assert payload["tool"] == "orbitfabric-sim"
+    assert payload["version"] == "0.1.0"
+    assert payload["mission"] == "demo-3u"
+    assert payload["scenario"] == "battery_low_during_payload"
+    assert payload["result"] == "passed"
+    assert payload["summary"]["failed_expectations"] == 0
+    assert payload["final_state"]["mode"] == "DEGRADED"
+    assert payload["final_state"]["telemetry"]["payload.acquisition.active"] is False
+
+    event_ids = {event["event_id"] for event in payload["events"]}
+    assert "eps.battery_low" in event_ids
+    assert "payload.acquisition_stopped" in event_ids
+
+    auto_commands = {
+        command["command_id"]
+        for command in payload["commands"]
+        if command["dispatch"] == "AUTO"
+    }
+    assert "payload.stop_acquisition" in auto_commands
+
+
+def test_sim_command_writes_json_report(tmp_path: Path) -> None:
+    output_path = tmp_path / "battery_low_report.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "sim",
+            str(DEMO_SCENARIO),
+            "--json",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert output_path.exists()
+    assert "JSON report written to" in result.output
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+    assert payload["tool"] == "orbitfabric-sim"
+    assert payload["mission"] == "demo-3u"
+    assert payload["scenario"] == "battery_low_during_payload"
+    assert payload["result"] == "passed"
+    assert payload["summary"]["failed_expectations"] == 0

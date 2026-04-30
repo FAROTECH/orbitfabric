@@ -1,0 +1,24 @@
+subsystems:
+  - id: obc
+    name: On-Board Computer
+    type: core
+    criticality: critical
+    description: Synthetic onboard computer responsible for command routing, mode management and fault coordination.
+
+  - id: eps
+    name: Electrical Power System
+    type: subsystem
+    criticality: critical
+    description: Synthetic electrical power subsystem used for battery telemetry and power-related fault examples.
+
+  - id: payload
+    name: Demo Payload
+    type: payload
+    criticality: medium
+    description: Synthetic payload used to demonstrate command execution and recovery actions.
+
+  - id: radio
+    name: Communication System
+    type: communication
+    criticality: high
+    description: Synthetic communication subsystem used for downlink-related examples.

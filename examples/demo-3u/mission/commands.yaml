@@ -1,0 +1,75 @@
+commands:
+  - id: payload.start_acquisition
+    target: payload
+    description: Start synthetic payload acquisition for a bounded duration.
+    arguments:
+      - name: duration_s
+        type: uint16
+        min: 1
+        max: 600
+        description: Requested acquisition duration in seconds.
+    allowed_modes:
+      - NOMINAL
+    requires_ack: true
+    timeout_ms: 1000
+    risk: medium
+    emits:
+      - payload.acquisition_started
+    expected_effects:
+      telemetry:
+        payload.acquisition.active: true
+      mode_transition:
+        to: PAYLOAD_ACTIVE
+
+  - id: payload.stop_acquisition
+    target: payload
+    description: Stop synthetic payload acquisition.
+    arguments: []
+    allowed_modes:
+      - PAYLOAD_ACTIVE
+      - DEGRADED
+      - SAFE
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - payload.acquisition_stopped
+    expected_effects:
+      telemetry:
+        payload.acquisition.active: false
+
+  - id: eps.get_status
+    target: eps
+    description: Request synthetic EPS status.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - PAYLOAD_ACTIVE
+      - DEGRADED
+      - SAFE
+      - MAINTENANCE
+    requires_ack: true
+    timeout_ms: 500
+    risk: low
+    emits:
+      - eps.status_requested
+    expected_effects:
+      no_state_change: true
+      
+  - id: radio.downlink_housekeeping
+    target: radio
+    description: Request downlink of housekeeping packet set during an available communication opportunity.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - PAYLOAD_ACTIVE
+      - DEGRADED
+      - SAFE
+      - MAINTENANCE
+    requires_ack: true
+    timeout_ms: 1500
+    risk: low
+    emits:
+      - radio.housekeeping_downlink_requested
+    expected_effects:
+      no_state_change: true
