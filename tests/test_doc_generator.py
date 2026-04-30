@@ -36,6 +36,26 @@ def test_generate_markdown_docs(tmp_path: Path) -> None:
     assert "Command Reference" in commands_doc
     assert "payload.start_acquisition" in commands_doc
 
+    faults_doc = (tmp_path / "faults.md").read_text(encoding="utf-8")
+
+    assert "## Summary" in telemetry_doc
+    assert "## Telemetry by subsystem" in telemetry_doc
+    assert "### `eps`" in telemetry_doc
+    assert "`warning_low` = `6.8`" in telemetry_doc
+    assert "`critical_low` = `6.4`" in telemetry_doc
+
+    assert "## Commands by target subsystem" in commands_doc
+    assert "### `payload`" in commands_doc
+    assert "`duration_s`: `uint16`" in commands_doc
+    assert "`payload.acquisition.active` = `true`" in commands_doc
+    assert "mode -> `PAYLOAD_ACTIVE`" in commands_doc
+
+    assert "## Faults by source subsystem" in faults_doc
+    assert "`eps.battery.voltage` < `6.8`" in faults_doc
+    assert "debounce `3` samples" in faults_doc
+    assert "mode -> `DEGRADED`" in faults_doc
+    assert "auto commands: `payload.stop_acquisition`" in faults_doc
+
 
 def test_gen_docs_cli_writes_markdown_files(tmp_path: Path) -> None:
     output_dir = tmp_path / "docs"
