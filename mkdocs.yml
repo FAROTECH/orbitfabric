@@ -22,6 +22,7 @@ nav:
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
       - Versioning Model: reference/versioning.md
+      - JSON Reports v0.1: reference/json-reports-v0.1.md
       - Lint Rules v0.1: reference/lint-rules-v0.1.md
 
   - ADR:
