@@ -61,6 +61,7 @@ class ScenarioLoader:
                         domain=finding.domain,
                         object_id=finding.object_id,
                         message=finding.message,
+                        suggestion=finding.suggestion,
                     )
                     for finding in reference_findings
                 ]
