@@ -358,6 +358,12 @@ orbitfabric/
 
 ## Documentation
 
+Published documentation is available at:
+
+```text
+https://farotech.github.io/orbitfabric/
+```
+
 Project documentation lives under:
 
 ```text
