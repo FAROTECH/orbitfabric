@@ -11,6 +11,8 @@ Mission Model YAML
   -> structural validation
   -> semantic lint
   -> generated Markdown docs
+  -> mission inspection
+  -> scenario validation
   -> scenario loading
   -> deterministic scenario execution
   -> JSON reports
@@ -78,7 +80,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.1.0.dev0
+orbitfabric 0.2.0.dev0
 ```
 
 ---
@@ -95,7 +97,35 @@ All checks should pass.
 
 ---
 
-## 7. Run Mission Model lint
+## 7. Inspect the demo Mission Model
+
+```bash
+orbitfabric inspect mission examples/demo-3u/mission/
+```
+
+Expected result:
+
+```text
+Result: PASSED
+```
+
+---
+
+## 8. Validate the demo scenario without executing it
+
+```bash
+orbitfabric validate scenario examples/demo-3u/scenarios/battery_low_during_payload.yaml
+```
+
+Expected result:
+
+```text
+Result: PASSED
+```
+
+---
+
+## 9. Run Mission Model lint
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/
@@ -122,7 +152,7 @@ generated/reports/lint_report.json
 
 ---
 
-## 8. Generate mission documentation
+## 10. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -146,7 +176,7 @@ Do not edit generated files manually.
 
 ---
 
-## 9. Run the demo scenario
+## 11. Run the demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -175,7 +205,7 @@ generated/logs/battery_low_during_payload.log
 
 ---
 
-## 10. What this proves
+## 12. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -183,6 +213,8 @@ The current demo proves that OrbitFabric can:
 - validate its structure;
 - run semantic lint rules;
 - generate Markdown documentation;
+- inspect a Mission Model summary;
+- validate a scenario without executing it;
 - load a scenario;
 - execute a deterministic operational sequence;
 - emit events;
@@ -192,7 +224,7 @@ The current demo proves that OrbitFabric can:
 
 ---
 
-## 11. What this does not prove
+## 13. What this does not prove
 
 The current demo does not prove:
 
@@ -204,4 +236,4 @@ The current demo does not prove:
 - orbital, attitude, power or thermal dynamics;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current v0.1.0 development preview scope.
+Those are intentionally outside the current v0.2.0 development preview scope.
