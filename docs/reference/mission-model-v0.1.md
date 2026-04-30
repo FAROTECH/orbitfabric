@@ -255,7 +255,7 @@ spacecraft:
 | `class` | string | yes | Spacecraft class, for example `cubesat`, `picosat`, `smallsat`. |
 | `form_factor` | string | no | Physical form factor, for example `1U`, `3U`, `6U`. |
 | `mission_type` | string | no | Mission category, for example `technology_demonstrator`. |
-| `model_version` | string | yes | OrbitFabric Mission Model version. |
+| `model_version` | string | yes | Mission Model contract version declared by this mission. |
 
 ### 5.4 Example
 
