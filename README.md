@@ -40,7 +40,7 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently published as a **v0.1.0 development preview**.
+OrbitFabric is currently published as a **v0.2.0 development preview**.
 
 The current vertical slice is functional:
 
@@ -61,7 +61,7 @@ Current verified baseline:
 
 ```text
 ruff check .  -> passing
-pytest        -> 34 tests passing
+pytest        -> passing
 ```
 
 ---
@@ -89,6 +89,7 @@ Mission Model YAML
   -> semantic lint
   -> JSON lint report
   -> generated Markdown docs
+  -> scenario validation
   -> scenario loading
   -> deterministic scenario execution
   -> simulation JSON report
@@ -99,7 +100,7 @@ Mission Model YAML
 
 ## What OrbitFabric Is Not
 
-OrbitFabric v0.1.0 development preview is not:
+OrbitFabric v0.2.0 development preview is not:
 
 - a flight-ready onboard runtime;
 - a replacement for cFS or F Prime;
@@ -182,7 +183,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.1.0.dev0
+orbitfabric 0.2.0.dev0
 ```
 
 ---
