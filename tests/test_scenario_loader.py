@@ -67,6 +67,7 @@ def test_validate_scenario_cli_rejects_unknown_command(tmp_path: Path) -> None:
     assert result.exit_code == 1
     assert "OF-SCN-001" in result.output
     assert "unknown command" in result.output
+    assert "Suggestion: Use a command defined in commands.yaml." in result.output
     assert "Result: FAILED" in result.output
 
 
@@ -136,6 +137,7 @@ def test_scenario_loader_rejects_invalid_references(
     codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
 
     assert expected_code in codes
+    assert any(diagnostic.suggestion for diagnostic in exc_info.value.diagnostics)
 
 
 def test_scenario_loader_rejects_missing_required_top_level_key(tmp_path: Path) -> None:

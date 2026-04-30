@@ -13,6 +13,7 @@ class ModelDiagnostic:
     file: str | None = None
     domain: str | None = None
     object_id: str | None = None
+    suggestion: str | None = None
 
     def format(self) -> str:
         parts = [self.severity, self.code]
@@ -24,6 +25,10 @@ class ModelDiagnostic:
             parts.append(self.object_id)
 
         parts.append(self.message)
+
+        if self.suggestion:
+            parts.append(f"Suggestion: {self.suggestion}")
+
         return " ".join(parts)
 
 
