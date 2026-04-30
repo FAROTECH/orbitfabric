@@ -1,7 +1,7 @@
 # OrbitFabric — Architecture
 
-Version: 0.1-draft  
-Status: Draft  
+Version: 0.1.0.dev0  
+Status: Development preview  
 Scope: MVP v0.1 architecture  
 
 ---

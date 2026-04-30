@@ -5,6 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from orbitfabric import __version__
 from orbitfabric.cli import app
 from orbitfabric.model.scenario_loader import ScenarioLoader
 from orbitfabric.sim.json_report import simulation_result_to_dict
@@ -21,7 +22,7 @@ def test_simulation_result_to_dict_for_demo_scenario() -> None:
     payload = simulation_result_to_dict(result)
 
     assert payload["tool"] == "orbitfabric-sim"
-    assert payload["version"] == "0.1.0"
+    assert payload["version"] == __version__
     assert payload["mission"] == "demo-3u"
     assert payload["scenario"] == "battery_low_during_payload"
     assert payload["result"] == "passed"

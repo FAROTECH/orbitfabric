@@ -40,7 +40,7 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is in early **v0.1-dev** development.
+OrbitFabric is currently published as a **v0.1.0 development preview**.
 
 The current vertical slice is functional:
 
@@ -99,7 +99,7 @@ Mission Model YAML
 
 ## What OrbitFabric Is Not
 
-OrbitFabric v0.1 is not:
+OrbitFabric v0.1.0 development preview is not:
 
 - a flight-ready onboard runtime;
 - a replacement for cFS or F Prime;
@@ -182,7 +182,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.1.0
+orbitfabric 0.1.0.dev0
 ```
 
 ---
