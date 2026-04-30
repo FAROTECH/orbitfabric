@@ -30,6 +30,10 @@ def test_missing_mission_directory_fails() -> None:
 
     assert exc_info.value.diagnostics[0].code == "OF-SYN-001"
 
+    assert exc_info.value.diagnostics[0].suggestion == (
+        "Pass an existing Mission Model directory."
+    )
+
 
 def test_missing_required_file_fails(tmp_path: Path) -> None:
     mission_dir = tmp_path / "mission"
@@ -40,3 +44,12 @@ def test_missing_required_file_fails(tmp_path: Path) -> None:
 
     codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
     assert "OF-SYN-002" in codes
+
+    suggestions = {    
+        diagnostic.suggestion
+        for diagnostic in exc_info.value.diagnostics
+        if diagnostic.code == "OF-SYN-002"
+    }
+
+    assert suggestions
+    assert all(suggestion is not None for suggestion in suggestions)

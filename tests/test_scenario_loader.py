@@ -159,6 +159,10 @@ initial_state:
 
     assert exc_info.value.diagnostics[0].code == "OF-SCN-011"
 
+    assert exc_info.value.diagnostics[0].suggestion == (
+        "Add the required scenario top-level key 'steps'."
+    )
+
 
 def test_scenario_loader_rejects_unexpected_top_level_key(tmp_path: Path) -> None:
     scenario_path = tmp_path / "unexpected-key.yaml"
@@ -181,6 +185,9 @@ unexpected: true
 
     assert exc_info.value.diagnostics[0].code == "OF-SCN-012"
 
+    assert exc_info.value.diagnostics[0].suggestion == (
+        "Remove or rename the unexpected scenario top-level key 'unexpected'."
+    )
 
 def _copy_demo_scenario_with_replacement(
     tmp_path: Path,

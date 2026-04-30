@@ -30,6 +30,7 @@ class ScenarioLoader:
                         code="OF-SCN-000",
                         file=str(scenario_file),
                         message="scenario path does not exist or is not a file",
+                        suggestion="Pass an existing scenario YAML file.",
                     )
                 ]
             )
@@ -248,6 +249,7 @@ class ScenarioLoader:
                     code="OF-SCN-008",
                     file=str(scenario_file),
                     message=f"invalid scenario YAML: {exc}",
+                    suggestion="Fix scenario YAML syntax.",
                 )
             )
             return {}
@@ -259,6 +261,7 @@ class ScenarioLoader:
                     code="OF-SCN-009",
                     file=str(scenario_file),
                     message="scenario YAML file is empty",
+                    suggestion="Add scenario content.",
                 )
             )
             return {}
@@ -270,6 +273,7 @@ class ScenarioLoader:
                     code="OF-SCN-010",
                     file=str(scenario_file),
                     message="scenario YAML file must contain a top-level mapping",
+                    suggestion="Use a YAML mapping at the top level.",
                 )
             )
             return {}
@@ -289,6 +293,7 @@ class ScenarioLoader:
                         code="OF-SCN-011",
                         domain="scenario",
                         message=f"missing required top-level key '{key}'",
+                        suggestion=f"Add the required scenario top-level key '{key}'.",
                     )
                 )
 
@@ -300,6 +305,10 @@ class ScenarioLoader:
                         code="OF-SCN-012",
                         domain="scenario",
                         message=f"unexpected top-level key '{key}'",
+                        suggestion=(
+                            "Remove or rename the unexpected scenario "
+                            f"top-level key '{key}'."
+                        ),
                     )
                 )
 
@@ -315,6 +324,7 @@ class ScenarioLoader:
                     code="OF-SCN-013",
                     domain=location or None,
                     message=message,
+                    suggestion="Fix the invalid scenario field.",
                 )
             )
 
