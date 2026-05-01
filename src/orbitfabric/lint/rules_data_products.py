@@ -103,7 +103,10 @@ def _check_storage_intent(data_product: DataProductContract) -> list[LintFinding
                 domain="data_products",
                 object_id=data_product.id,
                 message="data product storage intent should define retention",
-                suggestion="Set storage.retention or remove storage intent if the product is not retained.",
+                suggestion=(
+                    "Set storage.retention or remove storage intent if the product "
+                    "is not retained."
+                ),
             )
         )
 
