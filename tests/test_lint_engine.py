@@ -4,8 +4,32 @@ from pathlib import Path
 
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.model.loader import MissionModelLoader
+from orbitfabric.model.mission import (
+    DataProductContract,
+    DataProductDownlinkIntent,
+    DataProductStorageIntent,
+)
 
 DEMO_MISSION = Path("examples/demo-3u/mission")
+
+
+def make_valid_data_product() -> DataProductContract:
+    return DataProductContract(
+        id="payload.radiation_histogram",
+        producer="demo_iod_payload",
+        producer_type="payload",
+        type="histogram",
+        estimated_size_bytes=4096,
+        priority="high",
+        storage=DataProductStorageIntent(
+            **{
+                "class": "science",
+                "retention": "7d",
+                "overflow_policy": "drop_oldest",
+            }
+        ),
+        downlink=DataProductDownlinkIntent(policy="next_available_contact"),
+    )
 
 
 def test_demo_mission_has_no_semantic_lint_findings() -> None:
@@ -159,3 +183,82 @@ def test_command_expected_effect_payload_lifecycle_state_must_exist() -> None:
     codes = {finding.code for finding in report.findings}
     assert "OF-PAY-010" in codes
     assert report.has_errors
+
+
+def test_valid_data_product_contract_has_no_lint_findings() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.data_products.append(make_valid_data_product())
+
+    report = LintEngine().run(model)
+
+    data_product_codes = {
+        finding.code for finding in report.findings if finding.domain == "data_products"
+    }
+    assert data_product_codes == set()
+
+
+def test_data_product_payload_producer_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    data_product = make_valid_data_product()
+    data_product.producer = "missing_payload"
+    model.data_products.append(data_product)
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-DP-002" in codes
+    assert report.has_errors
+
+
+def test_data_product_subsystem_producer_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    data_product = make_valid_data_product()
+    data_product.producer = "missing_subsystem"
+    data_product.producer_type = "subsystem"
+    model.data_products.append(data_product)
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-DP-002" in codes
+    assert report.has_errors
+
+
+def test_data_product_optional_payload_reference_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    data_product = make_valid_data_product()
+    data_product.payload = "missing_payload"
+    model.data_products.append(data_product)
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-DP-003" in codes
+    assert report.has_errors
+
+
+def test_data_product_storage_intent_should_define_retention_and_overflow_policy() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    data_product = make_valid_data_product()
+    data_product.storage = DataProductStorageIntent(**{"class": "science"})
+    model.data_products.append(data_product)
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-DP-006" in codes
+    assert "OF-DP-007" in codes
+    assert report.warning_count >= 2
+
+
+def test_high_priority_data_product_should_define_downlink_intent() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    data_product = make_valid_data_product()
+    data_product.downlink = None
+    model.data_products.append(data_product)
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-DP-008" in codes
+    assert report.warning_count >= 1
