@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from orbitfabric.lint.engine import LintEngine
+from orbitfabric.model.errors import MissionModelError
 from orbitfabric.model.loader import MissionModelLoader
 
 DEMO_MISSION = Path("examples/demo-3u/mission")
@@ -27,7 +28,7 @@ def test_valid_payload_fixture_passes() -> None:
     [
         (lambda mission_dir: _set_payload_field(mission_dir, "subsystem", "missing"), "OF-PAY-001"),
         (lambda mission_dir: _set_payload_field(mission_dir, "subsystem", "eps"), "OF-PAY-002"),
-        (_remove_payload_initial_state, "OF-STR-003"),
+        (lambda mission_dir: _remove_payload_initial_state(mission_dir), "OF-STR-003"),
         (
             lambda mission_dir: _set_payload_lifecycle_initial_state(
                 mission_dir,
@@ -98,11 +99,10 @@ def test_invalid_payload_contract_fixture_fails_for_expected_reason(
     mutator(mission_dir)
 
     if expected_code == "OF-STR-003":
-        with pytest.raises(Exception) as exc_info:
+        with pytest.raises(MissionModelError) as exc_info:
             MissionModelLoader().load(mission_dir)
 
-        diagnostics = getattr(exc_info.value, "diagnostics", [])
-        codes = {diagnostic.code for diagnostic in diagnostics}
+        codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
         assert expected_code in codes
         return
 
