@@ -50,3 +50,46 @@ def test_missing_initial_mode_is_reported() -> None:
     codes = {finding.code for finding in report.findings}
     assert "OF-MODE-001" in codes
     assert report.has_errors
+
+
+def test_payload_lifecycle_initial_state_must_exist_in_states() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].lifecycle.initial_state = "UNKNOWN"
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-002" in codes
+    assert report.has_errors
+
+
+def test_command_precondition_payload_lifecycle_state_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commands[0].preconditions = {
+        "payload_lifecycle": {
+            "payload": "demo_iod_payload",
+            "state": "UNKNOWN",
+        }
+    }
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-004" in codes
+    assert report.has_errors
+
+
+def test_command_expected_effect_payload_lifecycle_state_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commands[0].expected_effects = {
+        "payload_lifecycle": {
+            "payload": "demo_iod_payload",
+            "state": "UNKNOWN",
+        }
+    }
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-006" in codes
+    assert report.has_errors
