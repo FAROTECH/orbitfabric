@@ -52,6 +52,28 @@ def test_missing_initial_mode_is_reported() -> None:
     assert report.has_errors
 
 
+def test_payload_subsystem_reference_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].subsystem = "missing_subsystem"
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-001" in codes
+    assert report.has_errors
+
+
+def test_payload_subsystem_type_must_be_payload() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].subsystem = "eps"
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-002" in codes
+    assert report.has_errors
+
+
 def test_payload_lifecycle_initial_state_must_exist_in_states() -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     model.payloads[0].lifecycle.initial_state = "UNKNOWN"
@@ -59,7 +81,51 @@ def test_payload_lifecycle_initial_state_must_exist_in_states() -> None:
     report = LintEngine().run(model)
 
     codes = {finding.code for finding in report.findings}
-    assert "OF-PAY-002" in codes
+    assert "OF-PAY-004" in codes
+    assert report.has_errors
+
+
+def test_payload_telemetry_references_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].telemetry.produced.append("payload.unknown.telemetry")
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-005" in codes
+    assert report.has_errors
+
+
+def test_payload_command_references_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].commands.accepted.append("payload.unknown_command")
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-006" in codes
+    assert report.has_errors
+
+
+def test_payload_event_references_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].events.generated.append("payload.unknown_event")
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-007" in codes
+    assert report.has_errors
+
+
+def test_payload_fault_references_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.payloads[0].faults.possible.append("payload.unknown_fault")
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-PAY-008" in codes
     assert report.has_errors
 
 
@@ -75,7 +141,7 @@ def test_command_precondition_payload_lifecycle_state_must_exist() -> None:
     report = LintEngine().run(model)
 
     codes = {finding.code for finding in report.findings}
-    assert "OF-PAY-004" in codes
+    assert "OF-PAY-009" in codes
     assert report.has_errors
 
 
@@ -91,5 +157,5 @@ def test_command_expected_effect_payload_lifecycle_state_must_exist() -> None:
     report = LintEngine().run(model)
 
     codes = {finding.code for finding in report.findings}
-    assert "OF-PAY-006" in codes
+    assert "OF-PAY-010" in codes
     assert report.has_errors
