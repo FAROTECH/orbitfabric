@@ -43,7 +43,7 @@ def test_runner_executes_nominal_payload_lifecycle_scenario() -> None:
 
     assert result.passed
     assert result.result_label == "PASSED"
-    assert result.state.current_mode == "NOMINAL"
+    assert result.state.current_mode == "PAYLOAD_ACTIVE"
     assert result.state.telemetry["payload.acquisition.active"] is False
     assert result.state.payload_lifecycle["demo_iod_payload"] == "READY"
 
