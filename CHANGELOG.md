@@ -2,7 +2,7 @@
 
 All notable changes to OrbitFabric will be documented in this file.
 
-This project follows a lightweight pre-1.0 changelog style while the Mission Model, Payload Contract Model and CLI stabilize.
+This project follows a lightweight pre-1.0 changelog style while the Mission Model, Payload Contract Model, Data Product Contract Model and CLI stabilize.
 
 ---
 
@@ -10,7 +10,70 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ### Changed
 
-- Public documentation, roadmap and release alignment work for the Payload Contract Model is ongoing under `v0.2.2 — Payload Contract Release Alignment`.
+- Next development focus: `v0.4 — Contact Windows and Downlink Flow Contracts`.
+
+---
+
+## [v0.3.0] — Data Product and Storage Contracts
+
+### Added
+
+- Added the Data Product Contract Model as an optional mission model domain.
+- Added optional `mission/data_products.yaml` loading.
+- Added the `DataProductContract` model.
+- Added data product producer type support.
+- Added data product type support.
+- Added estimated data product size support.
+- Added data product priority support.
+- Added storage intent fields.
+- Added storage class support.
+- Added retention intent support.
+- Added overflow policy support.
+- Added downlink intent fields.
+- Added downlink policy support.
+- Added semantic lint rules for Data Product Contracts.
+- Added data product producer reference checks.
+- Added optional payload reference checks.
+- Added storage intent warnings for missing retention and overflow policy.
+- Added downlink intent warnings for high-priority data products.
+- Added generated data product documentation.
+- Added generated `data_products.md` documentation output.
+- Added invalid data product fixtures and tests.
+- Added one synthetic data product to the `demo-3u` mission.
+- Added ADR-0008 for Data Product and Storage Contracts.
+
+### Changed
+
+- Extended the synthetic `demo-3u` mission with a clean-room payload data product.
+- Extended generated mission documentation to include Data Product Contract references when data products are present.
+- Reinforced the Mission Data Chain direction introduced by ADR-0007.
+- Moved OrbitFabric one step further from payload behavior modeling toward explicit mission data chain modeling.
+
+### Boundaries
+
+The Data Product and Storage Contract slice intentionally does not introduce:
+
+- real onboard storage runtime;
+- file-system abstraction;
+- compression engines;
+- payload data processing pipelines;
+- contact window modeling;
+- RF link modeling;
+- downlink runtime;
+- ground segment export;
+- runtime skeleton generation;
+- real payload data.
+
+---
+
+## [v0.2.2] — Payload Contract Release Alignment
+
+### Changed
+
+- Aligned README, public documentation, roadmap, changelog, release notes and package version around the Payload Contract Model.
+- Documented `v0.2.2` as the Payload Contract Release Alignment baseline.
+- Added release notes for `v0.2.2`.
+- Prepared public communication material for the Payload Contract Model.
 
 ---
 
