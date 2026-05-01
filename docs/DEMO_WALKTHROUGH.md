@@ -39,7 +39,9 @@ examples/demo-3u/
 │   ├── events.yaml
 │   ├── faults.yaml
 │   ├── packets.yaml
-│   └── policies.yaml
+│   ├── policies.yaml
+│   ├── payloads.yaml
+│   └── data_products.yaml
 └── scenarios/
     └── battery_low_during_payload.yaml
 ```
@@ -141,6 +143,38 @@ Defines synthetic packet groupings for generated documentation and future integr
 
 Defines allowed policy values used by the model.
 
+### `payloads.yaml`
+
+Defines the synthetic IOD payload contract:
+
+```text
+demo_iod_payload
+```
+
+The contract describes payload lifecycle, telemetry references, accepted commands and generated events without introducing payload firmware, drivers or physical simulation.
+
+### `data_products.yaml`
+
+Defines one synthetic data product:
+
+```text
+payload.radiation_histogram
+```
+
+It is produced by `demo_iod_payload` and declares:
+
+```text
+type: histogram
+estimated size: 4096 bytes
+priority: high
+storage class: science
+retention: 7d
+overflow policy: drop_oldest
+downlink policy: next_available_contact
+```
+
+This is contract intent only. It does not implement storage or downlink execution.
+
 ---
 
 ## 4. Scenario: battery low during payload operation
@@ -186,6 +220,10 @@ payload.start_acquisition
 → SCENARIO PASSED
 ```
 
+The data product contract is not executed by this scenario yet.
+
+It documents the expected mission-data object produced by the payload and prepares the model for future contact/downlink contracts.
+
 ---
 
 ## 6. Run the scenario
@@ -219,13 +257,39 @@ generated/logs/battery_low_during_payload.log
 
 ---
 
-## 8. What the simulator checks
+## 8. Generate mission documentation
+
+```bash
+orbitfabric gen docs examples/demo-3u/mission/
+```
+
+Generated files:
+
+```text
+generated/docs/
+├── telemetry.md
+├── commands.md
+├── events.md
+├── faults.md
+├── modes.md
+├── packets.md
+├── payloads.md
+└── data_products.md
+```
+
+The generated data product documentation exposes storage and downlink intent as contract data, not runtime behavior.
+
+---
+
+## 9. What the simulator checks
 
 During execution, OrbitFabric checks that:
 
 - commands exist in the Mission Model;
 - commands are allowed in the current mode;
 - expected command effects are applied;
+- payload lifecycle preconditions are respected;
+- payload lifecycle expected effects are applied;
 - events are emitted;
 - telemetry injections update simulation state;
 - fault conditions are evaluated;
@@ -235,12 +299,13 @@ During execution, OrbitFabric checks that:
 
 ---
 
-## 9. Expected final state
+## 10. Expected final state
 
 At the end of the scenario:
 
 ```text
 mode = DEGRADED
+payload lifecycle = READY
 payload.acquisition.active = false
 scenario_status = PASSED
 ```
@@ -252,11 +317,12 @@ EPS warning fault
   -> transition to DEGRADED
   -> auto-dispatch payload.stop_acquisition
   -> payload acquisition inactive
+  -> payload lifecycle READY
 ```
 
 ---
 
-## 10. Clean-room boundary
+## 11. Clean-room boundary
 
 This demo is deliberately synthetic.
 
@@ -269,6 +335,8 @@ It must not include:
 - real thresholds from private missions;
 - real operational procedures;
 - real telemetry logs;
-- real anomaly sequences.
+- real anomaly sequences;
+- real payload data;
+- real storage or downlink policies.
 
 The demo exists to prove OrbitFabric's architecture, not to approximate a real spacecraft.

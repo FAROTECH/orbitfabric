@@ -15,6 +15,8 @@ Mission Model YAML
   -> scenario validation
   -> scenario loading
   -> deterministic scenario execution
+  -> Payload Contract documentation
+  -> Data Product Contract documentation
   -> JSON reports
   -> simulation log
 ```
@@ -80,7 +82,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.2.0.dev0
+orbitfabric 0.3.0
 ```
 
 ---
@@ -167,7 +169,9 @@ generated/docs/
 ├── events.md
 ├── faults.md
 ├── modes.md
-└── packets.md
+├── packets.md
+├── payloads.md
+└── data_products.md
 ```
 
 Generated mission documentation is derived from the validated Mission Model.
@@ -210,9 +214,12 @@ generated/logs/battery_low_during_payload.log
 The current demo proves that OrbitFabric can:
 
 - load a multi-file YAML Mission Model;
-- validate its structure;
+- load optional `payloads.yaml` and `data_products.yaml` domains;
+- validate Mission Model structure;
 - run semantic lint rules;
+- validate payload and data product references;
 - generate Markdown documentation;
+- generate payload and data product documentation;
 - inspect a Mission Model summary;
 - validate a scenario without executing it;
 - load a scenario;
@@ -231,9 +238,12 @@ The current demo does not prove:
 - flight readiness;
 - real-time behavior;
 - hardware integration;
+- real onboard storage execution;
+- real downlink execution;
+- contact window modeling;
 - CCSDS, PUS or CFDP compliance;
 - compatibility with cFS, F Prime, Yamcs or OpenC3;
 - orbital, attitude, power or thermal dynamics;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current v0.2.0 development preview scope.
+Those are intentionally outside the current v0.3.0 development preview scope.
