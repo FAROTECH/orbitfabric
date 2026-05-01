@@ -24,6 +24,7 @@ REQUIRED_FILES: dict[str, tuple[str, ...]] = {
 
 OPTIONAL_FILES: dict[str, tuple[str, ...]] = {
     "payloads.yaml": ("payloads",),
+    "data_products.yaml": ("data_products",),
 }
 
 
@@ -254,6 +255,13 @@ class MissionModelLoader:
                 domain="payloads",
                 file="payloads.yaml",
                 values=[item.id for item in model.payloads],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="data_products",
+                file="data_products.yaml",
+                values=[item.id for item in model.data_products],
             )
         )
         diagnostics.extend(

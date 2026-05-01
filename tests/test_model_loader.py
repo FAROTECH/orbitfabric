@@ -9,6 +9,35 @@ from orbitfabric.model.loader import MissionModelLoader
 
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
+VALID_DATA_PRODUCTS_YAML = """data_products:
+  - id: payload.radiation_histogram
+    producer: demo_iod_payload
+    producer_type: payload
+    type: histogram
+    estimated_size_bytes: 4096
+    priority: high
+    storage:
+      class: science
+      retention: 7d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: next_available_contact
+    description: Synthetic payload data product used to validate data product contracts.
+"""
+
+
+def copy_demo_mission(tmp_path: Path) -> Path:
+    mission_dir = tmp_path / "mission"
+    mission_dir.mkdir()
+
+    for source_file in DEMO_MISSION.glob("*.yaml"):
+        (mission_dir / source_file.name).write_text(
+            source_file.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    return mission_dir
+
 
 def test_load_demo_mission() -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
@@ -65,14 +94,7 @@ def test_optional_payloads_file_can_be_absent(tmp_path: Path) -> None:
 
 
 def test_invalid_payloads_top_level_key_fails(tmp_path: Path) -> None:
-    mission_dir = tmp_path / "mission"
-    mission_dir.mkdir()
-
-    for source_file in DEMO_MISSION.glob("*.yaml"):
-        (mission_dir / source_file.name).write_text(
-            source_file.read_text(encoding="utf-8"),
-            encoding="utf-8",
-        )
+    mission_dir = copy_demo_mission(tmp_path)
 
     (mission_dir / "payloads.yaml").write_text(
         "payload_contracts: []\n",
@@ -85,6 +107,89 @@ def test_invalid_payloads_top_level_key_fails(tmp_path: Path) -> None:
     codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
     assert "OF-STR-001" in codes
     assert "OF-STR-002" in codes
+
+
+def test_optional_data_products_file_can_be_absent() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+
+    assert model.data_products == []
+
+
+def test_load_valid_data_product_contract(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "data_products.yaml").write_text(
+        VALID_DATA_PRODUCTS_YAML,
+        encoding="utf-8",
+    )
+
+    model = MissionModelLoader().load(mission_dir)
+
+    assert len(model.data_products) == 1
+    data_product = model.data_products[0]
+
+    assert data_product.id == "payload.radiation_histogram"
+    assert data_product.producer == "demo_iod_payload"
+    assert data_product.producer_type == "payload"
+    assert data_product.type == "histogram"
+    assert data_product.estimated_size_bytes == 4096
+    assert data_product.priority == "high"
+    assert data_product.storage is not None
+    assert data_product.storage.storage_class == "science"
+    assert data_product.storage.retention == "7d"
+    assert data_product.storage.overflow_policy == "drop_oldest"
+    assert data_product.downlink is not None
+    assert data_product.downlink.policy == "next_available_contact"
+    assert data_product.description is not None
+    assert model.data_product_ids == {"payload.radiation_histogram"}
+
+
+def test_invalid_data_products_top_level_key_fails(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "data_products.yaml").write_text(
+        "products: []\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MissionModelError) as exc_info:
+        MissionModelLoader().load(mission_dir)
+
+    codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
+    assert "OF-STR-001" in codes
+    assert "OF-STR-002" in codes
+
+
+def test_duplicate_data_product_id_fails(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "data_products.yaml").write_text(
+        """data_products:
+  - id: payload.radiation_histogram
+    producer: demo_iod_payload
+    producer_type: payload
+    type: histogram
+    estimated_size_bytes: 4096
+    priority: high
+  - id: payload.radiation_histogram
+    producer: demo_iod_payload
+    producer_type: payload
+    type: histogram
+    estimated_size_bytes: 4096
+    priority: high
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MissionModelError) as exc_info:
+        MissionModelLoader().load(mission_dir)
+
+    diagnostics = exc_info.value.diagnostics
+
+    assert any(
+        diagnostic.code == "OF-ID-001"
+        and diagnostic.file == "data_products.yaml"
+        and diagnostic.domain == "data_products"
+        and diagnostic.object_id == "payload.radiation_histogram"
+        for diagnostic in diagnostics
+    )
 
 
 def test_missing_mission_directory_fails() -> None:
