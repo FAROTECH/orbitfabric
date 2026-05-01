@@ -15,20 +15,20 @@ DEMO_MISSION = Path("examples/demo-3u/mission")
 
 def make_valid_data_product() -> DataProductContract:
     return DataProductContract(
-        id="payload.radiation_histogram",
+        id="payload.synthetic_histogram",
         producer="demo_iod_payload",
         producer_type="payload",
         type="histogram",
-        estimated_size_bytes=4096,
-        priority="high",
+        estimated_size_bytes=2048,
+        priority="medium",
         storage=DataProductStorageIntent(
             **{
                 "class": "science",
-                "retention": "7d",
+                "retention": "3d",
                 "overflow_policy": "drop_oldest",
             }
         ),
-        downlink=DataProductDownlinkIntent(policy="next_available_contact"),
+        downlink=DataProductDownlinkIntent(policy="priority_based"),
         description="Synthetic payload histogram data product.",
     )
 
@@ -68,9 +68,8 @@ def test_payload_contract_docs_are_skipped_without_payloads(tmp_path: Path) -> N
     assert not (tmp_path / "payloads.md").exists()
 
 
-def test_generate_data_product_contract_docs(tmp_path: Path) -> None:
+def test_generate_demo_data_product_contract_docs(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
-    model.data_products.append(make_valid_data_product())
 
     generated_files = generate_markdown_docs(model, tmp_path)
 
@@ -93,13 +92,35 @@ def test_generate_data_product_contract_docs(tmp_path: Path) -> None:
     assert "retention `7d`" in content
     assert "overflow `drop_oldest`" in content
     assert "policy `next_available_contact`" in content
-    assert "Synthetic payload histogram data product." in content
+    assert "Synthetic payload histogram data product used to demonstrate" in content
+
+
+def test_generate_data_product_contract_docs_from_model_object(tmp_path: Path) -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.data_products = [make_valid_data_product()]
+
+    generated_files = generate_markdown_docs(model, tmp_path)
+
+    data_products_path = tmp_path / "data_products.md"
+    generated_names = {path.name for path in generated_files}
+
+    assert "data_products.md" in generated_names
+    assert data_products_path.exists()
+
+    content = data_products_path.read_text(encoding="utf-8")
+
+    assert "`payload.synthetic_histogram`" in content
+    assert "2048" in content
+    assert "`medium`" in content
+    assert "retention `3d`" in content
+    assert "policy `priority_based`" in content
 
 
 def test_data_product_contract_docs_are_skipped_without_data_products(
     tmp_path: Path,
 ) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
+    model.data_products = []
 
     generated_files = generate_markdown_docs(model, tmp_path)
     generated_names = {path.name for path in generated_files}
