@@ -25,16 +25,20 @@ def test_generate_markdown_docs(tmp_path: Path) -> None:
         "faults.md",
         "modes.md",
         "packets.md",
+        "payloads.md",
     }
 
     telemetry_doc = (tmp_path / "telemetry.md").read_text(encoding="utf-8")
     commands_doc = (tmp_path / "commands.md").read_text(encoding="utf-8")
+    payloads_doc = (tmp_path / "payloads.md").read_text(encoding="utf-8")
 
     assert "Telemetry Reference" in telemetry_doc
     assert "eps.battery.voltage" in telemetry_doc
     assert "Battery Voltage" in telemetry_doc
     assert "Command Reference" in commands_doc
     assert "payload.start_acquisition" in commands_doc
+    assert "Payload Contract Reference" in payloads_doc
+    assert "demo_iod_payload" in payloads_doc
 
     faults_doc = (tmp_path / "faults.md").read_text(encoding="utf-8")
 
@@ -82,3 +86,4 @@ def test_gen_docs_cli_writes_markdown_files(tmp_path: Path) -> None:
     assert (output_dir / "faults.md").exists()
     assert (output_dir / "modes.md").exists()
     assert (output_dir / "packets.md").exists()
+    assert (output_dir / "payloads.md").exists()
