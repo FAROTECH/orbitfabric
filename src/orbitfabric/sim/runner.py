@@ -84,6 +84,7 @@ class ScenarioRunner:
             self._apply_command_effects(
                 result=result,
                 t=step.t,
+                state=state,
                 telemetry=telemetry,
                 event_bus=event_bus,
                 mode_manager=mode_manager,
@@ -95,6 +96,7 @@ class ScenarioRunner:
             self._apply_fault_triggers(
                 triggers=fault_monitor.evaluate(),
                 t=step.t,
+                state=state,
                 telemetry=telemetry,
                 event_bus=event_bus,
                 mode_manager=mode_manager,
@@ -114,6 +116,7 @@ class ScenarioRunner:
         self,
         result: CommandDispatchResult,
         t: float,
+        state: SimulationState,
         telemetry: TelemetryRegistry,
         event_bus: EventBus,
         mode_manager: ModeManager,
@@ -130,7 +133,7 @@ class ScenarioRunner:
             event_bus.emit(event_id, t)
 
         expected_effects = command.expected_effects
-        self._apply_payload_lifecycle_effects(result, t)
+        self._apply_payload_lifecycle_effects(expected_effects, state, t)
 
         telemetry_effects = expected_effects.get("telemetry", {})
         for telemetry_id, value in telemetry_effects.items():
@@ -145,13 +148,11 @@ class ScenarioRunner:
 
     def _apply_payload_lifecycle_effects(
         self,
-        result: CommandDispatchResult,
+        expected_effects: dict[str, Any],
+        state: SimulationState,
         t: float,
     ) -> None:
-        if result.command is None:
-            return
-
-        lifecycle_effect = result.command.expected_effects.get("payload_lifecycle")
+        lifecycle_effect = expected_effects.get("payload_lifecycle")
         if not isinstance(lifecycle_effect, dict):
             return
 
@@ -161,26 +162,14 @@ class ScenarioRunner:
         if not isinstance(payload_id, str) or not isinstance(lifecycle_state, str):
             return
 
-        result_state = result.command
-        del result_state
-
-        state = self._get_state_from_result(result)
-        if state is None:
-            return
-
         state.payload_lifecycle[payload_id] = lifecycle_state
         state.log(t, f"PAYLOAD {payload_id} LIFECYCLE={lifecycle_state}")
-
-    def _get_state_from_result(
-        self,
-        result: CommandDispatchResult,
-    ) -> SimulationState | None:
-        return getattr(result, "state", None)
 
     def _apply_fault_triggers(
         self,
         triggers: list[FaultTrigger],
         t: float,
+        state: SimulationState,
         telemetry: TelemetryRegistry,
         event_bus: EventBus,
         mode_manager: ModeManager,
@@ -203,6 +192,7 @@ class ScenarioRunner:
                 self._apply_command_effects(
                     result=result,
                     t=t,
+                    state=state,
                     telemetry=telemetry,
                     event_bus=event_bus,
                     mode_manager=mode_manager,
