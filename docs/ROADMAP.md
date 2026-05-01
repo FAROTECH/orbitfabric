@@ -1,6 +1,6 @@
 # OrbitFabric — Roadmap
 
-Version: v0.2.2 alignment  
+Version: v0.2.3 planning  
 Status: Development preview  
 Scope: v0.2.x to v1.0 planning
 
@@ -25,18 +25,21 @@ The correct growth path is:
 
 ```text
 Mission Model
-        → lint
-        → scenario simulation
-        → generated documentation
-        → model hardening
-        → runtime skeletons
-        → ground integration artifacts
-        → plugins and extensibility
+        -> lint
+        -> scenario simulation
+        -> generated documentation
+        -> payload contracts
+        -> mission data chain contracts
+        -> runtime skeletons
+        -> ground integration artifacts
+        -> plugins and extensibility
 ```
 
 Every milestone must reinforce the core identity:
 
 > OrbitFabric is a Mission Data Contract framework.
+
+The next major architectural objective is to model the mission data chain from payload behavior to onboard storage, downlink assumptions, contact windows, commandability, recovery behavior and ground-facing artifacts.
 
 ---
 
@@ -62,20 +65,26 @@ The model should become progressively more stable before generated runtime artif
 ## 3. Roadmap Overview
 
 ```text
-v0.1    Mission Contract MVP                         completed
-v0.2    Model Hardening                              active line
-v0.2.1  Payload Contract Model                       completed
-v0.2.2  Payload Contract Release Alignment           active
-v0.3    Generated Runtime Skeletons                  future
-v0.4    Ground Integration Artifacts                 future
-v0.5    Plugin and Extensibility Layer               future
-v1.0    Stable Mission Data Contract                 future
+v0.1    Mission Contract MVP                                  completed
+v0.2    Model Hardening                                       completed line
+v0.2.1  Payload Contract Model                                completed
+v0.2.2  Payload Contract Release Alignment                    completed
+v0.2.3  Mission Data Chain Roadmap Alignment                  immediate
+v0.3    Data Product and Storage Contracts                    future
+v0.4    Contact Windows and Downlink Flow Contracts           future
+v0.5    Commandability and Autonomy Contracts                 future
+v0.6    End-to-End Mission Data Flow Evidence                 future
+v0.7    Generated Runtime Skeletons                           future
+v0.8    Ground Integration Artifacts                          future
+v0.9    Plugin and Extensibility Layer                        future
+v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target is `v0.2.2`.
+The immediate target is `v0.2.3`.
 
-The next implementation priority is not runtime generation.  
-The next priority is to align documentation, release notes, roadmap and public communication after the Payload Contract Model vertical slice.
+The next implementation priority is not runtime generation.
+
+The next priority is to formalize the Mission Data Chain roadmap after the Payload Contract Model vertical slice.
 
 ---
 
@@ -141,7 +150,7 @@ message broker
 real spacecraft data
 ```
 
-These are not missing features.  
+These are not missing features.
 They are intentionally outside the first vertical slice.
 
 ---
@@ -184,7 +193,7 @@ FAULT
 The first demo payload vertical slice demonstrates:
 
 ```text
-READY → ACQUIRING → READY
+READY -> ACQUIRING -> READY
 ```
 
 ### 5.3 Payload Contract Boundary
@@ -225,34 +234,33 @@ It does not expand OrbitFabric into a payload runtime.
 
 ---
 
-## 6. Active Milestone — v0.2.2 Payload Contract Release Alignment
+## 6. Completed Alignment — v0.2.2 Payload Contract Release Alignment
 
 ### 6.1 Objective
 
 Capitalise on the completed Payload Contract Model vertical slice.
 
-v0.2.2 is a release-alignment milestone.  
-It must make the repository, public documentation, roadmap, changelog, release notes and public communication consistent with the current state of the project.
+v0.2.2 is a release-alignment milestone.
+It makes the repository, public documentation, roadmap, changelog, release notes and public communication consistent with the Payload Contract Model.
 
-### 6.2 Required Work
+### 6.2 Completed Work
 
-v0.2.2 should include:
+v0.2.2 aligned:
 
 ```text
-README alignment
-public documentation alignment
-ROADMAP alignment
-CHANGELOG update
-release/version decision
-release notes preparation
-Payload Contract Model communication draft
+README
+public documentation
+ROADMAP
+CHANGELOG
+release/version story
+Payload Contract Model communication
 ```
 
-### 6.3 Required Boundary
+### 6.3 Boundary
 
-v0.2.2 must not introduce new core model features.
+v0.2.2 did not introduce new core model features.
 
-The milestone must not include:
+It did not include:
 
 ```text
 new payload lifecycle states
@@ -266,52 +274,257 @@ payload runtime behavior
 physical payload simulation
 ```
 
-The purpose of v0.2.2 is alignment, not expansion.
+The purpose of v0.2.2 was alignment, not expansion.
 
 ---
 
-## 7. Possible Follow-Up — v0.2.x Additional Model Hardening
+## 7. Immediate Milestone — v0.2.3 Mission Data Chain Roadmap Alignment
 
-After v0.2.2, a small additional v0.2.x milestone may be considered if the model still needs hardening before v0.3.
+### 7.1 Objective
 
-Possible candidates:
+Formalize the next architectural direction after the Payload Contract Model.
 
-```text
-second clean-room payload example
-improved payload rule documentation
-more invalid payload fixtures
-clearer payload command precondition checks
-improved diagnostics
-expanded scenario validation
-schema/versioning cleanup
-```
+OrbitFabric should not jump directly from payload contracts to generated runtime skeletons.
 
-A second payload example may be valuable, but only if it proves generality without expanding the core too aggressively.
-
-Candidate examples:
+The model must first express the mission data chain:
 
 ```text
-imaging payload
-radiation monitor
-AIS or IoT receiver
-generic science payload
-technology demonstration payload
+Payload behavior
+        -> data products
+        -> onboard storage and retention
+        -> downlink queue intent
+        -> contact window assumptions
+        -> commandability constraints
+        -> autonomy and recovery expectations
+        -> end-to-end scenario evidence
+        -> future runtime and ground artifacts
 ```
 
-Any second example must remain synthetic and clean-room.
+### 7.2 Required Work
+
+v0.2.3 should include:
+
+```text
+ROADMAP update
+Project Charter alignment
+ADR for Mission Data Chain before runtime generation
+public documentation navigation update
+issue backlog alignment if needed
+```
+
+### 7.3 Required Boundary
+
+v0.2.3 must remain documentation-first and architecture-first.
+
+It must not introduce:
+
+```text
+data_products.yaml
+contacts.yaml
+storage simulator behavior
+downlink simulator behavior
+new scenario semantics
+runtime skeleton generation
+ground export
+plugin API
+```
+
+The milestone exists to make the next implementation sequence explicit before adding new model domains.
 
 ---
 
-## 8. Future Milestone — v0.3 Generated Runtime Skeletons
+## 8. Future Milestone — v0.3 Data Product and Storage Contracts
 
 ### 8.1 Objective
 
-Start deriving onboard-oriented artifacts from the Mission Data Contract.
+Introduce data products as first-class mission data artifacts.
 
-This is not flight software.  
-This is generated skeleton code that demonstrates how the Mission Data Contract can support future onboard runtime integration.
+A telemetry item describes state or measurement.
+A packet describes transport grouping.
+A data product describes an object produced by the mission or payload.
+
+Examples:
+
+```text
+image frame
+radiation histogram
+science sample batch
+AIS capture window
+IoT receiver burst
+diagnostic dump
+compressed payload product
+```
 
 ### 8.2 Candidate Features
+
+```text
+optional data_products.yaml domain
+DataProductContract model
+data product producer reference
+optional payload reference
+data product type
+estimated size
+priority
+storage class
+retention policy
+overflow policy
+downlink intent
+generated data product documentation
+data product lint rules
+invalid data product fixtures
+```
+
+### 8.3 Candidate Lint Rules
+
+```text
+ERROR: data product references unknown producer.
+ERROR: data product references unknown payload.
+ERROR: data product has no estimated size.
+WARNING: high-priority data product has no downlink policy.
+WARNING: retained data product has no overflow policy.
+```
+
+### 8.4 Boundary
+
+v0.3 must not implement real storage, file systems, compression, payload processing pipelines or downlink runtime behavior.
+
+It must only describe the contract.
+
+---
+
+## 9. Future Milestone — v0.4 Contact Windows and Downlink Flow Contracts
+
+### 9.1 Objective
+
+Model ground contact and downlink assumptions without becoming a ground segment or an orbital dynamics simulator.
+
+OrbitFabric should let a mission designer ask:
+
+> Given the declared data products, priorities, storage policies and contact assumptions, is the data flow coherent?
+
+### 9.2 Candidate Features
+
+```text
+contact window model
+contact profile model
+link profile model
+estimated downlink budget
+abstract downlink queue policy
+data product downlink eligibility
+scenario contact events
+generated downlink documentation
+downlink consistency lint rules
+```
+
+### 9.3 Candidate Lint Rules
+
+```text
+WARNING: produced data volume may exceed nominal contact budget.
+ERROR: downlink policy references unknown contact profile.
+WARNING: critical event has no immediate downlink class.
+WARNING: high-priority product is retained but never scheduled for downlink.
+```
+
+### 9.4 Boundary
+
+v0.4 must not implement orbit propagation, antenna pointing, RF budgets, live ground links, Yamcs/OpenC3 services or real spacecraft operations.
+
+Contact windows are contract assumptions, not physical simulation.
+
+---
+
+## 10. Future Milestone — v0.5 Commandability and Autonomy Contracts
+
+### 10.1 Objective
+
+Make command use and autonomous behavior explicit in the Mission Data Contract.
+
+Commands should not only exist.
+
+The model should express when they can be used, who or what may dispatch them, what they require and what evidence they should produce.
+
+### 10.2 Candidate Features
+
+```text
+command source model: ground, onboard, autonomous
+requires_contact flag
+allowed modes refinement
+abstract operator confirmation hint
+expected events
+expected telemetry effects
+timeout expectations
+recovery command references
+command inhibition rules
+autonomy rule documentation
+```
+
+### 10.3 Candidate Lint Rules
+
+```text
+ERROR: autonomous command has no expected effect.
+WARNING: ground-only command is used in autonomous recovery scenario.
+ERROR: command requires contact but scenario dispatches it outside contact.
+WARNING: risky command lacks operator confirmation hint.
+```
+
+### 10.4 Boundary
+
+v0.5 must not implement real command authentication, authorization, encryption, live uplink, operator consoles or flight-ready autonomy.
+
+It defines commandability and autonomy contracts only.
+
+---
+
+## 11. Future Milestone — v0.6 End-to-End Mission Data Flow Evidence
+
+### 11.1 Objective
+
+Combine payload contracts, data products, storage intent, downlink assumptions, contact windows, commandability and recovery expectations into end-to-end scenario evidence.
+
+The user should be able to inspect a data chain such as:
+
+```text
+payload acquisition
+        -> data product generated
+        -> stored onboard
+        -> queued for downlink
+        -> contact window available
+        -> product downlinked, partially downlinked, retained or dropped
+        -> ground-facing artifact prepared
+        -> scenario evidence generated
+```
+
+### 11.2 Candidate Features
+
+```text
+mission data flow graph
+scenario assertions on data product state
+scenario assertions on storage state
+scenario assertions on downlink state
+generated mission data flow documentation
+JSON data-flow evidence report
+scenario coverage for data products
+end-to-end demo scenario
+```
+
+### 11.3 Boundary
+
+v0.6 must remain deterministic and contract-level.
+
+It must not become real onboard storage software, a ground segment, a live simulator or an operations console.
+
+---
+
+## 12. Future Milestone — v0.7 Generated Runtime Skeletons
+
+### 12.1 Objective
+
+Start deriving onboard-oriented artifacts from the Mission Data Contract after the mission data chain model is sufficiently clear.
+
+This is not flight software.
+This is generated skeleton code that demonstrates how the Mission Data Contract can support future onboard runtime integration.
+
+### 12.2 Candidate Features
 
 ```text
 C++17 generated headers
@@ -320,16 +533,21 @@ generated command IDs
 generated event IDs
 generated mode IDs
 generated packet IDs
+generated payload IDs
+generated data product IDs
+generated storage policy enums
+generated downlink policy enums
 generated command argument structs
 generated adapter interfaces
 generated command dispatch skeleton
 generated telemetry registry skeleton
+generated data product registry skeleton
 host-buildable CMake example
 ```
 
-### 8.3 Required Boundary
+### 12.3 Required Boundary
 
-v0.3 generated code must be described as:
+v0.7 generated code must be described as:
 
 ```text
 runtime skeleton
@@ -346,35 +564,17 @@ complete OBC framework
 replacement for cFS or F Prime
 ```
 
-### 8.4 v0.3 Non-Goals
-
-Still out of scope:
-
-```text
-real hardware support
-RTOS-specific runtime
-Linux service integration
-flight qualification
-complete scheduler
-complete storage subsystem
-complete radio stack
-payload firmware
-payload driver generation
-```
-
-v0.3 must only start after the Mission Data Contract model is sufficiently stable.
-
 ---
 
-## 9. Future Milestone — v0.4 Ground Integration Artifacts
+## 13. Future Milestone — v0.8 Ground Integration Artifacts
 
-### 9.1 Objective
+### 13.1 Objective
 
 Generate useful artifacts for ground integration without becoming a ground segment.
 
 OrbitFabric should help external tools consume the Mission Data Contract.
 
-### 9.2 Candidate Features
+### 13.2 Candidate Features
 
 ```text
 JSON mission database export
@@ -382,17 +582,19 @@ packet dictionary export
 simple decoder skeletons
 telemetry dictionary export
 command dictionary export
+data product dictionary export
+downlink policy export
 Yamcs-like export prototype
 OpenC3-like export prototype
 XTCE exploration/prototype
 ```
 
-### 9.3 Required Boundary
+### 13.3 Required Boundary
 
-OrbitFabric may export artifacts for ground tools.  
+OrbitFabric may export artifacts for ground tools.
 OrbitFabric must not become a ground tool.
 
-No v0.4 feature should implement:
+No v0.8 feature should implement:
 
 ```text
 complete mission control UI
@@ -406,19 +608,22 @@ live spacecraft operations stack
 
 ---
 
-## 10. Future Milestone — v0.5 Plugin and Extensibility Layer
+## 14. Future Milestone — v0.9 Plugin and Extensibility Layer
 
-### 10.1 Objective
+### 14.1 Objective
 
 Turn OrbitFabric from a useful tool into an extensible framework.
 
-v0.5 should introduce controlled extension points.
+v0.9 should introduce controlled extension points after the core mission data chain has matured.
 
-### 10.2 Candidate Features
+### 14.2 Candidate Features
 
 ```text
 custom lint rule plugins
 custom generator plugins
+custom data product validators
+custom ground exporters
+custom scenario step plugins
 mission model extension mechanism
 adapter SDK
 plugin discovery
@@ -429,26 +634,29 @@ rule documentation generator
 semantic versioning policy
 ```
 
-### 10.3 Required Boundary
+### 14.3 Required Boundary
 
 Plugins must extend OrbitFabric without breaking the core contract.
 
-A plugin may consume or extend the Mission Model.  
+A plugin may consume or extend the Mission Model.
 A plugin must not silently redefine core semantics.
 
 ---
 
-## 11. Future Milestone — v1.0 Stable Mission Data Contract
+## 15. Future Milestone — v1.0 Stable Mission Data Contract
 
-### 11.1 Objective
+### 15.1 Objective
 
 v1.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
 
-### 11.2 Possible v1.0 Requirements
+### 15.2 Possible v1.0 Requirements
 
 ```text
 stable Mission Model schema
 stable Payload Contract Model schema
+stable Data Product Contract schema
+stable Contact/Downlink Contract schema
+stable Commandability Contract schema
 stable CLI commands
 stable lint rule code policy
 stable generated documentation format
@@ -462,7 +670,7 @@ CI-tested release artifacts
 clear contribution process
 ```
 
-### 11.3 v1.0 Should Not Require
+### 15.3 v1.0 Should Not Require
 
 ```text
 flight qualification
@@ -478,7 +686,7 @@ v1.0 should mean stable Mission Data Contract framework, not complete space soft
 
 ---
 
-## 12. Backlog Parking Lot
+## 16. Backlog Parking Lot
 
 These ideas are valid but must not distract from the active milestone.
 
@@ -515,12 +723,12 @@ second payload example
 payload lifecycle expansion
 ```
 
-Parking lot items are not rejected.  
+Parking lot items are not rejected.
 They are explicitly deferred.
 
 ---
 
-## 13. Priority Rules
+## 17. Priority Rules
 
 When deciding what to implement next, use these rules.
 
@@ -532,62 +740,71 @@ If a feature weakens the Mission Data Contract identity, defer it.
 
 If the model cannot express a concept cleanly, do not generate code for it.
 
-### Rule 3 — Lint Before Runtime
+### Rule 3 — Chain Before Runtime
+
+If the mission data chain is not explicit, do not generate runtime skeletons from it.
+
+### Rule 4 — Lint Before Runtime
 
 If a behavior can be inconsistent, create a lint rule before creating downstream generators.
 
-### Rule 4 — Docs from Model
+### Rule 5 — Docs from Model
 
 If information exists in the model, generated docs should expose it.
 
-### Rule 5 — No Hidden Semantics
+### Rule 6 — No Hidden Semantics
 
 If behavior matters, it must not live only in Python code.
 
-### Rule 6 — No Private Examples
+### Rule 7 — No Private Examples
 
 If an example resembles a private mission, remove or generalize it.
 
-### Rule 7 — Small Working Slice Beats Broad Incomplete Scope
+### Rule 8 — Small Working Slice Beats Broad Incomplete Scope
 
 A working vertical slice is more valuable than multiple half-implemented integrations.
 
-### Rule 8 — Payload Contracts Are Contracts
+### Rule 9 — Payload Contracts Are Contracts
 
 Payload contracts describe expected mission-data behavior.
 
 They must not become payload firmware, payload drivers, hardware simulation or scientific processing pipelines.
 
+### Rule 10 — Ground Assumptions Are Contracts
+
+Contact windows, downlink budgets and ground-facing artifacts are model assumptions and derived outputs.
+
+They must not become a live ground segment inside OrbitFabric.
+
 ---
 
-## 14. Immediate Work Plan
+## 18. Immediate Work Plan
 
 The immediate work package is:
 
 ```text
-v0.2.2 — Payload Contract Release Alignment
+v0.2.3 — Mission Data Chain Roadmap Alignment
 ```
 
 Required sequence:
 
 ```text
-1. README alignment
-2. public documentation alignment
-3. ROADMAP alignment
-4. CHANGELOG update
-5. release/version alignment
-6. public communication draft
+1. ROADMAP alignment
+2. Project Charter alignment
+3. Mission Data Chain ADR
+4. public documentation navigation update
+5. issue backlog alignment if needed
 ```
 
-Do not start v0.3 until v0.2.2 is complete.
+Do not start v0.3 implementation until v0.2.3 is complete.
 
-Do not add runtime skeletons before the model and documentation are coherent.
+Do not add runtime skeletons before the mission data chain model is coherent.
 
-Do not add a second payload example until the current Payload Contract Model has been clearly documented and communicated.
+Do not add ground exports before contact, downlink and data product contracts exist.
 
 ---
 
-## 15. Final Roadmap Statement
+## 19. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
 
@@ -595,7 +812,9 @@ OrbitFabric must first become excellent at one thing:
 
 The Payload Contract Model strengthens this mission by making mission-specific and IOD payload behavior explicit, lintable, documentable and scenario-aware.
 
+The Mission Data Chain roadmap extends that foundation by making payload data products, storage intent, downlink priorities, contact assumptions, commandability constraints, recovery expectations and end-to-end scenario evidence explicit before runtime or ground artifacts are generated.
+
 Only after the model is clear and stable should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
 
-The narrowness of the roadmap is intentional.  
+The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
