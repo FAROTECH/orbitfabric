@@ -3,17 +3,20 @@ from __future__ import annotations
 from typing import Any
 
 from orbitfabric.lint.finding import LintFinding
-from orbitfabric.model.mission import MissionModel, PayloadContract
+from orbitfabric.model.mission import MissionModel, PayloadContract, Subsystem
 
 
 def check_payloads(model: MissionModel) -> list[LintFinding]:
-    """Check Payload / IOD Payload Contract lifecycle consistency."""
+    """Check Payload / IOD Payload Contract consistency."""
     findings: list[LintFinding] = []
 
     payloads_by_id = {payload.id: payload for payload in model.payloads}
+    subsystems_by_id = {subsystem.id: subsystem for subsystem in model.subsystems}
 
     for payload in model.payloads:
+        findings.extend(_check_payload_subsystem(payload, subsystems_by_id))
         findings.extend(_check_lifecycle_definition(payload))
+        findings.extend(_check_payload_references(model, payload))
 
     for command in model.commands:
         findings.extend(
@@ -22,8 +25,7 @@ def check_payloads(model: MissionModel) -> list[LintFinding]:
                 command_id=command.id,
                 container=command.preconditions,
                 location="preconditions",
-                code_unknown_payload="OF-PAY-003",
-                code_unknown_state="OF-PAY-004",
+                code="OF-PAY-009",
             )
         )
         findings.extend(
@@ -32,8 +34,50 @@ def check_payloads(model: MissionModel) -> list[LintFinding]:
                 command_id=command.id,
                 container=command.expected_effects,
                 location="expected_effects",
-                code_unknown_payload="OF-PAY-005",
-                code_unknown_state="OF-PAY-006",
+                code="OF-PAY-010",
+            )
+        )
+
+    return findings
+
+
+def _check_payload_subsystem(
+    payload: PayloadContract,
+    subsystems_by_id: dict[str, Subsystem],
+) -> list[LintFinding]:
+    findings: list[LintFinding] = []
+    subsystem = subsystems_by_id.get(payload.subsystem)
+
+    if subsystem is None:
+        findings.append(
+            LintFinding(
+                severity="ERROR",
+                code="OF-PAY-001",
+                file="payloads.yaml",
+                domain="payloads",
+                object_id=payload.id,
+                message=(
+                    f"payload subsystem '{payload.subsystem}' does not reference "
+                    "an existing subsystem"
+                ),
+                suggestion="Add the subsystem to subsystems.yaml or fix payload.subsystem.",
+            )
+        )
+        return findings
+
+    if subsystem.type != "payload":
+        findings.append(
+            LintFinding(
+                severity="ERROR",
+                code="OF-PAY-002",
+                file="payloads.yaml",
+                domain="payloads",
+                object_id=payload.id,
+                message=(
+                    f"payload subsystem '{payload.subsystem}' references subsystem "
+                    f"type '{subsystem.type}', expected 'payload'"
+                ),
+                suggestion="Use a subsystem with type 'payload' or fix payload.subsystem.",
             )
         )
 
@@ -44,11 +88,24 @@ def _check_lifecycle_definition(payload: PayloadContract) -> list[LintFinding]:
     findings: list[LintFinding] = []
     states = payload.lifecycle.states
 
+    if not payload.lifecycle.initial_state:
+        findings.append(
+            LintFinding(
+                severity="ERROR",
+                code="OF-PAY-003",
+                file="payloads.yaml",
+                domain="payloads",
+                object_id=payload.id,
+                message="payload lifecycle must define an initial_state",
+                suggestion="Set lifecycle.initial_state to one of lifecycle.states.",
+            )
+        )
+
     if not states:
         findings.append(
             LintFinding(
                 severity="ERROR",
-                code="OF-PAY-001",
+                code="OF-PAY-004",
                 file="payloads.yaml",
                 domain="payloads",
                 object_id=payload.id,
@@ -62,7 +119,7 @@ def _check_lifecycle_definition(payload: PayloadContract) -> list[LintFinding]:
         findings.append(
             LintFinding(
                 severity="ERROR",
-                code="OF-PAY-002",
+                code="OF-PAY-004",
                 file="payloads.yaml",
                 domain="payloads",
                 object_id=payload.id,
@@ -77,13 +134,89 @@ def _check_lifecycle_definition(payload: PayloadContract) -> list[LintFinding]:
     return findings
 
 
+def _check_payload_references(
+    model: MissionModel,
+    payload: PayloadContract,
+) -> list[LintFinding]:
+    findings: list[LintFinding] = []
+
+    findings.extend(
+        _check_reference_list(
+            values=payload.telemetry.produced,
+            known_ids=model.telemetry_ids,
+            payload_id=payload.id,
+            code="OF-PAY-005",
+            label="telemetry",
+            file="telemetry.yaml",
+        )
+    )
+    findings.extend(
+        _check_reference_list(
+            values=payload.commands.accepted,
+            known_ids=model.command_ids,
+            payload_id=payload.id,
+            code="OF-PAY-006",
+            label="command",
+            file="commands.yaml",
+        )
+    )
+    findings.extend(
+        _check_reference_list(
+            values=payload.events.generated,
+            known_ids=model.event_ids,
+            payload_id=payload.id,
+            code="OF-PAY-007",
+            label="event",
+            file="events.yaml",
+        )
+    )
+    findings.extend(
+        _check_reference_list(
+            values=payload.faults.possible,
+            known_ids=model.fault_ids,
+            payload_id=payload.id,
+            code="OF-PAY-008",
+            label="fault",
+            file="faults.yaml",
+        )
+    )
+
+    return findings
+
+
+def _check_reference_list(
+    values: list[str],
+    known_ids: set[str],
+    payload_id: str,
+    code: str,
+    label: str,
+    file: str,
+) -> list[LintFinding]:
+    findings: list[LintFinding] = []
+
+    for value in values:
+        if value not in known_ids:
+            findings.append(
+                LintFinding(
+                    severity="ERROR",
+                    code=code,
+                    file="payloads.yaml",
+                    domain="payloads",
+                    object_id=payload_id,
+                    message=f"payload references unknown {label} '{value}'",
+                    suggestion=f"Add the {label} to {file} or fix the payload reference.",
+                )
+            )
+
+    return findings
+
+
 def _check_lifecycle_reference_group(
     payloads_by_id: dict[str, PayloadContract],
     command_id: str,
     container: Any,
     location: str,
-    code_unknown_payload: str,
-    code_unknown_state: str,
+    code: str,
 ) -> list[LintFinding]:
     findings: list[LintFinding] = []
 
@@ -98,7 +231,7 @@ def _check_lifecycle_reference_group(
         findings.append(
             LintFinding(
                 severity="ERROR",
-                code=code_unknown_payload,
+                code=code,
                 file="commands.yaml",
                 domain="commands",
                 object_id=command_id,
@@ -113,7 +246,7 @@ def _check_lifecycle_reference_group(
         findings.append(
             LintFinding(
                 severity="ERROR",
-                code=code_unknown_payload,
+                code=code,
                 file="commands.yaml",
                 domain="commands",
                 object_id=command_id,
@@ -130,7 +263,7 @@ def _check_lifecycle_reference_group(
         findings.append(
             LintFinding(
                 severity="ERROR",
-                code=code_unknown_state,
+                code=code,
                 file="commands.yaml",
                 domain="commands",
                 object_id=command_id,
