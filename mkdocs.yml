@@ -33,6 +33,7 @@ nav:
       - ADR-0004 No Flight Runtime in v0.1: adr/ADR-0004-no-flight-runtime-in-v0.1.md
       - ADR-0005 Lint as Core Feature: adr/ADR-0005-lint-as-core-feature.md
       - ADR-0006 Payload Contract Model: adr/ADR-0006-payload-contract-model.md
+      - ADR-0007 Mission Data Chain Before Runtime: adr/ADR-0007-mission-data-chain-before-runtime.md
 
 markdown_extensions:
   - admonition
