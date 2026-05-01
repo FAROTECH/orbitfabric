@@ -12,6 +12,7 @@ from orbitfabric.model.mission import (
     FaultRecovery,
     MissionModel,
     Packet,
+    PayloadContract,
     QualityPolicy,
     TelemetryItem,
     TelemetryLimits,
@@ -30,6 +31,11 @@ def generate_markdown_docs(model: MissionModel, output_dir: Path) -> list[Path]:
         _write(output_dir / "modes.md", _render_modes(model)),
         _write(output_dir / "packets.md", _render_packets(model)),
     ]
+
+    if model.payloads:
+        generated_files.append(
+            _write(output_dir / "payloads.md", _render_payloads(model))
+        )
 
     return generated_files
 
@@ -262,6 +268,43 @@ def _render_packet_row(packet: Packet) -> str:
     )
 
 
+def _render_payloads(model: MissionModel) -> str:
+    lines = [_header("Payload Contract Reference", model)]
+
+    lines.append("## Summary\n\n")
+    lines.append(f"- Payload contracts: `{len(model.payloads)}`\n")
+    lines.append(f"- Payload profiles: `{len({payload.profile for payload in model.payloads})}`\n\n")
+
+    lines.append("## Payload contracts\n\n")
+
+    for payload in sorted(model.payloads, key=lambda item: item.id):
+        lines.append(_render_payload_contract(model, payload))
+
+    return "".join(lines)
+
+
+def _render_payload_contract(model: MissionModel, payload: PayloadContract) -> str:
+    lines: list[str] = []
+
+    lines.append(f"### {_code(payload.id)}\n\n")
+
+    if payload.description:
+        lines.append(f"{_text(payload.description)}\n\n")
+
+    lines.append("| Field | Value |\n")
+    lines.append("|---|---|\n")
+    lines.append(f"| Subsystem | {_subsystem_heading(model, payload.subsystem)} |\n")
+    lines.append(f"| Profile | {_code(payload.profile)} |\n")
+    lines.append(f"| Initial lifecycle state | {_code(payload.lifecycle.initial_state)} |\n")
+    lines.append(f"| Lifecycle states | {_format_list(payload.lifecycle.states)} |\n")
+    lines.append(f"| Telemetry produced | {_format_list(payload.telemetry.produced)} |\n")
+    lines.append(f"| Commands accepted | {_format_list(payload.commands.accepted)} |\n")
+    lines.append(f"| Events generated | {_format_list(payload.events.generated)} |\n")
+    lines.append(f"| Faults possible | {_format_list(payload.faults.possible)} |\n\n")
+
+    return "".join(lines)
+
+
 def _telemetry_by_source(model: MissionModel) -> dict[str, list[TelemetryItem]]:
     grouped: dict[str, list[TelemetryItem]] = {}
 
@@ -346,6 +389,13 @@ def _format_expected_effects(expected_effects: dict[str, Any]) -> str:
 
     lines: list[str] = []
 
+    payload_lifecycle = expected_effects.get("payload_lifecycle")
+    if isinstance(payload_lifecycle, dict):
+        payload_id = payload_lifecycle.get("payload")
+        state = payload_lifecycle.get("state")
+        if payload_id is not None and state is not None:
+            lines.append(f"payload {_code(payload_id)} lifecycle -> {_code(state)}")
+
     telemetry_effects = expected_effects.get("telemetry", {})
     if isinstance(telemetry_effects, dict):
         for telemetry_id, value in sorted(telemetry_effects.items()):
@@ -357,7 +407,12 @@ def _format_expected_effects(expected_effects: dict[str, Any]) -> str:
         if target_mode is not None:
             lines.append(f"mode -> {_code(target_mode)}")
 
-    ignored_keys = {"telemetry", "mode_transition", "no_state_change"}
+    ignored_keys = {
+        "telemetry",
+        "mode_transition",
+        "no_state_change",
+        "payload_lifecycle",
+    }
     remaining = {
         key: value
         for key, value in expected_effects.items()
