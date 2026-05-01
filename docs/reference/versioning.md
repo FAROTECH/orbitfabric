@@ -29,10 +29,10 @@ It is shown by:
 orbitfabric --version
 ```
 
-Example:
+Current example:
 
 ```text
-orbitfabric 0.1.0.dev0
+orbitfabric 0.3.0
 ```
 
 This version answers the question:
@@ -55,7 +55,7 @@ For the current multi-file Mission Model, it is stored in:
 spacecraft.yaml
 ```
 
-Example:
+Current demo example:
 
 ```yaml
 spacecraft:
@@ -80,22 +80,20 @@ It is not the same as the OrbitFabric Python package version.
 
 Generated JSON reports include the OrbitFabric tool/package version.
 
-Example:
+Current example:
 
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.1.0.dev0",
-  "mission": {
-    "id": "demo-3u",
-    "model_version": "0.1.0"
-  }
+  "version": "0.3.0",
+  "mission": "demo-3u",
+  "model_version": "0.1.0"
 }
 ```
 
 The top-level `version` identifies the OrbitFabric tool that produced the report.
 
-The nested `mission.model_version` identifies the Mission Model version declared by the mission.
+The `model_version` identifies the Mission Model version declared by the mission.
 
 ---
 
@@ -106,7 +104,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.1.0.dev0
+OrbitFabric tool/package version: 0.3.0
 Mission Model version:           0.1.0
 ```
 
@@ -114,13 +112,13 @@ This is valid.
 
 It means:
 
-- the tool is still a development preview;
-- the mission declares the v0.1 Mission Model contract;
+- the tool has gained new capabilities such as Payload Contracts and Data Product Contracts;
+- the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record both pieces of information.
 
 ---
 
-## Current v0.1 rule
+## Current v0.3 rule
 
 For the current development preview:
 
@@ -129,7 +127,7 @@ For the current development preview:
 | `orbitfabric --version` | OrbitFabric CLI/package version. |
 | JSON report top-level `version` | OrbitFabric tool version that produced the report. |
 | `spacecraft.model_version` | Mission Model contract version declared by the mission. |
-| JSON report `mission.model_version` | Mission Model version copied from mission YAML. |
+| JSON report `model_version` | Mission Model version copied from mission YAML. |
 
 ---
 
@@ -155,4 +153,4 @@ Possible future additions include:
 - compatibility checks between tool version and Mission Model version;
 - JSON Schema export for Mission Model validation.
 
-These are not part of the current v0.1.0 development preview.
+These are not part of the current v0.3.0 development preview.

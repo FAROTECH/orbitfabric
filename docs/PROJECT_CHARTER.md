@@ -1,6 +1,6 @@
 # OrbitFabric — Project Charter
 
-Version: 0.2-draft  
+Version: 0.3-draft  
 Status: Draft  
 Scope: Mission Data Contract foundation and Mission Data Chain direction  
 
@@ -163,8 +163,8 @@ Examples:
 - a packet referencing unknown telemetry is an error;
 - a command without timeout is at least a warning;
 - an event without downlink priority is at least a warning;
-- a payload data product without storage intent is at least a warning;
-- a high-priority data product without downlink policy is at least a warning;
+- an incomplete data product storage intent is at least a warning;
+- a high-priority data product without downlink intent is at least a warning;
 - a contact profile referenced by downlink policy but missing from the model is an error.
 
 The lint system is a core feature, not a utility.
@@ -215,31 +215,28 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 ---
 
-## 7. MVP v0.1 Scope
+## 7. Completed Early Scope
 
-The goal of v0.1 is to demonstrate the complete OrbitFabric philosophy with a small but coherent vertical slice.
+The early OrbitFabric preview has already demonstrated the core philosophy with a small but coherent vertical slice.
 
-v0.1 must include:
+The current v0.3.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
 - structural validation;
 - semantic linting;
 - generated Markdown documentation;
-- simple simulation runtime;
+- simple deterministic simulation runtime;
 - scenario runner;
-- mock EPS subsystem;
-- mock Payload subsystem;
-- minimal telemetry registry;
-- minimal command router;
-- minimal event bus;
-- minimal mode manager;
-- minimal fault monitor;
+- payload contract model;
+- data product contract model;
+- generated payload documentation;
+- generated data product documentation;
 - readable logs;
 - JSON reports;
 - one complete demo mission named `demo-3u`.
 
-v0.1 must support these commands:
+The current baseline supports these commands:
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/
@@ -353,7 +350,7 @@ It contains:
 - OBC;
 - EPS mock;
 - Payload mock;
-- optional Radio mock;
+- Radio mock;
 - operational modes:
   - BOOT;
   - NOMINAL;
@@ -367,6 +364,8 @@ It contains:
 - EPS status command;
 - battery warning fault;
 - battery critical fault;
+- payload contract `demo_iod_payload`;
+- data product contract `payload.radiation_histogram`;
 - one scenario where the payload is active, battery voltage degrades, a warning event is emitted, the spacecraft transitions to DEGRADED and the payload is automatically stopped.
 
 The expected scenario narrative is:
@@ -374,16 +373,16 @@ The expected scenario narrative is:
 ```text
 [00:00] MODE=NOMINAL
 [00:05] COMMAND payload.start_acquisition -> ACCEPTED
-[00:06] EVENT payload.acquisition_started
-[00:30] INJECT eps.battery.voltage=6.7
-[00:33] EVENT eps.battery_low severity=WARNING
-[00:35] MODE TRANSITION PAYLOAD_ACTIVE -> DEGRADED
-[00:36] COMMAND payload.stop_acquisition -> AUTO_DISPATCHED
-[00:37] EVENT payload.acquisition_stopped
+[00:05] EVENT payload.acquisition_started
+[00:05] PAYLOAD demo_iod_payload LIFECYCLE=ACQUIRING
+[00:32] EVENT eps.battery_low severity=WARNING
+[00:32] MODE TRANSITION PAYLOAD_ACTIVE -> DEGRADED
+[00:32] COMMAND payload.stop_acquisition -> AUTO_DISPATCHED
+[00:32] PAYLOAD demo_iod_payload LIFECYCLE=READY
 [00:40] SCENARIO PASSED
 ```
 
-Future demo slices may extend this clean-room mission with synthetic data products, storage policies, downlink assumptions and contact windows.
+Future demo slices may extend this clean-room mission with contact windows and downlink assumptions.
 
 Those additions must remain generic and must not encode private mission details.
 
@@ -397,7 +396,7 @@ The recommended technical baseline is:
 - YAML for the Mission Model;
 - Pydantic v2 for typed model validation;
 - Typer for the command-line interface;
-- PyYAML or ruamel.yaml for YAML loading;
+- PyYAML for YAML loading;
 - pytest for tests;
 - ruff for formatting and linting;
 - MkDocs Material for documentation;
@@ -453,7 +452,7 @@ OrbitFabric is successful in the early public preview if a user can:
 7. understand the project positioning from the README in less than one minute;
 8. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
 9. understand how payload contracts fit into the Mission Data Contract;
-10. understand why data products, storage, downlink and contact assumptions belong in the roadmap before runtime skeletons.
+10. understand how data products, storage intent, downlink intent and contact assumptions fit into the roadmap before runtime skeletons.
 
 A minimal but strong preview is better than a broad, fragile and unfinished feature set.
 

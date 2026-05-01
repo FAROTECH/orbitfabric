@@ -1,6 +1,6 @@
 # ADR-0007 — Mission Data Chain Before Runtime Generation
 
-Status: Proposed  
+Status: Accepted  
 Date: 2026-05-01
 
 ---
@@ -39,7 +39,7 @@ Without that layer, generated runtime skeletons would be derived from an incompl
 
 OrbitFabric will introduce Mission Data Chain modeling before generated runtime skeletons.
 
-The roadmap will therefore place these model-first milestones before runtime generation:
+The roadmap therefore places these model-first milestones before runtime generation:
 
 ```text
 Data Product and Storage Contracts
@@ -48,7 +48,7 @@ Commandability and Autonomy Contracts
 End-to-End Mission Data Flow Evidence
 ```
 
-Generated runtime skeletons will be deferred until after these concepts are clear enough to be represented in the Mission Data Contract.
+Generated runtime skeletons are deferred until after these concepts are clear enough to be represented in the Mission Data Contract.
 
 The intended chain is:
 
@@ -190,7 +190,7 @@ The ground integration artifacts will also be stronger, because they will be der
 
 ## Expected Roadmap Impact
 
-The roadmap should include these milestones before runtime generation:
+The roadmap includes these milestones before runtime generation:
 
 ```text
 v0.3 Data Product and Storage Contracts
@@ -199,19 +199,19 @@ v0.5 Commandability and Autonomy Contracts
 v0.6 End-to-End Mission Data Flow Evidence
 ```
 
-Generated runtime skeletons should move later:
+Generated runtime skeletons are placed later:
 
 ```text
 v0.7 Generated Runtime Skeletons
 ```
 
-Ground integration artifacts should follow after the model contains enough ground-facing semantics:
+Ground integration artifacts follow after the model contains enough ground-facing semantics:
 
 ```text
 v0.8 Ground Integration Artifacts
 ```
 
-Plugin and extensibility work should remain after the core model has matured:
+Plugin and extensibility work remains after the core model has matured:
 
 ```text
 v0.9 Plugin and Extensibility Layer

@@ -1,6 +1,6 @@
 # ADR-0008 — Data Product and Storage Contracts
 
-Status: Proposed  
+Status: Accepted  
 Date: 2026-05-01
 
 ---
@@ -39,7 +39,7 @@ OrbitFabric needs a contract-level way to describe them before runtime skeletons
 
 ## Decision
 
-OrbitFabric will introduce Data Product and Storage Contracts as the next model-first slice after Payload Contracts.
+OrbitFabric introduces Data Product and Storage Contracts as the next model-first slice after Payload Contracts.
 
 A data product is a declared mission-data object produced by a payload or subsystem.
 
@@ -63,9 +63,7 @@ Storage and downlink fields represent declared intent.
 
 They do not represent real storage implementation, file-system behavior, compression, contact-window simulation or downlink runtime behavior.
 
-The first implementation slice should remain narrow and should be introduced as an optional model domain.
-
-A candidate file name is:
+The first implementation slice is intentionally narrow and is introduced as an optional model domain:
 
 ```text
 mission/data_products.yaml
@@ -99,9 +97,9 @@ The data product describes a mission output object.
 
 ---
 
-## Candidate Minimal Shape
+## Minimal Shape
 
-The first data product slice may use a shape similar to:
+The first data product slice uses a shape similar to:
 
 ```yaml
 data_products:
@@ -119,15 +117,13 @@ data_products:
       policy: next_available_contact
 ```
 
-This is a candidate shape, not a frozen schema.
-
-The implementation may refine field names if that improves clarity or validation.
+This is implemented in v0.3.0, but it is not a frozen v1.0 schema.
 
 ---
 
 ## Initial Scope
 
-The first vertical slice should include:
+The first vertical slice includes:
 
 ```text
 optional data_products.yaml loading
@@ -144,7 +140,7 @@ invalid fixtures and tests
 one synthetic demo data product
 ```
 
-The slice should prove this relationship:
+The slice proves this relationship:
 
 ```text
 Payload Contract
@@ -185,21 +181,19 @@ Runtime skeletons and ground integration artifacts must remain deferred until th
 
 ## Linting Direction
 
-Data Product and Storage Contracts must be lintable from the beginning.
+Data Product and Storage Contracts are lintable from the beginning.
 
-Candidate lint rules include:
+Implemented lint direction includes:
 
 ```text
-ERROR: data product id is duplicated.
 ERROR: data product references an unknown producer.
 ERROR: data product references an unknown payload contract.
-ERROR: data product estimated size must be positive.
 WARNING: retained data product has no retention policy.
 WARNING: retained data product has no overflow policy.
 WARNING: high-priority data product has no downlink intent.
 ```
 
-Exact rule IDs and severities should be defined during implementation.
+Structural validation covers duplicate IDs, positive estimated size and known literal values.
 
 The principle is fixed:
 
@@ -209,15 +203,15 @@ The principle is fixed:
 
 ## Documentation Direction
 
-Generated documentation should expose data products from the validated Mission Model.
+Generated documentation exposes data products from the validated Mission Model.
 
-A candidate generated file is:
+The generated file is:
 
 ```text
 generated/docs/data_products.md
 ```
 
-The generated page should make clear that storage and downlink fields are contract intent, not executable runtime behavior.
+The generated page makes clear that storage and downlink fields are contract intent, not executable runtime behavior.
 
 ---
 
@@ -250,8 +244,8 @@ This ADR is satisfied when:
 - data products are clearly distinguished from telemetry and packets;
 - storage and downlink fields are described as intent, not implementation;
 - non-goals are explicit;
-- the public documentation exposes the proposed contract scope;
-- implementation can proceed through small follow-up issues.
+- the public documentation exposes the contract scope;
+- implementation is covered by model loading, lint rules, invalid fixtures, generated documentation and one synthetic demo data product.
 
 ---
 

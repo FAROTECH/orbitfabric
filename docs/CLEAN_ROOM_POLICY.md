@@ -1,6 +1,6 @@
 # OrbitFabric — Clean-Room Policy
 
-Version: 0.1-draft  
+Version: 0.3-draft  
 Status: Draft  
 Scope: Entire OrbitFabric project  
 
@@ -389,6 +389,8 @@ The canonical demo mission `demo-3u` must obey these rules:
 - it uses synthetic events;
 - it uses synthetic faults;
 - it uses synthetic recovery actions;
+- it uses synthetic data products;
+- it uses synthetic storage and downlink intent;
 - it does not include real bus maps;
 - it does not include real packet formats;
 - it does not include real payload behavior;
@@ -687,7 +689,7 @@ OrbitFabric must remain a generic open-source framework for mission data modelin
 
 Avoid adding content that could materially increase the operational capability of a restricted system or reveal sensitive implementation details.
 
-v0.1 must stay far from:
+v0.3 must stay far from:
 
 - real mission operations procedures;
 - real secure command handling;

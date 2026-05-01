@@ -1,7 +1,7 @@
 # Payload Contract Model
 
-Status: Development preview  
-Scope: OrbitFabric v0.2.x model hardening
+Status: Implemented  
+Scope: OrbitFabric Payload / IOD Payload Contract Model
 
 ## Purpose
 
@@ -44,7 +44,7 @@ A payload contract does not describe:
 - thermal, optical or scientific payload simulation;
 - ground segment implementation.
 
-These are intentionally outside the scope of the current Payload Contract Model.
+These are intentionally outside the scope of the Payload Contract Model.
 
 ## Relationship with the Mission Model
 
@@ -85,7 +85,7 @@ The first demo vertical slice uses:
 READY → ACQUIRING → READY
 ```
 
-Additional states such as `STANDBY`, `WARMUP`, `PROCESSING` or `DOWNLINK_PENDING` are not part of the current slice and should only be introduced after the model is stable.
+Additional states such as `STANDBY`, `WARMUP`, `PROCESSING` or `DOWNLINK_PENDING` should only be introduced when a later model slice needs them.
 
 ## Generated Documentation
 
@@ -107,10 +107,24 @@ The current demo mission includes a nominal payload lifecycle sequence where the
 
 The scenario also demonstrates how payload behavior can interact with spacecraft-level conditions, such as EPS degradation and automatic command dispatch.
 
+## Relationship with Data Products
+
+Payload Contracts describe expected payload behavior.
+
+Data Product Contracts describe mission-data objects produced by payloads or subsystems.
+
+In the current `demo-3u` mission, `demo_iod_payload` is the producer of the synthetic data product:
+
+```text
+payload.radiation_histogram
+```
+
+This relationship is declarative. It does not imply payload runtime execution or payload data processing.
+
 ## Current Boundary
 
 The current implementation is a deliberately narrow vertical slice.
 
-It is meant to validate the model shape, lint rules, generated documentation and minimal scenario behavior.
+It validates the model shape, lint rules, generated documentation and minimal scenario behavior.
 
 It is not a commitment to payload runtime execution, payload hardware integration or physical payload simulation.

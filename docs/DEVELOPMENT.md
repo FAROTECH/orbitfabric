@@ -12,6 +12,8 @@ OrbitFabric currently targets:
 Python 3.11+
 ```
 
+The CI validates Python 3.11 and Python 3.12.
+
 Development tools are installed through the project optional dependency group:
 
 ```text
@@ -38,6 +40,12 @@ orbitfabric --version
 orbitfabric --help
 ```
 
+Expected current version:
+
+```text
+orbitfabric 0.3.0
+```
+
 ---
 
 ## Local Quality Checks
@@ -47,18 +55,20 @@ Run:
 ```bash
 ruff check .
 pytest
+mkdocs build --strict
 ```
 
 Expected current baseline:
 
 ```text
-ruff check .  -> All checks passed
-pytest        -> 34 passed
+ruff check .          -> All checks passed
+pytest                -> passing
+mkdocs build --strict -> passing
 ```
 
 ---
 
-## Verify the v0.1 Vertical Slice
+## Verify the Current v0.3 Vertical Slice
 
 Run mission lint:
 
@@ -89,6 +99,19 @@ gen docs  -> Result: PASSED
 sim       -> Result: PASSED
 ```
 
+The generated mission documentation should include:
+
+```text
+generated/docs/telemetry.md
+generated/docs/commands.md
+generated/docs/events.md
+generated/docs/faults.md
+generated/docs/modes.md
+generated/docs/packets.md
+generated/docs/payloads.md
+generated/docs/data_products.md
+```
+
 ---
 
 ## Generated Outputs
@@ -110,6 +133,8 @@ The source of truth is:
 
 ```text
 examples/demo-3u/mission/*.yaml
+examples/demo-3u/mission/payloads.yaml
+examples/demo-3u/mission/data_products.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
@@ -129,6 +154,8 @@ Preview locally:
 mkdocs serve
 ```
 
+The public site is deployed by the GitHub Pages workflow after pushes to `main`.
+
 ---
 
 ## Recommended Development Order
@@ -146,6 +173,8 @@ For new behavior, follow this order:
 Do not add simulator behavior that is not represented in the Mission Model.
 
 Do not add generated artifacts that bypass validation.
+
+Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
 ---
 

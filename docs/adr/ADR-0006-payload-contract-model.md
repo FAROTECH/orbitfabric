@@ -1,6 +1,6 @@
 # ADR-0006 — Payload / IOD Payload Contract Model
 
-Status: Proposed  
+Status: Accepted  
 Date: 2026-05-01
 
 ---
@@ -11,9 +11,7 @@ OrbitFabric is a model-first Mission Data Contract framework for small spacecraf
 
 The project already models spacecraft-level mission data such as telemetry, commands, events, faults, modes, packets and scenarios.
 
-The current demo mission also includes a generic `payload` subsystem and a scenario where payload activity is part of the operational narrative.
-
-However, payloads are not yet represented as a first-class mission contract concept.
+The demo mission also includes a generic `payload` subsystem and a scenario where payload activity is part of the operational narrative.
 
 IOD payloads and mission-specific payloads often introduce their own operational contracts:
 
@@ -34,7 +32,7 @@ Without a first-class payload contract model, these concepts remain scattered ac
 
 ## Decision
 
-OrbitFabric may introduce a first-class Payload / IOD Payload Contract Model as part of the v0.2.x Model Hardening phase.
+OrbitFabric introduces a first-class Payload / IOD Payload Contract Model as part of the Mission Data Contract.
 
 A payload contract describes a declarative mission data and behavior contract.
 
@@ -66,9 +64,9 @@ The canonical role of this model is:
 
 ## Initial Scope
 
-The first vertical slice must be deliberately narrow.
+The first vertical slice was deliberately narrow.
 
-It should include:
+It includes:
 
 ```text
 one synthetic IOD payload contract
@@ -77,11 +75,11 @@ two payload commands
 one payload state telemetry
 two payload events
 one nominal scenario
-one generated payload documentation page
+generated payload documentation
 a small set of payload lint rules
 ```
 
-The initial lifecycle should remain minimal:
+The initial lifecycle remains minimal:
 
 ```text
 OFF
@@ -90,7 +88,7 @@ ACQUIRING
 FAULT
 ```
 
-Additional states such as `STANDBY`, `WARMUP`, `PROCESSING` and `DOWNLINK_PENDING` may be added only after the first working slice is stable.
+Additional states such as `STANDBY`, `WARMUP`, `PROCESSING` and `DOWNLINK_PENDING` may be added only when a future model slice needs them.
 
 ---
 
@@ -126,9 +124,11 @@ Payloads become explicit model elements without turning OrbitFabric into a paylo
 
 The model can later support:
 
-- generated payload-oriented runtime skeletons in v0.3;
-- generated payload-oriented ground artifacts in v0.4;
-- payload-specific plugin extension points in v0.5.
+- Data Product and Storage Contracts;
+- Contact Windows and Downlink Flow Contracts;
+- future runtime skeletons;
+- future ground integration artifacts;
+- future payload-specific plugin extension points.
 
 The implementation order remains:
 
