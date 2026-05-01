@@ -1,0 +1,68 @@
+scenario:
+  id: nominal_payload_acquisition
+  name: Nominal payload acquisition lifecycle
+  description: Synthetic scenario demonstrating a minimal IOD payload lifecycle from READY to ACQUIRING and back to READY.
+
+mission:
+  path: ../mission
+
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    obc.mode: NOMINAL
+    eps.battery.voltage: 7.4
+    eps.battery.current: 0.4
+    payload.acquisition.active: false
+    radio.downlink.available: true
+
+steps:
+  - t: 0
+    expect_mode: NOMINAL
+
+  - t: 1
+    expect:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: READY
+
+  - t: 5
+    command: payload.start_acquisition
+    args:
+      duration_s: 120
+    expect:
+      command_status: ACCEPTED
+
+  - t: 6
+    expect_event: payload.acquisition_started
+
+  - t: 7
+    expect:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: ACQUIRING
+
+  - t: 8
+    expect_telemetry:
+      payload.acquisition.active: true
+
+  - t: 20
+    command: payload.stop_acquisition
+    expect:
+      command_status: ACCEPTED
+
+  - t: 21
+    expect_event: payload.acquisition_stopped
+
+  - t: 22
+    expect:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: READY
+
+  - t: 23
+    expect_telemetry:
+      payload.acquisition.active: false
+
+  - t: 25
+    expect:
+      scenario_status: PASSED

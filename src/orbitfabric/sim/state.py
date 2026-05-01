@@ -44,6 +44,7 @@ class SimulationState:
     current_time: float
     current_mode: str
     telemetry: dict[str, Any] = field(default_factory=dict)
+    payload_lifecycle: dict[str, str] = field(default_factory=dict)
     logs: list[SimLogEntry] = field(default_factory=list)
     events: list[SimEventRecord] = field(default_factory=list)
     commands: list[SimCommandRecord] = field(default_factory=list)
