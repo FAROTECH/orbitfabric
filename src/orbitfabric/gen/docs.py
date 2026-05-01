@@ -6,6 +6,9 @@ from typing import Any
 from orbitfabric.model.mission import (
     Command,
     CommandArgument,
+    DataProductContract,
+    DataProductDownlinkIntent,
+    DataProductStorageIntent,
     Event,
     Fault,
     FaultCondition,
@@ -35,6 +38,11 @@ def generate_markdown_docs(model: MissionModel, output_dir: Path) -> list[Path]:
     if model.payloads:
         generated_files.append(
             _write(output_dir / "payloads.md", _render_payloads(model))
+        )
+
+    if model.data_products:
+        generated_files.append(
+            _write(output_dir / "data_products.md", _render_data_products(model))
         )
 
     return generated_files
@@ -305,6 +313,78 @@ def _render_payload_contract(model: MissionModel, payload: PayloadContract) -> s
     lines.append(f"| Faults possible | {_format_list(payload.faults.possible)} |\n\n")
 
     return "".join(lines)
+
+
+def _render_data_products(model: MissionModel) -> str:
+    lines = [_header("Data Product Contract Reference", model)]
+
+    producer_count = len({data_product.producer for data_product in model.data_products})
+
+    lines.append("## Summary\n\n")
+    lines.append(f"- Data products: `{len(model.data_products)}`\n")
+    lines.append(f"- Producers: `{producer_count}`\n\n")
+    lines.append(
+        "Storage and downlink fields describe contract intent only. "
+        "They do not imply onboard storage execution, contact modeling or "
+        "downlink runtime behavior.\n\n"
+    )
+
+    lines.append("## Data products\n\n")
+    lines.append(
+        "| ID | Producer | Product Type | Estimated Size | Priority | "
+        "Storage Intent | Downlink Intent | Description |\n"
+    )
+    lines.append("|---|---|---|---:|---|---|---|---|\n")
+
+    for data_product in sorted(model.data_products, key=lambda item: item.id):
+        lines.append(_render_data_product_row(model, data_product))
+
+    return "".join(lines)
+
+
+def _render_data_product_row(
+    model: MissionModel,
+    data_product: DataProductContract,
+) -> str:
+    return (
+        f"| {_code(data_product.id)} "
+        f"| {_producer_heading(model, data_product)} "
+        f"| {_code(data_product.type)} "
+        f"| {data_product.estimated_size_bytes} "
+        f"| {_code(data_product.priority)} "
+        f"| {_format_storage_intent(data_product.storage)} "
+        f"| {_format_downlink_intent(data_product.downlink)} "
+        f"| {_text(data_product.description or '-')} |\n"
+    )
+
+
+def _producer_heading(model: MissionModel, data_product: DataProductContract) -> str:
+    if data_product.producer_type == "subsystem":
+        return _subsystem_heading(model, data_product.producer)
+
+    return f"{_code(data_product.producer)} ({_code(data_product.producer_type)})"
+
+
+def _format_storage_intent(storage: DataProductStorageIntent | None) -> str:
+    if storage is None:
+        return "-"
+
+    lines = [f"class {_code(storage.storage_class)}"]
+
+    if storage.retention is not None:
+        lines.append(f"retention {_code(storage.retention)}")
+
+    if storage.overflow_policy is not None:
+        lines.append(f"overflow {_code(storage.overflow_policy)}")
+
+    return _line_break_join(lines)
+
+
+def _format_downlink_intent(downlink: DataProductDownlinkIntent | None) -> str:
+    if downlink is None or downlink.policy is None:
+        return "-"
+
+    return f"policy {_code(downlink.policy)}"
 
 
 def _telemetry_by_source(model: MissionModel) -> dict[str, list[TelemetryItem]]:
