@@ -1,0 +1,25 @@
+payloads:
+  - id: demo_iod_payload
+    subsystem: payload
+    profile: iod
+    lifecycle:
+      initial_state: READY
+      states:
+        - OFF
+        - READY
+        - ACQUIRING
+        - FAULT
+    telemetry:
+      produced:
+        - payload.acquisition.active
+    commands:
+      accepted:
+        - payload.start_acquisition
+        - payload.stop_acquisition
+    events:
+      generated:
+        - payload.acquisition_started
+        - payload.acquisition_stopped
+    faults:
+      possible: []
+    description: Synthetic IOD payload contract used to demonstrate payload-specific mission data grouping.
