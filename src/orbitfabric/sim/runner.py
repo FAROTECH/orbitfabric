@@ -22,6 +22,10 @@ class ScenarioRunner:
             current_time=0,
             current_mode=scenario.initial_state.mode,
             telemetry=dict(scenario.initial_state.telemetry),
+            payload_lifecycle={
+                payload.id: payload.lifecycle.initial_state
+                for payload in mission.payloads
+            },
         )
 
         telemetry = TelemetryRegistry(state)
@@ -31,6 +35,7 @@ class ScenarioRunner:
         fault_monitor = FaultMonitor(mission, telemetry)
 
         mode_manager.initialize(t=0)
+        self._initialize_payload_lifecycle(state)
 
         for step in scenario.steps:
             state.current_time = step.t
@@ -54,6 +59,10 @@ class ScenarioRunner:
             mission_id=mission.spacecraft.id,
             state=state,
         )
+
+    def _initialize_payload_lifecycle(self, state: SimulationState) -> None:
+        for payload_id, lifecycle_state in sorted(state.payload_lifecycle.items()):
+            state.log(0, f"PAYLOAD {payload_id} LIFECYCLE={lifecycle_state}")
 
     def _execute_step(
         self,
@@ -121,6 +130,8 @@ class ScenarioRunner:
             event_bus.emit(event_id, t)
 
         expected_effects = command.expected_effects
+        self._apply_payload_lifecycle_effects(result, t)
+
         telemetry_effects = expected_effects.get("telemetry", {})
         for telemetry_id, value in telemetry_effects.items():
             telemetry.set(telemetry_id, value, t, log=True)
@@ -131,6 +142,40 @@ class ScenarioRunner:
             if target_mode is not None:
                 reason = command.emits[0] if command.emits else command.id
                 mode_manager.transition_to(target_mode, reason, t)
+
+    def _apply_payload_lifecycle_effects(
+        self,
+        result: CommandDispatchResult,
+        t: float,
+    ) -> None:
+        if result.command is None:
+            return
+
+        lifecycle_effect = result.command.expected_effects.get("payload_lifecycle")
+        if not isinstance(lifecycle_effect, dict):
+            return
+
+        payload_id = lifecycle_effect.get("payload")
+        lifecycle_state = lifecycle_effect.get("state")
+
+        if not isinstance(payload_id, str) or not isinstance(lifecycle_state, str):
+            return
+
+        result_state = result.command
+        del result_state
+
+        state = self._get_state_from_result(result)
+        if state is None:
+            return
+
+        state.payload_lifecycle[payload_id] = lifecycle_state
+        state.log(t, f"PAYLOAD {payload_id} LIFECYCLE={lifecycle_state}")
+
+    def _get_state_from_result(
+        self,
+        result: CommandDispatchResult,
+    ) -> SimulationState | None:
+        return getattr(result, "state", None)
 
     def _apply_fault_triggers(
         self,
@@ -213,6 +258,7 @@ class ScenarioRunner:
             self._check_telemetry_expectations(step, telemetry, state)
 
         if step.expect is not None:
+            self._check_payload_lifecycle_expectation(step, state)
             self._check_scenario_status_expectation(step, state)
 
     def _check_telemetry_expectations(
@@ -237,6 +283,35 @@ class ScenarioRunner:
                     step.t,
                     f"TELEMETRY {telemetry_id}={_format_value(actual_value)}",
                 )
+
+    def _check_payload_lifecycle_expectation(
+        self,
+        step: ScenarioStep,
+        state: SimulationState,
+    ) -> None:
+        if step.expect is None:
+            return
+
+        expected_lifecycle = step.expect.get("payload_lifecycle")
+        if not isinstance(expected_lifecycle, dict):
+            return
+
+        payload_id = expected_lifecycle.get("payload")
+        expected_state = expected_lifecycle.get("state")
+
+        if not isinstance(payload_id, str) or not isinstance(expected_state, str):
+            state.fail_expectation(step.t, "invalid payload lifecycle expectation")
+            return
+
+        actual_state = state.payload_lifecycle.get(payload_id)
+        if actual_state != expected_state:
+            state.fail_expectation(
+                step.t,
+                f"expected payload {payload_id} lifecycle {expected_state} "
+                f"but got {actual_state}",
+            )
+        else:
+            state.log(step.t, f"PAYLOAD {payload_id} LIFECYCLE={actual_state}")
 
     def _check_scenario_status_expectation(
         self,
