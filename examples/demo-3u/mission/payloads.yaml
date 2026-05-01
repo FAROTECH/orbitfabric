@@ -3,12 +3,12 @@ payloads:
     subsystem: payload
     profile: iod
     lifecycle:
-      initial_state: READY
+      initial_state: "READY"
       states:
-        - OFF
-        - READY
-        - ACQUIRING
-        - FAULT
+        - "OFF"
+        - "READY"
+        - "ACQUIRING"
+        - "FAULT"
     telemetry:
       produced:
         - payload.acquisition.active
