@@ -271,9 +271,11 @@ def _render_packet_row(packet: Packet) -> str:
 def _render_payloads(model: MissionModel) -> str:
     lines = [_header("Payload Contract Reference", model)]
 
+    profile_count = len({payload.profile for payload in model.payloads})
+
     lines.append("## Summary\n\n")
     lines.append(f"- Payload contracts: `{len(model.payloads)}`\n")
-    lines.append(f"- Payload profiles: `{len({payload.profile for payload in model.payloads})}`\n\n")
+    lines.append(f"- Payload profiles: `{profile_count}`\n\n")
 
     lines.append("## Payload contracts\n\n")
 
