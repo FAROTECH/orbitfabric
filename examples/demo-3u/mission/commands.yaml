@@ -10,12 +10,19 @@ commands:
         description: Requested acquisition duration in seconds.
     allowed_modes:
       - NOMINAL
+    preconditions:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: READY
     requires_ack: true
     timeout_ms: 1000
     risk: medium
     emits:
       - payload.acquisition_started
     expected_effects:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: ACQUIRING
       telemetry:
         payload.acquisition.active: true
       mode_transition:
@@ -29,12 +36,19 @@ commands:
       - PAYLOAD_ACTIVE
       - DEGRADED
       - SAFE
+    preconditions:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: ACQUIRING
     requires_ack: true
     timeout_ms: 1000
     risk: low
     emits:
       - payload.acquisition_stopped
     expected_effects:
+      payload_lifecycle:
+        payload: demo_iod_payload
+        state: READY
       telemetry:
         payload.acquisition.active: false
 
