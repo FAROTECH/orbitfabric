@@ -6,6 +6,7 @@ from orbitfabric.lint.rules_events import check_events
 from orbitfabric.lint.rules_faults import check_faults
 from orbitfabric.lint.rules_modes import check_modes
 from orbitfabric.lint.rules_packets import check_packets
+from orbitfabric.lint.rules_payloads import check_payloads
 from orbitfabric.lint.rules_references import check_references
 from orbitfabric.lint.rules_telemetry import check_telemetry
 from orbitfabric.model.mission import MissionModel
@@ -18,6 +19,7 @@ class LintEngine:
         findings = []
         findings.extend(check_references(model))
         findings.extend(check_modes(model))
+        findings.extend(check_payloads(model))
         findings.extend(check_telemetry(model))
         findings.extend(check_commands(model))
         findings.extend(check_events(model))
