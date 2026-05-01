@@ -25,6 +25,7 @@ TelemetryType = Literal[
 ]
 
 PacketType = Literal["json", "binary_compact", "ccsds_like"]
+PayloadProfile = Literal["iod", "mission_specific"]
 
 
 class StrictModel(BaseModel):
@@ -158,6 +159,39 @@ class Packet(StrictModel):
     description: str | None = None
 
 
+class PayloadLifecycle(StrictModel):
+    initial_state: str
+    states: list[str]
+
+
+class PayloadTelemetryRefs(StrictModel):
+    produced: list[str] = Field(default_factory=list)
+
+
+class PayloadCommandRefs(StrictModel):
+    accepted: list[str] = Field(default_factory=list)
+
+
+class PayloadEventRefs(StrictModel):
+    generated: list[str] = Field(default_factory=list)
+
+
+class PayloadFaultRefs(StrictModel):
+    possible: list[str] = Field(default_factory=list)
+
+
+class PayloadContract(StrictModel):
+    id: str
+    subsystem: str
+    profile: PayloadProfile
+    lifecycle: PayloadLifecycle
+    telemetry: PayloadTelemetryRefs = Field(default_factory=PayloadTelemetryRefs)
+    commands: PayloadCommandRefs = Field(default_factory=PayloadCommandRefs)
+    events: PayloadEventRefs = Field(default_factory=PayloadEventRefs)
+    faults: PayloadFaultRefs = Field(default_factory=PayloadFaultRefs)
+    description: str | None = None
+
+
 class AllowedValues(StrictModel):
     allowed_values: list[str]
 
@@ -181,6 +215,7 @@ class MissionModel(StrictModel):
     faults: list[Fault]
     packets: list[Packet]
     policies: Policies
+    payloads: list[PayloadContract] = Field(default_factory=list)
 
     @property
     def subsystem_ids(self) -> set[str]:
@@ -205,6 +240,10 @@ class MissionModel(StrictModel):
     @property
     def packet_ids(self) -> set[str]:
         return {item.id for item in self.packets}
+
+    @property
+    def payload_ids(self) -> set[str]:
+        return {item.id for item in self.payloads}
 
     @property
     def mode_ids(self) -> set[str]:

@@ -22,6 +22,10 @@ REQUIRED_FILES: dict[str, tuple[str, ...]] = {
     "policies.yaml": ("policies",),
 }
 
+OPTIONAL_FILES: dict[str, tuple[str, ...]] = {
+    "payloads.yaml": ("payloads",),
+}
+
 
 class MissionModelLoader:
     """Loads a Mission Model from a canonical OrbitFabric mission directory."""
@@ -60,15 +64,15 @@ class MissionModelLoader:
                 )
                 continue
 
-            loaded = self._load_yaml_file(file_path, filename, diagnostics)
-            if loaded is None:
+            self._load_model_file(file_path, filename, expected_keys, diagnostics, data)
+
+        for filename, expected_keys in OPTIONAL_FILES.items():
+            file_path = mission_dir / filename
+
+            if not file_path.exists():
                 continue
 
-            self._validate_expected_keys(filename, loaded, expected_keys, diagnostics)
-
-            for key in expected_keys:
-                if key in loaded:
-                    data[key] = loaded[key]
+            self._load_model_file(file_path, filename, expected_keys, diagnostics, data)
 
         if diagnostics:
             raise MissionModelError(diagnostics)
@@ -83,6 +87,24 @@ class MissionModelLoader:
             raise MissionModelError(duplicate_diagnostics)
 
         return model
+
+    def _load_model_file(
+        self,
+        file_path: Path,
+        filename: str,
+        expected_keys: tuple[str, ...],
+        diagnostics: list[ModelDiagnostic],
+        data: dict[str, Any],
+    ) -> None:
+        loaded = self._load_yaml_file(file_path, filename, diagnostics)
+        if loaded is None:
+            return
+
+        self._validate_expected_keys(filename, loaded, expected_keys, diagnostics)
+
+        for key in expected_keys:
+            if key in loaded:
+                data[key] = loaded[key]
 
     def _load_yaml_file(
         self,
@@ -225,6 +247,13 @@ class MissionModelLoader:
                 domain="packets",
                 file="packets.yaml",
                 values=[item.id for item in model.packets],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="payloads",
+                file="payloads.yaml",
+                values=[item.id for item in model.payloads],
             )
         )
         diagnostics.extend(
