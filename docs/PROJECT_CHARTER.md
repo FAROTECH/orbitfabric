@@ -1,8 +1,8 @@
 # OrbitFabric — Project Charter
 
-Version: 0.1-draft  
+Version: 0.2-draft  
 Status: Draft  
-Scope: MVP foundation  
+Scope: Mission Data Contract foundation and Mission Data Chain direction  
 
 ---
 
@@ -10,9 +10,9 @@ Scope: MVP foundation
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets and operational scenarios once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
+Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions and operational scenarios once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
 
-OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial or another ground segment tool.
+OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool or a payload runtime framework.
 
 It is the contract layer between mission design, onboard software, simulation, testing, documentation and ground integration.
 
@@ -37,7 +37,12 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - operational modes;
 - mode transitions;
 - packets;
-- persistence and downlink policies;
+- payload contracts;
+- data products;
+- persistence, storage and retention policies;
+- downlink priorities and contact assumptions;
+- commandability constraints;
+- autonomy and recovery expectations;
 - operational scenarios;
 - validation and linting rules.
 
@@ -59,11 +64,13 @@ The same information is commonly duplicated and reinterpreted across multiple pl
 - simulation setups;
 - operational procedures;
 - fault handling logic;
-- payload-specific integration notes.
+- payload-specific integration notes;
+- storage and downlink planning notes;
+- contact and pass assumptions.
 
 This creates drift.
 
-A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A packet may exceed its expected size without being detected early. A mode may forbid an operation in principle, while the command router still accepts it in practice.
+A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A packet may exceed its expected size without being detected early. A mode may forbid an operation in principle, while the command router still accepts it in practice. A payload may produce data products that have no storage policy, retention rule or downlink path. A ground dictionary may describe data that the onboard design does not actually preserve or prioritize.
 
 OrbitFabric addresses this by making the mission data model explicit, validated, executable and reusable.
 
@@ -78,7 +85,8 @@ The initial target users are:
 - aerospace students building mission software prototypes;
 - embedded engineers entering the small spacecraft domain;
 - small space startups and technical teams needing disciplined mission-data organization;
-- research labs needing repeatable mission simulations and test scenarios.
+- research labs needing repeatable mission simulations and test scenarios;
+- space software architects who need a coherent contract between payload behavior, onboard data handling and ground-facing artifacts.
 
 The target is not purely educational.
 
@@ -122,7 +130,26 @@ The first valuable artifact is the contract.
 
 Code generation, runtime execution and integration bridges are secondary and must not be designed before the model has sufficient clarity.
 
-### 6.3 Linting as Engineering Judgment
+### 6.3 Mission Data Chain Before Runtime
+
+OrbitFabric must make the mission data chain explicit before generating runtime skeletons.
+
+The project must be able to reason about:
+
+```text
+payload behavior
+        -> data products
+        -> onboard storage and retention
+        -> downlink queue intent
+        -> contact window assumptions
+        -> commandability constraints
+        -> autonomy and recovery expectations
+        -> end-to-end scenario evidence
+```
+
+Only after these concepts are sufficiently clear should OrbitFabric derive runtime skeletons or ground integration artifacts from them.
+
+### 6.4 Linting as Engineering Judgment
 
 OrbitFabric linting must not be limited to YAML syntax validation.
 
@@ -135,11 +162,14 @@ Examples:
 - a fault emitting an unknown event is an error;
 - a packet referencing unknown telemetry is an error;
 - a command without timeout is at least a warning;
-- an event without downlink priority is at least a warning.
+- an event without downlink priority is at least a warning;
+- a payload data product without storage intent is at least a warning;
+- a high-priority data product without downlink policy is at least a warning;
+- a contact profile referenced by downlink policy but missing from the model is an error.
 
 The lint system is a core feature, not a utility.
 
-### 6.4 Scenario-First Testing
+### 6.5 Scenario-First Testing
 
 Operational scenarios must be first-class artifacts.
 
@@ -149,7 +179,9 @@ The simulator must be able to answer a practical engineering question:
 
 > Given this mission model and this scenario, does the system behave as expected?
 
-### 6.5 Ground by Construction
+As the model matures, scenarios should be able to provide evidence not only for mode transitions and command behavior, but also for payload data production, storage intent, downlink assumptions, contact windows and recovery expectations.
+
+### 6.6 Ground by Construction
 
 OrbitFabric must not become a full ground segment.
 
@@ -159,25 +191,27 @@ However, it must generate artifacts useful for ground integration:
 - JSON mission database exports;
 - packet descriptions;
 - decoder skeletons;
+- data product dictionaries;
+- downlink policy descriptions;
 - future Yamcs/OpenC3/XTCE exports.
 
-### 6.6 Clean-Room Development
+### 6.7 Clean-Room Development
 
 OrbitFabric must be developed from scratch using public knowledge, synthetic examples and generic engineering concepts.
 
 It must not contain proprietary mission details, real non-public architectures, private protocols, real bus maps, real pinouts, real logs, real payload data or any information under NDA.
 
-### 6.7 Small Core, Extensible Edges
+### 6.8 Small Core, Extensible Edges
 
 The core must stay small.
 
 Extensibility should come through plugins, generators, custom lint rules and adapters, not through a bloated core.
 
-### 6.8 Practical Before Perfect
+### 6.9 Practical Before Perfect
 
 OrbitFabric must favor useful, testable, well-documented behavior over broad but shallow standard compliance.
 
-CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations are future extensions, not v0.1 requirements.
+CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations are future extensions, not early-version requirements.
 
 ---
 
@@ -215,9 +249,68 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 
 ---
 
-## 8. MVP v0.1 Non-Goals
+## 8. Payload Contract Direction
 
-v0.1 must not include:
+The Payload / IOD Payload Contract Model makes mission-specific payload behavior explicit without turning OrbitFabric into a payload runtime framework.
+
+A payload contract may describe:
+
+- payload identity;
+- payload profile;
+- linked subsystem;
+- lifecycle states;
+- telemetry references;
+- command references;
+- event references;
+- fault references;
+- command preconditions;
+- expected effects;
+- scenario-level behavior;
+- generated documentation.
+
+A payload contract must not describe:
+
+- payload firmware;
+- payload drivers;
+- hardware buses;
+- physical payload simulation;
+- scientific data processing pipelines;
+- real payload acquisition implementation.
+
+Payload contracts are part of the Mission Data Contract.
+
+They are the foundation for later data product, storage and downlink modeling.
+
+---
+
+## 9. Mission Data Chain Direction
+
+After the Payload Contract Model, OrbitFabric should evolve toward explicit Mission Data Chain modeling.
+
+The chain is:
+
+```text
+Payload or subsystem activity
+        -> generated telemetry and data products
+        -> onboard storage and retention intent
+        -> downlink queue and priority intent
+        -> contact window assumptions
+        -> commandability and autonomy constraints
+        -> end-to-end scenario evidence
+        -> future runtime and ground artifacts
+```
+
+This direction is essential for small spacecraft and CubeSat missions because the value of mission data depends on the full path from onboard generation to ground consumption.
+
+OrbitFabric must model the contract of that path.
+
+It must not implement the physical, flight or operational stack behind that path.
+
+---
+
+## 10. Early Non-Goals
+
+Early OrbitFabric versions must not include:
 
 - real spacecraft hardware support;
 - real SPI/I2C/UART drivers;
@@ -233,19 +326,23 @@ v0.1 must not include:
 - CANopen integration;
 - cFS integration;
 - F Prime integration;
-- Yamcs integration;
-- OpenC3 integration;
-- Basilisk integration;
+- Yamcs integration as a live service;
+- OpenC3 integration as a live service;
+- Basilisk integration as a dynamics simulator;
 - formal verification;
 - advanced security;
 - real mission operations procedures;
-- proprietary mission examples.
+- proprietary mission examples;
+- payload firmware support;
+- payload driver support;
+- physical payload simulation;
+- live ground operations.
 
-These items may become future work only after the Mission Model, lint engine and scenario runner prove valuable.
+These items may become future integration targets, generated artifacts or external consumers only after the Mission Model, lint engine, scenario runner and mission data chain contracts prove valuable.
 
 ---
 
-## 9. Demo Mission
+## 11. Demo Mission
 
 The initial demo mission is `demo-3u`.
 
@@ -286,11 +383,15 @@ The expected scenario narrative is:
 [00:40] SCENARIO PASSED
 ```
 
+Future demo slices may extend this clean-room mission with synthetic data products, storage policies, downlink assumptions and contact windows.
+
+Those additions must remain generic and must not encode private mission details.
+
 ---
 
-## 10. Initial Technical Direction
+## 12. Initial Technical Direction
 
-The recommended technical baseline for v0.1 is:
+The recommended technical baseline is:
 
 - Python 3.11 or newer;
 - YAML for the Mission Model;
@@ -303,11 +404,11 @@ The recommended technical baseline for v0.1 is:
 - GitHub Actions for CI;
 - Apache-2.0 license.
 
-The future onboard runtime may use C++17, but C++ generation is explicitly out of scope for v0.1.
+The future onboard runtime may use C++17, but C++ generation must wait until the Mission Data Contract and Mission Data Chain models are sufficiently clear.
 
 ---
 
-## 11. Repository Philosophy
+## 13. Repository Philosophy
 
 OrbitFabric should use a monorepo at the beginning.
 
@@ -339,9 +440,9 @@ Splitting into multiple repositories too early would add complexity without arch
 
 ---
 
-## 12. Success Criteria for v0.1
+## 14. Success Criteria for the Early Public Preview
 
-OrbitFabric v0.1 is successful if a user can:
+OrbitFabric is successful in the early public preview if a user can:
 
 1. inspect the `demo-3u` Mission Model;
 2. run mission linting;
@@ -350,13 +451,15 @@ OrbitFabric v0.1 is successful if a user can:
 5. see events, faults, mode transitions and auto-dispatched commands in the log;
 6. generate Markdown documentation from the same Mission Model;
 7. understand the project positioning from the README in less than one minute;
-8. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals.
+8. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
+9. understand how payload contracts fit into the Mission Data Contract;
+10. understand why data products, storage, downlink and contact assumptions belong in the roadmap before runtime skeletons.
 
-A minimal but strong v0.1 is better than a broad, fragile and unfinished v0.1.
+A minimal but strong preview is better than a broad, fragile and unfinished feature set.
 
 ---
 
-## 13. Clean-Room Policy Summary
+## 15. Clean-Room Policy Summary
 
 OrbitFabric must not use or encode non-public mission information.
 
@@ -384,15 +487,17 @@ Allowed content includes:
 - invented telemetry;
 - invented commands;
 - invented scenarios;
+- invented data products;
+- invented contact windows;
 - clean-room code written from scratch.
 
 If a design choice risks being too close to a private mission, it must be generalized or removed.
 
 ---
 
-## 14. Governance Principles
+## 16. Governance Principles
 
-Until the project reaches a usable v0.1, technical decisions should optimize for clarity, minimalism and architectural coherence.
+Technical decisions should optimize for clarity, minimalism and architectural coherence.
 
 The project should prefer:
 
@@ -402,7 +507,8 @@ The project should prefer:
 - deterministic simulation over realism;
 - semantic lint rules over superficial validation;
 - generated documentation over manually duplicated references;
-- clean interfaces over premature integrations.
+- clean interfaces over premature integrations;
+- mission data chain modeling before runtime skeleton generation.
 
 The project should reject:
 
@@ -411,43 +517,24 @@ The project should reject:
 - hardware-specific shortcuts;
 - hidden behavior not represented in the Mission Model;
 - undocumented assumptions;
-- private mission-derived examples.
+- private mission-derived examples;
+- runtime generation from an immature model;
+- ground integration exports before the contract they export is clear.
 
 ---
 
-## 15. Immediate Next Artifacts
+## 17. Final Position
 
-After this Project Charter, the next required artifacts are:
-
-```text
-docs/CLEAN_ROOM_POLICY.md
-docs/ROADMAP.md
-docs/ARCHITECTURE.md
-docs/adr/ADR-0001-mission-model-first.md
-docs/adr/ADR-0002-python-toolchain-first.md
-docs/adr/ADR-0003-yaml-multifile-mission-model.md
-docs/adr/ADR-0004-no-flight-runtime-in-v0.1.md
-docs/adr/ADR-0005-lint-as-core-feature.md
-docs/reference/mission-model-v0.1.md
-```
-
-The next highest-priority artifact is:
-
-```text
-docs/adr/ADR-0001-mission-model-first.md
-```
-
----
-
-## 16. Final Position
-
-OrbitFabric must begin as a disciplined Mission Data Contract framework.
+OrbitFabric must remain a disciplined Mission Data Contract framework.
 
 The project should not try to look large. It should try to be coherent.
 
-The first version must prove one thing convincingly:
+The first versions must prove one thing convincingly:
 
 > A small spacecraft mission can be described once, validated semantically, simulated operationally, tested through scenarios and documented automatically from a single source of truth.
 
-That is the core of OrbitFabric.
+The next versions must extend that proof to the mission data chain:
 
+> Payload behavior, data products, onboard storage intent, downlink priorities, contact assumptions, commandability constraints and recovery expectations can be modeled before real onboard or ground software is implemented.
+
+That is the core of OrbitFabric.
