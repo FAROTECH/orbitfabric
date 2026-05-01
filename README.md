@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets and operational scenarios once.  
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products and operational scenarios once.  
 Validate them, document them, and execute deterministic mission scenarios from the same source of truth.
 
 </div>
@@ -40,21 +40,28 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently in the `v0.2.x` development line.
+OrbitFabric is currently at `v0.3.0 — Data Product and Storage Contracts`.
 
-The current repository includes the `v0.2.1 — Payload Contract Model` vertical slice, which extends the Mission Data Contract with an optional Payload / IOD Payload Contract domain.
+The current repository includes:
+
+- the `v0.2.1 — Payload Contract Model` vertical slice;
+- the `v0.2.3 — Mission Data Chain Roadmap Alignment` direction;
+- the `v0.3.0 — Data Product and Storage Contracts` vertical slice.
 
 The current vertical slice is functional:
 
 - Mission Model YAML loading;
 - optional `payloads.yaml` loading;
+- optional `data_products.yaml` loading;
 - structural validation;
 - semantic linting;
 - engineering lint rules;
 - payload contract lint rules;
+- data product contract lint rules;
 - JSON lint report generation;
 - generated Markdown documentation;
 - generated payload contract documentation;
+- generated data product contract documentation;
 - scenario YAML loading;
 - scenario reference validation;
 - deterministic scenario execution;
@@ -89,7 +96,8 @@ It models:
 - packets;
 - scenarios;
 - persistence and downlink policies;
-- optional Payload / IOD Payload Contracts.
+- optional Payload / IOD Payload Contracts;
+- optional Data Product and Storage Contracts.
 
 A payload contract describes mission-specific or IOD payload behavior as a declarative contract. It may reference:
 
@@ -102,7 +110,19 @@ A payload contract describes mission-specific or IOD payload behavior as a decla
 - expected effects;
 - generated payload documentation.
 
-Payload contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services or physical payload simulation.
+A data product contract describes a mission-data object produced by a payload or subsystem. It may define:
+
+- producer reference;
+- product type;
+- estimated size;
+- priority;
+- storage intent;
+- retention intent;
+- overflow policy;
+- downlink intent;
+- generated data product documentation.
+
+Payload and Data Product Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution or real downlink runtime behavior.
 
 From that model, OrbitFabric currently provides:
 
@@ -123,6 +143,12 @@ Optional Payload Contract Model
         -> payload lifecycle validation
         -> payload documentation generation
         -> payload-aware scenario behavior
+
+Optional Data Product Contract Model
+        -> producer reference validation
+        -> storage intent validation
+        -> downlink intent validation
+        -> data product documentation generation
 ```
 
 ---
@@ -139,11 +165,13 @@ OrbitFabric is not:
 - a CCSDS/PUS/CFDP implementation;
 - a hardware abstraction layer;
 - a CubeSat tutorial;
-- a ground segment.
+- a ground segment;
 - a payload firmware framework;
 - a payload driver framework;
 - a payload physical simulator;
 - a payload data processing pipeline;
+- an onboard storage runtime;
+- a downlink runtime.
 
 Those may become future integration targets or generated artifacts, but they are not part of the current development preview.
 
@@ -165,12 +193,13 @@ examples/demo-3u/
 │   ├── faults.yaml
 │   ├── packets.yaml
 │   ├── policies.yaml
-│   └── payloads.yaml
+│   ├── payloads.yaml
+│   └── data_products.yaml
 └── scenarios/
     └── battery_low_during_payload.yaml
 ```
 
-The demo also includes a synthetic IOD payload contract:
+The demo includes a synthetic IOD payload contract:
 
 ```text
 demo_iod_payload
@@ -179,7 +208,25 @@ demo_iod_payload
         lifecycle: READY -> ACQUIRING -> READY
 ```
 
-This payload contract groups payload-specific telemetry, commands, events and lifecycle behavior without introducing payload firmware or hardware integration.
+The demo also includes one synthetic payload data product:
+
+```text
+payload.radiation_histogram
+        producer: demo_iod_payload
+        type: histogram
+        estimated size: 4096 bytes
+        storage: science, retention 7d, drop_oldest
+        downlink: next_available_contact
+```
+
+This demonstrates the relationship:
+
+```text
+Payload Contract
+        -> Data Product Contract
+        -> Storage Intent
+        -> Downlink Intent
+```
 
 The demo contains:
 
@@ -228,7 +275,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.2.0.dev0
+orbitfabric 0.3.0
 ```
 
 ---
@@ -280,7 +327,8 @@ generated/docs/
 ├── faults.md
 ├── modes.md
 ├── packets.md
-└── payloads.md
+├── payloads.md
+└── data_products.md
 ```
 
 These files are generated from the validated Mission Model. Do not edit them manually.
@@ -364,7 +412,8 @@ generated/
 │   ├── faults.md
 │   ├── modes.md
 │   ├── packets.md
-│   └── payloads.md
+│   ├── payloads.md
+│   └── data_products.md
 ├── reports/
 │   ├── lint_report.json
 │   └── battery_low_during_payload_report.json
@@ -379,6 +428,7 @@ The source of truth remains:
 ```text
 examples/demo-3u/mission/*.yaml
 examples/demo-3u/mission/payloads.yaml
+examples/demo-3u/mission/data_products.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
@@ -427,6 +477,8 @@ Useful entry points:
 - `docs/ROADMAP.md`
 - `docs/DEVELOPMENT.md`
 - `docs/reference/mission-model-v0.1.md`
+- `docs/reference/payload-contract-model.md`
+- `docs/reference/data-product-contract-model.md`
 - `docs/adr/`
 
 Build the documentation site locally:
