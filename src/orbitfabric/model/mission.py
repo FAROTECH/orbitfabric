@@ -26,6 +26,25 @@ TelemetryType = Literal[
 
 PacketType = Literal["json", "binary_compact", "ccsds_like"]
 PayloadProfile = Literal["iod", "mission_specific"]
+DataProductProducerType = Literal["payload", "subsystem"]
+DataProductType = Literal[
+    "histogram",
+    "image",
+    "sample_batch",
+    "capture_window",
+    "diagnostic_dump",
+    "compressed_product",
+    "generic",
+]
+StorageClass = Literal["science", "diagnostic", "housekeeping", "engineering"]
+OverflowPolicy = Literal["drop_oldest", "drop_newest", "reject_new", "overwrite", "none"]
+DownlinkIntentPolicy = Literal[
+    "none",
+    "next_available_contact",
+    "priority_based",
+    "deferred",
+    "manual",
+]
 
 
 class StrictModel(BaseModel):
@@ -192,6 +211,29 @@ class PayloadContract(StrictModel):
     description: str | None = None
 
 
+class DataProductStorageIntent(StrictModel):
+    storage_class: StorageClass = Field(alias="class")
+    retention: str | None = None
+    overflow_policy: OverflowPolicy | None = None
+
+
+class DataProductDownlinkIntent(StrictModel):
+    policy: DownlinkIntentPolicy | None = None
+
+
+class DataProductContract(StrictModel):
+    id: str
+    producer: str
+    producer_type: DataProductProducerType
+    type: DataProductType
+    estimated_size_bytes: int = Field(gt=0)
+    priority: DownlinkPriority
+    payload: str | None = None
+    storage: DataProductStorageIntent | None = None
+    downlink: DataProductDownlinkIntent | None = None
+    description: str | None = None
+
+
 class AllowedValues(StrictModel):
     allowed_values: list[str]
 
@@ -216,6 +258,7 @@ class MissionModel(StrictModel):
     packets: list[Packet]
     policies: Policies
     payloads: list[PayloadContract] = Field(default_factory=list)
+    data_products: list[DataProductContract] = Field(default_factory=list)
 
     @property
     def subsystem_ids(self) -> set[str]:
@@ -244,6 +287,10 @@ class MissionModel(StrictModel):
     @property
     def payload_ids(self) -> set[str]:
         return {item.id for item in self.payloads}
+
+    @property
+    def data_product_ids(self) -> set[str]:
+        return {item.id for item in self.data_products}
 
     @property
     def mode_ids(self) -> set[str]:
