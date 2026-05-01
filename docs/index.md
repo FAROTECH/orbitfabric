@@ -2,9 +2,30 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets and scenarios in a single Mission Data Contract.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products and scenarios in a single Mission Data Contract.
 
 From that contract, OrbitFabric validates consistency, generates documentation and executes host-side operational scenarios.
+
+## Current development preview
+
+OrbitFabric is currently at:
+
+```text
+v0.3.0 — Data Product and Storage Contracts
+```
+
+The current public preview includes:
+
+- Mission Model YAML loading;
+- structural validation;
+- semantic linting;
+- generated Markdown documentation;
+- deterministic scenario execution;
+- optional Payload / IOD Payload Contracts;
+- optional Data Product and Storage Contracts;
+- generated payload documentation;
+- generated data product documentation;
+- a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
 
@@ -13,5 +34,12 @@ Mission Model
   -> lint
   -> documentation
   -> scenario simulation
+  -> payload contracts
+  -> data product and storage contracts
+  -> future contact/downlink contracts
   -> future runtime and ground artifacts
 ```
+
+OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
+
+It is the contract layer between mission design, onboard software, simulation, testing, documentation and future ground integration artifacts.
