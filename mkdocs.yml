@@ -25,6 +25,7 @@ nav:
       - JSON Reports v0.1: reference/json-reports-v0.1.md
       - Lint Rules v0.1: reference/lint-rules-v0.1.md
       - Payload Contract Model: reference/payload-contract-model.md
+      - Data Product Contract Model: reference/data-product-contract-model.md
 
   - ADR:
       - ADR-0001 Mission Model First: adr/ADR-0001-mission-model-first.md
@@ -34,6 +35,7 @@ nav:
       - ADR-0005 Lint as Core Feature: adr/ADR-0005-lint-as-core-feature.md
       - ADR-0006 Payload Contract Model: adr/ADR-0006-payload-contract-model.md
       - ADR-0007 Mission Data Chain Before Runtime: adr/ADR-0007-mission-data-chain-before-runtime.md
+      - ADR-0008 Data Product and Storage Contracts: adr/ADR-0008-data-product-and-storage-contracts.md
 
 markdown_extensions:
   - admonition
