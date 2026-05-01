@@ -10,18 +10,18 @@ from orbitfabric.model.loader import MissionModelLoader
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
 VALID_DATA_PRODUCTS_YAML = """data_products:
-  - id: payload.radiation_histogram
+  - id: payload.synthetic_histogram
     producer: demo_iod_payload
     producer_type: payload
     type: histogram
-    estimated_size_bytes: 4096
-    priority: high
+    estimated_size_bytes: 2048
+    priority: medium
     storage:
       class: science
-      retention: 7d
+      retention: 3d
       overflow_policy: drop_oldest
     downlink:
-      policy: next_available_contact
+      policy: priority_based
     description: Synthetic payload data product used to validate data product contracts.
 """
 
@@ -109,20 +109,8 @@ def test_invalid_payloads_top_level_key_fails(tmp_path: Path) -> None:
     assert "OF-STR-002" in codes
 
 
-def test_optional_data_products_file_can_be_absent() -> None:
+def test_load_demo_data_product_contract() -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
-
-    assert model.data_products == []
-
-
-def test_load_valid_data_product_contract(tmp_path: Path) -> None:
-    mission_dir = copy_demo_mission(tmp_path)
-    (mission_dir / "data_products.yaml").write_text(
-        VALID_DATA_PRODUCTS_YAML,
-        encoding="utf-8",
-    )
-
-    model = MissionModelLoader().load(mission_dir)
 
     assert len(model.data_products) == 1
     data_product = model.data_products[0]
@@ -141,6 +129,51 @@ def test_load_valid_data_product_contract(tmp_path: Path) -> None:
     assert data_product.downlink.policy == "next_available_contact"
     assert data_product.description is not None
     assert model.data_product_ids == {"payload.radiation_histogram"}
+
+
+def test_optional_data_products_file_can_be_absent(tmp_path: Path) -> None:
+    mission_dir = tmp_path / "mission"
+    mission_dir.mkdir()
+
+    for source_file in DEMO_MISSION.glob("*.yaml"):
+        if source_file.name == "data_products.yaml":
+            continue
+        (mission_dir / source_file.name).write_text(
+            source_file.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    model = MissionModelLoader().load(mission_dir)
+
+    assert model.data_products == []
+
+
+def test_load_valid_data_product_contract(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "data_products.yaml").write_text(
+        VALID_DATA_PRODUCTS_YAML,
+        encoding="utf-8",
+    )
+
+    model = MissionModelLoader().load(mission_dir)
+
+    assert len(model.data_products) == 1
+    data_product = model.data_products[0]
+
+    assert data_product.id == "payload.synthetic_histogram"
+    assert data_product.producer == "demo_iod_payload"
+    assert data_product.producer_type == "payload"
+    assert data_product.type == "histogram"
+    assert data_product.estimated_size_bytes == 2048
+    assert data_product.priority == "medium"
+    assert data_product.storage is not None
+    assert data_product.storage.storage_class == "science"
+    assert data_product.storage.retention == "3d"
+    assert data_product.storage.overflow_policy == "drop_oldest"
+    assert data_product.downlink is not None
+    assert data_product.downlink.policy == "priority_based"
+    assert data_product.description is not None
+    assert model.data_product_ids == {"payload.synthetic_histogram"}
 
 
 def test_invalid_data_products_top_level_key_fails(tmp_path: Path) -> None:
