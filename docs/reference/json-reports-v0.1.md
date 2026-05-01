@@ -1,6 +1,12 @@
-# JSON Reports v0.1
+# JSON Reports
 
-This page documents the JSON reports currently produced by OrbitFabric v0.1.0 development preview.
+This page documents the JSON reports currently produced by OrbitFabric.
+
+Current documented baseline:
+
+```text
+v0.3.0 — Data Product and Storage Contracts
+```
 
 OrbitFabric JSON reports are generated artifacts intended for:
 
@@ -19,7 +25,7 @@ The source of truth remains the Mission Model YAML and scenario YAML.
 
 The JSON report structures documented here are development-preview contracts.
 
-They are intended to be stable enough for v0.1/v0.2 workflows, but they are not a v1.0 compatibility promise.
+They are stable enough for current v0.3 workflows, but they are not a v1.0 compatibility promise.
 
 Future versions may introduce:
 
@@ -35,12 +41,12 @@ Future versions may introduce:
 
 OrbitFabric JSON reports include the OrbitFabric tool/package version in the top-level `version` field.
 
-Example:
+Current example:
 
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.1.0.dev0"
+  "version": "0.3.0"
 }
 ```
 
@@ -93,7 +99,7 @@ orbitfabric-lint
 | `mission` | string | Mission ID loaded from the Mission Model. |
 | `model_version` | string | Mission Model version declared by the mission. |
 | `result` | string | Machine-readable lint result. |
-| `loaded` | object | Counts of loaded Mission Model domains. |
+| `loaded` | object | Counts of loaded core Mission Model domains. |
 | `summary` | object | Count of findings by severity. |
 | `findings` | array | List of lint findings. |
 
@@ -113,7 +119,7 @@ Current lint report `result` values:
 
 ## Lint `loaded` object
 
-The `loaded` object reports how many Mission Model objects were loaded.
+The `loaded` object reports how many core Mission Model objects were loaded.
 
 Current fields:
 
@@ -128,6 +134,8 @@ Current fields:
 | `events` | Number of event definitions. |
 | `faults` | Number of fault definitions. |
 | `packets` | Number of packet definitions. |
+
+Note: optional domains such as `payloads` and `data_products` are validated and documented, but they are not currently included in the lint JSON `loaded` object. This may be expanded in a future report schema revision.
 
 ---
 
@@ -164,12 +172,12 @@ Example:
 ```json
 {
   "severity": "WARNING",
-  "code": "OF-CMD-005",
-  "file": "commands.yaml",
-  "domain": "commands",
-  "object_id": "payload.start_acquisition",
-  "message": "command should define timeout_ms",
-  "suggestion": "Add timeout_ms to make command behavior testable."
+  "code": "OF-DP-008",
+  "file": "data_products.yaml",
+  "domain": "data_products",
+  "object_id": "payload.radiation_histogram",
+  "message": "high-priority data product should define downlink intent",
+  "suggestion": "Set downlink.policy for high or critical data products."
 }
 ```
 
@@ -182,7 +190,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.1.0.dev0",
+  "version": "0.3.0",
   "mission": "demo-3u",
   "model_version": "0.1.0",
   "result": "passed",
@@ -190,7 +198,7 @@ Compact example:
     "spacecraft": 1,
     "subsystems": 4,
     "modes": 6,
-    "mode_transitions": 5,
+    "mode_transitions": 6,
     "telemetry": 5,
     "commands": 4,
     "events": 8,
@@ -363,7 +371,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.1.0.dev0",
+  "version": "0.3.0",
   "mission": "demo-3u",
   "scenario": "battery_low_during_payload",
   "result": "passed",
@@ -389,7 +397,7 @@ Compact example:
 
 ## Current limitations
 
-Current v0.1.0 development preview reports do not yet include:
+Current development-preview reports do not yet include:
 
 - explicit report schema version;
 - JSON Schema URL;
@@ -398,7 +406,8 @@ Current v0.1.0 development preview reports do not yet include:
 - Git commit SHA;
 - environment metadata;
 - compatibility matrix;
-- stable v1.0 compatibility guarantee.
+- stable v1.0 compatibility guarantee;
+- optional payload/data product loaded counts in the lint report.
 
 These may be added later, but they are not part of the current report contract.
 
