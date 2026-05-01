@@ -1,6 +1,12 @@
-# Diagnostics and Lint Rules v0.1
+# Diagnostics and Lint Rules
 
-This page documents the diagnostics and lint rules currently implemented by OrbitFabric v0.1.0 development preview.
+This page documents the diagnostics and lint rules currently implemented by OrbitFabric.
+
+Current documented baseline:
+
+```text
+v0.3.0 — Data Product and Storage Contracts
+```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
 
@@ -62,16 +68,6 @@ OrbitFabric diagnostics expose a common diagnostic shape across Mission Model lo
 
 The `suggestion` field is intentionally optional, but it should be provided whenever OrbitFabric can recommend a clear and safe corrective action.
 
-Examples:
-
-```text
-ERROR OF-SYN-002 telemetry.yaml required Mission Model file is missing Suggestion: Add the required Mission Model file 'telemetry.yaml'.
-
-ERROR OF-SCN-001 scenario.yaml battery_low_during_payload scenario command references unknown command 'payload.unknown_command' Suggestion: Use a command defined in commands.yaml.
-```
-
-Loader diagnostics and lint findings are implemented by different internal types, but they should remain aligned at the user-facing level.
-
 ---
 
 ## Rule families
@@ -88,6 +84,8 @@ Loader diagnostics and lint findings are implemented by different internal types
 | `OF-FLT-*` | Fault engineering lint rules. |
 | `OF-MODE-*` | Mode and mode-transition diagnostics. |
 | `OF-PKT-*` | Packet engineering lint rules. |
+| `OF-PAY-*` | Payload Contract lint rules. |
+| `OF-DP-*` | Data Product Contract lint rules. |
 | `OF-SCN-*` | Scenario loading and scenario reference diagnostics. |
 
 ---
@@ -118,6 +116,13 @@ packets.yaml
 policies.yaml
 ```
 
+Current optional Mission Model files:
+
+```text
+payloads.yaml
+data_products.yaml
+```
+
 ---
 
 ## `OF-STR-*` — Structural diagnostics
@@ -129,12 +134,6 @@ These diagnostics are produced during Mission Model structural validation.
 | `OF-STR-001` | `ERROR` | top-level key | A required top-level key is missing from a Mission Model YAML file. | Add the expected top-level key. |
 | `OF-STR-002` | `ERROR` | top-level key | An unexpected top-level key was found in a Mission Model YAML file. | Remove or rename the unexpected key. |
 | `OF-STR-003` | `ERROR` | typed model validation | Pydantic model validation failed. | Fix the field type, required field or invalid value. |
-
-Example:
-
-```text
-ERROR OF-STR-001 telemetry.yaml telemetry missing required top-level key 'telemetry'
-```
 
 ---
 
@@ -154,6 +153,8 @@ commands
 events
 faults
 packets
+payloads
+data_products
 ```
 
 ---
@@ -174,12 +175,6 @@ These rules check that Mission Model objects reference existing objects.
 | `OF-REF-008` | `ERROR` | commands | Command allowed mode does not reference an existing mode. | Add the mode or fix `allowed_modes`. |
 | `OF-REF-009` | `ERROR` | faults | Fault recovery references an unknown target mode. | Add the mode or fix `recovery.mode_transition`. |
 | `OF-REF-010` | `ERROR` | packets | Packet references unknown telemetry. | Add the telemetry item or fix packet `telemetry`. |
-
-Example:
-
-```text
-ERROR OF-REF-005 faults.yaml eps.battery_low_fault fault condition references unknown telemetry 'eps.battery.vbat'
-```
 
 ---
 
@@ -214,14 +209,6 @@ float64
 | `OF-CMD-006` | `WARNING` | commands | Command should define expected effects. | Add `expected_effects` or explicitly justify no expected effects. |
 | `OF-CMD-007` | `ERROR` | commands | A medium, high or critical-risk command is allowed in `SAFE` mode. | Remove `SAFE` from `allowed_modes` or lower the command risk. |
 
-Risk levels treated as risky by `OF-CMD-007`:
-
-```text
-medium
-high
-critical
-```
-
 ---
 
 ## `OF-EVT-*` — Event rules
@@ -240,8 +227,6 @@ critical
 | `OF-FLT-003` | `ERROR` | faults | Fault must emit at least one event. | Add at least one event ID to the fault `emits` list. |
 | `OF-FLT-005` | `ERROR` | faults | Fault recovery references an unknown command. | Add the command or fix `recovery.auto_commands`. |
 
-Note: `OF-FLT-005` is currently emitted by cross-reference validation because it checks a fault recovery reference.
-
 ---
 
 ## `OF-MODE-*` — Mode rules
@@ -259,6 +244,45 @@ Note: `OF-FLT-005` is currently emitted by cross-reference validation because it
 |---|---|---|---|---|
 | `OF-PKT-002` | `ERROR` | packets | Packet must not be empty. | Add at least one telemetry item to the packet. |
 | `OF-PKT-003` | `ERROR` | packets | Packet `max_payload_bytes` must be positive. | Set `max_payload_bytes` to a positive integer. |
+
+---
+
+## `OF-PAY-*` — Payload Contract rules
+
+These rules validate optional Payload / IOD Payload Contracts.
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-PAY-001` | `ERROR` | payloads | Payload subsystem reference must exist. | Add the subsystem or fix `payload.subsystem`. |
+| `OF-PAY-002` | `ERROR` | payloads | Payload subsystem must have type `payload`. | Link the payload contract to a payload subsystem. |
+| `OF-PAY-003` | `ERROR` | payloads | Payload lifecycle must define an initial state. | Add `lifecycle.initial_state`. |
+| `OF-PAY-004` | `ERROR` | payloads | Payload lifecycle initial state must exist in lifecycle states. | Add the state or fix `initial_state`. |
+| `OF-PAY-005` | `ERROR` | payloads | Payload telemetry reference must exist. | Add the telemetry or fix the reference. |
+| `OF-PAY-006` | `ERROR` | payloads | Payload command reference must exist. | Add the command or fix the reference. |
+| `OF-PAY-007` | `ERROR` | payloads | Payload event reference must exist. | Add the event or fix the reference. |
+| `OF-PAY-008` | `ERROR` | payloads | Payload fault reference must exist. | Add the fault or fix the reference. |
+| `OF-PAY-009` | `ERROR` | commands | Command payload lifecycle precondition references an unknown payload or state. | Fix the payload lifecycle precondition. |
+| `OF-PAY-010` | `ERROR` | commands | Command expected payload lifecycle effect references an unknown payload or state. | Fix the expected payload lifecycle effect. |
+
+Payload rules are contract-level rules. They do not validate payload firmware, drivers, buses or physical payload behavior.
+
+---
+
+## `OF-DP-*` — Data Product Contract rules
+
+These rules validate optional Data Product and Storage Contracts.
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-DP-002` | `ERROR` | data_products | Data product producer reference must exist. | Add the producer payload/subsystem or fix `producer`. |
+| `OF-DP-003` | `ERROR` | data_products | Optional data product payload reference must exist. | Add the payload contract or fix `payload`. |
+| `OF-DP-006` | `WARNING` | data_products | Data product storage intent should define retention. | Set `storage.retention` or remove storage intent if not retained. |
+| `OF-DP-007` | `WARNING` | data_products | Data product storage intent should define overflow policy. | Set `storage.overflow_policy` for retained data products. |
+| `OF-DP-008` | `WARNING` | data_products | High or critical priority data product should define downlink intent. | Set `downlink.policy`. |
+
+Structural validation covers additional data product constraints such as duplicate IDs, positive estimated size and known literal values for product type, storage class, overflow policy and downlink policy.
+
+Data Product rules are contract-level rules. They do not validate real storage, compression, contact windows or downlink runtime behavior.
 
 ---
 
@@ -296,7 +320,7 @@ steps
 
 ## Current command coverage
 
-Current v0.1.0 development preview behavior:
+Current behavior:
 
 | Command | Diagnostics produced |
 |---|---|
