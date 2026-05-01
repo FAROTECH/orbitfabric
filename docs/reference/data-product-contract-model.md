@@ -1,11 +1,11 @@
 # Data Product Contract Model
 
-Status: Proposed for OrbitFabric v0.3  
+Status: Implemented in OrbitFabric v0.3.0  
 Scope: Data Product and Storage Contract definition
 
 ## Purpose
 
-The Data Product Contract Model extends OrbitFabric with a proposed model domain for mission data objects produced by payloads or subsystems.
+The Data Product Contract Model extends OrbitFabric with an optional model domain for mission data objects produced by payloads or subsystems.
 
 A data product contract describes what mission data object is expected to be produced, who produces it, how large it is expected to be, how important it is, how it should be retained and how it should be prepared for future downlink planning.
 
@@ -15,7 +15,7 @@ It does not implement onboard storage, payload processing, compression, contact 
 
 ## Why Data Products Are Separate
 
-OrbitFabric must keep telemetry, packets and data products distinct.
+OrbitFabric keeps telemetry, packets and data products distinct.
 
 ```text
 Telemetry
@@ -75,17 +75,17 @@ A data product contract does not describe:
 - ground segment implementation;
 - runtime skeleton generation.
 
-Those are intentionally outside the proposed v0.3 scope.
+Those are intentionally outside the v0.3.0 scope.
 
-## Candidate YAML Shape
+## YAML Shape
 
-The first implementation slice may introduce an optional file:
+Data products are defined in the optional file:
 
 ```text
 mission/data_products.yaml
 ```
 
-A candidate shape is:
+Current shape:
 
 ```yaml
 data_products:
@@ -103,9 +103,7 @@ data_products:
       policy: next_available_contact
 ```
 
-This is a proposed shape for the v0.3 design direction.
-
-It is not yet a stable schema.
+This shape is implemented in v0.3.0, but OrbitFabric is still pre-1.0 and the schema may evolve.
 
 ## Relationship with Payload Contracts
 
@@ -127,9 +125,9 @@ Payload Contract
 
 A data product may reference a payload contract as its producer.
 
-The reference must remain declarative.
+The reference remains declarative.
 
-It must not imply payload runtime execution or data processing.
+It does not imply payload runtime execution or data processing.
 
 ## Storage Intent
 
@@ -156,44 +154,42 @@ Examples include:
 - deferred downlink;
 - manual or operator-selected downlink.
 
-The first data product slice should not implement contact windows or downlink simulation.
+The first data product slice does not implement contact windows or downlink simulation.
 
 Those belong to later Mission Data Chain milestones.
 
-## Linting Direction
+## Implemented Lint Rules
 
-Data Product Contracts should be linted semantically.
+Data Product Contracts are linted semantically.
 
-Candidate findings include:
+Implemented rule families include:
 
 ```text
-ERROR: data product id is duplicated.
-ERROR: data product references an unknown producer.
-ERROR: data product references an unknown payload contract.
-ERROR: estimated size must be positive.
-WARNING: retained data product has no retention policy.
-WARNING: retained data product has no overflow policy.
-WARNING: high-priority data product has no downlink intent.
+OF-DP-002  producer reference must be known
+OF-DP-003  optional payload reference must be known
+OF-DP-006  storage intent should define retention
+OF-DP-007  storage intent should define overflow_policy
+OF-DP-008  high-priority data product should define downlink intent
 ```
 
-Exact rule IDs and severities should be defined during implementation.
+Structural validation also covers duplicate IDs, positive estimated size and known literal values for product type, storage class, overflow policy and downlink policy.
 
-## Generated Documentation Direction
+## Generated Documentation
 
-When data products are present, OrbitFabric should be able to generate data product documentation from the validated Mission Model.
+When data products are present, OrbitFabric can generate data product documentation from the validated Mission Model.
 
-Candidate output:
+Current generated output:
 
 ```text
 generated/docs/data_products.md
 ```
 
-The generated page should expose data product identity, producer, type, estimated size, priority, storage intent and downlink intent.
+The generated page exposes data product identity, producer, type, estimated size, priority, storage intent and downlink intent.
 
 ## Current Status
 
-This page defines proposed v0.3 scope only.
+This page documents the implemented v0.3.0 Data Product Contract Model.
 
-It does not document an implemented schema yet.
+The model remains development-preview and pre-1.0.
 
-Implementation should proceed through small follow-up issues covering model loading, lint rules, invalid fixtures, generated documentation and one synthetic demo data product.
+Future milestones will add contact windows, downlink flow contracts, commandability contracts and end-to-end mission data flow evidence before runtime skeletons or ground artifacts are introduced.
