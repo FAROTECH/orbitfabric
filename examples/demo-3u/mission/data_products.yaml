@@ -1,0 +1,14 @@
+data_products:
+  - id: payload.radiation_histogram
+    producer: demo_iod_payload
+    producer_type: payload
+    type: histogram
+    estimated_size_bytes: 4096
+    priority: high
+    storage:
+      class: science
+      retention: 7d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: next_available_contact
+    description: Synthetic payload histogram data product used to demonstrate Data Product Contracts.
