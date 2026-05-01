@@ -24,6 +24,7 @@ nav:
       - Versioning Model: reference/versioning.md
       - JSON Reports v0.1: reference/json-reports-v0.1.md
       - Lint Rules v0.1: reference/lint-rules-v0.1.md
+      - Payload Contract Model: reference/payload-contract-model.md
 
   - ADR:
       - ADR-0001 Mission Model First: adr/ADR-0001-mission-model-first.md
@@ -31,6 +32,7 @@ nav:
       - ADR-0003 YAML Multi-File Mission Model: adr/ADR-0003-yaml-multifile-mission-model.md
       - ADR-0004 No Flight Runtime in v0.1: adr/ADR-0004-no-flight-runtime-in-v0.1.md
       - ADR-0005 Lint as Core Feature: adr/ADR-0005-lint-as-core-feature.md
+      - ADR-0006 Payload Contract Model: adr/ADR-0006-payload-contract-model.md
 
 markdown_extensions:
   - admonition
