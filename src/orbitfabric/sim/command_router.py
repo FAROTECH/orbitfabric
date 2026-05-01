@@ -50,6 +50,15 @@ class CommandRouter:
                 reason=f"command not allowed in mode {self._state.current_mode}",
             )
 
+        lifecycle_error = self._validate_payload_lifecycle_precondition(command)
+        if lifecycle_error is not None:
+            self._record(command_id, "REJECTED", dispatch, t)
+            return CommandDispatchResult(
+                command=command,
+                status="REJECTED",
+                reason=lifecycle_error,
+            )
+
         validation_error = self._validate_args(command, args)
         if validation_error is not None:
             self._record(command_id, "FAILED", dispatch, t)
@@ -88,6 +97,29 @@ class CommandRouter:
             )
         )
         self._state.log(t, f"COMMAND {command_id} -> {status}")
+
+    def _validate_payload_lifecycle_precondition(self, command: Command) -> str | None:
+        if not isinstance(command.preconditions, dict):
+            return None
+
+        lifecycle = command.preconditions.get("payload_lifecycle")
+        if not isinstance(lifecycle, dict):
+            return None
+
+        payload_id = lifecycle.get("payload")
+        expected_state = lifecycle.get("state")
+
+        if not isinstance(payload_id, str) or not isinstance(expected_state, str):
+            return "invalid payload lifecycle precondition"
+
+        actual_state = self._state.payload_lifecycle.get(payload_id)
+        if actual_state != expected_state:
+            return (
+                f"payload {payload_id} lifecycle state is {actual_state}, "
+                f"expected {expected_state}"
+            )
+
+        return None
 
     def _validate_args(self, command: Command, args: dict[str, Any]) -> str | None:
         declared_args = {arg.name: arg for arg in command.arguments}
