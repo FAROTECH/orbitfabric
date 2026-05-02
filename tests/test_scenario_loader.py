@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+from orbitfabric import __version__
 from orbitfabric.cli import app
 from orbitfabric.model.errors import MissionModelError
 from orbitfabric.model.scenario_loader import ScenarioLoader
@@ -28,7 +29,7 @@ def test_sim_cli_loads_demo_scenario() -> None:
     result = runner.invoke(app, ["sim", str(DEMO_SCENARIO)])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Scenario Simulator v0.1" in result.output
+    assert f"OrbitFabric Scenario Simulator {__version__}" in result.output
     assert "Scenario: battery_low_during_payload" in result.output
     assert "Mission: demo-3u" in result.output
     assert "Result: PASSED" in result.output
@@ -45,7 +46,7 @@ def test_validate_scenario_cli_loads_demo_scenario() -> None:
     result = runner.invoke(app, ["validate", "scenario", str(DEMO_SCENARIO)])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Scenario Validation v0.1" in result.output
+    assert f"OrbitFabric Scenario Validation {__version__}" in result.output
     assert "Scenario: battery_low_during_payload" in result.output
     assert "Mission: demo-3u" in result.output
     assert "Initial mode: NOMINAL" in result.output
@@ -188,6 +189,7 @@ unexpected: true
     assert exc_info.value.diagnostics[0].suggestion == (
         "Remove or rename the unexpected scenario top-level key 'unexpected'."
     )
+
 
 def _copy_demo_scenario_with_replacement(
     tmp_path: Path,
