@@ -29,16 +29,17 @@ def test_lint_loads_demo_mission() -> None:
     result = runner.invoke(app, ["lint", "examples/demo-3u/mission"])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Mission Lint v0.1" in result.output
+    assert f"OrbitFabric Mission Lint {__version__}" in result.output
     assert "Mission: demo-3u" in result.output
     assert "No findings." in result.output
     assert "Result: PASSED" in result.output
+
 
 def test_inspect_mission_loads_demo_mission() -> None:
     result = runner.invoke(app, ["inspect", "mission", "examples/demo-3u/mission"])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Mission Inspection v0.1" in result.output
+    assert f"OrbitFabric Mission Inspection {__version__}" in result.output
     assert "Mission: demo-3u" in result.output
     assert "Model version: 0.1.0" in result.output
     assert "subsystems: 4" in result.output
@@ -48,8 +49,11 @@ def test_inspect_mission_loads_demo_mission() -> None:
     assert "events:" in result.output
     assert "faults:" in result.output
     assert "packets:" in result.output
+    assert "payloads:" in result.output
+    assert "data products:" in result.output
     assert "Result: PASSED" in result.output
     assert "Findings:" not in result.output
+
 
 def test_inspect_mission_rejects_invalid_mission(tmp_path: Path) -> None:
     mission_dir = _copy_demo_mission_missing_required_file(tmp_path)
@@ -60,6 +64,7 @@ def test_inspect_mission_rejects_invalid_mission(tmp_path: Path) -> None:
     assert "OF-SYN-002" in result.output
     assert "required Mission Model file is missing" in result.output
     assert "Result: FAILED" in result.output
+
 
 def test_lint_with_warnings_passes_by_default(tmp_path: Path) -> None:
     mission_dir = _copy_demo_mission_with_warning(tmp_path)
@@ -102,6 +107,7 @@ def _copy_demo_mission_with_warning(tmp_path: Path) -> Path:
 
     return mission_dir
 
+
 def _copy_demo_mission_missing_required_file(tmp_path: Path) -> Path:
     source = Path("examples/demo-3u/mission")
     mission_dir = tmp_path / "mission"
@@ -109,4 +115,4 @@ def _copy_demo_mission_missing_required_file(tmp_path: Path) -> Path:
 
     (mission_dir / "telemetry.yaml").unlink()
 
-    return mission_dir 
+    return mission_dir

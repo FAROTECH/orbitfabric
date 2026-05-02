@@ -4,6 +4,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from orbitfabric import __version__
 from orbitfabric.cli import app
 from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.model.loader import MissionModelLoader
@@ -80,7 +81,7 @@ def test_gen_docs_cli_writes_markdown_files(tmp_path: Path) -> None:
     )
 
     assert result.exit_code == 0
-    assert "OrbitFabric Docs Generator v0.1" in result.output
+    assert f"OrbitFabric Docs Generator {__version__}" in result.output
     assert "Generated files:" in result.output
     assert "Result: PASSED" in result.output
 
