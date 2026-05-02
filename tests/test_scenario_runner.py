@@ -4,6 +4,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from orbitfabric import __version__
 from orbitfabric.cli import app
 from orbitfabric.model.scenario_loader import ScenarioLoader
 from orbitfabric.sim.runner import ScenarioRunner
@@ -64,7 +65,7 @@ def test_sim_cli_executes_demo_scenario() -> None:
     result = runner.invoke(app, ["sim", str(DEMO_SCENARIO)])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Scenario Simulator v0.1" in result.output
+    assert f"OrbitFabric Scenario Simulator {__version__}" in result.output
     assert "Scenario: battery_low_during_payload" in result.output
     assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
     assert "EVENT eps.battery_low severity=WARNING" in result.output
@@ -76,7 +77,7 @@ def test_sim_cli_executes_nominal_payload_lifecycle_scenario() -> None:
     result = runner.invoke(app, ["sim", str(PAYLOAD_SCENARIO)])
 
     assert result.exit_code == 0
-    assert "OrbitFabric Scenario Simulator v0.1" in result.output
+    assert f"OrbitFabric Scenario Simulator {__version__}" in result.output
     assert "Scenario: nominal_payload_acquisition" in result.output
     assert "PAYLOAD demo_iod_payload LIFECYCLE=READY" in result.output
     assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
