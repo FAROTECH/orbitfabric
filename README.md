@@ -78,6 +78,9 @@ ruff check .
 
 pytest
 -> passing
+
+mkdocs build --strict
+-> passing
 ```
 
 ---
@@ -388,13 +391,15 @@ generated/logs/battery_low_during_payload.log
 ```bash
 ruff check .
 pytest
+mkdocs build --strict
 ```
 
 Current expected baseline:
 
 ```text
-ruff check .  -> All checks passed
-pytest        -> passing
+ruff check .           -> All checks passed
+pytest                 -> passing
+mkdocs build --strict  -> passing
 ```
 
 ---

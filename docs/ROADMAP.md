@@ -391,7 +391,7 @@ OrbitFabric should let a mission designer ask:
 contact window model
 contact profile model
 link profile model
-estimated downlink budget
+declared downlink capacity assumption
 abstract downlink queue policy
 data product downlink eligibility
 scenario contact events
@@ -402,7 +402,7 @@ downlink consistency lint rules
 ### 9.3 Candidate Lint Rules
 
 ```text
-WARNING: produced data volume may exceed nominal contact budget.
+WARNING: produced data volume may exceed declared contact capacity.
 ERROR: downlink policy references unknown contact profile.
 WARNING: critical event has no immediate downlink class.
 WARNING: high-priority product is retained but never scheduled for downlink.
