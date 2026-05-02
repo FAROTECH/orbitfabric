@@ -34,6 +34,7 @@ app.add_typer(validate_app, name="validate")
 inspect_app = typer.Typer(help="Inspect OrbitFabric models and inputs.")
 app.add_typer(inspect_app, name="inspect")
 
+
 @app.callback()
 def main(
     version: Annotated[
@@ -77,7 +78,7 @@ def lint(
     ] = False,
 ) -> None:
     """Validate and semantically lint a Mission Model."""
-    typer.echo("OrbitFabric Mission Lint v0.1")
+    typer.echo(f"OrbitFabric Mission Lint {__version__}")
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -123,7 +124,7 @@ def gen_docs(
     ] = Path("generated/docs"),
 ) -> None:
     """Generate Markdown documentation from a Mission Model."""
-    typer.echo("OrbitFabric Docs Generator v0.1")
+    typer.echo(f"OrbitFabric Docs Generator {__version__}")
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -149,6 +150,7 @@ def gen_docs(
 
     typer.echo("\nResult: PASSED")
 
+
 @inspect_app.command("mission")
 def inspect_mission(
     mission_dir: Annotated[
@@ -163,7 +165,7 @@ def inspect_mission(
     ],
 ) -> None:
     """Inspect a Mission Model without linting or generating artifacts."""
-    typer.echo("OrbitFabric Mission Inspection v0.1")
+    typer.echo(f"OrbitFabric Mission Inspection {__version__}")
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -174,7 +176,8 @@ def inspect_mission(
     _print_loaded_model_summary(model)
 
     typer.echo("\nResult: PASSED")
-    
+
+
 @validate_app.command("scenario")
 def validate_scenario(
     scenario_file: Annotated[
@@ -189,7 +192,7 @@ def validate_scenario(
     ],
 ) -> None:
     """Validate a scenario without executing it."""
-    typer.echo("OrbitFabric Scenario Validation v0.1")
+    typer.echo(f"OrbitFabric Scenario Validation {__version__}")
 
     try:
         loaded = ScenarioLoader().load(scenario_file)
@@ -204,6 +207,7 @@ def validate_scenario(
     typer.echo(f"Steps: {len(loaded.scenario.steps)}")
 
     typer.echo("\nResult: PASSED")
+
 
 @app.command()
 def sim(
@@ -233,7 +237,7 @@ def sim(
     ] = None,
 ) -> None:
     """Run a scenario against a Mission Model."""
-    typer.echo("OrbitFabric Scenario Simulator v0.1")
+    typer.echo(f"OrbitFabric Scenario Simulator {__version__}")
 
     try:
         loaded = ScenarioLoader().load(scenario_file)
@@ -283,6 +287,8 @@ def _print_loaded_model_summary(model: MissionModel) -> None:
     typer.echo(f"  events: {len(model.events)}")
     typer.echo(f"  faults: {len(model.faults)}")
     typer.echo(f"  packets: {len(model.packets)}")
+    typer.echo(f"  payloads: {len(model.payloads)}")
+    typer.echo(f"  data products: {len(model.data_products)}")
 
 
 def _print_lint_report(report: LintReport) -> None:
