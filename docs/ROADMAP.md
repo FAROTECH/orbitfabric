@@ -1,7 +1,7 @@
 # OrbitFabric — Roadmap
 
-Version: v0.3.0  
-Status: Development preview  
+Version: v0.4.0
+Status: Development preview
 Scope: v0.3 to v1.0 planning
 
 ---
@@ -74,8 +74,8 @@ v0.2.1  Payload Contract Model                                completed
 v0.2.2  Payload Contract Release Alignment                    completed
 v0.2.3  Mission Data Chain Roadmap Alignment                  completed
 v0.3.0  Data Product and Storage Contracts                    completed
-v0.4    Contact Windows and Downlink Flow Contracts           next
-v0.5    Commandability and Autonomy Contracts                 future
+v0.4    Contact Windows and Downlink Flow Contracts           completed
+v0.5    Commandability and Autonomy Contracts                 next
 v0.6    End-to-End Mission Data Flow Evidence                 future
 v0.7    Generated Runtime Skeletons                           future
 v0.8    Ground Integration Artifacts                          future
@@ -83,7 +83,7 @@ v0.9    Plugin and Extensibility Layer                        future
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target is `v0.4 — Contact Windows and Downlink Flow Contracts`.
+The immediate target is `v0.5 — Commandability and Autonomy Contracts`.
 
 Runtime skeleton generation remains deferred until the Mission Data Chain is coherent enough to generate useful artifacts from it.
 
@@ -375,40 +375,23 @@ It describes contract intent only.
 
 ---
 
-## 9. Next Milestone — v0.4 Contact Windows and Downlink Flow Contracts
+## 9. Completed Slice — v0.4.0 Contact Windows and Downlink Flow Contracts
 
 ### 9.1 Objective
 
 Model contact windows and downlink flow assumptions without becoming a ground segment, an orbital dynamics simulator, an RF simulator or a downlink runtime.
 
-OrbitFabric should let a mission designer ask:
+OrbitFabric now lets a mission designer ask:
 
 > Given the declared data products, priorities, storage policies, downlink intent and contact assumptions, is the mission data flow coherent?
 
-### 9.2 Architectural Question
+### 9.2 Completed Capabilities
 
-The v0.4 slice strengthens this contract chain:
-
-```text
-Data Product Contract
-        -> Storage Intent
-        -> Downlink Intent
-        -> Contact Window Assumptions
-        -> Downlink Flow Contract
-        -> future End-to-End Mission Data Flow Evidence
-```
-
-The model should expose assumptions that can be validated, linted and documented.
-
-It must not execute those assumptions.
-
-### 9.3 Initial Scope
-
-The first v0.4 implementation slice should remain narrow.
-
-Candidate scope:
+v0.4.0 introduced:
 
 ```text
+ADR-0009 Contact Windows and Downlink Flow Contracts
+Contact and Downlink Contract reference documentation
 optional contacts.yaml domain
 contact profile model
 link profile model
@@ -422,7 +405,7 @@ generated contact/downlink documentation
 one synthetic demo contact/downlink slice
 ```
 
-The preferred initial file is:
+The implemented file is:
 
 ```text
 mission/contacts.yaml
@@ -430,44 +413,47 @@ mission/contacts.yaml
 
 The file may contain contact profiles, link profiles, contact windows and downlink flow contracts.
 
-### 9.4 Deferred Items
+### 9.3 Implemented Lint Direction
 
-The following items are valid but should not be part of the first v0.4 implementation unless a later PR proves that they are necessary:
-
-```text
-scenario contact events
-partial downlink scenario behavior
-derived capacity from rate and duration
-multiple contact networks
-ground export artifacts
-runtime downlink queues
-```
-
-Scenario contact events are especially easy to over-scope.
-
-They should remain deferred until the model and lint slice are stable.
-
-### 9.5 Candidate Lint Rules
-
-Initial lint direction:
+v0.4.0 introduced:
 
 ```text
-ERROR: contact window references an unknown contact profile.
-ERROR: contact window references an unknown link profile.
-ERROR: downlink flow references an unknown contact profile.
-ERROR: downlink flow references an unknown link profile.
-ERROR: downlink flow references an unknown data product.
-WARNING: high-priority data product has downlink intent but no eligible downlink flow.
-WARNING: estimated data volume may exceed declared contact capacity.
+OF-CON-001 contact window references unknown contact profile
+OF-CON-002 contact window references unknown link profile
+OF-DL-001  downlink flow references unknown contact profile
+OF-DL-002  downlink flow references unknown link profile
+OF-DL-003  downlink flow references unknown data product
+OF-DL-004  high-priority data product has downlink intent but no eligible downlink flow
+OF-DL-005  estimated data product volume may exceed declared contact capacity
 ```
 
-Linting should expose ambiguity.
+Linting exposes ambiguity.
 
-It must not pretend to schedule real downlink operations.
+It does not schedule real downlink operations.
+
+### 9.4 Generated Documentation
+
+When contact/downlink contracts are present, OrbitFabric now generates:
+
+```text
+generated/docs/contacts.md
+```
+
+### 9.5 Demo Evidence
+
+The synthetic `demo-3u` mission now demonstrates:
+
+```text
+Data Product Contract
+        -> Storage Intent
+        -> Downlink Intent
+        -> Contact Window Assumption
+        -> Downlink Flow Contract
+```
 
 ### 9.6 Boundary
 
-v0.4 must not implement:
+v0.4.0 does not implement:
 
 ```text
 orbit propagation
@@ -490,8 +476,7 @@ ground export generation
 Contact windows and downlink flows are contract assumptions, not physical simulation or runtime behavior.
 
 ---
-
-## 10. Future Milestone — v0.5 Commandability and Autonomy Contracts
+## 10. Next Milestone — v0.5 Commandability and Autonomy Contracts
 
 ### 10.1 Objective
 
@@ -832,18 +817,19 @@ They must not become a live ground segment inside OrbitFabric.
 The immediate work package is:
 
 ```text
-v0.4 — Contact Windows and Downlink Flow Contracts
+v0.5 — Commandability and Autonomy Contracts
 ```
 
 Required sequence:
 
 ```text
-1. define contact/downlink contract scope
-2. add ADR for Contact Windows and Downlink Flow Contracts
-3. introduce optional contact/link model domain
-4. add semantic lint rules for contact/downlink references
-5. generate contact/downlink documentation
-6. update the synthetic demo mission with one clean contact/downlink slice
+1. define commandability/autonomy contract scope
+2. add ADR for Commandability and Autonomy Contracts
+3. refine command source and dispatch intent
+4. model autonomous command intent without implementing autonomy runtime
+5. add semantic lint rules for commandability consistency
+6. generate commandability/autonomy documentation
+7. update the synthetic demo mission with one clean commandability slice
 ```
 
 Do not add runtime skeletons before the mission data chain model is coherent.
@@ -851,7 +837,6 @@ Do not add runtime skeletons before the mission data chain model is coherent.
 Do not add ground exports before contact, downlink and data product contracts exist.
 
 ---
-
 ## 19. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
@@ -862,9 +847,11 @@ The Payload Contract Model strengthens this mission by making mission-specific a
 
 The Data Product and Storage Contract Model strengthens the mission data chain by making payload and subsystem data products, storage intent and downlink intent explicit.
 
-The next roadmap step is to model contact windows and downlink flow assumptions before runtime or ground artifacts are generated.
+The v0.4 roadmap step has completed the first Contact Windows and Downlink Flow Contract slice.
 
-Only after the model is clear and stable should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
+The next roadmap step is to model commandability and autonomy assumptions before runtime or ground artifacts are generated.
+
+Only after the mission data chain, commandability and autonomy contracts are clear should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.

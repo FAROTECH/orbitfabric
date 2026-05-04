@@ -40,28 +40,32 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently at `v0.3.0 — Data Product and Storage Contracts`.
+OrbitFabric is currently at `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
 
 The current repository includes:
 
 - the `v0.2.1 — Payload Contract Model` vertical slice;
 - the `v0.2.3 — Mission Data Chain Roadmap Alignment` direction;
-- the `v0.3.0 — Data Product and Storage Contracts` vertical slice.
+- the `v0.3.0 — Data Product and Storage Contracts` vertical slice;
+- the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice.
 
 The current vertical slice is functional:
 
 - Mission Model YAML loading;
 - optional `payloads.yaml` loading;
 - optional `data_products.yaml` loading;
+- optional `contacts.yaml` loading;
 - structural validation;
 - semantic linting;
 - engineering lint rules;
 - payload contract lint rules;
 - data product contract lint rules;
+- contact/downlink contract lint rules;
 - JSON lint report generation;
 - generated Markdown documentation;
 - generated payload contract documentation;
 - generated data product contract documentation;
+- generated contact/downlink contract documentation;
 - scenario YAML loading;
 - scenario reference validation;
 - deterministic scenario execution;
@@ -100,7 +104,8 @@ It models:
 - scenarios;
 - persistence and downlink policies;
 - optional Payload / IOD Payload Contracts;
-- optional Data Product and Storage Contracts.
+- optional Data Product and Storage Contracts;
+- optional Contact Windows and Downlink Flow Contracts.
 
 A payload contract describes mission-specific or IOD payload behavior as a declarative contract. It may reference:
 
@@ -125,7 +130,17 @@ A data product contract describes a mission-data object produced by a payload or
 - downlink intent;
 - generated data product documentation.
 
-Payload and Data Product Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution or real downlink runtime behavior.
+A contact/downlink contract describes declared assumptions about how data products become eligible for downlink. It may define:
+
+- contact profiles;
+- link profiles;
+- contact windows;
+- declared contact capacity;
+- downlink flow intent;
+- eligible data products;
+- generated contact/downlink documentation.
+
+Payload, Data Product and Contact/Downlink Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling or real downlink runtime behavior.
 
 From that model, OrbitFabric currently provides:
 
@@ -152,6 +167,13 @@ Optional Data Product Contract Model
         -> storage intent validation
         -> downlink intent validation
         -> data product documentation generation
+
+Optional Contact and Downlink Contract Model
+        -> contact profile validation
+        -> link profile validation
+        -> contact window validation
+        -> downlink flow consistency validation
+        -> contact/downlink documentation generation
 ```
 
 ---
@@ -174,7 +196,10 @@ OrbitFabric is not:
 - a payload physical simulator;
 - a payload data processing pipeline;
 - an onboard storage runtime;
-- a downlink runtime.
+- a downlink runtime;
+- an orbit propagator;
+- an RF/link budget simulator;
+- a real contact scheduler.
 
 Those may become future integration targets or generated artifacts, but they are not part of the current development preview.
 
@@ -197,7 +222,8 @@ examples/demo-3u/
 │   ├── packets.yaml
 │   ├── policies.yaml
 │   ├── payloads.yaml
-│   └── data_products.yaml
+│   ├── data_products.yaml
+│   └── contacts.yaml
 └── scenarios/
     └── battery_low_during_payload.yaml
 ```
@@ -222,6 +248,16 @@ payload.radiation_histogram
         downlink: next_available_contact
 ```
 
+The demo also includes one synthetic contact/downlink assumption slice:
+
+```text
+primary_ground_contact
+        link: uhf_downlink_nominal
+        window: demo_contact_001
+        flow: science_next_available_contact
+        eligible data product: payload.radiation_histogram
+```
+
 This demonstrates the relationship:
 
 ```text
@@ -229,6 +265,8 @@ Payload Contract
         -> Data Product Contract
         -> Storage Intent
         -> Downlink Intent
+        -> Contact Window Assumption
+        -> Downlink Flow Contract
 ```
 
 The demo contains:
@@ -278,7 +316,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.3.0
+orbitfabric 0.4.0
 ```
 
 ---
@@ -331,7 +369,8 @@ generated/docs/
 ├── modes.md
 ├── packets.md
 ├── payloads.md
-└── data_products.md
+├── data_products.md
+└── contacts.md
 ```
 
 These files are generated from the validated Mission Model. Do not edit them manually.
@@ -418,7 +457,8 @@ generated/
 │   ├── modes.md
 │   ├── packets.md
 │   ├── payloads.md
-│   └── data_products.md
+│   ├── data_products.md
+│   └── contacts.md
 ├── reports/
 │   ├── lint_report.json
 │   └── battery_low_during_payload_report.json
@@ -434,6 +474,7 @@ The source of truth remains:
 examples/demo-3u/mission/*.yaml
 examples/demo-3u/mission/payloads.yaml
 examples/demo-3u/mission/data_products.yaml
+examples/demo-3u/mission/contacts.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
@@ -484,6 +525,7 @@ Useful entry points:
 - `docs/reference/mission-model-v0.1.md`
 - `docs/reference/payload-contract-model.md`
 - `docs/reference/data-product-contract-model.md`
+- `docs/reference/contact-downlink-contract-model.md`
 - `docs/adr/`
 
 Build the documentation site locally:

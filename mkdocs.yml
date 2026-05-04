@@ -30,6 +30,7 @@ nav:
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
+      - v0.4.0 Contact Windows and Downlink Flow Contracts: releases/v0.4.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 

@@ -10,7 +10,57 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ### Changed
 
-- Next development focus: `v0.4 — Contact Windows and Downlink Flow Contracts`.
+- Next development focus: `v0.5 — Commandability and Autonomy Contracts`.
+
+---
+
+## [v0.4.0] — Contact Windows and Downlink Flow Contracts
+
+### Added
+
+- Added the Contact Windows and Downlink Flow Contract Model as an optional mission model domain.
+- Added optional `mission/contacts.yaml` loading.
+- Added contact profiles.
+- Added link profiles.
+- Added contact windows with declared capacity assumptions.
+- Added downlink flow contracts.
+- Added data product eligibility for downlink flows.
+- Added Mission Model ID helpers for contact/downlink domains.
+- Added duplicate ID validation for contact profiles, link profiles, contact windows and downlink flows.
+- Added semantic lint rules for contact/downlink references and downlink flow consistency.
+- Added `OF-CON-*` lint rules for contact assumptions.
+- Added `OF-DL-*` lint rules for downlink flow assumptions.
+- Added generated Contact and Downlink Contract documentation.
+- Added generated `contacts.md` documentation output.
+- Added one synthetic contact/downlink slice to the `demo-3u` mission.
+- Added ADR-0009 for Contact Windows and Downlink Flow Contracts.
+- Added reference documentation for the Contact and Downlink Contract Model.
+
+### Changed
+
+- Extended the synthetic `demo-3u` mission with contract-level contact/downlink assumptions.
+- Extended generated mission documentation to include contact/downlink references when contact contracts are present.
+- Extended the Mission Data Chain from downlink intent to declared contact and downlink flow assumptions.
+- Reinforced the boundary between contract assumptions and runtime/ground behavior.
+
+### Boundaries
+
+The Contact Windows and Downlink Flow Contract slice intentionally does not introduce:
+
+- orbit propagation;
+- TLE parsing;
+- ground track computation;
+- antenna pointing;
+- RF link budget simulation;
+- real contact scheduling;
+- real downlink execution;
+- onboard downlink queues;
+- live ground links;
+- CCSDS/PUS/CFDP implementation;
+- Yamcs/OpenC3 runtime integration;
+- runtime skeleton generation;
+- ground export generation;
+- real spacecraft operations.
 
 ---
 

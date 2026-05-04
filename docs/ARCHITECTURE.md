@@ -1,8 +1,8 @@
 # OrbitFabric — Architecture
 
-Version: 0.3.0  
-Status: Development preview  
-Scope: Mission Data Contract architecture through Data Product and Storage Contracts
+Version: 0.4.0
+Status: Development preview
+Scope: Mission Data Contract architecture through Contact Windows and Downlink Flow Contracts
 
 ---
 
@@ -33,9 +33,9 @@ Its architectural role is:
 
 > define, validate, simulate and document the contract between mission design, onboard software, tests, documentation, simulation and future ground integration artifacts.
 
-The current architectural baseline is `v0.3.0 — Data Product and Storage Contracts`.
+The current architectural baseline is `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
 
-The next architectural step is `v0.4 — Contact Windows and Downlink Flow Contracts`.
+The next architectural step is `v0.5 — Commandability and Autonomy Contracts`.
 
 ---
 
@@ -68,7 +68,7 @@ Payload behavior
         -> Data Product Contract
         -> Storage Intent
         -> Downlink Intent
-        -> future Contact Windows and Downlink Flow Contracts
+        -> Contact Windows and Downlink Flow Contracts
         -> future Commandability and Autonomy Contracts
         -> future End-to-End Mission Data Flow Evidence
         -> future Runtime Skeletons
@@ -143,6 +143,7 @@ OrbitFabric
 │   ├── policies
 │   ├── payload contracts
 │   ├── data product contracts
+│   ├── contact/downlink contracts
 │   └── scenarios
 │
 ├── Toolchain
@@ -165,6 +166,7 @@ OrbitFabric
 │   ├── engineering rules
 │   ├── payload contract rules
 │   ├── data product contract rules
+│   ├── contact/downlink contract rules
 │   ├── findings
 │   └── JSON reports
 │
@@ -189,7 +191,8 @@ OrbitFabric
 │   ├── mode documentation
 │   ├── packet documentation
 │   ├── payload contract documentation
-│   └── data product documentation
+│   ├── data product documentation
+│   └── contact/downlink documentation
 │
 └── Future Extension Layer
     ├── contact/downlink contracts
@@ -203,20 +206,22 @@ OrbitFabric
 
 ---
 
-## 4. Current Capability Boundary — v0.3.0
+## 4. Current Capability Boundary — v0.4.0
 
-OrbitFabric v0.3.0 includes:
+OrbitFabric v0.4.0 includes:
 
 ```text
 Mission Model YAML
 canonical multi-file mission directory
 optional payloads.yaml domain
 optional data_products.yaml domain
+optional contacts.yaml domain
 Pydantic typed validation
 structural validation
 semantic lint
 payload contract lint rules
 data product contract lint rules
+contact/downlink contract lint rules
 scenario loading
 scenario reference validation
 host-side deterministic scenario execution
@@ -224,6 +229,7 @@ payload lifecycle scenario behavior
 generated Markdown docs
 generated payload documentation
 generated data product documentation
+generated contact/downlink documentation
 JSON lint reports
 JSON scenario reports
 plain-text scenario logs
@@ -662,6 +668,7 @@ hardware communication
 embedded resource constraints
 storage runtime behavior
 downlink runtime behavior
+contact visibility behavior
 flight qualification semantics
 ```
 
@@ -706,6 +713,7 @@ generated/docs/modes.md
 generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
+generated/docs/contacts.md
 ```
 
 ### 13.2 Generator Rule
@@ -1040,6 +1048,7 @@ generated/docs/modes.md
 generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
+generated/docs/contacts.md
 ```
 
 These document a specific mission model.
@@ -1159,9 +1168,9 @@ Using real private mission details as examples.
 
 ---
 
-## 24. v0.3.0 Acceptance Architecture
+## 24. v0.4.0 Acceptance Architecture
 
-OrbitFabric v0.3.0 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.4.0 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -1185,6 +1194,7 @@ valid lint output
 Markdown mission documentation
 payload contract documentation
 data product contract documentation
+contact/downlink contract documentation
 scenario execution log
 scenario JSON report
 ```
@@ -1197,6 +1207,7 @@ structural validation
 semantic linting
 payload contract validation
 data product contract validation
+contact/downlink contract validation
 command validation
 event emission
 fault detection
@@ -1207,16 +1218,16 @@ scenario pass/fail result
 generated documentation
 ```
 
-No runtime skeleton, ground export, contact window model or storage/downlink runtime is required for v0.3.0.
+No runtime skeleton, ground export, orbital propagation, RF simulation or storage/downlink runtime is required for v0.4.0.
 
 ---
 
-## 25. Next Architectural Step — v0.4
+## 25. Next Architectural Step — v0.5
 
 The next architectural step is:
 
 ```text
-v0.4 — Contact Windows and Downlink Flow Contracts
+v0.5 — Commandability and Autonomy Contracts
 ```
 
 The purpose is to model ground contact and downlink assumptions without becoming a ground segment or orbital dynamics simulator.
