@@ -25,6 +25,7 @@ REQUIRED_FILES: dict[str, tuple[str, ...]] = {
 OPTIONAL_FILES: dict[str, tuple[str, ...]] = {
     "payloads.yaml": ("payloads",),
     "data_products.yaml": ("data_products",),
+    "contacts.yaml": ("contacts",),
 }
 
 
@@ -262,6 +263,34 @@ class MissionModelLoader:
                 domain="data_products",
                 file="data_products.yaml",
                 values=[item.id for item in model.data_products],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="contact_profiles",
+                file="contacts.yaml",
+                values=[item.id for item in model.contacts.contact_profiles],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="link_profiles",
+                file="contacts.yaml",
+                values=[item.id for item in model.contacts.link_profiles],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="contact_windows",
+                file="contacts.yaml",
+                values=[item.id for item in model.contacts.contact_windows],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="downlink_flows",
+                file="contacts.yaml",
+                values=[item.id for item in model.contacts.downlink_flows],
             )
         )
         diagnostics.extend(
