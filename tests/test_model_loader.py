@@ -78,10 +78,10 @@ def test_load_demo_mission() -> None:
     assert len(model.events) >= 8
     assert len(model.faults) == 2
     assert len(model.packets) >= 3
-    assert model.contacts.contact_profiles == []
-    assert model.contacts.link_profiles == []
-    assert model.contacts.contact_windows == []
-    assert model.contacts.downlink_flows == []
+    assert len(model.contacts.contact_profiles) == 1
+    assert len(model.contacts.link_profiles) == 1
+    assert len(model.contacts.contact_windows) == 1
+    assert len(model.contacts.downlink_flows) == 1
 
 
 def test_load_demo_payload_contract() -> None:
@@ -160,6 +160,31 @@ def test_load_demo_data_product_contract() -> None:
     assert data_product.downlink.policy == "next_available_contact"
     assert data_product.description is not None
     assert model.data_product_ids == {"payload.radiation_histogram"}
+
+
+def test_load_demo_contact_downlink_contract() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+
+    contact_profile = model.contacts.contact_profiles[0]
+    link_profile = model.contacts.link_profiles[0]
+    contact_window = model.contacts.contact_windows[0]
+    downlink_flow = model.contacts.downlink_flows[0]
+
+    assert contact_profile.id == "primary_ground_contact"
+    assert contact_profile.target == "synthetic_ground_station"
+    assert link_profile.id == "uhf_downlink_nominal"
+    assert link_profile.direction == "downlink"
+    assert link_profile.assumed_rate_bps == 9600
+    assert contact_window.id == "demo_contact_001"
+    assert contact_window.contact_profile == "primary_ground_contact"
+    assert contact_window.link_profile == "uhf_downlink_nominal"
+    assert contact_window.duration_seconds == 600
+    assert contact_window.assumed_capacity_bytes == 512000
+    assert downlink_flow.id == "science_next_available_contact"
+    assert downlink_flow.contact_profile == "primary_ground_contact"
+    assert downlink_flow.link_profile == "uhf_downlink_nominal"
+    assert downlink_flow.queue_policy == "priority_then_age"
+    assert downlink_flow.eligible_data_products == ["payload.radiation_histogram"]
 
 
 def test_optional_data_products_file_can_be_absent(tmp_path: Path) -> None:

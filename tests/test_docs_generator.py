@@ -140,6 +140,31 @@ def test_generate_demo_data_product_contract_docs(tmp_path: Path) -> None:
     assert "Synthetic payload histogram data product used to demonstrate" in content
 
 
+def test_generate_demo_contact_downlink_contract_docs(tmp_path: Path) -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+
+    generated_files = generate_markdown_docs(model, tmp_path)
+
+    contacts_path = tmp_path / "contacts.md"
+    generated_names = {path.name for path in generated_files}
+
+    assert "contacts.md" in generated_names
+    assert contacts_path.exists()
+
+    content = contacts_path.read_text(encoding="utf-8")
+
+    assert "# Contact and Downlink Contract Reference" in content
+    assert "contract assumptions only" in content
+    assert "`primary_ground_contact`" in content
+    assert "`synthetic_ground_station`" in content
+    assert "`uhf_downlink_nominal`" in content
+    assert "`demo_contact_001`" in content
+    assert "512000" in content
+    assert "`science_next_available_contact`" in content
+    assert "`priority_then_age`" in content
+    assert "`payload.radiation_histogram`" in content
+
+
 def test_generate_data_product_contract_docs_from_model_object(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     model.data_products = [make_valid_data_product()]

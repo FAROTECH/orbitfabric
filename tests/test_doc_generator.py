@@ -28,6 +28,7 @@ def test_generate_markdown_docs(tmp_path: Path) -> None:
         "packets.md",
         "payloads.md",
         "data_products.md",
+        "contacts.md",
     }
 
     telemetry_doc = (tmp_path / "telemetry.md").read_text(encoding="utf-8")
