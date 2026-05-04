@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products and operational scenarios once.  
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products and operational scenarios once.
 Validate them, document them, and execute deterministic mission scenarios from the same source of truth.
 
 </div>
@@ -225,7 +225,8 @@ examples/demo-3u/
 │   ├── data_products.yaml
 │   └── contacts.yaml
 └── scenarios/
-    └── battery_low_during_payload.yaml
+    ├── battery_low_during_payload.yaml
+    └── nominal_payload_acquisition.yaml
 ```
 
 The demo includes a synthetic IOD payload contract:
@@ -276,9 +277,9 @@ The demo contains:
 - Payload mock;
 - Radio mock;
 - modes: `BOOT`, `NOMINAL`, `PAYLOAD_ACTIVE`, `DEGRADED`, `SAFE`, `MAINTENANCE`;
-- one executable scenario: `battery_low_during_payload`.
+- executable scenarios: `battery_low_during_payload` and `nominal_payload_acquisition`.
 
-The scenario demonstrates:
+The `battery_low_during_payload` scenario demonstrates:
 
 ```text
 payload.start_acquisition

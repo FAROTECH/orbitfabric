@@ -43,7 +43,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.3.0
+orbitfabric 0.4.0
 ```
 
 ---
@@ -68,13 +68,12 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.3 Vertical Slice
+## Verify the Current v0.4 Vertical Slice
 
 Run mission lint:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
 ```
 
 Generate documentation:
@@ -86,9 +85,7 @@ orbitfabric gen docs examples/demo-3u/mission/
 Run the scenario:
 
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
 ```
 
 Expected results:
@@ -110,6 +107,7 @@ generated/docs/modes.md
 generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
+generated/docs/contacts.md
 ```
 
 ---
@@ -135,6 +133,7 @@ The source of truth is:
 examples/demo-3u/mission/*.yaml
 examples/demo-3u/mission/payloads.yaml
 examples/demo-3u/mission/data_products.yaml
+examples/demo-3u/mission/contacts.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 

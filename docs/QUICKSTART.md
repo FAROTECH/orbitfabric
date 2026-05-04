@@ -17,6 +17,7 @@ Mission Model YAML
   -> deterministic scenario execution
   -> Payload Contract documentation
   -> Data Product Contract documentation
+  -> Contact and Downlink Contract documentation
   -> JSON reports
   -> simulation log
 ```
@@ -82,7 +83,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.3.0
+orbitfabric 0.4.0
 ```
 
 ---
@@ -142,8 +143,7 @@ Result: PASSED
 Generate a JSON lint report:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
 ```
 
 Generated output:
@@ -171,7 +171,8 @@ generated/docs/
 ├── modes.md
 ├── packets.md
 ├── payloads.md
-└── data_products.md
+├── data_products.md
+└── contacts.md
 ```
 
 Generated mission documentation is derived from the validated Mission Model.
@@ -195,9 +196,7 @@ Result: PASSED
 Generate both JSON report and timeline log:
 
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
 ```
 
 Generated outputs:
@@ -214,16 +213,16 @@ generated/logs/battery_low_during_payload.log
 The current demo proves that OrbitFabric can:
 
 - load a multi-file YAML Mission Model;
-- load optional `payloads.yaml` and `data_products.yaml` domains;
+- load optional `payloads.yaml`, `data_products.yaml` and `contacts.yaml` domains;
 - validate Mission Model structure;
 - run semantic lint rules;
-- validate payload and data product references;
+- validate payload, data product and contact/downlink references;
 - generate Markdown documentation;
-- generate payload and data product documentation;
+- generate payload, data product and contact/downlink documentation;
 - inspect a Mission Model summary;
 - validate a scenario without executing it;
 - load a scenario;
-- execute a deterministic operational sequence;
+- execute deterministic operational sequences;
 - emit events;
 - apply a fault-triggered mode transition;
 - auto-dispatch a recovery command;
@@ -240,10 +239,12 @@ The current demo does not prove:
 - hardware integration;
 - real onboard storage execution;
 - real downlink execution;
-- contact window modeling;
+- real contact scheduling;
+- orbit propagation;
+- RF link budget simulation;
 - CCSDS, PUS or CFDP compliance;
 - compatibility with cFS, F Prime, Yamcs or OpenC3;
 - orbital, attitude, power or thermal dynamics;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current v0.3.0 development preview scope.
+Those are intentionally outside the current v0.4.0 development preview scope.

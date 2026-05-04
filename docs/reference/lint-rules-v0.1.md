@@ -5,7 +5,7 @@ This page documents the diagnostics and lint rules currently implemented by Orbi
 Current documented baseline:
 
 ```text
-v0.3.0 — Data Product and Storage Contracts
+v0.4.0 — Contact Windows and Downlink Flow Contracts
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -86,6 +86,8 @@ The `suggestion` field is intentionally optional, but it should be provided when
 | `OF-PKT-*` | Packet engineering lint rules. |
 | `OF-PAY-*` | Payload Contract lint rules. |
 | `OF-DP-*` | Data Product Contract lint rules. |
+| `OF-CON-*` | Contact assumption rules. |
+| `OF-DL-*` | Downlink flow assumption rules. |
 | `OF-SCN-*` | Scenario loading and scenario reference diagnostics. |
 
 ---
@@ -282,7 +284,28 @@ These rules validate optional Data Product and Storage Contracts.
 
 Structural validation covers additional data product constraints such as duplicate IDs, positive estimated size and known literal values for product type, storage class, overflow policy and downlink policy.
 
-Data Product rules are contract-level rules. They do not validate real storage, compression, contact windows or downlink runtime behavior.
+Data Product rules are contract-level rules. They do not validate real storage, compression, contact scheduling or downlink runtime behavior.
+
+---
+
+## `OF-CON-*` — Contact assumption rules
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-CON-001` | `ERROR` | contact_windows | Contact window references an unknown contact profile. | Add the contact profile or fix `contact_window.contact_profile`. |
+| `OF-CON-002` | `ERROR` | contact_windows | Contact window references an unknown link profile. | Add the link profile or fix `contact_window.link_profile`. |
+
+---
+
+## `OF-DL-*` — Downlink flow assumption rules
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-DL-001` | `ERROR` | downlink_flows | Downlink flow references an unknown contact profile. | Add the contact profile or fix `downlink_flow.contact_profile`. |
+| `OF-DL-002` | `ERROR` | downlink_flows | Downlink flow references an unknown link profile. | Add the link profile or fix `downlink_flow.link_profile`. |
+| `OF-DL-003` | `ERROR` | downlink_flows | Downlink flow references an unknown eligible data product. | Add the data product or fix `downlink_flow.eligible_data_products`. |
+| `OF-DL-004` | `WARNING` | data_products | High-priority data product has downlink intent but is not eligible in any downlink flow. | Add the data product to a downlink flow or revise its downlink intent. |
+| `OF-DL-005` | `WARNING` | downlink_flows | Estimated eligible data product volume may exceed declared contact capacity. | Increase capacity, reduce eligible volume or split the flow. |
 
 ---
 

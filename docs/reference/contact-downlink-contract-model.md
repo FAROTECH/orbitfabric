@@ -1,6 +1,6 @@
 # Contact and Downlink Contract Model
 
-Status: Proposed for OrbitFabric v0.4.0  
+Status: Implemented in OrbitFabric v0.4.0
 Scope: Contact Windows and Downlink Flow Contract definition
 
 ---
@@ -49,7 +49,7 @@ It does not imply runtime queue execution or file transfer.
 
 ---
 
-## What the Model May Describe
+## What the Model Describes
 
 A contact/downlink contract may describe:
 
@@ -100,13 +100,13 @@ Those are intentionally outside the v0.4.0 scope.
 
 ## YAML Shape
 
-Contact and downlink assumptions are expected to be defined in the optional file:
+Contact and downlink assumptions are defined in the optional file:
 
 ```text
 mission/contacts.yaml
 ```
 
-Proposed shape:
+Implemented shape:
 
 ```yaml
 contacts:
@@ -119,7 +119,7 @@ contacts:
     - id: uhf_downlink_nominal
       direction: downlink
       assumed_rate_bps: 9600
-      description: Abstract nominal downlink assumption.
+      description: Abstract nominal downlink assumption for contract-level reasoning.
 
   contact_windows:
     - id: demo_contact_001
@@ -128,6 +128,7 @@ contacts:
       start: "2026-01-01T00:00:00Z"
       duration_seconds: 600
       assumed_capacity_bytes: 512000
+      description: Synthetic contact window used to demonstrate downlink flow assumptions.
 
   downlink_flows:
     - id: science_next_available_contact
@@ -136,6 +137,7 @@ contacts:
       queue_policy: priority_then_age
       eligible_data_products:
         - payload.radiation_histogram
+      description: Synthetic science downlink flow used by the demo mission.
 ```
 
 This shape is intentionally minimal.
@@ -197,9 +199,9 @@ duration
 declared capacity
 ```
 
-The declared capacity may be explicit or derived later from declared rate and duration.
+The declared capacity may be explicit or derived by a future model from declared rate and duration.
 
-In the first v0.4.0 slice, explicit `assumed_capacity_bytes` is preferred because it avoids pretending to perform physical link simulation.
+In the v0.4.0 slice, explicit `assumed_capacity_bytes` is preferred because it avoids pretending to perform physical link simulation.
 
 ---
 
@@ -231,37 +233,37 @@ The model does not implement a runtime queue.
 
 ---
 
-## Initial Lint Direction
+## Implemented Lint Rules
 
-Initial lint rules should focus on reference integrity and obvious consistency issues.
+The v0.4.0 lint rules focus on reference integrity and obvious consistency issues.
 
-Expected rule direction:
+Implemented rules:
 
 ```text
-ERROR: contact window references an unknown contact profile.
-ERROR: contact window references an unknown link profile.
-ERROR: downlink flow references an unknown contact profile.
-ERROR: downlink flow references an unknown link profile.
-ERROR: downlink flow references an unknown data product.
-WARNING: high-priority data product has downlink intent but no eligible downlink flow.
-WARNING: estimated data volume may exceed declared contact capacity.
+OF-CON-001  contact window references unknown contact profile
+OF-CON-002  contact window references unknown link profile
+OF-DL-001   downlink flow references unknown contact profile
+OF-DL-002   downlink flow references unknown link profile
+OF-DL-003   downlink flow references unknown data product
+OF-DL-004   high-priority data product has downlink intent but no eligible downlink flow
+OF-DL-005   estimated data product volume may exceed declared contact capacity
 ```
 
-Warnings should expose engineering ambiguity without pretending to solve scheduling.
+Warnings expose engineering ambiguity without pretending to solve scheduling.
 
 ---
 
 ## Generated Documentation
 
-When contact/downlink contracts are present, OrbitFabric should generate Markdown documentation from the validated Mission Model.
+When contact/downlink contracts are present, OrbitFabric generates Markdown documentation from the validated Mission Model.
 
-Expected generated output:
+Generated output:
 
 ```text
 generated/docs/contacts.md
 ```
 
-The generated page should expose:
+The generated page exposes:
 
 ```text
 contact profiles
@@ -272,15 +274,15 @@ downlink flows
 eligible data products
 ```
 
-Generated documentation must state that these are contract assumptions, not runtime behavior.
+Generated documentation states that these are contract assumptions, not runtime behavior.
 
 ---
 
 ## Current Boundary
 
-The v0.4.0 model must remain narrow.
+The v0.4.0 model remains narrow.
 
-It should strengthen the Mission Data Chain without introducing runtime behavior.
+It strengthens the Mission Data Chain without introducing runtime behavior.
 
 The correct v0.4.0 outcome is:
 

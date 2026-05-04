@@ -41,9 +41,11 @@ examples/demo-3u/
 │   ├── packets.yaml
 │   ├── policies.yaml
 │   ├── payloads.yaml
-│   └── data_products.yaml
+│   ├── data_products.yaml
+│   └── contacts.yaml
 └── scenarios/
-    └── battery_low_during_payload.yaml
+    ├── battery_low_during_payload.yaml
+    └── nominal_payload_acquisition.yaml
 ```
 
 The `mission/` directory contains the Mission Model.
@@ -175,17 +177,45 @@ downlink policy: next_available_contact
 
 This is contract intent only. It does not implement storage or downlink execution.
 
+### `contacts.yaml`
+
+Defines one synthetic Contact and Downlink Contract slice:
+
+```text
+primary_ground_contact
+uhf_downlink_nominal
+demo_contact_001
+science_next_available_contact
+```
+
+The downlink flow makes this data product eligible for the declared contact/link path:
+
+```text
+payload.radiation_histogram
+```
+
+This is contract intent only. It does not implement contact scheduling, RF behavior, onboard downlink queues or ground operations.
+
 ---
 
-## 4. Scenario: battery low during payload operation
+## 4. Scenarios
 
-The executable scenario is:
+The demo currently includes:
 
 ```text
 examples/demo-3u/scenarios/battery_low_during_payload.yaml
+examples/demo-3u/scenarios/nominal_payload_acquisition.yaml
 ```
 
-It starts in:
+`battery_low_during_payload.yaml` demonstrates a degraded recovery path.
+
+`nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
+
+---
+
+## 5. Scenario: battery low during payload operation
+
+The battery-low scenario starts in:
 
 ```text
 NOMINAL
@@ -203,9 +233,9 @@ radio.downlink.available = true
 
 ---
 
-## 5. Scenario timeline
+## 6. Scenario timeline
 
-The scenario demonstrates this operational sequence:
+The battery-low scenario demonstrates this operational sequence:
 
 ```text
 payload.start_acquisition
@@ -220,13 +250,13 @@ payload.start_acquisition
 → SCENARIO PASSED
 ```
 
-The data product contract is not executed by this scenario yet.
+The data product and contact/downlink contracts are not executed by this scenario yet.
 
-It documents the expected mission-data object produced by the payload and prepares the model for future contact/downlink contracts.
+They document declared mission-data and downlink-flow assumptions and prepare the model for future end-to-end mission data flow evidence.
 
 ---
 
-## 6. Run the scenario
+## 7. Run the scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -240,12 +270,10 @@ Result: PASSED
 
 ---
 
-## 7. Generate scenario outputs
+## 8. Generate scenario outputs
 
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
 ```
 
 Generated files:
@@ -257,7 +285,7 @@ generated/logs/battery_low_during_payload.log
 
 ---
 
-## 8. Generate mission documentation
+## 9. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -274,14 +302,19 @@ generated/docs/
 ├── modes.md
 ├── packets.md
 ├── payloads.md
-└── data_products.md
+├── data_products.md
+└── contacts.md
 ```
 
-The generated data product documentation exposes storage and downlink intent as contract data, not runtime behavior.
+The generated data product documentation exposes storage and downlink intent as contract data.
+
+The generated contact/downlink documentation exposes contact profiles, link profiles, contact windows, declared capacity and downlink flow eligibility as contract data.
+
+Neither page describes runtime behavior.
 
 ---
 
-## 9. What the simulator checks
+## 10. What the simulator checks
 
 During execution, OrbitFabric checks that:
 
@@ -297,11 +330,13 @@ During execution, OrbitFabric checks that:
 - auto-dispatched recovery commands are recorded;
 - scenario expectations pass.
 
+The simulator does not execute storage or downlink behavior in v0.4.0.
+
 ---
 
-## 10. Expected final state
+## 11. Expected final state
 
-At the end of the scenario:
+At the end of the battery-low scenario:
 
 ```text
 mode = DEGRADED
@@ -322,7 +357,7 @@ EPS warning fault
 
 ---
 
-## 11. Clean-room boundary
+## 12. Clean-room boundary
 
 This demo is deliberately synthetic.
 
@@ -337,6 +372,8 @@ It must not include:
 - real telemetry logs;
 - real anomaly sequences;
 - real payload data;
-- real storage or downlink policies.
+- real storage or downlink policies;
+- real ground station details;
+- real RF assumptions.
 
 The demo exists to prove OrbitFabric's architecture, not to approximate a real spacecraft.

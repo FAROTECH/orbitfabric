@@ -1,6 +1,6 @@
 # Data Product Contract Model
 
-Status: Implemented in OrbitFabric v0.3.0  
+Status: Implemented in OrbitFabric v0.3.0
 Scope: Data Product and Storage Contract definition
 
 ## Purpose
@@ -69,13 +69,13 @@ A data product contract does not describe:
 - compression engines;
 - payload data processing pipelines;
 - physical payload simulation;
-- contact window modeling;
+- contact scheduling;
 - RF link modeling;
 - downlink runtime;
 - ground segment implementation;
 - runtime skeleton generation.
 
-Those are intentionally outside the v0.3.0 scope.
+Those are intentionally outside the Data Product Contract scope.
 
 ## YAML Shape
 
@@ -141,7 +141,7 @@ Examples include:
 
 They do not implement storage.
 
-They make it possible to validate that a produced mission object has a declared preservation strategy before later milestones introduce contact windows, downlink flow or runtime skeletons.
+They make it possible to validate that a produced mission object has a declared preservation strategy before contact/downlink contracts, runtime skeletons or ground artifacts consume it.
 
 ## Downlink Intent
 
@@ -154,9 +154,9 @@ Examples include:
 - deferred downlink;
 - manual or operator-selected downlink.
 
-The first data product slice does not implement contact windows or downlink simulation.
+The Data Product Contract slice does not implement contact scheduling or downlink simulation.
 
-Those belong to later Mission Data Chain milestones.
+Contact and Downlink Contracts are modeled separately by the v0.4.0 reference model.
 
 ## Implemented Lint Rules
 
@@ -192,4 +192,4 @@ This page documents the implemented v0.3.0 Data Product Contract Model.
 
 The model remains development-preview and pre-1.0.
 
-Future milestones will add contact windows, downlink flow contracts, commandability contracts and end-to-end mission data flow evidence before runtime skeletons or ground artifacts are introduced.
+v0.4.0 adds Contact Windows and Downlink Flow Contracts as the next declared Mission Data Chain layer. Future milestones will add commandability contracts and end-to-end mission data flow evidence before runtime skeletons or ground artifacts are introduced.
