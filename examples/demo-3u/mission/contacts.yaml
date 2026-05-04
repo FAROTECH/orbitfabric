@@ -1,0 +1,29 @@
+contacts:
+  contact_profiles:
+    - id: primary_ground_contact
+      target: synthetic_ground_station
+      description: Synthetic primary ground contact used by the demo mission.
+
+  link_profiles:
+    - id: uhf_downlink_nominal
+      direction: downlink
+      assumed_rate_bps: 9600
+      description: Abstract nominal downlink assumption for contract-level reasoning.
+
+  contact_windows:
+    - id: demo_contact_001
+      contact_profile: primary_ground_contact
+      link_profile: uhf_downlink_nominal
+      start: "2026-01-01T00:00:00Z"
+      duration_seconds: 600
+      assumed_capacity_bytes: 512000
+      description: Synthetic contact window used to demonstrate downlink flow assumptions.
+
+  downlink_flows:
+    - id: science_next_available_contact
+      contact_profile: primary_ground_contact
+      link_profile: uhf_downlink_nominal
+      queue_policy: priority_then_age
+      eligible_data_products:
+        - payload.radiation_histogram
+      description: Synthetic science downlink flow used by the demo mission.
