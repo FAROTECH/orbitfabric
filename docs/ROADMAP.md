@@ -379,40 +379,115 @@ It describes contract intent only.
 
 ### 9.1 Objective
 
-Model ground contact and downlink assumptions without becoming a ground segment or an orbital dynamics simulator.
+Model contact windows and downlink flow assumptions without becoming a ground segment, an orbital dynamics simulator, an RF simulator or a downlink runtime.
 
 OrbitFabric should let a mission designer ask:
 
-> Given the declared data products, priorities, storage policies and contact assumptions, is the data flow coherent?
+> Given the declared data products, priorities, storage policies, downlink intent and contact assumptions, is the mission data flow coherent?
 
-### 9.2 Candidate Features
+### 9.2 Architectural Question
+
+The v0.4 slice strengthens this contract chain:
 
 ```text
-contact window model
+Data Product Contract
+        -> Storage Intent
+        -> Downlink Intent
+        -> Contact Window Assumptions
+        -> Downlink Flow Contract
+        -> future End-to-End Mission Data Flow Evidence
+```
+
+The model should expose assumptions that can be validated, linted and documented.
+
+It must not execute those assumptions.
+
+### 9.3 Initial Scope
+
+The first v0.4 implementation slice should remain narrow.
+
+Candidate scope:
+
+```text
+optional contacts.yaml domain
 contact profile model
 link profile model
-declared downlink capacity assumption
-abstract downlink queue policy
+contact window model
+declared contact capacity assumption
+downlink flow contract model
 data product downlink eligibility
-scenario contact events
-generated downlink documentation
-downlink consistency lint rules
+contact/downlink reference validation
+minimal contact/downlink semantic lint rules
+generated contact/downlink documentation
+one synthetic demo contact/downlink slice
 ```
 
-### 9.3 Candidate Lint Rules
+The preferred initial file is:
 
 ```text
-WARNING: produced data volume may exceed declared contact capacity.
-ERROR: downlink policy references unknown contact profile.
-WARNING: critical event has no immediate downlink class.
-WARNING: high-priority product is retained but never scheduled for downlink.
+mission/contacts.yaml
 ```
 
-### 9.4 Boundary
+The file may contain contact profiles, link profiles, contact windows and downlink flow contracts.
 
-v0.4 must not implement orbit propagation, antenna pointing, RF budgets, live ground links, Yamcs/OpenC3 services or real spacecraft operations.
+### 9.4 Deferred Items
 
-Contact windows are contract assumptions, not physical simulation.
+The following items are valid but should not be part of the first v0.4 implementation unless a later PR proves that they are necessary:
+
+```text
+scenario contact events
+partial downlink scenario behavior
+derived capacity from rate and duration
+multiple contact networks
+ground export artifacts
+runtime downlink queues
+```
+
+Scenario contact events are especially easy to over-scope.
+
+They should remain deferred until the model and lint slice are stable.
+
+### 9.5 Candidate Lint Rules
+
+Initial lint direction:
+
+```text
+ERROR: contact window references an unknown contact profile.
+ERROR: contact window references an unknown link profile.
+ERROR: downlink flow references an unknown contact profile.
+ERROR: downlink flow references an unknown link profile.
+ERROR: downlink flow references an unknown data product.
+WARNING: high-priority data product has downlink intent but no eligible downlink flow.
+WARNING: estimated data volume may exceed declared contact capacity.
+```
+
+Linting should expose ambiguity.
+
+It must not pretend to schedule real downlink operations.
+
+### 9.6 Boundary
+
+v0.4 must not implement:
+
+```text
+orbit propagation
+TLE parsing
+ground track computation
+antenna pointing
+RF link budgets
+live ground links
+real contact scheduling
+real downlink execution
+onboard downlink queues
+file transfer protocols
+CCSDS/PUS/CFDP implementation
+Yamcs/OpenC3 services
+real spacecraft operations
+runtime skeleton generation
+ground export generation
+```
+
+Contact windows and downlink flows are contract assumptions, not physical simulation or runtime behavior.
 
 ---
 
