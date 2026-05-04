@@ -628,7 +628,7 @@ They describe contract assumptions only.
 
 ## 12. Lint Layer
 
-### 11.1 Responsibility
+### 12.1 Responsibility
 
 The Lint Layer performs mission consistency analysis.
 
@@ -646,7 +646,7 @@ It is responsible for:
 - JSON lint report generation;
 - CI-friendly pass/fail decision.
 
-### 11.2 Rule Families
+### 12.2 Rule Families
 
 Current rule families:
 
@@ -668,7 +668,7 @@ OF-DL-*    downlink flow assumption rules
 OF-SCN-*   scenario rules
 ```
 
-### 11.3 Pass/Fail Policy
+### 12.3 Pass/Fail Policy
 
 Default behavior:
 
@@ -686,7 +686,7 @@ orbitfabric lint <mission-dir> --warnings-as-errors
 
 warnings also make lint fail.
 
-### 11.4 Generator Dependency on Lint
+### 12.4 Generator Dependency on Lint
 
 Generated documentation should be produced from a structurally valid and semantically acceptable Mission Model.
 
@@ -696,7 +696,7 @@ Documentation generation must not silently continue when lint errors exist.
 
 ## 13. Simulation Layer
 
-### 14.1 Responsibility
+### 13.1 Responsibility
 
 The Simulation Layer executes operational scenarios against a validated Mission Model.
 
