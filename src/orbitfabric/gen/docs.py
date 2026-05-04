@@ -6,13 +6,17 @@ from typing import Any
 from orbitfabric.model.mission import (
     Command,
     CommandArgument,
+    ContactProfile,
+    ContactWindow,
     DataProductContract,
     DataProductDownlinkIntent,
     DataProductStorageIntent,
+    DownlinkFlowContract,
     Event,
     Fault,
     FaultCondition,
     FaultRecovery,
+    LinkProfile,
     MissionModel,
     Packet,
     PayloadContract,
@@ -43,6 +47,11 @@ def generate_markdown_docs(model: MissionModel, output_dir: Path) -> list[Path]:
     if model.data_products:
         generated_files.append(
             _write(output_dir / "data_products.md", _render_data_products(model))
+        )
+
+    if _has_contact_contracts(model):
+        generated_files.append(
+            _write(output_dir / "contacts.md", _render_contacts(model))
         )
 
     return generated_files
@@ -356,6 +365,143 @@ def _render_data_product_row(
         f"| {_format_downlink_intent(data_product.downlink)} "
         f"| {_text(data_product.description or '-')} |\n"
     )
+
+
+def _has_contact_contracts(model: MissionModel) -> bool:
+    return any(
+        (
+            model.contacts.contact_profiles,
+            model.contacts.link_profiles,
+            model.contacts.contact_windows,
+            model.contacts.downlink_flows,
+        )
+    )
+
+
+def _render_contacts(model: MissionModel) -> str:
+    lines = [_header("Contact and Downlink Contract Reference", model)]
+
+    lines.append("## Summary\n\n")
+    lines.append(f"- Contact profiles: `{len(model.contacts.contact_profiles)}`\n")
+    lines.append(f"- Link profiles: `{len(model.contacts.link_profiles)}`\n")
+    lines.append(f"- Contact windows: `{len(model.contacts.contact_windows)}`\n")
+    lines.append(f"- Downlink flows: `{len(model.contacts.downlink_flows)}`\n\n")
+    lines.append(
+        "Contact windows, link profiles, declared capacities and downlink flows "
+        "describe contract assumptions only. They do not imply orbit propagation, "
+        "RF simulation, contact scheduling or downlink runtime behavior.\n\n"
+    )
+
+    lines.append(_render_contact_profiles(model.contacts.contact_profiles))
+    lines.append(_render_link_profiles(model.contacts.link_profiles))
+    lines.append(_render_contact_windows(model.contacts.contact_windows))
+    lines.append(_render_downlink_flows(model.contacts.downlink_flows))
+
+    return "".join(lines)
+
+
+def _render_contact_profiles(contact_profiles: list[ContactProfile]) -> str:
+    lines = ["## Contact profiles\n\n"]
+
+    if not contact_profiles:
+        lines.append("No contact profiles declared.\n\n")
+        return "".join(lines)
+
+    lines.append("| ID | Target | Description |\n")
+    lines.append("|---|---|---|\n")
+
+    for profile in sorted(contact_profiles, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(profile.id)} "
+            f"| {_code(profile.target)} "
+            f"| {_text(profile.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_link_profiles(link_profiles: list[LinkProfile]) -> str:
+    lines = ["## Link profiles\n\n"]
+
+    if not link_profiles:
+        lines.append("No link profiles declared.\n\n")
+        return "".join(lines)
+
+    lines.append("| ID | Direction | Assumed Rate bps | Description |\n")
+    lines.append("|---|---|---:|---|\n")
+
+    for profile in sorted(link_profiles, key=lambda item: item.id):
+        rate = profile.assumed_rate_bps if profile.assumed_rate_bps is not None else "-"
+        lines.append(
+            f"| {_code(profile.id)} "
+            f"| {_code(profile.direction)} "
+            f"| {rate} "
+            f"| {_text(profile.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_contact_windows(contact_windows: list[ContactWindow]) -> str:
+    lines = ["## Contact windows\n\n"]
+
+    if not contact_windows:
+        lines.append("No contact windows declared.\n\n")
+        return "".join(lines)
+
+    lines.append(
+        "| ID | Contact Profile | Link Profile | Start | Duration s | "
+        "Assumed Capacity Bytes | Description |\n"
+    )
+    lines.append("|---|---|---|---|---:|---:|---|\n")
+
+    for window in sorted(contact_windows, key=lambda item: item.id):
+        capacity = (
+            window.assumed_capacity_bytes
+            if window.assumed_capacity_bytes is not None
+            else "-"
+        )
+        lines.append(
+            f"| {_code(window.id)} "
+            f"| {_code(window.contact_profile)} "
+            f"| {_code(window.link_profile)} "
+            f"| {_code(window.start)} "
+            f"| {window.duration_seconds} "
+            f"| {capacity} "
+            f"| {_text(window.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_downlink_flows(downlink_flows: list[DownlinkFlowContract]) -> str:
+    lines = ["## Downlink flows\n\n"]
+
+    if not downlink_flows:
+        lines.append("No downlink flows declared.\n\n")
+        return "".join(lines)
+
+    lines.append(
+        "| ID | Contact Profile | Link Profile | Queue Policy | "
+        "Eligible Data Products | Description |\n"
+    )
+    lines.append("|---|---|---|---|---|---|\n")
+
+    for flow in sorted(downlink_flows, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(flow.id)} "
+            f"| {_code(flow.contact_profile)} "
+            f"| {_code(flow.link_profile)} "
+            f"| {_code(flow.queue_policy)} "
+            f"| {_format_list(flow.eligible_data_products)} "
+            f"| {_text(flow.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
 
 
 def _producer_heading(model: MissionModel, data_product: DataProductContract) -> str:
