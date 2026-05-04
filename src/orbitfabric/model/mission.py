@@ -47,6 +47,15 @@ DownlinkIntentPolicy = Literal[
 ]
 
 
+ContactLinkDirection = Literal["downlink"]
+DownlinkFlowQueuePolicy = Literal[
+    "priority_then_age",
+    "oldest_first",
+    "manual_selection",
+    "critical_first",
+]
+
+
 class StrictModel(BaseModel):
     """Base Pydantic model used by OrbitFabric Mission Model objects."""
 
@@ -234,6 +243,45 @@ class DataProductContract(StrictModel):
     description: str | None = None
 
 
+class ContactProfile(StrictModel):
+    id: str
+    target: str
+    description: str | None = None
+
+
+class LinkProfile(StrictModel):
+    id: str
+    direction: ContactLinkDirection
+    assumed_rate_bps: int | None = Field(default=None, gt=0)
+    description: str | None = None
+
+
+class ContactWindow(StrictModel):
+    id: str
+    contact_profile: str
+    link_profile: str
+    start: str
+    duration_seconds: int = Field(gt=0)
+    assumed_capacity_bytes: int | None = Field(default=None, gt=0)
+    description: str | None = None
+
+
+class DownlinkFlowContract(StrictModel):
+    id: str
+    contact_profile: str
+    link_profile: str
+    queue_policy: DownlinkFlowQueuePolicy
+    eligible_data_products: list[str] = Field(default_factory=list)
+    description: str | None = None
+
+
+class ContactContracts(StrictModel):
+    contact_profiles: list[ContactProfile] = Field(default_factory=list)
+    link_profiles: list[LinkProfile] = Field(default_factory=list)
+    contact_windows: list[ContactWindow] = Field(default_factory=list)
+    downlink_flows: list[DownlinkFlowContract] = Field(default_factory=list)
+
+
 class AllowedValues(StrictModel):
     allowed_values: list[str]
 
@@ -259,6 +307,7 @@ class MissionModel(StrictModel):
     policies: Policies
     payloads: list[PayloadContract] = Field(default_factory=list)
     data_products: list[DataProductContract] = Field(default_factory=list)
+    contacts: ContactContracts = Field(default_factory=ContactContracts)
 
     @property
     def subsystem_ids(self) -> set[str]:
@@ -291,6 +340,22 @@ class MissionModel(StrictModel):
     @property
     def data_product_ids(self) -> set[str]:
         return {item.id for item in self.data_products}
+
+    @property
+    def contact_profile_ids(self) -> set[str]:
+        return {item.id for item in self.contacts.contact_profiles}
+
+    @property
+    def link_profile_ids(self) -> set[str]:
+        return {item.id for item in self.contacts.link_profiles}
+
+    @property
+    def contact_window_ids(self) -> set[str]:
+        return {item.id for item in self.contacts.contact_windows}
+
+    @property
+    def downlink_flow_ids(self) -> set[str]:
+        return {item.id for item in self.contacts.downlink_flows}
 
     @property
     def mode_ids(self) -> set[str]:
