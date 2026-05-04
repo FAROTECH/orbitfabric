@@ -1,8 +1,8 @@
 # OrbitFabric — Clean-Room Policy
 
-Version: 0.3-draft  
-Status: Draft  
-Scope: Entire OrbitFabric project  
+Version: 0.3-draft
+Status: Draft
+Scope: Entire OrbitFabric project
 
 ---
 
@@ -689,7 +689,7 @@ OrbitFabric must remain a generic open-source framework for mission data modelin
 
 Avoid adding content that could materially increase the operational capability of a restricted system or reveal sensitive implementation details.
 
-v0.3 must stay far from:
+Current development previews must stay far from:
 
 - real mission operations procedures;
 - real secure command handling;

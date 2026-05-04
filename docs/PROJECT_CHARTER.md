@@ -1,8 +1,8 @@
 # OrbitFabric — Project Charter
 
-Version: 0.3-draft  
-Status: Draft  
-Scope: Mission Data Contract foundation and Mission Data Chain direction  
+Version: 0.4
+Status: Draft
+Scope: Mission Data Contract foundation and Mission Data Chain direction
 
 ---
 
@@ -219,7 +219,7 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 The early OrbitFabric preview has already demonstrated the core philosophy with a small but coherent vertical slice.
 
-The current v0.3.0 baseline includes:
+The current v0.4.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
@@ -230,8 +230,10 @@ The current v0.3.0 baseline includes:
 - scenario runner;
 - payload contract model;
 - data product contract model;
+- contact/downlink contract model;
 - generated payload documentation;
 - generated data product documentation;
+- generated contact/downlink documentation;
 - readable logs;
 - JSON reports;
 - one complete demo mission named `demo-3u`.
@@ -366,6 +368,11 @@ It contains:
 - battery critical fault;
 - payload contract `demo_iod_payload`;
 - data product contract `payload.radiation_histogram`;
+- contact profile `primary_ground_contact`;
+- link profile `uhf_downlink_nominal`;
+- contact window `demo_contact_001`;
+- downlink flow `science_next_available_contact`;
+- one nominal payload acquisition scenario;
 - one scenario where the payload is active, battery voltage degrades, a warning event is emitted, the spacecraft transitions to DEGRADED and the payload is automatically stopped.
 
 The expected scenario narrative is:
@@ -382,9 +389,9 @@ The expected scenario narrative is:
 [00:40] SCENARIO PASSED
 ```
 
-Future demo slices may extend this clean-room mission with contact windows and downlink assumptions.
+The demo also includes a synthetic contact/downlink assumption slice.
 
-Those additions must remain generic and must not encode private mission details.
+Those assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
 
 ---
 

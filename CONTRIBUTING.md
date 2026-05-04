@@ -4,33 +4,40 @@ Thank you for your interest in OrbitFabric.
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-The project is currently in early v0.1-dev development. Contributions should stay focused, small and aligned with the Mission Data Contract architecture.
+The project is currently in pre-1.0 development. Contributions should stay focused, small and aligned with the Mission Data Contract architecture.
 
 ---
 
 ## Current Project Focus
 
-The current priority is to stabilize the v0.1 vertical slice:
+The current public baseline is `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
+
+The next development focus is `v0.5 — Commandability and Autonomy Contracts`.
+
+The current baseline proves this Mission Data Chain:
 
 ```text
-Mission Model YAML
-  -> structural validation
-  -> semantic lint
-  -> JSON lint report
-  -> generated Markdown docs
-  -> scenario loading
-  -> deterministic scenario execution
-  -> simulation JSON report
-  -> simulation log file
+Payload Contract
+  -> Data Product Contract
+  -> Storage Intent
+  -> Downlink Intent
+  -> Contact Window Assumption
+  -> Downlink Flow Contract
 ```
 
-Do not add large integrations before the core is stable.
+Do not add large integrations before the contract model is coherent.
 
-Out of scope for v0.1:
+Out of scope for the current preview:
 
 - flight runtime;
 - hardware drivers;
 - RTOS integration;
+- real onboard storage runtime;
+- real downlink runtime;
+- real contact scheduling;
+- command uplink runtime;
+- flight autonomy runtime;
+- operator console;
 - CCSDS/PUS/CFDP implementation;
 - Yamcs/OpenC3 full integration;
 - Basilisk integration;
@@ -90,6 +97,12 @@ orbitfabric --version
 orbitfabric --help
 ```
 
+Expected current version:
+
+```text
+orbitfabric 0.4.0
+```
+
 ---
 
 ## Required Local Checks
@@ -99,19 +112,17 @@ Before opening a pull request or committing significant changes, run:
 ```bash
 ruff check .
 pytest
+mkdocs build --strict
 ```
 
 Then verify the demo vertical slice:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
 ```
 
 Expected result:
@@ -119,6 +130,7 @@ Expected result:
 ```text
 ruff check .  -> All checks passed
 pytest        -> passing
+mkdocs        -> passing
 lint          -> Result: PASSED
 gen docs      -> Result: PASSED
 sim           -> Result: PASSED
@@ -188,9 +200,9 @@ Use short imperative commit messages.
 Good examples:
 
 ```text
-Add scenario JSON report generation
-Add engineering lint rules
-Document v0.1 vertical slice
+Add contact downlink consistency rules
+Generate contact downlink documentation
+Align public documentation with v0.4
 Fix scenario command validation
 ```
 
@@ -216,13 +228,3 @@ A good pull request should include:
 - no generated artifacts unless explicitly required.
 
 Generated outputs under `generated/` are reproducible artifacts and should normally not be committed.
-
----
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the project license:
-
-```text
-Apache-2.0
-```
