@@ -1,0 +1,43 @@
+contacts:
+  contact_profiles:
+    - id: spacelab_inspired_ground_contact
+      target: abstract_public_demo_ground_context
+      description: >
+        Synthetic ground contact profile for the SpaceLab-inspired public communications
+        demo. This is an assumption for contract reasoning only, not a real SpaceLab,
+        FloripaSat or GOLDS-UFSC contact schedule.
+
+  link_profiles:
+    - id: constrained_ttc_downlink
+      direction: downlink
+      assumed_rate_bps: 9600
+      description: >
+        Generic constrained TT&C downlink assumption for contract reasoning. No real
+        frequency, callsign, key, ground station, TLE, operational schedule or link
+        budget is modeled.
+
+  contact_windows:
+    - id: spacelab_inspired_contact_001
+      contact_profile: spacelab_inspired_ground_contact
+      link_profile: constrained_ttc_downlink
+      start: "2026-01-01T00:00:00Z"
+      duration_seconds: 300
+      assumed_capacity_bytes: 12000
+      description: Synthetic limited-capacity contact window used to force partial requested-frame downlink.
+
+  downlink_flows:
+    - id: spacelab_inspired_priority_downlink
+      contact_profile: spacelab_inspired_ground_contact
+      link_profile: constrained_ttc_downlink
+      queue_policy: critical_first
+      eligible_data_products:
+        - periodic_beacon_packet
+        - critical_housekeeping_packet
+        - downlink_summary_report
+        - decoder_reception_log
+        - scenario_evidence_log
+        - requested_telemetry_frame_batch
+        - requested_data_frame_batch
+      description: >
+        Priority-based downlink flow demonstrating beacon/critical-housekeeping/evidence-first
+        allocation, followed by requested telemetry/data frames under limited contact capacity.
