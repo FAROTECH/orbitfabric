@@ -126,7 +126,7 @@ commands:
       - LOW_POWER
     requires_ack: true
     timeout_ms: 1000
-    risk: medium
+    risk: low
     emits:
       - obc.fault_cleared
     expected_effects:
