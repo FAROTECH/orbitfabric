@@ -1,0 +1,196 @@
+commands:
+  - id: c3.request_health_telemetry
+    target: c3
+    description: Request current critical housekeeping and health telemetry products.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - PAYLOAD_ACQUISITION
+      - DOWNLINK
+      - LOW_POWER
+      - SAFE
+      - FAULT_RECOVERY
+    requires_ack: true
+    timeout_ms: 500
+    risk: low
+    emits:
+      - c3.health_telemetry_requested
+    expected_effects:
+      no_state_change: true
+
+  - id: comms.request_payload_data
+    target: comms
+    description: Request CFC-style payload data eligibility for the next prioritized downlink flow.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - LOW_POWER
+      - DOWNLINK
+    preconditions:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DATA_READY
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - comms.payload_data_requested
+    expected_effects:
+      no_state_change: true
+
+  - id: cfc.schedule_capture
+    target: cfc_payload
+    description: Schedule and complete a bounded CFC-style capture producing an image-derived data product.
+    arguments:
+      - name: capture_count
+        type: uint8
+        min: 1
+        max: 4
+        default: 1
+        description: Number of conceptual CFC captures to acquire.
+      - name: integration_time_ms
+        type: uint16
+        min: 1
+        max: 80000
+        default: 1000
+        description: Conceptual integration time for the capture.
+    allowed_modes:
+      - NOMINAL
+    preconditions:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: READY
+    requires_ack: true
+    timeout_ms: 1000
+    risk: medium
+    emits:
+      - cfc.data_generated
+    expected_effects:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DATA_READY
+      telemetry:
+        cfc.camera_status: DATA_READY
+        payload.data_generated_bytes: 64000
+        payload.data_pending_bytes: 32000
+        c3.storage_used: 3.5
+        data_storage.used_bytes: 64000
+
+  - id: comms.set_downlink_priority
+    target: comms
+    description: Select the priority policy used by the constrained downlink flow.
+    arguments:
+      - name: policy
+        type: enum
+        enum:
+          - critical_first
+          - priority_then_age
+          - manual_selection
+        default: critical_first
+        description: Abstract queue selection policy for the next downlink opportunity.
+    allowed_modes:
+      - NOMINAL
+      - LOW_POWER
+      - DOWNLINK
+    requires_ack: true
+    timeout_ms: 500
+    risk: low
+    emits:
+      - comms.downlink_priority_set
+    expected_effects:
+      no_state_change: true
+
+  - id: comms.start_downlink
+    target: comms
+    description: Start the prioritized downlink flow for the current abstract contact window.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - LOW_POWER
+    preconditions:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DATA_READY
+    requires_ack: true
+    timeout_ms: 1500
+    risk: medium
+    emits:
+      - comms.contact_window_started
+      - comms.downlink_started
+      - comms.beacon_transmitted
+      - comms.downlink_partial
+      - comms.downlink_capacity_insufficient
+      - payload.data_pending
+    expected_effects:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DOWNLINK_PENDING
+      telemetry:
+        comms.link_status: DOWNLINK_ACTIVE
+        downlink.capacity_remaining_bytes: 0
+        payload.data_pending_bytes: 29216
+        cfc.camera_status: DOWNLINK_PENDING
+      mode_transition:
+        to: DOWNLINK
+
+  - id: comms.end_downlink
+    target: comms
+    description: Close the current contact window and record remaining pending CFC-style payload data.
+    arguments: []
+    allowed_modes:
+      - DOWNLINK
+    preconditions:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DOWNLINK_PENDING
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - comms.contact_window_ended
+    expected_effects:
+      telemetry:
+        comms.link_status: NO_CONTACT
+        cfc.camera_status: BACKLOG
+      mode_transition:
+        to: LOW_POWER
+
+  - id: c3.enter_safe_mode
+    target: c3
+    description: Request transition to safe mode.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - PAYLOAD_ACQUISITION
+      - DOWNLINK
+      - LOW_POWER
+      - FAULT_RECOVERY
+    requires_ack: true
+    timeout_ms: 1000
+    risk: high
+    emits:
+      - c3.safe_mode_requested
+    expected_effects:
+      telemetry:
+        cfc.camera_status: "OFF"
+      mode_transition:
+        to: SAFE
+
+  - id: c3.clear_fault
+    target: c3
+    description: Clear a recorded warning or fault after ground review.
+    arguments:
+      - name: fault_id
+        type: string
+        description: Fault identifier to clear.
+    allowed_modes:
+      - SAFE
+      - FAULT_RECOVERY
+      - LOW_POWER
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - c3.fault_cleared
+    expected_effects:
+      no_state_change: true

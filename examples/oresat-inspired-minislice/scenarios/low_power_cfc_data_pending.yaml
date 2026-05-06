@@ -1,0 +1,156 @@
+scenario:
+  id: low_power_cfc_data_pending
+  name: Low power leaves CFC-style payload data pending
+  description: >
+    OreSat-inspired public minislice where a CFC-style payload generates data, a
+    low-power warning is raised, and a constrained contact prioritizes beacon and
+    critical housekeeping before leaving payload data partially pending.
+
+mission:
+  path: ../mission
+
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    eps.battery.state_of_charge: 55.0
+    eps.battery.voltage: 7.6
+    eps.battery.temperature: 22.0
+    solar.input_power: 6.0
+    c3.uptime: 4200
+    c3.storage_used: 0.0
+    data_storage.used_bytes: 0
+    comms.link_status: NO_CONTACT
+    gps.fix_status: LOCKED
+    gps.time_sync_status: true
+    adcs.manager_mode: POINT
+    adcs.attitude_ready: true
+    star_tracker.status: STANDBY
+    cfc.camera_status: STANDBY
+    cfc.camera_temperature: 20.0
+    dxwifi.status: STANDBY
+    payload.data_generated_bytes: 0
+    payload.data_pending_bytes: 0
+    downlink.capacity_remaining_bytes: 12000
+
+steps:
+  - t: 0
+    expect_mode: NOMINAL
+
+  - t: 5
+    command: cfc.schedule_capture
+    args:
+      capture_count: 1
+      integration_time_ms: 1000
+    expect:
+      command_status: ACCEPTED
+
+  - t: 6
+    expect_event: cfc.data_generated
+
+  - t: 7
+    expect:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DATA_READY
+
+  - t: 8
+    expect_telemetry:
+      cfc.camera_status: DATA_READY
+      payload.data_generated_bytes: 64000
+      payload.data_pending_bytes: 32000
+      c3.storage_used: 3.5
+      data_storage.used_bytes: 64000
+
+  - t: 12
+    command: c3.request_health_telemetry
+    expect:
+      command_status: ACCEPTED
+
+  - t: 13
+    expect_event: c3.health_telemetry_requested
+
+  - t: 20
+    inject:
+      telemetry: eps.battery.state_of_charge
+      value: 28.0
+
+  - t: 21
+    inject:
+      telemetry: eps.battery.state_of_charge
+      value: 28.0
+
+  - t: 22
+    expect_event: eps.low_power_warning_raised
+
+  - t: 23
+    expect_mode: LOW_POWER
+
+  - t: 30
+    command: comms.set_downlink_priority
+    args:
+      policy: critical_first
+    expect:
+      command_status: ACCEPTED
+
+  - t: 31
+    expect_event: comms.downlink_priority_set
+
+  - t: 32
+    command: comms.start_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 33
+    expect_event: comms.contact_window_started
+
+  - t: 34
+    expect_event: comms.downlink_started
+
+  - t: 35
+    expect_event: comms.beacon_transmitted
+
+  - t: 36
+    expect_event: comms.downlink_partial
+
+  - t: 37
+    expect_event: comms.downlink_capacity_insufficient
+
+  - t: 38
+    expect_event: payload.data_pending
+
+  - t: 39
+    expect_mode: DOWNLINK
+
+  - t: 40
+    expect:
+      payload_lifecycle:
+        payload: cfc_payload
+        state: DOWNLINK_PENDING
+
+  - t: 41
+    expect_telemetry:
+      comms.link_status: DOWNLINK_ACTIVE
+      downlink.capacity_remaining_bytes: 0
+      cfc.camera_status: DOWNLINK_PENDING
+      payload.data_pending_bytes: 29216
+
+  - t: 45
+    command: comms.end_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 46
+    expect_event: comms.contact_window_ended
+
+  - t: 47
+    expect_mode: LOW_POWER
+
+  - t: 48
+    expect_telemetry:
+      comms.link_status: NO_CONTACT
+      cfc.camera_status: BACKLOG
+      payload.data_pending_bytes: 29216
+
+  - t: 50
+    expect:
+      scenario_status: PASSED

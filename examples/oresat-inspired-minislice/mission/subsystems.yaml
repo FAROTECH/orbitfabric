@@ -1,0 +1,82 @@
+subsystems:
+  - id: spacecraft_bus
+    name: Spacecraft Bus
+    type: bus
+    criticality: critical
+    description: Conceptual CubeSat bus context coordinating spacecraft-level operational state.
+
+  - id: c3
+    name: C3 / Command, Control and Communication
+    type: core
+    criticality: critical
+    description: >
+      OreSat-inspired C3 context for command routing, telemetry collection, storage
+      coordination, beacon handling and spacecraft mode control.
+
+  - id: eps
+    name: Electrical Power System
+    type: subsystem
+    criticality: critical
+    description: Conceptual EPS context aggregating battery and solar health constraints.
+
+  - id: battery
+    name: Battery
+    type: subsystem
+    criticality: critical
+    description: OreSat-inspired battery telemetry context for voltage, temperature and state of charge.
+
+  - id: solar
+    name: Solar Input
+    type: subsystem
+    criticality: high
+    description: OreSat-inspired solar input telemetry context for available input power.
+
+  - id: gps
+    name: GPS
+    type: subsystem
+    criticality: medium
+    description: OreSat-inspired GPS state and time synchronization context.
+
+  - id: adcs
+    name: ADCS
+    type: subsystem
+    criticality: high
+    description: OreSat-inspired ADCS readiness and manager-mode context.
+
+  - id: star_tracker
+    name: Star Tracker
+    type: subsystem
+    criticality: medium
+    description: OreSat-inspired star-tracker status context used only as attitude-supporting telemetry.
+
+  - id: dxwifi
+    name: DxWiFi
+    type: payload_support
+    criticality: medium
+    description: OreSat-inspired high-volume image/data transmission payload-support context.
+
+  - id: cfc_payload
+    name: CFC-style Payload
+    type: payload
+    criticality: medium
+    description: Conceptual CFC-style imaging payload producing data products retained for constrained downlink.
+
+  - id: comms
+    name: Beacon and Downlink Context
+    type: communication
+    criticality: high
+    description: Conceptual beacon, EDL and constrained downlink context.
+
+  - id: data_storage
+    name: Onboard Data Storage
+    type: storage
+    criticality: high
+    description: Storage/evidence context for housekeeping, payload products and scenario evidence.
+
+  - id: ground_station_context
+    name: Ground Station Context
+    type: ground_context
+    criticality: medium
+    description: >
+      Abstract public-demo ground contact context. SatNOGS/UniClOGS wording may be
+      used only as public inspiration, not as a real operational schedule or link model.

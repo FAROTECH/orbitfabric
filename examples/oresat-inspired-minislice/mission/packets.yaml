@@ -1,0 +1,63 @@
+packets:
+  - id: oresat_inspired_health_beacon_packet
+    name: OreSat-Inspired Health Beacon Packet
+    type: json
+    max_payload_bytes: 512
+    period: 60s
+    telemetry:
+      - c3.uptime
+      - c3.storage_used
+      - comms.link_status
+      - eps.battery.state_of_charge
+      - eps.battery.voltage
+      - payload.data_pending_bytes
+    description: >
+      Compact health beacon packet prioritized during constrained contacts. This is
+      an OreSat-inspired public demo packet, not an official OreSat beacon definition.
+
+  - id: critical_housekeeping_packet
+    name: Critical Housekeeping Packet
+    type: json
+    max_payload_bytes: 1024
+    period: 30s
+    telemetry:
+      - eps.battery.state_of_charge
+      - eps.battery.voltage
+      - eps.battery.temperature
+      - solar.input_power
+      - gps.fix_status
+      - gps.time_sync_status
+      - adcs.manager_mode
+      - adcs.attitude_ready
+    description: >
+      Critical housekeeping packet carrying representative power, GPS and ADCS
+      health fields for priority-first downlink reasoning.
+
+  - id: cfc_payload_status_packet
+    name: CFC Payload Status Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_change
+    telemetry:
+      - cfc.camera_status
+      - cfc.camera_temperature
+      - dxwifi.status
+      - payload.data_generated_bytes
+      - payload.data_pending_bytes
+    description: >
+      CFC/DxWiFi-style payload status packet exposing generated and pending payload
+      data without modeling the full public object dictionary.
+
+  - id: downlink_summary_packet
+    name: Downlink Summary Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_contact
+    telemetry:
+      - comms.link_status
+      - downlink.capacity_remaining_bytes
+      - data_storage.used_bytes
+      - payload.data_pending_bytes
+    description: >
+      Contact summary packet used as scenario evidence for constrained downlink
+      behavior and retained payload backlog.

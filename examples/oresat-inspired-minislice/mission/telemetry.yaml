@@ -1,0 +1,331 @@
+telemetry:
+  - id: eps.battery.state_of_charge
+    name: Battery State of Charge
+    type: float32
+    unit: percent
+    source: battery
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    limits:
+      warning_low: 30.0
+      critical_low: 15.0
+    quality:
+      required: true
+      default: good
+    description: Battery reported state of charge used to drive low-power and safe-mode implications.
+
+  - id: eps.battery.voltage
+    name: Battery Voltage
+    type: float32
+    unit: V
+    source: battery
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    limits:
+      warning_low: 6.8
+      critical_low: 6.4
+    quality:
+      required: true
+      default: good
+    description: Battery pack voltage included in critical housekeeping and health beacon products.
+
+  - id: eps.battery.temperature
+    name: Battery Temperature
+    type: float32
+    unit: degC
+    source: battery
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_low: -5.0
+      warning_high: 45.0
+      critical_high: 55.0
+    quality:
+      required: true
+      default: good
+    description: Battery temperature used as a power-system health indicator.
+
+  - id: solar.input_power
+    name: Solar Input Power
+    type: float32
+    unit: W
+    source: solar
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    limits:
+      warning_low: 1.0
+    quality:
+      required: true
+      default: good
+    description: Estimated solar input power used to contextualize low-power behavior.
+
+  - id: c3.uptime
+    name: C3 Uptime
+    type: uint32
+    unit: s
+    source: c3
+    sampling: 1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    quality:
+      required: true
+      default: good
+    description: C3 uptime included in health and beacon products.
+
+  - id: c3.storage_used
+    name: C3 Storage Used
+    type: float32
+    unit: percent
+    source: c3
+    sampling: 0.1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 80.0
+      critical_high: 95.0
+    quality:
+      required: true
+      default: good
+    description: C3 storage percentage inspired by public beacon storage fields.
+
+  - id: data_storage.used_bytes
+    name: Onboard Storage Used
+    type: uint32
+    unit: bytes
+    source: data_storage
+    sampling: 0.1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 50000000
+      critical_high: 80000000
+    quality:
+      required: true
+      default: good
+    description: Retained housekeeping, payload and evidence storage occupancy.
+
+  - id: comms.link_status
+    name: Communications Link Status
+    type: enum
+    unit: none
+    source: comms
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - NO_CONTACT
+      - CONTACT_AVAILABLE
+      - DOWNLINK_ACTIVE
+    quality:
+      required: true
+      default: good
+    description: Abstract contact/downlink status for scenario evidence.
+
+  - id: gps.fix_status
+    name: GPS Fix Status
+    type: enum
+    unit: none
+    source: gps
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - NO_FIX
+      - SEARCHING
+      - LOCKED
+      - ERROR
+    quality:
+      required: true
+      default: good
+    description: GPS lock status used as a compact public-demo substitute for detailed GPS object dictionary fields.
+
+  - id: gps.time_sync_status
+    name: GPS Time Sync Status
+    type: bool
+    unit: none
+    source: gps
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Whether spacecraft time is synchronized to GPS time.
+
+  - id: adcs.manager_mode
+    name: ADCS Manager Mode
+    type: enum
+    unit: none
+    source: adcs
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - NONE
+      - STANDBY
+      - HOLD
+      - CALIBRATE
+      - SPINDOWN
+      - DETUMBLE
+      - BBQ
+      - POINT
+      - MANUAL
+    quality:
+      required: true
+      default: good
+    description: Compact ADCS manager-mode context inspired by public C3 ADCS manager fields.
+
+  - id: adcs.attitude_ready
+    name: ADCS Attitude Ready
+    type: bool
+    unit: none
+    source: adcs
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Minimal attitude readiness flag used to gate payload acquisition and pointing-relevant products.
+
+  - id: star_tracker.status
+    name: Star Tracker Status
+    type: enum
+    unit: none
+    source: star_tracker
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - "OFF"
+      - BOOT
+      - STANDBY
+      - LOW_POWER
+      - STAR_TRACK
+      - CAPTURE
+      - ERROR
+    quality:
+      required: true
+      default: good
+    description: Star-tracker status retained as a small attitude-supporting field.
+
+  - id: cfc.camera_status
+    name: CFC Camera Status
+    type: enum
+    unit: none
+    source: cfc_payload
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - "OFF"
+      - STANDBY
+      - CAPTURE
+      - DATA_READY
+      - BOOT_LOCKOUT
+      - ERROR
+    quality:
+      required: true
+      default: good
+    description: CFC-style camera state used by the conceptual payload lifecycle.
+
+  - id: cfc.camera_temperature
+    name: CFC Camera Temperature
+    type: float32
+    unit: degC
+    source: cfc_payload
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    limits:
+      warning_high: 45.0
+      critical_high: 55.0
+    quality:
+      required: true
+      default: good
+    description: CFC-style camera temperature retained as representative payload health telemetry.
+
+  - id: dxwifi.status
+    name: DxWiFi Status
+    type: enum
+    unit: none
+    source: dxwifi
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - "OFF"
+      - BOOT
+      - STANDBY
+      - FILM
+      - TRANSMIT
+      - PURGE
+      - ERROR
+    quality:
+      required: true
+      default: good
+    description: DxWiFi-style status retained for image/data transmission context.
+
+  - id: payload.data_generated_bytes
+    name: Payload Data Generated
+    type: uint32
+    unit: bytes
+    source: cfc_payload
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: low
+    quality:
+      required: true
+      default: good
+    description: Size of the latest conceptual CFC-style capture before downlink selection.
+
+  - id: payload.data_pending_bytes
+    name: Payload Data Pending
+    type: uint32
+    unit: bytes
+    source: cfc_payload
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 1
+    quality:
+      required: true
+      default: good
+    description: Payload bytes still pending after prioritized contact downlink allocation.
+
+  - id: downlink.capacity_remaining_bytes
+    name: Downlink Capacity Remaining
+    type: uint32
+    unit: bytes
+    source: comms
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Contract-level scenario evidence for remaining capacity after prioritized downlink allocation.
