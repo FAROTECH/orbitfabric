@@ -1,0 +1,45 @@
+packets:
+  - id: critical_housekeeping_packet
+    name: Critical Housekeeping Packet
+    type: json
+    max_payload_bytes: 512
+    period: 30s
+    telemetry:
+      - eps.battery.state_of_charge
+      - eps.battery.voltage
+      - eps.battery.temperature
+      - eps.solar.input_power
+    description: Compact critical housekeeping packet prioritized during constrained contacts.
+
+  - id: health_beacon_packet
+    name: Health Beacon Packet
+    type: json
+    max_payload_bytes: 256
+    period: 60s
+    telemetry:
+      - obc.uptime
+      - comms.link_status
+      - payload.data_pending_bytes
+    description: Periodic health beacon packet for low-rate contact opportunities.
+
+  - id: payload_status_packet
+    name: Payload Status Packet
+    type: json
+    max_payload_bytes: 256
+    period: on_change
+    telemetry:
+      - adcs.attitude_ready
+      - payload.status
+      - payload.data_generated_bytes
+      - payload.data_pending_bytes
+    description: Payload status packet exposing generated and pending payload data.
+
+  - id: downlink_summary_packet
+    name: Downlink Summary Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_contact
+    telemetry:
+      - downlink.capacity_remaining_bytes
+      - data_storage.used_bytes
+    description: Contact summary packet used as scenario evidence for constrained downlink behavior.

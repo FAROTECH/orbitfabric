@@ -1,0 +1,33 @@
+contacts:
+  contact_profiles:
+    - id: university_ground_contact
+      target: generic_university_ground_station
+      description: Abstract university ground contact used for clean-room downlink contract assumptions.
+
+  link_profiles:
+    - id: low_rate_uhf_downlink
+      direction: downlink
+      assumed_rate_bps: 9600
+      description: Generic low-rate UHF-like downlink assumption for constrained contact reasoning.
+
+  contact_windows:
+    - id: low_rate_contact_001
+      contact_profile: university_ground_contact
+      link_profile: low_rate_uhf_downlink
+      start: "2026-01-01T00:00:00Z"
+      duration_seconds: 300
+      assumed_capacity_bytes: 12000
+      description: Synthetic low-rate contact window with intentionally limited capacity.
+
+  downlink_flows:
+    - id: university_priority_downlink
+      contact_profile: university_ground_contact
+      link_profile: low_rate_uhf_downlink
+      queue_policy: critical_first
+      eligible_data_products:
+        - critical_housekeeping_packet
+        - health_beacon
+        - downlink_summary_report
+        - scenario_evidence_log
+        - compressed_payload_bundle
+      description: Priority-based downlink flow demonstrating health-first allocation and pending payload data.

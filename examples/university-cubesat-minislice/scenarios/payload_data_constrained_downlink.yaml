@@ -1,0 +1,131 @@
+scenario:
+  id: payload_data_constrained_downlink
+  name: Payload data constrained by low-rate downlink
+  description: Generic university CubeSat minislice where payload data is generated, low-power warning is raised, and a constrained contact prioritizes health data before leaving payload data partially pending.
+
+mission:
+  path: ../mission
+
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    eps.battery.state_of_charge: 55.0
+    eps.battery.voltage: 7.6
+    eps.battery.temperature: 22.0
+    eps.solar.input_power: 6.0
+    data_storage.used_bytes: 0
+    obc.uptime: 4200
+    comms.link_status: NO_CONTACT
+    adcs.attitude_ready: true
+    payload.status: IDLE
+    payload.data_generated_bytes: 0
+    payload.data_pending_bytes: 0
+    downlink.capacity_remaining_bytes: 12000
+
+steps:
+  - t: 0
+    expect_mode: NOMINAL
+
+  - t: 5
+    command: payload.schedule_acquisition
+    args:
+      duration_s: 120
+    expect:
+      command_status: ACCEPTED
+
+  - t: 6
+    expect_event: payload.data_generated
+
+  - t: 7
+    expect:
+      payload_lifecycle:
+        payload: generic_observation_payload
+        state: DATA_READY
+
+  - t: 8
+    expect_telemetry:
+      payload.status: DATA_READY
+      payload.data_generated_bytes: 32000
+      payload.data_pending_bytes: 18000
+      data_storage.used_bytes: 32000
+
+  - t: 12
+    command: obc.request_health_telemetry
+    expect:
+      command_status: ACCEPTED
+
+  - t: 13
+    expect_event: obc.health_telemetry_requested
+
+  - t: 20
+    inject:
+      telemetry: eps.battery.state_of_charge
+      value: 28.0
+
+  - t: 21
+    inject:
+      telemetry: eps.battery.state_of_charge
+      value: 28.0
+
+  - t: 22
+    expect_event: eps.low_power_warning_raised
+
+  - t: 23
+    expect_mode: LOW_POWER
+
+  - t: 30
+    command: comms.start_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 31
+    expect_event: comms.contact_window_started
+
+  - t: 32
+    expect_event: comms.downlink_started
+
+  - t: 33
+    expect_event: comms.beacon_transmitted
+
+  - t: 34
+    expect_event: comms.downlink_partial
+
+  - t: 35
+    expect_event: payload.data_pending
+
+  - t: 36
+    expect_mode: DOWNLINK
+
+  - t: 37
+    expect:
+      payload_lifecycle:
+        payload: generic_observation_payload
+        state: DOWNLINK_PENDING
+
+  - t: 38
+    expect_telemetry:
+      comms.link_status: DOWNLINK_ACTIVE
+      downlink.capacity_remaining_bytes: 0
+      payload.status: DOWNLINK_PENDING
+      payload.data_pending_bytes: 13680
+
+  - t: 45
+    command: comms.end_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 46
+    expect_event: comms.contact_window_ended
+
+  - t: 47
+    expect_mode: LOW_POWER
+
+  - t: 48
+    expect_telemetry:
+      comms.link_status: NO_CONTACT
+      payload.status: BACKLOG
+      payload.data_pending_bytes: 13680
+
+  - t: 50
+    expect:
+      scenario_status: PASSED

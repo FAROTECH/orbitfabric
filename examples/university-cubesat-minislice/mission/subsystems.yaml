@@ -1,0 +1,48 @@
+subsystems:
+  - id: spacecraft_bus
+    name: Spacecraft Bus
+    type: bus
+    criticality: critical
+    description: Generic CubeSat bus context coordinating power, data handling and spacecraft-level operational state.
+
+  - id: obc_or_cdh
+    name: OBC / C&DH
+    type: core
+    criticality: critical
+    description: Generic command and data handling function responsible for command routing, telemetry collection, storage coordination and mode control.
+
+  - id: eps
+    name: Electrical Power System
+    type: subsystem
+    criticality: critical
+    description: Generic power subsystem providing battery, solar input and power-state telemetry.
+
+  - id: comms
+    name: Communications Subsystem
+    type: communication
+    criticality: high
+    description: Generic low-rate communication subsystem supporting beacon, telecommand reception and constrained downlink.
+
+  - id: adcs
+    name: Attitude Determination and Control
+    type: subsystem
+    criticality: high
+    description: Minimal attitude readiness context used to gate payload acquisition and downlink-relevant operations.
+
+  - id: payload
+    name: Generic Observation Payload
+    type: payload
+    criticality: medium
+    description: Generic university CubeSat payload producing observation data products.
+
+  - id: data_storage
+    name: Onboard Data Storage
+    type: storage
+    criticality: high
+    description: Generic onboard storage context for retained housekeeping, payload and scenario evidence products.
+
+  - id: ground_station_context
+    name: Ground Station Context
+    type: ground_context
+    criticality: medium
+    description: Abstract ground contact context used only for contact and downlink contract assumptions.
