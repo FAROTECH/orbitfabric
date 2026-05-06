@@ -78,7 +78,9 @@ The point is not to reproduce FINCH. The point is to test OrbitFabric's contract
     │   ├── commands.yaml
     │   ├── events.yaml
     │   ├── faults.yaml
+    │   ├── packets.yaml
     │   ├── payloads.yaml
+    │   ├── policies.yaml
     │   ├── data_products.yaml
     │   └── contacts.yaml
     └── scenarios
