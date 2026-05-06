@@ -1,0 +1,78 @@
+faults:
+  - id: ttc.command_authentication_failed
+    source: ttc
+    severity: warning
+    description: Abstract command authentication or authorization fails for a received data request.
+    condition:
+      telemetry: ttc.command_rx_status
+      operator: ==
+      value: REJECTED
+      debounce_samples: 1
+    emits:
+      - ttc.command_authentication_failed
+      - obdh.data_request_rejected
+
+  - id: comms.downlink_capacity_insufficient
+    source: comms
+    severity: warning
+    description: Downlink capacity is exhausted while requested frames remain pending.
+    condition:
+      telemetry: downlink.capacity_remaining_bytes
+      operator: ==
+      value: 0
+      debounce_samples: 1
+    emits:
+      - comms.downlink_capacity_insufficient
+      - comms.downlink_partial
+
+  - id: requested_data.backlog
+    source: data_storage
+    severity: warning
+    description: Requested data frames remain pending after contact completion.
+    condition:
+      telemetry: requested_data.frames_pending
+      operator: '>'
+      value: 0
+      debounce_samples: 1
+    emits:
+      - requested_data.frames_pending
+      - decoder.partial_reception_recorded
+
+  - id: data_storage.high_usage
+    source: data_storage
+    severity: warning
+    description: Non-volatile storage usage exceeds the warning threshold.
+    condition:
+      telemetry: data_storage.used_bytes
+      operator: '>'
+      value: 50000000
+      debounce_samples: 1
+    emits:
+      - data_storage.high_usage
+
+  - id: eps.low_battery_warning
+    source: eps
+    severity: warning
+    description: Battery state of charge remains below the warning threshold for two consecutive samples.
+    condition:
+      telemetry: eps.battery.state_of_charge
+      operator: <
+      value: 30.0
+      debounce_samples: 2
+    emits:
+      - eps.low_power_warning_raised
+    recovery:
+      mode_transition: HIBERNATION
+      auto_commands: []
+
+  - id: thermal.board_temperature_high
+    source: thermal
+    severity: warning
+    description: Board temperature exceeds the communications-readiness warning threshold.
+    condition:
+      telemetry: thermal.board_temperature
+      operator: '>'
+      value: 55.0
+      debounce_samples: 1
+    emits:
+      - thermal.board_temperature_high

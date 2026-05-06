@@ -1,0 +1,84 @@
+subsystems:
+  - id: spacecraft_bus
+    name: Spacecraft Bus
+    type: bus
+    criticality: critical
+    description: Conceptual CubeSat bus context coordinating spacecraft-level operational state.
+
+  - id: obdh
+    name: Onboard Data Handling
+    type: core
+    criticality: critical
+    description: >
+      SpaceLab-inspired OBDH context for command routing, stored telemetry selection,
+      dataframe packaging, storage coordination and spacecraft mode control.
+
+  - id: ttc
+    name: Telemetry, Tracking and Telecommand
+    type: communication
+    criticality: critical
+    description: >
+      SpaceLab-inspired TT&C context for beacon transmission, telecommand reception,
+      command forwarding to OBDH and requested-data downlink.
+
+  - id: beacon_context
+    name: Beacon Context
+    type: communication
+    criticality: high
+    description: Conceptual periodic beacon context carrying basic satellite telemetry.
+
+  - id: data_storage
+    name: Non-Volatile Data Storage
+    type: storage
+    criticality: high
+    description: >
+      Conceptual onboard non-volatile storage context for retained telemetry frames,
+      requested data frames and scenario evidence products.
+
+  - id: comms
+    name: Communications Flow Context
+    type: communication
+    criticality: high
+    description: Contract-level contact, prioritization and constrained downlink context.
+
+  - id: rf
+    name: RF Link Context
+    type: communication
+    criticality: high
+    description: >
+      Abstract RF link state used only for public-demo downlink evidence. No real
+      frequency, callsign, TLE, ground station or link budget is modeled.
+
+  - id: transceiver
+    name: Transceiver Context
+    type: communication
+    criticality: high
+    description: Conceptual transceiver state for receive, transmit and standby behavior.
+
+  - id: ground_station_context
+    name: Ground Station Context
+    type: ground_context
+    criticality: medium
+    description: >
+      Abstract public-demo ground-contact context used only for contact and downlink
+      contract assumptions, not a real SpaceLab operational plan.
+
+  - id: decoder_context
+    name: Decoder Evidence Context
+    type: ground_context
+    criticality: medium
+    description: >
+      Conceptual ground-side decoder evidence context inspired by public SpaceLab
+      decoder documentation. It records received frames and partial completion only.
+
+  - id: eps
+    name: Electrical Power System
+    type: subsystem
+    criticality: critical
+    description: Conceptual EPS context exposing battery state of charge for communications availability.
+
+  - id: thermal
+    name: Board Thermal Context
+    type: subsystem
+    criticality: medium
+    description: Conceptual board-temperature context used as a simple communications-readiness warning source.

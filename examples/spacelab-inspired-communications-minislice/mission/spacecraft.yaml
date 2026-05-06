@@ -1,0 +1,7 @@
+spacecraft:
+  id: spacelab-inspired-communications-minislice
+  name: SpaceLab-inspired Communications Minislice
+  class: cubesat
+  form_factor: 1U-inspired
+  mission_type: publicly_derived_conceptual_university_communications_demo
+  model_version: 0.4.0-demo

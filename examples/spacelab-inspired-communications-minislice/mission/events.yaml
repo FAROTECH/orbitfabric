@@ -1,0 +1,161 @@
+events:
+  - id: ttc.beacon_transmitted
+    source: ttc
+    severity: info
+    description: Periodic beacon product transmitted during a contact opportunity.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: comms.contact_window_started
+    source: comms
+    severity: info
+    description: Abstract constrained public-demo contact window started.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: ttc.telecommand_received
+    source: ttc
+    severity: info
+    description: Abstract data-request telecommand received by TT&C.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: obdh.data_request_accepted
+    source: obdh
+    severity: info
+    description: OBDH accepted the abstract data request forwarded by TT&C.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: obdh.data_frames_selected
+    source: obdh
+    severity: info
+    description: OBDH selected stored telemetry/data frames for the accepted request.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: obdh.downlink_frames_packaged
+    source: obdh
+    severity: info
+    description: OBDH packaged selected frames into downlink-eligible batches.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.downlink_started
+    source: comms
+    severity: info
+    description: Prioritized TT&C downlink flow started for the available contact window.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.downlink_partial
+    source: comms
+    severity: warning
+    description: Downlink flow was capacity-constrained and only part of the requested frame set could be sent.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: requested_data.frames_pending
+    source: data_storage
+    severity: warning
+    description: Requested frames remain pending onboard after the constrained contact window.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: decoder.frames_received
+    source: decoder_context
+    severity: info
+    description: Ground-side decoder context recorded received downlink frames.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: decoder.partial_reception_recorded
+    source: decoder_context
+    severity: warning
+    description: Decoder evidence context recorded partial completion of the requested transfer.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.contact_window_ended
+    source: comms
+    severity: info
+    description: Abstract constrained public-demo contact window ended.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: obdh.mode_changed
+    source: obdh
+    severity: info
+    description: Spacecraft operational mode changed.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: obdh.data_request_rejected
+    source: obdh
+    severity: warning
+    description: OBDH rejected an abstract data request due to authorization or request-validity constraints.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: comms.downlink_capacity_insufficient
+    source: comms
+    severity: warning
+    description: Declared contact capacity is insufficient for the eligible downlink set.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: ttc.command_authentication_failed
+    source: ttc
+    severity: warning
+    description: Abstract command authentication or authorization failed; no requested-data selection is performed.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: obdh.health_telemetry_requested
+    source: obdh
+    severity: info
+    description: Ground requested OBDH/communications health telemetry.
+    downlink_priority: medium
+    persistence: store
+
+  - id: comms.downlink_priority_set
+    source: comms
+    severity: info
+    description: Downlink priority policy was selected for the contact opportunity.
+    downlink_priority: medium
+    persistence: store
+
+  - id: obdh.safe_mode_requested
+    source: obdh
+    severity: warning
+    description: Safe mode was requested by command or recovery logic.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: obdh.fault_cleared
+    source: obdh
+    severity: info
+    description: Fault state was cleared by ground command.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: data_storage.high_usage
+    source: data_storage
+    severity: warning
+    description: Non-volatile data storage usage exceeded the warning threshold.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: eps.low_power_warning_raised
+    source: eps
+    severity: warning
+    description: Battery state of charge crossed the low-power warning threshold.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: thermal.board_temperature_high
+    source: thermal
+    severity: warning
+    description: Board temperature exceeded the communications-readiness warning threshold.
+    downlink_priority: high
+    persistence: store_and_downlink

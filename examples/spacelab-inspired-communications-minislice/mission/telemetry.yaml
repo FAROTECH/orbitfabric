@@ -1,0 +1,290 @@
+telemetry:
+  - id: obdh.uptime
+    name: OBDH Uptime
+    type: uint32
+    unit: s
+    source: obdh
+    sampling: 1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    quality:
+      required: true
+      default: good
+    description: OBDH uptime included in beacon, housekeeping and decoder evidence context.
+
+  - id: obdh.storage_used_bytes
+    name: OBDH Storage Used
+    type: uint32
+    unit: bytes
+    source: obdh
+    sampling: 0.1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 50000000
+      critical_high: 80000000
+    quality:
+      required: true
+      default: good
+    description: OBDH-visible stored-data occupancy.
+
+  - id: data_storage.used_bytes
+    name: Data Storage Used
+    type: uint32
+    unit: bytes
+    source: data_storage
+    sampling: 0.1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 50000000
+      critical_high: 80000000
+    quality:
+      required: true
+      default: good
+    description: Generic non-volatile storage occupancy for retained telemetry, requested frames and evidence logs.
+
+  - id: ttc.link_status
+    name: TT&C Link Status
+    type: enum
+    unit: none
+    source: ttc
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - NO_CONTACT
+      - CONTACT_AVAILABLE
+      - DOWNLINK_ACTIVE
+    quality:
+      required: true
+      default: good
+    description: Abstract TT&C contact/downlink state for scenario evidence.
+
+  - id: ttc.beacon_status
+    name: TT&C Beacon Status
+    type: enum
+    unit: none
+    source: beacon_context
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    enum:
+      - IDLE
+      - AVAILABLE
+      - TRANSMITTED
+      - DEGRADED
+    quality:
+      required: true
+      default: good
+    description: Periodic beacon availability and transmission state.
+
+  - id: ttc.command_rx_status
+    name: TT&C Command Receive Status
+    type: enum
+    unit: none
+    source: ttc
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - IDLE
+      - RECEIVED
+      - ACCEPTED
+      - REJECTED
+    quality:
+      required: true
+      default: good
+    description: Abstract received-telecommand status used for data-request handling.
+
+  - id: ttc.downlink_status
+    name: TT&C Downlink Status
+    type: enum
+    unit: none
+    source: ttc
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - IDLE
+      - ACTIVE
+      - PARTIAL
+      - COMPLETE
+    quality:
+      required: true
+      default: good
+    description: Abstract TT&C downlink progress status.
+
+  - id: comms.contact_status
+    name: Contact Status
+    type: enum
+    unit: none
+    source: comms
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - NO_CONTACT
+      - ACTIVE_CONTACT
+      - CONTACT_ENDED
+    quality:
+      required: true
+      default: good
+    description: Contract-level contact state for the synthetic public-demo contact window.
+
+  - id: rf.downlink_status
+    name: RF Downlink Status
+    type: enum
+    unit: none
+    source: rf
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - IDLE
+      - ACTIVE
+      - PARTIAL
+      - COMPLETE
+    quality:
+      required: true
+      default: good
+    description: Abstract RF downlink status with no operational frequency or link budget.
+
+  - id: transceiver.status
+    name: Transceiver Status
+    type: enum
+    unit: none
+    source: transceiver
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - STANDBY
+      - RX_COMMAND
+      - TX_BEACON
+      - TX_DOWNLINK
+      - FAULT
+    quality:
+      required: true
+      default: good
+    description: Conceptual transceiver state during command reception, beacon and downlink.
+
+  - id: downlink.capacity_remaining_bytes
+    name: Downlink Capacity Remaining
+    type: uint32
+    unit: bytes
+    source: comms
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Contract-level remaining capacity after priority allocation.
+
+  - id: requested_data.frames_selected
+    name: Requested Data Frames Selected
+    type: uint16
+    unit: frames
+    source: obdh
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    quality:
+      required: true
+      default: good
+    description: Number of stored telemetry/data frames selected by OBDH for the current request.
+
+  - id: requested_data.frames_pending
+    name: Requested Data Frames Pending
+    type: uint16
+    unit: frames
+    source: data_storage
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 0
+    quality:
+      required: true
+      default: good
+    description: Requested frames remaining pending after the constrained contact window.
+
+  - id: decoder.frames_received
+    name: Decoder Frames Received
+    type: uint16
+    unit: frames
+    source: decoder_context
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    quality:
+      required: true
+      default: good
+    description: Conceptual ground-side decoder count of received frames.
+
+  - id: decoder.partial_completion_status
+    name: Decoder Partial Completion Status
+    type: enum
+    unit: none
+    source: decoder_context
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - NOT_STARTED
+      - PARTIAL
+      - COMPLETE
+    quality:
+      required: true
+      default: good
+    description: Decoder-side evidence that the requested transfer completed only partially.
+
+  - id: eps.battery.state_of_charge
+    name: Battery State of Charge
+    type: float32
+    unit: percent
+    source: eps
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    limits:
+      warning_low: 30.0
+      critical_low: 15.0
+    quality:
+      required: true
+      default: good
+    description: Battery state of charge used to warn about communications availability constraints.
+
+  - id: thermal.board_temperature
+    name: Board Temperature
+    type: float32
+    unit: degC
+    source: thermal
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 55.0
+      critical_high: 70.0
+    quality:
+      required: true
+      default: good
+    description: Board-temperature context used as a simple TT&C/OBDH readiness warning source.

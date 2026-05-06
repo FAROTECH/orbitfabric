@@ -1,0 +1,86 @@
+modes:
+  SAFE:
+    description: Protective mode with communications and data-handling activity reduced to essential operations.
+
+  STANDBY:
+    description: Low-activity mode used before nominal operations or after recovery.
+
+  NOMINAL:
+    description: Routine telemetry collection, beacon availability and command-handling readiness.
+    initial: true
+
+  CONTACT:
+    description: Ground contact is available and TT&C command reception/downlink preparation can occur.
+
+  DATA_REQUEST_HANDLING:
+    description: OBDH is validating, selecting and packaging stored frames requested by ground.
+
+  DOWNLINK:
+    description: TT&C/comms are using the available contact window to downlink prioritized mission data.
+
+  HIBERNATION:
+    description: Reduced-activity low-energy state where only essential wakeup and beacon context remain.
+
+  FAULT_RECOVERY:
+    description: Controlled recovery mode used after communications, command or storage-related warnings.
+
+mode_transitions:
+  - from: STANDBY
+    to: NOMINAL
+    reason: ground_authorized_nominal
+    description: Ground authorizes transition from standby to nominal operations.
+
+  - from: NOMINAL
+    to: CONTACT
+    reason: contact_window_started
+    description: A declared public-demo contact window becomes available.
+
+  - from: HIBERNATION
+    to: CONTACT
+    reason: contact_window_started
+    description: A declared public-demo contact window wakes the spacecraft into contact handling.
+
+  - from: CONTACT
+    to: DATA_REQUEST_HANDLING
+    reason: data_request_received
+    description: TT&C receives an abstract data request and forwards it to OBDH.
+
+  - from: DATA_REQUEST_HANDLING
+    to: DOWNLINK
+    reason: downlink_frames_packaged
+    description: OBDH has packaged selected stored frames for prioritized downlink.
+
+  - from: CONTACT
+    to: DOWNLINK
+    reason: beacon_and_housekeeping_only
+    description: Contact downlink starts without requested-data selection.
+
+  - from: DOWNLINK
+    to: NOMINAL
+    reason: contact_window_ended
+    description: Contact ends and the spacecraft returns to nominal operations with any pending frames retained.
+
+  - from: NOMINAL
+    to: HIBERNATION
+    reason: energy_saving_requested
+    description: Spacecraft enters a reduced-activity state between contact opportunities.
+
+  - from: NOMINAL
+    to: SAFE
+    reason: safe_mode_requested
+    description: Protective safe mode requested by command or recovery logic.
+
+  - from: CONTACT
+    to: SAFE
+    reason: command_authorization_failed
+    description: Command validation fails and the spacecraft transitions to a protective state if required.
+
+  - from: SAFE
+    to: FAULT_RECOVERY
+    reason: ground_clear_fault
+    description: Ground starts a controlled recovery sequence.
+
+  - from: FAULT_RECOVERY
+    to: STANDBY
+    reason: recovery_completed
+    description: Recovery completes and the spacecraft returns to standby.

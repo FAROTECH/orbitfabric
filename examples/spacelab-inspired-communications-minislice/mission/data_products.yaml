@@ -1,0 +1,100 @@
+data_products:
+  - id: periodic_beacon_packet
+    producer: beacon_context
+    producer_type: subsystem
+    type: generic
+    estimated_size_bytes: 512
+    priority: critical
+    storage:
+      class: housekeeping
+      retention: 7d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: next_available_contact
+    description: >
+      Periodic beacon product prioritized before requested data. This is a conceptual
+      public-demo product, not an official SpaceLab packet definition.
+
+  - id: critical_housekeeping_packet
+    producer: obdh
+    producer_type: subsystem
+    type: generic
+    estimated_size_bytes: 1024
+    priority: critical
+    storage:
+      class: housekeeping
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Critical housekeeping product containing OBDH, TT&C, EPS and thermal context.
+
+  - id: requested_telemetry_frame_batch
+    producer: obdh
+    producer_type: subsystem
+    type: sample_batch
+    estimated_size_bytes: 8000
+    priority: high
+    storage:
+      class: housekeeping
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Abstract stored telemetry frame batch selected after a ground data request.
+
+  - id: requested_data_frame_batch
+    producer: data_storage
+    producer_type: subsystem
+    type: sample_batch
+    estimated_size_bytes: 24000
+    priority: medium
+    storage:
+      class: engineering
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Larger requested stored-data frame batch eligible after beacon, housekeeping and evidence products.
+
+  - id: downlink_summary_report
+    producer: obdh
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 2048
+    priority: high
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Summary of contact capacity usage and remaining requested-frame backlog.
+
+  - id: decoder_reception_log
+    producer: decoder_context
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 2048
+    priority: high
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Conceptual decoder evidence log for received frames and partial completion status.
+
+  - id: scenario_evidence_log
+    producer: obdh
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 4096
+    priority: high
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Scenario evidence log explaining why requested frames remained partially pending.
