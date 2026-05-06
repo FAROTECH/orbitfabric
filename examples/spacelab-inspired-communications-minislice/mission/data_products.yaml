@@ -36,7 +36,7 @@ data_products:
     estimated_size_bytes: 8000
     priority: high
     storage:
-      class: telemetry
+      class: housekeeping
       retention: 14d
       overflow_policy: drop_oldest
     downlink:
@@ -50,7 +50,7 @@ data_products:
     estimated_size_bytes: 24000
     priority: medium
     storage:
-      class: mission_data
+      class: engineering
       retention: 14d
       overflow_policy: drop_oldest
     downlink:
