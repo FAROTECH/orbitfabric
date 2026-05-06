@@ -1,0 +1,196 @@
+telemetry:
+  - id: eps.battery.state_of_charge
+    name: Battery State of Charge
+    type: float32
+    unit: percent
+    source: eps
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    limits:
+      warning_low: 30.0
+      critical_low: 15.0
+    quality:
+      required: true
+      default: good
+    description: Battery state of charge used to drive low-power and safe-mode implications.
+
+  - id: eps.battery.voltage
+    name: Battery Voltage
+    type: float32
+    unit: V
+    source: eps
+    sampling: 1Hz
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: critical
+    limits:
+      warning_low: 6.8
+      critical_low: 6.4
+    quality:
+      required: true
+      default: good
+    description: Battery bus voltage included in critical housekeeping and health beacon products.
+
+  - id: eps.battery.temperature
+    name: Battery Temperature
+    type: float32
+    unit: degC
+    source: eps
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_low: -5.0
+      warning_high: 45.0
+      critical_high: 55.0
+    quality:
+      required: true
+      default: good
+    description: Battery temperature used as a generic EPS health indicator.
+
+  - id: eps.solar.input_power
+    name: Solar Input Power
+    type: float32
+    unit: W
+    source: eps
+    sampling: 0.2Hz
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    limits:
+      warning_low: 1.0
+    quality:
+      required: true
+      default: good
+    description: Estimated solar input power used to contextualize low-power behavior.
+
+  - id: data_storage.used_bytes
+    name: Onboard Storage Used
+    type: uint32
+    unit: bytes
+    source: data_storage
+    sampling: 0.1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 50000000
+      critical_high: 80000000
+    quality:
+      required: true
+      default: good
+    description: Generic onboard storage occupancy used to expose retained payload and evidence data.
+
+  - id: obc.uptime
+    name: OBC Uptime
+    type: uint32
+    unit: s
+    source: obc_or_cdh
+    sampling: 1Hz
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    quality:
+      required: true
+      default: good
+    description: OBC uptime included in health and beacon products.
+
+  - id: comms.link_status
+    name: Communications Link Status
+    type: enum
+    unit: none
+    source: comms
+    sampling: on_change
+    criticality: high
+    persistence: store_and_downlink
+    downlink_priority: high
+    enum:
+      - NO_CONTACT
+      - CONTACT_AVAILABLE
+      - DOWNLINK_ACTIVE
+    quality:
+      required: true
+      default: good
+    description: Abstract contact/downlink status for scenario evidence.
+
+  - id: adcs.attitude_ready
+    name: ADCS Attitude Ready
+    type: bool
+    unit: none
+    source: adcs
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Minimal attitude readiness flag used by payload acquisition and imaging-derived future examples.
+
+  - id: payload.status
+    name: Payload Status
+    type: enum
+    unit: none
+    source: payload
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: medium
+    enum:
+      - IDLE
+      - ACQUIRING
+      - DATA_READY
+      - DOWNLINK_PENDING
+      - BACKLOG
+      - FAULT
+    quality:
+      required: true
+      default: good
+    description: Abstract payload status used to track data generation and pending downlink.
+
+  - id: payload.data_generated_bytes
+    name: Payload Data Generated
+    type: uint32
+    unit: bytes
+    source: payload
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: low
+    quality:
+      required: true
+      default: good
+    description: Size of the latest generic payload observation before compression and downlink selection.
+
+  - id: payload.data_pending_bytes
+    name: Payload Data Pending
+    type: uint32
+    unit: bytes
+    source: payload
+    sampling: on_change
+    criticality: medium
+    persistence: store_and_downlink
+    downlink_priority: high
+    limits:
+      warning_high: 1
+    quality:
+      required: true
+      default: good
+    description: Payload bytes still pending after prioritized contact downlink allocation.
+
+  - id: downlink.capacity_remaining_bytes
+    name: Downlink Capacity Remaining
+    type: uint32
+    unit: bytes
+    source: comms
+    sampling: on_change
+    criticality: medium
+    persistence: store
+    downlink_priority: medium
+    quality:
+      required: true
+      default: good
+    description: Contract-level scenario evidence for remaining capacity after prioritized downlink allocation.
