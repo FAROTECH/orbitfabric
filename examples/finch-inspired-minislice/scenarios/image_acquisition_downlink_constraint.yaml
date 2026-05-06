@@ -1,0 +1,213 @@
+scenario:
+  id: image_acquisition_downlink_constraint
+  name: Image acquisition constrained by downlink capacity
+  description: FINCH-inspired public minislice where acquisition parameters are loaded, the OBC enters acquisition preparation, ADCS and payload camera readiness are verified, hyperspectral image data is acquired and compressed, and a constrained contact leaves compressed image data partially pending.
+mission:
+  path: ../mission
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    obc.uptime: 4200
+    data_storage.used_bytes: 0
+    comms.link_status: NO_CONTACT
+    rf.downlink_status: IDLE
+    transceiver.status: STANDBY
+    downlink.capacity_remaining_bytes: 16000
+    adcs.attitude_ready: false
+    adcs.pointing_status: NOT_READY
+    star_tracker.status: STANDBY
+    sun_sensors.status: READY
+    gnss.fix_status: LOCKED
+    payload.camera_status: READY
+    payload.camera_temperature: 5.0
+    thermal.payload_temperature: 5.0
+    payload.acquisition_status: IDLE
+    payload.compression_status: NOT_STARTED
+    payload.data_generated_bytes: 0
+    payload.data_pending_bytes: 0
+    eps.battery.state_of_charge: 62.0
+steps:
+- t: 0
+  expect_mode: NOMINAL
+- t: 5
+  command: payload.load_acquisition_params
+  args:
+    target_id: crop_residue_demo_target
+    exposure_ms: 1000
+  expect:
+    command_status: ACCEPTED
+- t: 6
+  expect_event: payload.acquisition_params_loaded
+- t: 7
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: PARAMS_LOADED
+- t: 8
+  command: payload.schedule_image_acquisition
+  args:
+    acquisition_window_s: 120
+  expect:
+    command_status: ACCEPTED
+- t: 9
+  expect_event: payload.acquisition_scheduled
+- t: 10
+  expect_mode: ACQUISITION_PREP
+- t: 11
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: SCHEDULED
+- t: 12
+  command: adcs.request_pointing_ready
+  expect:
+    command_status: ACCEPTED
+- t: 13
+  expect_event: adcs.ready_for_acquisition
+- t: 14
+  expect_telemetry:
+    adcs.attitude_ready: true
+    adcs.pointing_status: READY_FOR_ACQUISITION
+    star_tracker.status: TRACKING
+    sun_sensors.status: READY
+- t: 16
+  command: payload.prepare_camera
+  expect:
+    command_status: ACCEPTED
+- t: 17
+  expect_event: payload.camera_ready
+- t: 18
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: CAMERA_READY
+- t: 19
+  expect_telemetry:
+    payload.camera_status: READY
+    payload.acquisition_status: CAMERA_READY
+    payload.camera_temperature: 5.0
+    thermal.payload_temperature: 5.0
+- t: 21
+  command: obc.verify_acquisition_conditions
+  expect:
+    command_status: ACCEPTED
+- t: 22
+  expect_event: obc.acquisition_conditions_met
+- t: 23
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: CONDITIONS_VERIFIED
+- t: 24
+  expect_telemetry:
+    payload.acquisition_status: CONDITIONS_VERIFIED
+    adcs.attitude_ready: true
+    adcs.pointing_status: READY_FOR_ACQUISITION
+    payload.camera_status: READY
+- t: 26
+  command: payload.start_image_acquisition
+  expect:
+    command_status: ACCEPTED
+- t: 27
+  expect_event: payload.image_acquisition_started
+- t: 28
+  expect_event: payload.image_acquisition_completed
+- t: 29
+  expect_mode: IMAGE_ACQUISITION
+- t: 30
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: DATA_READY
+- t: 31
+  expect_telemetry:
+    payload.camera_status: DATA_READY
+    payload.acquisition_status: COMPLETE
+    adcs.pointing_status: DONE
+    payload.data_generated_bytes: 120000
+    data_storage.used_bytes: 120000
+- t: 34
+  command: payload.compress_image_data
+  expect:
+    command_status: ACCEPTED
+- t: 35
+  expect_event: payload.image_compressed
+- t: 36
+  expect_mode: DATA_COMPRESSION
+- t: 37
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: COMPRESSED_READY
+- t: 38
+  expect_telemetry:
+    payload.camera_status: COMPRESSED_READY
+    payload.compression_status: COMPLETE
+    payload.data_pending_bytes: 48000
+    data_storage.used_bytes: 168000
+- t: 41
+  command: obc.request_health_telemetry
+  expect:
+    command_status: ACCEPTED
+- t: 42
+  expect_event: obc.health_telemetry_requested
+- t: 44
+  command: comms.set_downlink_priority
+  args:
+    policy: critical_first
+  expect:
+    command_status: ACCEPTED
+- t: 45
+  expect_event: comms.downlink_priority_set
+- t: 47
+  command: comms.start_downlink
+  expect:
+    command_status: ACCEPTED
+- t: 48
+  expect_event: comms.contact_window_started
+- t: 49
+  expect_event: comms.downlink_started
+- t: 50
+  expect_event: comms.downlink_partial
+- t: 51
+  expect_event: comms.downlink_capacity_insufficient
+- t: 52
+  expect_event: payload.image_data_pending
+- t: 53
+  expect_mode: DOWNLINK
+- t: 54
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: DOWNLINK_PENDING
+- t: 55
+  expect_telemetry:
+    comms.link_status: DOWNLINK_ACTIVE
+    rf.downlink_status: ACTIVE
+    transceiver.status: TX_DOWNLINK
+    downlink.capacity_remaining_bytes: 0
+    payload.camera_status: DOWNLINK_PENDING
+    payload.data_pending_bytes: 43264
+- t: 59
+  command: comms.end_downlink
+  expect:
+    command_status: ACCEPTED
+- t: 60
+  expect_event: comms.contact_window_ended
+- t: 61
+  expect_mode: NOMINAL
+- t: 62
+  expect:
+    payload_lifecycle:
+      payload: hyperspectral_payload
+      state: BACKLOG
+- t: 63
+  expect_telemetry:
+    comms.link_status: NO_CONTACT
+    rf.downlink_status: PARTIAL
+    transceiver.status: STANDBY
+    payload.camera_status: BACKLOG
+    payload.data_pending_bytes: 43264
+- t: 65
+  expect:
+    scenario_status: PASSED

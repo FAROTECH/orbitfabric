@@ -1,0 +1,75 @@
+modes:
+  SAFE:
+    description: Protective mode with payload activity disabled and only essential operations allowed.
+  STANDBY:
+    description: Low-activity mode used before nominal operations or after recovery.
+  NOMINAL:
+    description: Routine telemetry collection, command handling and scheduled acquisition planning.
+    initial: true
+  ACQUISITION_PREP:
+    description: OBC is preparing a scheduled imaging opportunity and verifying ADCS/payload readiness.
+  IMAGE_ACQUISITION:
+    description: Hyperspectral image acquisition is active or has just completed.
+  DATA_COMPRESSION:
+    description: Payload image data is being compressed into a downlink-eligible product.
+  DOWNLINK:
+    description: Spacecraft is using an available contact window to downlink prioritized mission data.
+  FAULT_RECOVERY:
+    description: Controlled recovery mode used after acquisition, payload, ADCS or communications faults.
+mode_transitions:
+- from: STANDBY
+  to: NOMINAL
+  reason: ground_authorized_nominal
+  description: Ground authorizes transition from standby to nominal operations.
+- from: NOMINAL
+  to: ACQUISITION_PREP
+  reason: acquisition_scheduled
+  description: Acquisition parameters are loaded and the OBC starts readiness preparation.
+- from: ACQUISITION_PREP
+  to: IMAGE_ACQUISITION
+  reason: image_acquisition_started
+  description: OBC has verified acquisition conditions and starts image acquisition.
+- from: IMAGE_ACQUISITION
+  to: DATA_COMPRESSION
+  reason: image_acquisition_completed
+  description: Hyperspectral image acquisition completed and compression begins.
+- from: DATA_COMPRESSION
+  to: NOMINAL
+  reason: image_compressed
+  description: Compressed image bundle is stored and the spacecraft returns to nominal operations.
+- from: NOMINAL
+  to: DOWNLINK
+  reason: contact_window_started
+  description: A constrained contact window starts during nominal operations.
+- from: DATA_COMPRESSION
+  to: DOWNLINK
+  reason: contact_window_started
+  description: A constrained contact window starts while compressed image data is pending.
+- from: DOWNLINK
+  to: NOMINAL
+  reason: contact_window_ended
+  description: Contact ends and remaining image data is retained onboard.
+- from: NOMINAL
+  to: SAFE
+  reason: protective_safe_mode_requested
+  description: OBC requests safe mode due to a severe condition.
+- from: ACQUISITION_PREP
+  to: FAULT_RECOVERY
+  reason: acquisition_conditions_not_met
+  description: Acquisition conditions could not be met and recovery/evidence capture begins.
+- from: IMAGE_ACQUISITION
+  to: FAULT_RECOVERY
+  reason: acquisition_fault
+  description: Image acquisition could not complete and recovery/evidence capture begins.
+- from: DATA_COMPRESSION
+  to: FAULT_RECOVERY
+  reason: compression_fault
+  description: Compression could not complete and recovery/evidence capture begins.
+- from: SAFE
+  to: FAULT_RECOVERY
+  reason: ground_clear_fault
+  description: Ground starts a controlled recovery sequence.
+- from: FAULT_RECOVERY
+  to: STANDBY
+  reason: recovery_completed
+  description: Recovery completes and the spacecraft returns to standby.

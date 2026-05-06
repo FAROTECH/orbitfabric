@@ -1,0 +1,49 @@
+payloads:
+- id: hyperspectral_payload
+  subsystem: hyperspectral_payload
+  profile: mission_specific
+  lifecycle:
+    initial_state: READY
+    states:
+    - 'OFF'
+    - READY
+    - PARAMS_LOADED
+    - SCHEDULED
+    - CAMERA_READY
+    - CONDITIONS_VERIFIED
+    - ACQUIRING
+    - DATA_READY
+    - COMPRESSED_READY
+    - DOWNLINK_PENDING
+    - BACKLOG
+    - FAULT
+  telemetry:
+    produced:
+    - payload.camera_status
+    - payload.camera_temperature
+    - payload.acquisition_status
+    - payload.compression_status
+    - payload.data_generated_bytes
+    - payload.data_pending_bytes
+  commands:
+    accepted:
+    - payload.load_acquisition_params
+    - payload.schedule_image_acquisition
+    - payload.prepare_camera
+    - payload.start_image_acquisition
+    - payload.compress_image_data
+  events:
+    generated:
+    - payload.acquisition_params_loaded
+    - payload.acquisition_scheduled
+    - payload.camera_ready
+    - payload.image_acquisition_started
+    - payload.image_acquisition_completed
+    - payload.image_compressed
+    - payload.image_data_pending
+  faults:
+    possible:
+    - payload.camera_not_ready
+    - payload.camera_temperature_high
+    - payload.image_data_backlog
+  description: Conceptual FINCH-inspired hyperspectral payload contract used by the public demo. This is a small representative acquisition/readiness/compression contract, not an import of FINCH firmware or architecture diagrams.
