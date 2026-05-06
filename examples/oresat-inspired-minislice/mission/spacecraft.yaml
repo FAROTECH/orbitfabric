@@ -1,0 +1,7 @@
+spacecraft:
+  id: oresat-inspired-minislice
+  name: OreSat-inspired Minislice
+  class: cubesat
+  form_factor: 2U-inspired
+  mission_type: publicly_derived_conceptual_university_technology_demonstrator
+  model_version: 0.4.0-demo

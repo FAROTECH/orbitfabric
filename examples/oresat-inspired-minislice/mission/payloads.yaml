@@ -1,0 +1,34 @@
+payloads:
+  - id: cfc_payload
+    subsystem: cfc_payload
+    profile: mission_specific
+    lifecycle:
+      initial_state: READY
+      states:
+        - "OFF"
+        - READY
+        - CAPTURING
+        - DATA_READY
+        - DOWNLINK_PENDING
+        - BACKLOG
+        - FAULT
+    telemetry:
+      produced:
+        - cfc.camera_status
+        - cfc.camera_temperature
+        - payload.data_generated_bytes
+        - payload.data_pending_bytes
+    commands:
+      accepted:
+        - cfc.schedule_capture
+    events:
+      generated:
+        - cfc.data_generated
+        - payload.data_pending
+    faults:
+      possible:
+        - cfc.camera_temperature_high
+        - cfc.data_backlog
+    description: >
+      Conceptual CFC-style payload contract used by the OreSat-inspired public demo.
+      This is a small representative contract, not an import of OreSat object dictionaries.

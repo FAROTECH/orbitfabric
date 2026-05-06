@@ -1,0 +1,42 @@
+contacts:
+  contact_profiles:
+    - id: oresat_inspired_ground_contact
+      target: abstract_public_demo_ground_context
+      description: >
+        Synthetic ground contact profile for the OreSat-inspired public demo. This is
+        an assumption for contract reasoning only, not a real OreSat contact schedule.
+
+  link_profiles:
+    - id: low_rate_uhf_downlink
+      direction: downlink
+      assumed_rate_bps: 9600
+      description: >
+        Generic low-rate downlink assumption for constrained contact reasoning. No
+        real frequency, callsign or operational link budget is modeled.
+
+  contact_windows:
+    - id: oresat_inspired_contact_001
+      contact_profile: oresat_inspired_ground_contact
+      link_profile: low_rate_uhf_downlink
+      start: "2026-01-01T00:00:00Z"
+      duration_seconds: 300
+      assumed_capacity_bytes: 12000
+      description: Synthetic limited-capacity contact window used to force priority-based allocation.
+
+  downlink_flows:
+    - id: oresat_inspired_priority_downlink
+      contact_profile: oresat_inspired_ground_contact
+      link_profile: low_rate_uhf_downlink
+      queue_policy: critical_first
+      eligible_data_products:
+        - health_beacon
+        - critical_housekeeping_packet
+        - gps_state_sample
+        - adcs_sensor_snapshot
+        - downlink_summary_report
+        - scenario_evidence_log
+        - compressed_cfc_bundle
+        - dxwifi_image_bundle
+      description: >
+        Priority-based downlink flow demonstrating beacon/health-first allocation and
+        retained CFC-style payload data under limited contact capacity.
