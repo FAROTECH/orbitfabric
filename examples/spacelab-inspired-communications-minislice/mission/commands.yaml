@@ -1,0 +1,196 @@
+commands:
+  - id: obdh.request_health_telemetry
+    target: obdh
+    description: Request current critical housekeeping and communications health telemetry products.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - CONTACT
+      - DATA_REQUEST_HANDLING
+      - DOWNLINK
+      - SAFE
+      - FAULT_RECOVERY
+    requires_ack: true
+    timeout_ms: 500
+    risk: low
+    emits:
+      - obdh.health_telemetry_requested
+    expected_effects:
+      no_state_change: true
+
+  - id: ttc.receive_data_request
+    target: ttc
+    description: Receive an abstract ground data-request telecommand and forward it to OBDH for contract-level handling.
+    arguments:
+      - name: request_id
+        type: string
+        description: Abstract request identifier used only for public-demo scenario evidence.
+      - name: requested_frame_count
+        type: uint16
+        min: 1
+        max: 256
+        default: 12
+        description: Number of conceptual stored frames requested by ground.
+    allowed_modes:
+      - CONTACT
+    requires_ack: true
+    timeout_ms: 1000
+    risk: medium
+    emits:
+      - ttc.telecommand_received
+      - obdh.data_request_accepted
+    expected_effects:
+      telemetry:
+        ttc.command_rx_status: ACCEPTED
+        transceiver.status: RX_COMMAND
+      mode_transition:
+        to: DATA_REQUEST_HANDLING
+
+  - id: obdh.select_requested_data
+    target: obdh
+    description: Select stored telemetry/data frames matching the accepted abstract data request.
+    arguments: []
+    allowed_modes:
+      - DATA_REQUEST_HANDLING
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - obdh.data_frames_selected
+    expected_effects:
+      telemetry:
+        requested_data.frames_selected: 12
+        requested_data.frames_pending: 12
+        obdh.storage_used_bytes: 42000
+        data_storage.used_bytes: 42000
+
+  - id: obdh.package_downlink_frames
+    target: obdh
+    description: Package selected stored frames into downlink-eligible requested telemetry and data batches.
+    arguments: []
+    allowed_modes:
+      - DATA_REQUEST_HANDLING
+    requires_ack: true
+    timeout_ms: 1500
+    risk: medium
+    emits:
+      - obdh.downlink_frames_packaged
+    expected_effects:
+      telemetry:
+        ttc.downlink_status: IDLE
+      mode_transition:
+        to: DOWNLINK
+
+  - id: comms.set_downlink_priority
+    target: comms
+    description: Select the priority policy used by the constrained TT&C downlink flow.
+    arguments:
+      - name: policy
+        type: enum
+        enum:
+          - critical_first
+          - priority_then_age
+          - manual_selection
+        default: critical_first
+        description: Abstract queue selection policy for the next downlink opportunity.
+    allowed_modes:
+      - CONTACT
+      - DATA_REQUEST_HANDLING
+      - DOWNLINK
+    requires_ack: true
+    timeout_ms: 500
+    risk: low
+    emits:
+      - comms.downlink_priority_set
+    expected_effects:
+      no_state_change: true
+
+  - id: comms.start_downlink
+    target: comms
+    description: Start the prioritized downlink flow for the current abstract contact window.
+    arguments: []
+    allowed_modes:
+      - DOWNLINK
+    requires_ack: true
+    timeout_ms: 1500
+    risk: medium
+    emits:
+      - ttc.beacon_transmitted
+      - comms.downlink_started
+      - comms.downlink_partial
+      - comms.downlink_capacity_insufficient
+      - requested_data.frames_pending
+      - decoder.frames_received
+      - decoder.partial_reception_recorded
+    expected_effects:
+      telemetry:
+        ttc.link_status: DOWNLINK_ACTIVE
+        ttc.beacon_status: TRANSMITTED
+        ttc.downlink_status: PARTIAL
+        comms.contact_status: ACTIVE_CONTACT
+        rf.downlink_status: PARTIAL
+        transceiver.status: TX_DOWNLINK
+        downlink.capacity_remaining_bytes: 0
+        requested_data.frames_selected: 12
+        requested_data.frames_pending: 8
+        decoder.frames_received: 4
+        decoder.partial_completion_status: PARTIAL
+
+  - id: comms.end_downlink
+    target: comms
+    description: Close the current contact window and retain remaining requested frames onboard.
+    arguments: []
+    allowed_modes:
+      - DOWNLINK
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - comms.contact_window_ended
+    expected_effects:
+      telemetry:
+        ttc.link_status: NO_CONTACT
+        ttc.downlink_status: PARTIAL
+        comms.contact_status: CONTACT_ENDED
+        rf.downlink_status: PARTIAL
+        transceiver.status: STANDBY
+      mode_transition:
+        to: NOMINAL
+
+  - id: obdh.enter_safe_mode
+    target: obdh
+    description: Request transition to safe mode.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - CONTACT
+      - DATA_REQUEST_HANDLING
+      - DOWNLINK
+      - HIBERNATION
+      - FAULT_RECOVERY
+    requires_ack: true
+    timeout_ms: 1000
+    risk: high
+    emits:
+      - obdh.safe_mode_requested
+    expected_effects:
+      mode_transition:
+        to: SAFE
+
+  - id: obdh.clear_fault
+    target: obdh
+    description: Clear a recorded warning or fault after ground review.
+    arguments:
+      - name: fault_id
+        type: string
+        description: Fault identifier to clear.
+    allowed_modes:
+      - SAFE
+      - FAULT_RECOVERY
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - obdh.fault_cleared
+    expected_effects:
+      no_state_change: true
