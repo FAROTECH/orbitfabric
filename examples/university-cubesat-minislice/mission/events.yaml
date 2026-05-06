@@ -1,0 +1,133 @@
+events:
+  - id: comms.beacon_transmitted
+    source: comms
+    severity: info
+    description: Health beacon transmitted during a contact opportunity.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: payload.data_generated
+    source: payload
+    severity: info
+    description: Payload observation data product generated and stored onboard.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.contact_window_started
+    source: comms
+    severity: info
+    description: Abstract low-rate contact window started.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.contact_window_ended
+    source: comms
+    severity: info
+    description: Abstract low-rate contact window ended.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: comms.downlink_started
+    source: comms
+    severity: info
+    description: Prioritized downlink flow started for the available contact window.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.downlink_completed
+    source: comms
+    severity: info
+    description: Downlink flow completed without remaining eligible payload data.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: comms.downlink_partial
+    source: comms
+    severity: warning
+    description: Downlink flow was capacity-constrained and only part of the eligible payload data could be sent.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: payload.data_pending
+    source: payload
+    severity: warning
+    description: Payload data remains pending after the constrained contact window.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: eps.low_power_warning_raised
+    source: eps
+    severity: warning
+    description: Battery state of charge crossed the low-power warning threshold.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: eps.low_battery_critical_raised
+    source: eps
+    severity: critical
+    description: Battery state of charge crossed the critical threshold.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: obc.mode_changed
+    source: obc_or_cdh
+    severity: info
+    description: Spacecraft operational mode changed.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: obc.health_telemetry_requested
+    source: obc_or_cdh
+    severity: info
+    description: Ground requested health telemetry.
+    downlink_priority: medium
+    persistence: store
+
+  - id: comms.payload_data_requested
+    source: comms
+    severity: info
+    description: Ground requested payload data during an available contact opportunity.
+    downlink_priority: medium
+    persistence: store
+
+  - id: comms.downlink_priority_set
+    source: comms
+    severity: info
+    description: Downlink priority policy was selected for the contact opportunity.
+    downlink_priority: medium
+    persistence: store
+
+  - id: obc.safe_mode_requested
+    source: obc_or_cdh
+    severity: warning
+    description: Safe mode was requested by command or recovery logic.
+    downlink_priority: critical
+    persistence: store_and_downlink
+
+  - id: obc.fault_cleared
+    source: obc_or_cdh
+    severity: info
+    description: Fault state was cleared by ground command.
+    downlink_priority: medium
+    persistence: store_and_downlink
+
+  - id: adcs.attitude_not_ready
+    source: adcs
+    severity: warning
+    description: ADCS was not ready for payload acquisition or pointing-constrained operations.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: data_storage.high_usage
+    source: data_storage
+    severity: warning
+    description: Onboard storage usage exceeded the warning threshold.
+    downlink_priority: high
+    persistence: store_and_downlink
+
+  - id: comms.downlink_capacity_insufficient
+    source: comms
+    severity: warning
+    description: Declared contact capacity is insufficient for the eligible downlink set.
+    downlink_priority: high
+    persistence: store_and_downlink
