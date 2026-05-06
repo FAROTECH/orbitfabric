@@ -1,0 +1,78 @@
+modes:
+  SAFE:
+    description: Protective mode with payload activity disabled and only essential operations allowed.
+
+  STANDBY:
+    description: Low-activity mode used before nominal operations or after recovery.
+
+  NOMINAL:
+    description: Standard operational mode for routine telemetry collection, command handling and scheduled payload activity.
+    initial: true
+
+  PAYLOAD_ACQUISITION:
+    description: Payload acquisition is active or recently completed, with payload data expected to be stored onboard.
+
+  DOWNLINK:
+    description: Spacecraft is using an available contact window to downlink prioritized mission data.
+
+  LOW_POWER:
+    description: Reduced-power mode entered after a battery warning; critical telemetry and beacon remain prioritized.
+
+  FAULT_RECOVERY:
+    description: Controlled recovery mode used after a severe warning or fault condition.
+
+mode_transitions:
+  - from: STANDBY
+    to: NOMINAL
+    reason: ground_authorized_nominal
+    description: Ground authorizes transition from standby to nominal operations.
+
+  - from: NOMINAL
+    to: PAYLOAD_ACQUISITION
+    reason: payload_acquisition_scheduled
+    description: Payload acquisition command is accepted in nominal mode.
+
+  - from: PAYLOAD_ACQUISITION
+    to: NOMINAL
+    reason: payload_data_generated
+    description: Payload data is generated and acquisition state is closed.
+
+  - from: NOMINAL
+    to: LOW_POWER
+    reason: eps_low_power_warning
+    description: EPS battery state of charge falls below the warning threshold.
+
+  - from: PAYLOAD_ACQUISITION
+    to: LOW_POWER
+    reason: eps_low_power_warning
+    description: EPS warning interrupts payload-oriented operations.
+
+  - from: LOW_POWER
+    to: DOWNLINK
+    reason: contact_window_started
+    description: A constrained contact window starts while the spacecraft remains power-limited.
+
+  - from: NOMINAL
+    to: DOWNLINK
+    reason: contact_window_started
+    description: A contact window starts during nominal operations.
+
+  - from: DOWNLINK
+    to: LOW_POWER
+    reason: contact_window_ended
+    description: Contact ends and the spacecraft remains in reduced-power operations.
+
+  - from: LOW_POWER
+    to: SAFE
+    reason: eps_low_battery_critical
+    description: Battery condition becomes critical.
+
+  - from: SAFE
+    to: FAULT_RECOVERY
+    reason: ground_clear_fault
+    description: Ground starts a controlled recovery sequence.
+
+  - from: FAULT_RECOVERY
+    to: STANDBY
+    reason: recovery_completed
+    description: Recovery completes and the spacecraft returns to standby.
