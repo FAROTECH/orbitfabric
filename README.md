@@ -74,6 +74,16 @@ The current vertical slice is functional:
 - simulation plain-text log generation;
 - synthetic demo mission: `demo-3u`.
 
+The repository also includes a growing set of example mission slices:
+
+- `examples/demo-3u/` — synthetic clean-room demo mission;
+- `examples/university-cubesat-minislice/` — generic university CubeSat minislice;
+- `examples/oresat-inspired-minislice/` — public-material-derived low-power / beacon / constrained-downlink minislice;
+- `examples/finch-inspired-minislice/` — public-material-derived imaging acquisition / ADCS readiness / compression / constrained-downlink minislice;
+- `examples/spacelab-inspired-communications-minislice/` — public-material-derived TT&C / OBDH / beacon / telecommanded data-request / decoder-evidence minislice.
+
+The `*-inspired-*` examples are conceptual public demos. They are not official models, not endorsed by the original project teams, and do not imply adoption of OrbitFabric by those teams.
+
 Current verified baseline:
 
 ```text
@@ -296,6 +306,48 @@ payload.start_acquisition
 
 ---
 
+## Example Mission Slices
+
+In addition to the synthetic `demo-3u` mission, OrbitFabric includes small mission slices that exercise different Mission Data Contract patterns.
+
+These examples are intentionally compact. They are designed to validate OrbitFabric's contract-layer model across different spacecraft-data situations, not to reproduce real missions.
+
+```text
+examples/university-cubesat-minislice/
+        generic university CubeSat mission-data baseline
+
+examples/oresat-inspired-minislice/
+        low-power behavior
+        beacon / housekeeping-first downlink
+        constrained contact capacity
+        payload data backlog
+
+examples/finch-inspired-minislice/
+        imaging acquisition workflow
+        ADCS and payload readiness gating
+        image compression
+        partial compressed-image downlink
+
+examples/spacelab-inspired-communications-minislice/
+        TT&C / OBDH data request flow
+        periodic beacon context
+        stored frame selection and packaging
+        constrained downlink
+        decoder-side reception evidence
+```
+
+The inspired examples are derived only from public material and are conceptual OrbitFabric demos. They are not official models and are not endorsed by the referenced project teams.
+
+Their purpose is to demonstrate that the same Mission Data Contract approach can be specialized toward different public university CubeSat patterns:
+
+```text
+power-constrained operations
+payload imaging acquisition
+communications / telecommanded data retrieval
+```
+
+---
+
 ## Installation for Local Development
 
 Create and activate a Python virtual environment:
@@ -493,7 +545,11 @@ orbitfabric/
 │       └── orbitfabric-social-preview.png
 ├── docs/
 ├── examples/
-│   └── demo-3u/
+│   ├── demo-3u/
+│   ├── university-cubesat-minislice/
+│   ├── oresat-inspired-minislice/
+│   ├── finch-inspired-minislice/
+│   └── spacelab-inspired-communications-minislice/
 ├── src/
 │   └── orbitfabric/
 ├── tests/
