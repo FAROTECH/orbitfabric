@@ -34,27 +34,24 @@ steps:
     expect_mode: NOMINAL
 
   - t: 5
-    event: ttc.beacon_transmitted
+    command: comms.start_contact
+    expect:
+      command_status: ACCEPTED
 
   - t: 6
+    expect_event: comms.contact_window_started
+
+  - t: 7
     expect_event: ttc.beacon_transmitted
 
   - t: 8
-    event: comms.contact_window_started
+    expect_mode: CONTACT
 
   - t: 9
-    expect_event: comms.contact_window_started
-
-  - t: 10
-    inject:
-      comms.contact_status: ACTIVE_CONTACT
-      ttc.link_status: CONTACT_AVAILABLE
-      transceiver.status: RX_COMMAND
-
-  - t: 11
     expect_telemetry:
       comms.contact_status: ACTIVE_CONTACT
       ttc.link_status: CONTACT_AVAILABLE
+      ttc.beacon_status: TRANSMITTED
       transceiver.status: RX_COMMAND
 
   - t: 12
