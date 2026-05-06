@@ -1,0 +1,61 @@
+packets:
+  - id: periodic_beacon_packet
+    name: Periodic Beacon Packet
+    type: json
+    max_payload_bytes: 256
+    period: 60s
+    telemetry:
+      - obdh.uptime
+      - ttc.beacon_status
+      - eps.battery.state_of_charge
+      - thermal.board_temperature
+    description: >
+      Compact SpaceLab-inspired public-demo beacon packet. This is not an official
+      FloripaSat or GOLDS-UFSC beacon definition.
+
+  - id: critical_housekeeping_packet
+    name: Critical Housekeeping Packet
+    type: json
+    max_payload_bytes: 512
+    period: 30s
+    telemetry:
+      - obdh.uptime
+      - obdh.storage_used_bytes
+      - ttc.link_status
+      - eps.battery.state_of_charge
+      - thermal.board_temperature
+    description: Critical housekeeping packet prioritized before requested data frames.
+
+  - id: requested_telemetry_frame_batch
+    name: Requested Telemetry Frame Batch
+    type: json
+    max_payload_bytes: 2048
+    period: on_request
+    telemetry:
+      - requested_data.frames_selected
+      - requested_data.frames_pending
+      - data_storage.used_bytes
+    description: Abstract batch of requested stored telemetry frames selected by OBDH.
+
+  - id: downlink_summary_packet
+    name: Downlink Summary Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_contact
+    telemetry:
+      - downlink.capacity_remaining_bytes
+      - ttc.downlink_status
+      - requested_data.frames_pending
+      - decoder.frames_received
+      - decoder.partial_completion_status
+    description: Contact summary packet used as evidence for partial requested-data completion.
+
+  - id: decoder_reception_packet
+    name: Decoder Reception Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_contact
+    telemetry:
+      - decoder.frames_received
+      - decoder.partial_completion_status
+    description: Conceptual ground-side decoder reception evidence packet.
