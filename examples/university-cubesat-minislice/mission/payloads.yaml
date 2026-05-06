@@ -1,0 +1,29 @@
+payloads:
+  - id: generic_observation_payload
+    subsystem: payload
+    profile: mission_specific
+    lifecycle:
+      initial_state: READY
+      states:
+        - OFF
+        - READY
+        - ACQUIRING
+        - DATA_READY
+        - DOWNLINK_PENDING
+        - FAULT
+    telemetry:
+      produced:
+        - payload.status
+        - payload.data_generated_bytes
+        - payload.data_pending_bytes
+    commands:
+      accepted:
+        - payload.schedule_acquisition
+    events:
+      generated:
+        - payload.data_generated
+        - payload.data_pending
+    faults:
+      possible:
+        - payload.data_backlog
+    description: Generic observation payload contract used by the university CubeSat minislice.
