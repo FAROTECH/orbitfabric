@@ -1,0 +1,7 @@
+spacecraft:
+  id: university-cubesat-minislice
+  name: University CubeSat Minislice
+  class: cubesat
+  form_factor: 3U
+  mission_type: university_technology_demonstrator
+  model_version: 0.4.0-demo
