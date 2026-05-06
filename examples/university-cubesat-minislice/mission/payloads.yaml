@@ -5,7 +5,7 @@ payloads:
     lifecycle:
       initial_state: READY
       states:
-        - OFF
+        - "OFF"
         - READY
         - ACQUIRING
         - DATA_READY
