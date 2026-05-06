@@ -1,0 +1,178 @@
+scenario:
+  id: ttc_data_request_constrained_downlink
+  name: TT&C data request constrained by downlink capacity
+  description: >
+    SpaceLab-inspired public communications minislice where a periodic beacon is
+    available, a ground contact starts, TT&C receives an abstract data-request
+    telecommand, OBDH selects and packages stored frames, and the constrained
+    contact downlinks beacon/housekeeping/evidence before leaving requested frames
+    partially pending onboard.
+mission:
+  path: ../mission
+initial_state:
+  mode: NOMINAL
+  telemetry:
+    obdh.uptime: 7200
+    obdh.storage_used_bytes: 42000
+    data_storage.used_bytes: 42000
+    ttc.link_status: NO_CONTACT
+    ttc.beacon_status: AVAILABLE
+    ttc.command_rx_status: IDLE
+    ttc.downlink_status: IDLE
+    comms.contact_status: NO_CONTACT
+    rf.downlink_status: IDLE
+    transceiver.status: STANDBY
+    downlink.capacity_remaining_bytes: 12000
+    requested_data.frames_selected: 0
+    requested_data.frames_pending: 0
+    decoder.frames_received: 0
+    decoder.partial_completion_status: NOT_STARTED
+    eps.battery.state_of_charge: 64.0
+    thermal.board_temperature: 32.0
+steps:
+  - t: 0
+    expect_mode: NOMINAL
+
+  - t: 5
+    event: ttc.beacon_transmitted
+
+  - t: 6
+    expect_event: ttc.beacon_transmitted
+
+  - t: 8
+    event: comms.contact_window_started
+
+  - t: 9
+    expect_event: comms.contact_window_started
+
+  - t: 10
+    inject:
+      comms.contact_status: ACTIVE_CONTACT
+      ttc.link_status: CONTACT_AVAILABLE
+      transceiver.status: RX_COMMAND
+
+  - t: 11
+    expect_telemetry:
+      comms.contact_status: ACTIVE_CONTACT
+      ttc.link_status: CONTACT_AVAILABLE
+      transceiver.status: RX_COMMAND
+
+  - t: 12
+    command: ttc.receive_data_request
+    args:
+      request_id: stored_frames_demo_request
+      requested_frame_count: 12
+    expect:
+      command_status: ACCEPTED
+
+  - t: 13
+    expect_event: ttc.telecommand_received
+
+  - t: 14
+    expect_event: obdh.data_request_accepted
+
+  - t: 15
+    expect_mode: DATA_REQUEST_HANDLING
+
+  - t: 16
+    expect_telemetry:
+      ttc.command_rx_status: ACCEPTED
+      transceiver.status: RX_COMMAND
+
+  - t: 18
+    command: obdh.select_requested_data
+    expect:
+      command_status: ACCEPTED
+
+  - t: 19
+    expect_event: obdh.data_frames_selected
+
+  - t: 20
+    expect_telemetry:
+      requested_data.frames_selected: 12
+      requested_data.frames_pending: 12
+      obdh.storage_used_bytes: 42000
+      data_storage.used_bytes: 42000
+
+  - t: 22
+    command: comms.set_downlink_priority
+    args:
+      policy: critical_first
+    expect:
+      command_status: ACCEPTED
+
+  - t: 23
+    expect_event: comms.downlink_priority_set
+
+  - t: 25
+    command: obdh.package_downlink_frames
+    expect:
+      command_status: ACCEPTED
+
+  - t: 26
+    expect_event: obdh.downlink_frames_packaged
+
+  - t: 27
+    expect_mode: DOWNLINK
+
+  - t: 29
+    command: comms.start_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 30
+    expect_event: comms.downlink_started
+
+  - t: 31
+    expect_event: comms.downlink_partial
+
+  - t: 32
+    expect_event: comms.downlink_capacity_insufficient
+
+  - t: 33
+    expect_event: requested_data.frames_pending
+
+  - t: 34
+    expect_event: decoder.frames_received
+
+  - t: 35
+    expect_event: decoder.partial_reception_recorded
+
+  - t: 36
+    expect_telemetry:
+      ttc.link_status: DOWNLINK_ACTIVE
+      ttc.beacon_status: TRANSMITTED
+      ttc.downlink_status: PARTIAL
+      comms.contact_status: ACTIVE_CONTACT
+      rf.downlink_status: PARTIAL
+      transceiver.status: TX_DOWNLINK
+      downlink.capacity_remaining_bytes: 0
+      requested_data.frames_selected: 12
+      requested_data.frames_pending: 8
+      decoder.frames_received: 4
+      decoder.partial_completion_status: PARTIAL
+
+  - t: 40
+    command: comms.end_downlink
+    expect:
+      command_status: ACCEPTED
+
+  - t: 41
+    expect_event: comms.contact_window_ended
+
+  - t: 42
+    expect_mode: NOMINAL
+
+  - t: 43
+    expect_telemetry:
+      ttc.link_status: NO_CONTACT
+      ttc.downlink_status: PARTIAL
+      comms.contact_status: CONTACT_ENDED
+      rf.downlink_status: PARTIAL
+      transceiver.status: STANDBY
+      requested_data.frames_pending: 8
+      decoder.partial_completion_status: PARTIAL
+
+  - t: 45
+    expect:
+      scenario_status: PASSED
