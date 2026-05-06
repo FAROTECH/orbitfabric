@@ -1,0 +1,7 @@
+spacecraft:
+  id: finch-inspired-minislice
+  name: FINCH-inspired Minislice
+  class: cubesat
+  form_factor: 3U-inspired
+  mission_type: publicly_derived_conceptual_university_hyperspectral_imaging_demo
+  model_version: 0.4.0-demo

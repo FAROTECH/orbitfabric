@@ -1,0 +1,64 @@
+packets:
+  - id: finch_inspired_health_packet
+    name: FINCH-Inspired Health Packet
+    type: json
+    max_payload_bytes: 1024
+    period: 30s
+    telemetry:
+      - obc.uptime
+      - comms.link_status
+      - rf.downlink_status
+      - eps.battery.state_of_charge
+      - data_storage.used_bytes
+      - payload.data_pending_bytes
+    description: >
+      Compact health packet for the FINCH-inspired public demo. This is not an
+      official FINCH telemetry packet or radio packet definition.
+
+  - id: acquisition_readiness_packet
+    name: Acquisition Readiness Packet
+    type: json
+    max_payload_bytes: 1024
+    period: on_change
+    telemetry:
+      - adcs.attitude_ready
+      - adcs.pointing_status
+      - star_tracker.status
+      - sun_sensors.status
+      - gnss.fix_status
+      - payload.camera_status
+      - payload.camera_temperature
+      - thermal.payload_temperature
+    description: >
+      Readiness-focused packet used to explain why a scheduled hyperspectral
+      acquisition can proceed or must be blocked.
+
+  - id: hyperspectral_payload_status_packet
+    name: Hyperspectral Payload Status Packet
+    type: json
+    max_payload_bytes: 1024
+    period: on_change
+    telemetry:
+      - payload.acquisition_status
+      - payload.compression_status
+      - payload.data_generated_bytes
+      - payload.data_pending_bytes
+      - data_storage.used_bytes
+    description: >
+      Payload status packet exposing acquisition, compression and pending-data
+      state for the FINCH-inspired minislice.
+
+  - id: downlink_summary_packet
+    name: Downlink Summary Packet
+    type: json
+    max_payload_bytes: 512
+    period: on_contact
+    telemetry:
+      - comms.link_status
+      - rf.downlink_status
+      - transceiver.status
+      - downlink.capacity_remaining_bytes
+      - payload.data_pending_bytes
+    description: >
+      Contact summary packet used as scenario evidence for constrained downlink
+      behavior and retained compressed-image backlog.

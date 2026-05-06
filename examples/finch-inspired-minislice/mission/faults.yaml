@@ -1,0 +1,104 @@
+faults:
+  - id: adcs.not_ready
+    source: adcs
+    severity: warning
+    description: ADCS readiness is false when image acquisition would require pointing readiness.
+    condition:
+      telemetry: adcs.attitude_ready
+      operator: ==
+      value: false
+      debounce_samples: 1
+    emits:
+      - adcs.not_ready
+      - obc.acquisition_conditions_not_met
+
+  - id: payload.camera_not_ready
+    source: hyperspectral_payload
+    severity: warning
+    description: Payload camera is not ready when image acquisition is requested.
+    condition:
+      telemetry: payload.camera_status
+      operator: ==
+      value: ERROR
+      debounce_samples: 1
+    emits:
+      - payload.camera_not_ready
+      - obc.acquisition_conditions_not_met
+
+  - id: payload.camera_temperature_high
+    source: hyperspectral_payload
+    severity: warning
+    description: Payload camera temperature exceeds the warning threshold.
+    condition:
+      telemetry: payload.camera_temperature
+      operator: '>'
+      value: 25.0
+      debounce_samples: 1
+    emits:
+      - payload.camera_temperature_high
+      - obc.acquisition_conditions_not_met
+
+  - id: payload.image_data_backlog
+    source: hyperspectral_payload
+    severity: warning
+    description: Compressed image data remains pending above the retained-backlog warning threshold.
+    condition:
+      telemetry: payload.data_pending_bytes
+      operator: '>'
+      value: 20000
+      debounce_samples: 1
+    emits:
+      - payload.image_data_pending
+
+  - id: comms.downlink_capacity_insufficient
+    source: comms
+    severity: warning
+    description: Downlink capacity is exhausted while compressed image data remains pending.
+    condition:
+      telemetry: downlink.capacity_remaining_bytes
+      operator: ==
+      value: 0
+      debounce_samples: 1
+    emits:
+      - comms.downlink_capacity_insufficient
+      - comms.downlink_partial
+
+  - id: data_storage.high_usage
+    source: data_storage
+    severity: warning
+    description: Onboard storage usage exceeds the warning threshold.
+    condition:
+      telemetry: data_storage.used_bytes
+      operator: '>'
+      value: 50000000
+      debounce_samples: 1
+    emits:
+      - data_storage.high_usage
+
+  - id: eps.low_battery_warning
+    source: eps
+    severity: warning
+    description: Battery state of charge remains below the warning threshold for two consecutive samples.
+    condition:
+      telemetry: eps.battery.state_of_charge
+      operator: <
+      value: 30.0
+      debounce_samples: 2
+    emits:
+      - eps.low_power_warning_raised
+    recovery:
+      mode_transition: SAFE
+      auto_commands: []
+
+  - id: thermal.payload_temperature_out_of_range
+    source: thermal
+    severity: warning
+    description: Payload thermal context exceeds the warning threshold.
+    condition:
+      telemetry: thermal.payload_temperature
+      operator: '>'
+      value: 25.0
+      debounce_samples: 1
+    emits:
+      - thermal.payload_temperature_out_of_range
+      - obc.acquisition_conditions_not_met

@@ -1,0 +1,143 @@
+data_products:
+  - id: critical_housekeeping_packet
+    producer: obc
+    producer_type: subsystem
+    type: generic
+    estimated_size_bytes: 1024
+    priority: critical
+    storage:
+      class: housekeeping
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Critical housekeeping product containing OBC, EPS, ADCS, payload and communications health fields.
+
+  - id: acquisition_summary_report
+    producer: obc
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 2048
+    priority: critical
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Summary of acquisition parameters, readiness state, acquisition outcome and compression state.
+
+  - id: adcs_readiness_snapshot
+    producer: adcs
+    producer_type: subsystem
+    type: sample_batch
+    estimated_size_bytes: 1024
+    priority: high
+    storage:
+      class: housekeeping
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Compact ADCS readiness and pointing snapshot used to justify acquisition gating.
+
+  - id: payload_health_snapshot
+    producer: hyperspectral_payload
+    producer_type: payload
+    type: sample_batch
+    estimated_size_bytes: 1024
+    priority: high
+    payload: hyperspectral_payload
+    storage:
+      class: housekeeping
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Compact payload camera and thermal-readiness health snapshot.
+
+  - id: raw_hyperspectral_image
+    producer: hyperspectral_payload
+    producer_type: payload
+    type: image
+    estimated_size_bytes: 120000
+    priority: medium
+    payload: hyperspectral_payload
+    storage:
+      class: science
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: deferred
+    description: Conceptual raw hyperspectral image product retained onboard before compression.
+
+  - id: compressed_hyperspectral_bundle
+    producer: hyperspectral_payload
+    producer_type: payload
+    type: compressed_product
+    estimated_size_bytes: 48000
+    priority: medium
+    payload: hyperspectral_payload
+    storage:
+      class: science
+      retention: 14d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Compressed hyperspectral image bundle eligible after critical products and evidence.
+
+  - id: level1b_processing_candidate
+    producer: ground_station_context
+    producer_type: subsystem
+    type: generic
+    estimated_size_bytes: 48000
+    priority: low
+    storage:
+      class: science
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: deferred
+    description: Ground-side or downstream Level 1B processing candidate; not modeled as an onboard-generated product.
+
+  - id: destriping_processing_candidate
+    producer: ground_station_context
+    producer_type: subsystem
+    type: generic
+    estimated_size_bytes: 48000
+    priority: low
+    storage:
+      class: science
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: deferred
+    description: Ground-side or downstream destriping processing candidate; not modeled as an onboard-generated product.
+
+  - id: downlink_summary_report
+    producer: obc
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 2048
+    priority: high
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Summary of contact capacity usage and remaining pending compressed image data.
+
+  - id: scenario_evidence_log
+    producer: obc
+    producer_type: subsystem
+    type: diagnostic_dump
+    estimated_size_bytes: 4096
+    priority: high
+    storage:
+      class: diagnostic
+      retention: 30d
+      overflow_policy: drop_oldest
+    downlink:
+      policy: priority_based
+    description: Scenario evidence log explaining why compressed image data remained partially pending.

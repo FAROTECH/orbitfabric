@@ -1,0 +1,102 @@
+subsystems:
+  - id: spacecraft_bus
+    name: Spacecraft Bus
+    type: bus
+    criticality: critical
+    description: Conceptual CubeSat bus context coordinating spacecraft-level operational state.
+
+  - id: obc
+    name: Onboard Computer
+    type: core
+    criticality: critical
+    description: >
+      FINCH-inspired OBC context for command routing, acquisition scheduling,
+      telemetry collection, storage coordination and mode control.
+
+  - id: data_storage
+    name: Onboard Data Storage
+    type: storage
+    criticality: high
+    description: Storage/evidence context for housekeeping, image products and scenario evidence.
+
+  - id: adcs
+    name: ADCS
+    type: subsystem
+    criticality: high
+    description: FINCH-inspired attitude readiness context used to gate image acquisition.
+
+  - id: star_tracker
+    name: Star Tracker
+    type: subsystem
+    criticality: medium
+    description: Attitude-supporting context retained as a public-demo sensor status.
+
+  - id: sun_sensors
+    name: Sun Sensors
+    type: subsystem
+    criticality: medium
+    description: Attitude-supporting context retained as a compact readiness indicator.
+
+  - id: gnss
+    name: GNSS Context
+    type: subsystem
+    criticality: medium
+    description: Navigation/time context supporting acquisition planning and evidence products.
+
+  - id: hyperspectral_payload
+    name: Hyperspectral Payload
+    type: payload
+    criticality: high
+    description: >
+      FINCH-inspired hyperspectral imaging payload context producing raw and compressed
+      image-derived data products for constrained downlink reasoning.
+
+  - id: payload_firmware
+    name: Payload Firmware Context
+    type: payload_support
+    criticality: medium
+    description: Payload-side firmware context used only to describe acquisition and compression states.
+
+  - id: optics
+    name: Optics Context
+    type: payload_support
+    criticality: medium
+    description: FINCH Eye-inspired optics context retained only as a public-demo imaging-readiness concept.
+
+  - id: comms
+    name: Communications Context
+    type: communication
+    criticality: high
+    description: Abstract command/contact/downlink context for constrained image-product downlink.
+
+  - id: rf
+    name: RF Context
+    type: communication
+    criticality: high
+    description: Public-demo RF forwarding and downlink context, not a real link budget or operational RF model.
+
+  - id: transceiver
+    name: Transceiver Context
+    type: communication
+    criticality: medium
+    description: Compact transceiver status context supporting contact and downlink evidence.
+
+  - id: eps
+    name: Electrical Power System
+    type: subsystem
+    criticality: critical
+    description: Conceptual EPS health context for housekeeping and protective faults.
+
+  - id: thermal
+    name: Thermal Context
+    type: subsystem
+    criticality: high
+    description: Payload thermal context used to represent camera readiness constraints.
+
+  - id: ground_station_context
+    name: Ground Station Context
+    type: ground_context
+    criticality: medium
+    description: >
+      Abstract public-demo ground contact context. No real UTAT contact plan, station,
+      frequency, pass schedule or operational downlink model is represented.

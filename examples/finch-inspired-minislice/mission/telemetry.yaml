@@ -1,0 +1,327 @@
+telemetry:
+- id: obc.uptime
+  name: OBC Uptime
+  type: uint32
+  unit: s
+  source: obc
+  sampling: 1Hz
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: high
+  quality:
+    required: true
+    default: good
+  description: OBC uptime included in critical housekeeping and acquisition evidence products.
+- id: data_storage.used_bytes
+  name: Onboard Storage Used
+  type: uint32
+  unit: bytes
+  source: data_storage
+  sampling: 0.1Hz
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  limits:
+    warning_high: 50000000
+    critical_high: 80000000
+  quality:
+    required: true
+    default: good
+  description: Retained housekeeping, raw image, compressed image and evidence storage occupancy.
+- id: comms.link_status
+  name: Communications Link Status
+  type: enum
+  unit: none
+  source: comms
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - NO_CONTACT
+  - CONTACT_AVAILABLE
+  - DOWNLINK_ACTIVE
+  quality:
+    required: true
+    default: good
+  description: Abstract contact/downlink status for scenario evidence.
+- id: rf.downlink_status
+  name: RF Downlink Status
+  type: enum
+  unit: none
+  source: rf
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - IDLE
+  - READY
+  - ACTIVE
+  - COMPLETE
+  - PARTIAL
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: RF-side public-demo downlink state, not a real radio implementation state.
+- id: transceiver.status
+  name: Transceiver Status
+  type: enum
+  unit: none
+  source: transceiver
+  sampling: on_change
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: medium
+  enum:
+  - 'OFF'
+  - STANDBY
+  - RX_CONTACT
+  - TX_DOWNLINK
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Compact transceiver state used to support contact and downlink evidence.
+- id: downlink.capacity_remaining_bytes
+  name: Downlink Capacity Remaining
+  type: uint32
+  unit: bytes
+  source: comms
+  sampling: on_change
+  criticality: medium
+  persistence: store
+  downlink_priority: medium
+  quality:
+    required: true
+    default: good
+  description: Contract-level scenario evidence for remaining capacity after prioritized allocation.
+- id: adcs.attitude_ready
+  name: ADCS Attitude Ready
+  type: bool
+  unit: none
+  source: adcs
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  quality:
+    required: true
+    default: good
+  description: Readiness flag that gates image acquisition.
+- id: adcs.pointing_status
+  name: ADCS Pointing Status
+  type: enum
+  unit: none
+  source: adcs
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - NOT_READY
+  - SLEWING
+  - READY_FOR_ACQUISITION
+  - MANEUVERING
+  - DONE
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Compact pointing-readiness state for image acquisition.
+- id: star_tracker.status
+  name: Star Tracker Status
+  type: enum
+  unit: none
+  source: star_tracker
+  sampling: on_change
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: medium
+  enum:
+  - 'OFF'
+  - STANDBY
+  - TRACKING
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Attitude-supporting status retained as public-demo context.
+- id: sun_sensors.status
+  name: Sun Sensors Status
+  type: enum
+  unit: none
+  source: sun_sensors
+  sampling: on_change
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: medium
+  enum:
+  - 'OFF'
+  - READY
+  - DEGRADED
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Sun-sensor status retained as compact attitude context.
+- id: gnss.fix_status
+  name: GNSS Fix Status
+  type: enum
+  unit: none
+  source: gnss
+  sampling: on_change
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: medium
+  enum:
+  - NO_FIX
+  - SEARCHING
+  - LOCKED
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: GNSS status used only as acquisition-planning context.
+- id: payload.camera_status
+  name: Payload Camera Status
+  type: enum
+  unit: none
+  source: hyperspectral_payload
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - 'OFF'
+  - STANDBY
+  - COOLING
+  - READY
+  - ACQUIRING
+  - DATA_READY
+  - COMPRESSED_READY
+  - DOWNLINK_PENDING
+  - BACKLOG
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Hyperspectral payload camera state used by the conceptual acquisition-preparation and payload lifecycle.
+- id: payload.camera_temperature
+  name: Payload Camera Temperature
+  type: float32
+  unit: degC
+  source: hyperspectral_payload
+  sampling: 0.2Hz
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  limits:
+    warning_high: 25.0
+    critical_high: 35.0
+  quality:
+    required: true
+    default: good
+  description: Camera temperature used as a readiness constraint for acquisition.
+- id: thermal.payload_temperature
+  name: Payload Thermal Temperature
+  type: float32
+  unit: degC
+  source: thermal
+  sampling: 0.2Hz
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  limits:
+    warning_high: 25.0
+    critical_high: 35.0
+  quality:
+    required: true
+    default: good
+  description: Payload thermal context used to support camera-readiness evidence.
+- id: payload.acquisition_status
+  name: Payload Acquisition Status
+  type: enum
+  unit: none
+  source: payload_firmware
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - IDLE
+  - PARAMS_LOADED
+  - SCHEDULED
+  - CAMERA_READY
+  - CONDITIONS_VERIFIED
+  - ACQUIRING
+  - COMPLETE
+  - CONDITIONS_NOT_MET
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Payload/OBC acquisition state for readiness gating, command handling and scenario evidence.
+- id: payload.compression_status
+  name: Payload Compression Status
+  type: enum
+  unit: none
+  source: payload_firmware
+  sampling: on_change
+  criticality: medium
+  persistence: store_and_downlink
+  downlink_priority: high
+  enum:
+  - NOT_STARTED
+  - RUNNING
+  - COMPLETE
+  - ERROR
+  quality:
+    required: true
+    default: good
+  description: Compression state for the downlink-eligible hyperspectral bundle.
+- id: payload.data_generated_bytes
+  name: Payload Data Generated
+  type: uint32
+  unit: bytes
+  source: hyperspectral_payload
+  sampling: on_change
+  criticality: medium
+  persistence: store
+  downlink_priority: low
+  quality:
+    required: true
+    default: good
+  description: Size of the latest conceptual raw hyperspectral image product.
+- id: payload.data_pending_bytes
+  name: Payload Data Pending
+  type: uint32
+  unit: bytes
+  source: hyperspectral_payload
+  sampling: on_change
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: high
+  limits:
+    warning_high: 1
+  quality:
+    required: true
+    default: good
+  description: Compressed image bytes still pending after prioritized contact downlink allocation.
+- id: eps.battery.state_of_charge
+  name: Battery State of Charge
+  type: float32
+  unit: percent
+  source: eps
+  sampling: 1Hz
+  criticality: high
+  persistence: store_and_downlink
+  downlink_priority: critical
+  limits:
+    warning_low: 30.0
+    critical_low: 15.0
+  quality:
+    required: true
+    default: good
+  description: Battery state of charge retained for protective housekeeping context.

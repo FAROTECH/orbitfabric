@@ -1,0 +1,41 @@
+contacts:
+  contact_profiles:
+    - id: finch_inspired_ground_contact
+      target: abstract_public_demo_ground_context
+      description: >
+        Synthetic ground contact profile for the FINCH-inspired public demo. This is
+        an assumption for contract reasoning only, not a real UTAT contact schedule.
+
+  link_profiles:
+    - id: constrained_payload_downlink
+      direction: downlink
+      assumed_rate_bps: 9600
+      description: >
+        Generic constrained downlink assumption for contract reasoning. No real
+        frequency, callsign, ground station, operational schedule or link budget is modeled.
+
+  contact_windows:
+    - id: finch_inspired_contact_001
+      contact_profile: finch_inspired_ground_contact
+      link_profile: constrained_payload_downlink
+      start: "2026-01-01T00:00:00Z"
+      duration_seconds: 300
+      assumed_capacity_bytes: 16000
+      description: Synthetic limited-capacity contact window used to force partial compressed-image downlink.
+
+  downlink_flows:
+    - id: finch_inspired_priority_downlink
+      contact_profile: finch_inspired_ground_contact
+      link_profile: constrained_payload_downlink
+      queue_policy: critical_first
+      eligible_data_products:
+        - critical_housekeeping_packet
+        - acquisition_summary_report
+        - adcs_readiness_snapshot
+        - payload_health_snapshot
+        - downlink_summary_report
+        - scenario_evidence_log
+        - compressed_hyperspectral_bundle
+      description: >
+        Priority-based downlink flow demonstrating health/acquisition-summary/evidence-first allocation
+        and retained compressed hyperspectral image data under limited contact capacity.

@@ -1,0 +1,157 @@
+events:
+- id: payload.acquisition_params_loaded
+  source: hyperspectral_payload
+  severity: info
+  description: Acquisition parameters were loaded into the conceptual payload/OBC contract.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.acquisition_scheduled
+  source: hyperspectral_payload
+  severity: info
+  description: Image acquisition was scheduled and the OBC entered acquisition-preparation mode.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: adcs.ready_for_acquisition
+  source: adcs
+  severity: info
+  description: ADCS is ready for the scheduled acquisition pointing condition.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.camera_ready
+  source: hyperspectral_payload
+  severity: info
+  description: Payload camera is ready for the scheduled image acquisition.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: obc.acquisition_conditions_met
+  source: obc
+  severity: info
+  description: OBC verified that ADCS, payload camera and thermal readiness conditions allow the scheduled image acquisition.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.image_acquisition_started
+  source: hyperspectral_payload
+  severity: info
+  description: Hyperspectral image acquisition started.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.image_acquisition_completed
+  source: hyperspectral_payload
+  severity: info
+  description: Hyperspectral image acquisition completed and raw data was stored.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.image_compressed
+  source: payload_firmware
+  severity: info
+  description: Hyperspectral image data was compressed into a downlink-eligible bundle.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.image_data_pending
+  source: hyperspectral_payload
+  severity: warning
+  description: Compressed image data remains pending after the constrained contact window.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: comms.contact_window_started
+  source: comms
+  severity: info
+  description: Abstract constrained public-demo contact window started.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: comms.contact_window_ended
+  source: comms
+  severity: info
+  description: Abstract constrained public-demo contact window ended.
+  downlink_priority: medium
+  persistence: store_and_downlink
+- id: comms.downlink_started
+  source: comms
+  severity: info
+  description: Prioritized downlink flow started for the available contact window.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: comms.downlink_partial
+  source: comms
+  severity: warning
+  description: Downlink flow was capacity-constrained and only part of the compressed image bundle could be sent.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: comms.downlink_capacity_insufficient
+  source: comms
+  severity: warning
+  description: Declared contact capacity is insufficient for the eligible downlink set.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: obc.acquisition_conditions_not_met
+  source: obc
+  severity: warning
+  description: Acquisition conditions could not be met and the OBC logs a conceptual error.
+  downlink_priority: critical
+  persistence: store_and_downlink
+- id: obc.mode_changed
+  source: obc
+  severity: info
+  description: Spacecraft operational mode changed.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: obc.health_telemetry_requested
+  source: obc
+  severity: info
+  description: Ground requested health and acquisition-readiness telemetry.
+  downlink_priority: medium
+  persistence: store
+- id: comms.downlink_priority_set
+  source: comms
+  severity: info
+  description: Downlink priority policy was selected for the contact opportunity.
+  downlink_priority: medium
+  persistence: store
+- id: obc.safe_mode_requested
+  source: obc
+  severity: warning
+  description: Safe mode was requested by command or recovery logic.
+  downlink_priority: critical
+  persistence: store_and_downlink
+- id: obc.fault_cleared
+  source: obc
+  severity: info
+  description: Fault state was cleared by ground command.
+  downlink_priority: medium
+  persistence: store_and_downlink
+- id: adcs.not_ready
+  source: adcs
+  severity: warning
+  description: ADCS was not ready for acquisition or pointing-constrained operations.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.camera_not_ready
+  source: hyperspectral_payload
+  severity: warning
+  description: Payload camera was not ready for the scheduled acquisition.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: payload.camera_temperature_high
+  source: hyperspectral_payload
+  severity: warning
+  description: Payload camera temperature exceeded the warning threshold.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: data_storage.high_usage
+  source: data_storage
+  severity: warning
+  description: Onboard storage usage exceeded the warning threshold.
+  downlink_priority: high
+  persistence: store_and_downlink
+- id: eps.low_power_warning_raised
+  source: eps
+  severity: warning
+  description: Battery state of charge crossed the low-power warning threshold.
+  downlink_priority: critical
+  persistence: store_and_downlink
+- id: thermal.payload_temperature_out_of_range
+  source: thermal
+  severity: warning
+  description: Payload thermal context exceeded the readiness threshold.
+  downlink_priority: high
+  persistence: store_and_downlink
