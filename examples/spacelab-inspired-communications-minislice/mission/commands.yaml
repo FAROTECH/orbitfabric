@@ -18,6 +18,28 @@ commands:
     expected_effects:
       no_state_change: true
 
+  - id: comms.start_contact
+    target: comms
+    description: Open the synthetic public-demo contact window and make TT&C available for beacon and command reception.
+    arguments: []
+    allowed_modes:
+      - NOMINAL
+      - HIBERNATION
+    requires_ack: true
+    timeout_ms: 1000
+    risk: low
+    emits:
+      - comms.contact_window_started
+      - ttc.beacon_transmitted
+    expected_effects:
+      telemetry:
+        comms.contact_status: ACTIVE_CONTACT
+        ttc.link_status: CONTACT_AVAILABLE
+        ttc.beacon_status: TRANSMITTED
+        transceiver.status: RX_COMMAND
+      mode_transition:
+        to: CONTACT
+
   - id: ttc.receive_data_request
     target: ttc
     description: Receive an abstract ground data-request telecommand and forward it to OBDH for contract-level handling.
@@ -115,7 +137,6 @@ commands:
     timeout_ms: 1500
     risk: medium
     emits:
-      - ttc.beacon_transmitted
       - comms.downlink_started
       - comms.downlink_partial
       - comms.downlink_capacity_insufficient
@@ -125,7 +146,6 @@ commands:
     expected_effects:
       telemetry:
         ttc.link_status: DOWNLINK_ACTIVE
-        ttc.beacon_status: TRANSMITTED
         ttc.downlink_status: PARTIAL
         comms.contact_status: ACTIVE_CONTACT
         rf.downlink_status: PARTIAL
