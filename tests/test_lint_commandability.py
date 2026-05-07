@@ -154,7 +154,10 @@ def test_autonomous_action_unknown_command_is_reported(tmp_path: Path) -> None:
 
 
 def test_autonomous_action_unknown_source_is_reported(tmp_path: Path) -> None:
-    mutated = VALID_COMMANDABILITY_YAML.replace("source: onboard_autonomy", "source: missing_source")
+    mutated = VALID_COMMANDABILITY_YAML.replace(
+        "source: onboard_autonomy",
+        "source: missing_source",
+    )
 
     assert "OF-AUT-002" in lint_codes(mutated, tmp_path)
 
