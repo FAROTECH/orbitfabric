@@ -1,8 +1,8 @@
 # OrbitFabric — Architecture
 
-Version: 0.4.0
+Version: 0.5.0
 Status: Development preview
-Scope: Mission Data Contract architecture through Contact Windows and Downlink Flow Contracts
+Scope: Mission Data Contract architecture through Commandability and Autonomy Contracts
 
 ---
 
@@ -16,7 +16,7 @@ Its architecture is centered on one primary artifact:
 
 The Mission Data Contract is expressed as a structured Mission Model.
 
-It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, documentation and scenario evidence from one source of truth.
+It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, documentation and scenario evidence from one source of truth.
 
 OrbitFabric is not designed as:
 
@@ -33,9 +33,9 @@ Its architectural role is:
 
 > define, validate, simulate and document the contract between mission design, onboard software, tests, documentation, simulation and future ground integration artifacts.
 
-The current architectural baseline is `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
+The current architectural baseline is `v0.5.0 — Commandability and Autonomy Contracts`.
 
-The next architectural step is `v0.5 — Commandability and Autonomy Contracts`.
+The next architectural step is `v0.6 — End-to-End Mission Data Flow Evidence`.
 
 ---
 
@@ -69,7 +69,7 @@ Payload behavior
         -> Storage Intent
         -> Downlink Intent
         -> Contact Windows and Downlink Flow Contracts
-        -> future Commandability and Autonomy Contracts
+        -> Commandability and Autonomy Contracts
         -> future End-to-End Mission Data Flow Evidence
         -> future Runtime Skeletons
         -> future Ground Integration Artifacts
@@ -144,6 +144,7 @@ OrbitFabric
 │   ├── payload contracts
 │   ├── data product contracts
 │   ├── contact/downlink contracts
+│   ├── commandability/autonomy contracts
 │   └── scenarios
 │
 ├── Toolchain
@@ -167,6 +168,7 @@ OrbitFabric
 │   ├── payload contract rules
 │   ├── data product contract rules
 │   ├── contact/downlink contract rules
+│   ├── commandability/autonomy contract rules
 │   ├── findings
 │   └── JSON reports
 │
@@ -205,9 +207,9 @@ OrbitFabric
 
 ---
 
-## 4. Current Capability Boundary — v0.4.0
+## 4. Current Capability Boundary — v0.5.0
 
-OrbitFabric v0.4.0 includes:
+OrbitFabric v0.5.0 includes:
 
 ```text
 Mission Model YAML
@@ -215,12 +217,14 @@ canonical multi-file mission directory
 optional payloads.yaml domain
 optional data_products.yaml domain
 optional contacts.yaml domain
+optional commandability.yaml domain
 Pydantic typed validation
 structural validation
 semantic lint
 payload contract lint rules
 data product contract lint rules
 contact/downlink contract lint rules
+commandability/autonomy contract lint rules
 scenario loading
 scenario reference validation
 host-side deterministic scenario execution
@@ -229,13 +233,14 @@ generated Markdown docs
 generated payload documentation
 generated data product documentation
 generated contact/downlink documentation
+generated commandability/autonomy documentation
 JSON lint reports
 JSON scenario reports
 plain-text scenario logs
 synthetic demo mission
 ```
 
-OrbitFabric v0.4.0 excludes:
+OrbitFabric v0.5.0 excludes:
 
 ```text
 flight runtime
@@ -265,6 +270,14 @@ Basilisk bridge
 cFS/F Prime bridge
 formal verification
 security model
+real command authentication
+real command authorization
+live uplink services
+operator consoles
+command queues
+onboard schedulers
+flight autonomy runtime
+real FDIR or safing logic
 ```
 
 These are not accidental omissions.
@@ -324,6 +337,9 @@ Storage Intent and Downlink Intent
       │
       ▼
 Contact Windows and Downlink Flow Contracts
+      │
+      ▼
+Commandability and Autonomy Contracts
       │
       ▼
 Future End-to-End Mission Data Flow Evidence
@@ -418,6 +434,7 @@ Optional:
 payloads.yaml
 data_products.yaml
 contacts.yaml
+commandability.yaml
 ```
 
 ### 8.3 Current Typed Model Surface
@@ -438,7 +455,8 @@ MissionModel
 ├── policies
 ├── payloads
 ├── data_products
-└── contacts
+├── contacts
+└── commandability
 ```
 
 It also exposes ID helpers such as:
@@ -456,6 +474,10 @@ contact_profile_ids
 link_profile_ids
 contact_window_ids
 downlink_flow_ids
+command_source_ids
+commandability_rule_ids
+autonomous_action_ids
+recovery_intent_ids
 mode_ids
 ```
 
@@ -626,7 +648,63 @@ They describe contract assumptions only.
 
 ---
 
-## 12. Lint Layer
+## 12. Commandability and Autonomy Contract Architecture
+
+Commandability and Autonomy Contracts are optional Mission Model domains.
+
+They describe declared assumptions about command sources, command dispatch intent, autonomous actions and recovery intent.
+
+A commandability/autonomy contract may define:
+
+```text
+command source identity
+source type
+contact requirement
+linked contact profile
+commandability rule identity
+referenced command
+allowed command sources
+allowed modes
+confirmation intent
+timeout expectation
+expected events
+expected effects
+autonomous action trigger
+autonomous command dispatch intent
+recovery intent
+target recovery mode
+```
+
+Current demo example:
+
+```text
+ground_operator
+        -> payload.start_acquisition commandability rule
+
+onboard_autonomy
+        -> stop payload on low/critical battery faults
+        -> recovery intents toward DEGRADED and SAFE
+```
+
+Commandability and Autonomy Contracts do not describe:
+
+```text
+real command authentication
+real command authorization
+encryption
+live uplink services
+operator consoles
+command queues
+onboard schedulers
+flight autonomy runtime
+real FDIR or safing behavior
+```
+
+They describe contract assumptions only.
+
+---
+
+## 13. Lint Layer
 
 ### 12.1 Responsibility
 
@@ -665,6 +743,9 @@ OF-PAY-*   payload contract rules
 OF-DP-*    data product contract rules
 OF-CON-*   contact assumption rules
 OF-DL-*    downlink flow assumption rules
+OF-CAB-*   commandability rule diagnostics
+OF-AUT-*   autonomous action diagnostics
+OF-REC-*   recovery intent diagnostics
 OF-SCN-*   scenario rules
 ```
 
@@ -694,7 +775,7 @@ Documentation generation must not silently continue when lint errors exist.
 
 ---
 
-## 13. Simulation Layer
+## 14. Simulation Layer
 
 ### 13.1 Responsibility
 
@@ -756,13 +837,13 @@ payload lifecycle ACQUIRING -> READY
 scenario pass/fail result
 ```
 
-Data Product and Contact/Downlink Contracts are documented and linted in v0.4.0.
+Data Product, Contact/Downlink and Commandability/Autonomy Contracts are documented and linted in v0.5.0.
 
-They are not executed as storage/downlink runtime behavior yet.
+They are not executed as storage, downlink, uplink or autonomy runtime behavior yet.
 
 ---
 
-## 14. Generation Layer
+## 15. Generation Layer
 
 ### 14.1 Responsibility
 
@@ -780,6 +861,7 @@ generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
 generated/docs/contacts.md
+generated/docs/commandability.md
 ```
 
 ### 14.2 Generator Rule
@@ -809,7 +891,7 @@ Those belong to future milestones after the Mission Data Chain is more complete.
 
 ---
 
-## 15. Demo Mission Architecture
+## 16. Demo Mission Architecture
 
 The canonical demo is `demo-3u`.
 
@@ -833,7 +915,8 @@ examples/demo-3u/
 │   ├── policies.yaml
 │   ├── payloads.yaml
 │   ├── data_products.yaml
-│   └── contacts.yaml
+│   ├── contacts.yaml
+│   └── commandability.yaml
 └── scenarios/
     └── battery_low_during_payload.yaml
 ```
@@ -851,6 +934,11 @@ Contact Profile primary_ground_contact
 Link Profile uhf_downlink_nominal
 Contact Window demo_contact_001
 Downlink Flow science_next_available_contact
+Command Source ground_operator
+Command Source onboard_autonomy
+Commandability Rule payload_start_ground_rule
+Autonomous Actions stop payload on low/critical battery faults
+Recovery Intents toward DEGRADED and SAFE
 BOOT
 NOMINAL
 PAYLOAD_ACTIVE
@@ -871,7 +959,7 @@ It must not approximate a private mission.
 
 ---
 
-## 16. Repository Architecture
+## 17. Repository Architecture
 
 Current repository layout:
 
@@ -923,7 +1011,7 @@ orbitfabric/
 
 ---
 
-## 17. Dependency Architecture
+## 18. Dependency Architecture
 
 OrbitFabric uses a small dependency set.
 
@@ -963,7 +1051,7 @@ async frameworks unless necessary
 
 ---
 
-## 18. Layer Dependency Rules
+## 19. Layer Dependency Rules
 
 Allowed dependencies:
 
@@ -998,7 +1086,7 @@ The Model Layer must remain the lowest stable layer.
 
 ---
 
-## 19. Error and Diagnostics Architecture
+## 20. Error and Diagnostics Architecture
 
 OrbitFabric diagnostics should be consistent across loader, lint and simulation.
 
@@ -1038,7 +1126,7 @@ ERROR OF-DP-002 data_products.yaml payload.radiation_histogram producer 'unknown
 
 ---
 
-## 20. Reports Architecture
+## 21. Reports Architecture
 
 Reports are JSON where machine-readable output is required.
 
@@ -1049,7 +1137,7 @@ Conceptual shape:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "mission": "demo-3u",
   "model_version": "0.1.0",
   "result": "passed",
@@ -1069,7 +1157,7 @@ Conceptual shape:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "scenario": "battery_low_during_payload",
   "mission": "demo-3u",
   "result": "passed",
@@ -1084,7 +1172,7 @@ Reports must be stable enough for tests and CI.
 
 ---
 
-## 21. Documentation Architecture
+## 22. Documentation Architecture
 
 OrbitFabric documentation has two classes.
 
@@ -1120,6 +1208,7 @@ generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
 generated/docs/contacts.md
+generated/docs/commandability.md
 ```
 
 These document a specific mission model.
@@ -1128,7 +1217,7 @@ Generated docs must not be manually edited.
 
 ---
 
-## 22. Testing Architecture
+## 23. Testing Architecture
 
 Current test strategy covers:
 
@@ -1165,7 +1254,7 @@ The documentation site is deployed separately through the Pages workflow.
 
 ---
 
-## 23. Future Extension Architecture
+## 24. Future Extension Architecture
 
 Future extensions should be added as generators, plugins or adapters.
 
@@ -1191,7 +1280,7 @@ They must not redefine the mission contract.
 
 ---
 
-## 24. Anti-Patterns
+## 25. Anti-Patterns
 
 The following patterns are architecturally wrong.
 
@@ -1237,9 +1326,9 @@ Using real private mission details as examples.
 
 ---
 
-## 25. v0.4.0 Acceptance Architecture
+## 26. v0.5.0 Acceptance Architecture
 
-OrbitFabric v0.4.0 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.5.0 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -1264,6 +1353,7 @@ Markdown mission documentation
 payload contract documentation
 data product contract documentation
 contact/downlink contract documentation
+commandability/autonomy contract documentation
 scenario execution log
 scenario JSON report
 ```
@@ -1277,6 +1367,7 @@ semantic linting
 payload contract validation
 data product contract validation
 contact/downlink contract validation
+commandability/autonomy contract validation
 command validation
 event emission
 fault detection
@@ -1287,49 +1378,37 @@ scenario pass/fail result
 generated documentation
 ```
 
-No runtime skeleton, ground export, orbital propagation, RF simulation or storage/downlink runtime is required for v0.4.0.
+No runtime skeleton, ground export, orbital propagation, RF simulation, storage/downlink runtime, live uplink or autonomy runtime is required for v0.5.0.
 
 ---
 
-## 26. Next Architectural Step — v0.5
+## 27. Next Architectural Step — v0.6
 
 The next architectural step is:
 
 ```text
-v0.5 — Commandability and Autonomy Contracts
+v0.6 — End-to-End Mission Data Flow Evidence
 ```
 
-The purpose is to model commandability and autonomy assumptions without becoming a live command stack, an operator console or a flight autonomy runtime.
+The purpose is to combine payload contracts, data products, storage intent, downlink assumptions, contact windows, commandability and recovery expectations into end-to-end mission data flow evidence.
 
 The expected direction is:
 
 ```text
-Contact Windows and Downlink Flow Contracts
-        -> command source assumptions
-        -> command dispatch intent
-        -> autonomous action assumptions
-        -> commandability consistency
-        -> future end-to-end mission data flow evidence
+Payload acquisition
+        -> data product generated
+        -> stored onboard by intent
+        -> eligible for downlink by intent
+        -> contact window available by assumption
+        -> downlink flow evidence produced
+        -> recovery/commandability evidence remains inspectable
 ```
 
-v0.5 must not implement:
-
-```text
-real command authentication
-real command authorization
-live uplink services
-operator consoles
-flight autonomy runtime
-onboard command dispatch software
-Yamcs/OpenC3 services
-real spacecraft operations
-```
-
-Commandability and autonomy must remain contract assumptions.
+v0.6 must not implement real onboard storage runtime, real downlink execution, real RF behavior, a live ground segment or an operations console.
 
 ---
 
-## 27. Final Architectural Statement
+## 28. Final Architectural Statement
 
 OrbitFabric is architecturally centered on the Mission Data Contract.
 

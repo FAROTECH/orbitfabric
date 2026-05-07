@@ -1,6 +1,6 @@
 # OrbitFabric — Project Charter
 
-Version: 0.4
+Version: 0.5
 Status: Draft
 Scope: Mission Data Contract foundation and Mission Data Chain direction
 
@@ -10,7 +10,7 @@ Scope: Mission Data Contract foundation and Mission Data Chain direction
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions and operational scenarios once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
+Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions and operational scenarios once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
 
 OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool or a payload runtime framework.
 
@@ -219,7 +219,7 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 The early OrbitFabric preview has already demonstrated the core philosophy with a small but coherent vertical slice.
 
-The current v0.4.0 baseline includes:
+The current v0.5.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
@@ -231,9 +231,11 @@ The current v0.4.0 baseline includes:
 - payload contract model;
 - data product contract model;
 - contact/downlink contract model;
+- commandability/autonomy contract model;
 - generated payload documentation;
 - generated data product documentation;
 - generated contact/downlink documentation;
+- generated commandability/autonomy documentation;
 - readable logs;
 - JSON reports;
 - one complete demo mission named `demo-3u`.
@@ -372,6 +374,10 @@ It contains:
 - link profile `uhf_downlink_nominal`;
 - contact window `demo_contact_001`;
 - downlink flow `science_next_available_contact`;
+- command sources `ground_operator` and `onboard_autonomy`;
+- commandability rule `payload_start_ground_rule`;
+- autonomous actions for low/critical battery recovery assumptions;
+- recovery intents toward DEGRADED and SAFE;
 - one nominal payload acquisition scenario;
 - one scenario where the payload is active, battery voltage degrades, a warning event is emitted, the spacecraft transitions to DEGRADED and the payload is automatically stopped.
 
@@ -389,7 +395,7 @@ The expected scenario narrative is:
 [00:40] SCENARIO PASSED
 ```
 
-The demo also includes a synthetic contact/downlink assumption slice.
+The demo also includes synthetic contact/downlink and commandability/autonomy assumption slices.
 
 Those assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
 
@@ -459,7 +465,7 @@ OrbitFabric is successful in the early public preview if a user can:
 7. understand the project positioning from the README in less than one minute;
 8. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
 9. understand how payload contracts fit into the Mission Data Contract;
-10. understand how data products, storage intent, downlink intent and contact assumptions fit into the roadmap before runtime skeletons.
+10. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints and recovery expectations fit into the roadmap before runtime skeletons.
 
 A minimal but strong preview is better than a broad, fragile and unfinished feature set.
 

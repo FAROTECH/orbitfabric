@@ -43,7 +43,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.4.0
+orbitfabric 0.5.0
 ```
 
 ---
@@ -68,7 +68,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.4 Vertical Slice
+## Verify the Current v0.5 Vertical Slice
 
 Run mission lint:
 
@@ -108,6 +108,7 @@ generated/docs/packets.md
 generated/docs/payloads.md
 generated/docs/data_products.md
 generated/docs/contacts.md
+generated/docs/commandability.md
 ```
 
 ---
@@ -134,6 +135,7 @@ examples/demo-3u/mission/*.yaml
 examples/demo-3u/mission/payloads.yaml
 examples/demo-3u/mission/data_products.yaml
 examples/demo-3u/mission/contacts.yaml
+examples/demo-3u/mission/commandability.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 

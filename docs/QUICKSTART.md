@@ -84,7 +84,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.4.0
+orbitfabric 0.5.0
 ```
 
 ---
