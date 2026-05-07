@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products and operational scenarios once.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts and operational scenarios once.
 Validate them, document them, and execute deterministic mission scenarios from the same source of truth.
 
 </div>
@@ -40,14 +40,17 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently at `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
+OrbitFabric's current development baseline includes `v0.5 — Commandability and Autonomy Contracts`.
+
+The package/CLI version remains `0.4.0` until the next release tag.
 
 The current repository includes:
 
 - the `v0.2.1 — Payload Contract Model` vertical slice;
 - the `v0.2.3 — Mission Data Chain Roadmap Alignment` direction;
 - the `v0.3.0 — Data Product and Storage Contracts` vertical slice;
-- the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice.
+- the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice;
+- the `v0.5 — Commandability and Autonomy Contracts` development slice.
 
 The current vertical slice is functional:
 
@@ -55,17 +58,20 @@ The current vertical slice is functional:
 - optional `payloads.yaml` loading;
 - optional `data_products.yaml` loading;
 - optional `contacts.yaml` loading;
+- optional `commandability.yaml` loading;
 - structural validation;
 - semantic linting;
 - engineering lint rules;
 - payload contract lint rules;
 - data product contract lint rules;
 - contact/downlink contract lint rules;
+- commandability/autonomy contract lint rules;
 - JSON lint report generation;
 - generated Markdown documentation;
 - generated payload contract documentation;
 - generated data product contract documentation;
 - generated contact/downlink contract documentation;
+- generated commandability/autonomy contract documentation;
 - scenario YAML loading;
 - scenario reference validation;
 - deterministic scenario execution;
@@ -115,7 +121,8 @@ It models:
 - persistence and downlink policies;
 - optional Payload / IOD Payload Contracts;
 - optional Data Product and Storage Contracts;
-- optional Contact Windows and Downlink Flow Contracts.
+- optional Contact Windows and Downlink Flow Contracts;
+- optional Commandability and Autonomy Contracts.
 
 A payload contract describes mission-specific or IOD payload behavior as a declarative contract. It may reference:
 
@@ -150,7 +157,16 @@ A contact/downlink contract describes declared assumptions about how data produc
 - eligible data products;
 - generated contact/downlink documentation.
 
-Payload, Data Product and Contact/Downlink Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling or real downlink runtime behavior.
+A commandability/autonomy contract describes declared assumptions about how commands are intended to be used, constrained, dispatched by declared sources or referenced by autonomous recovery intent. It may define:
+
+- command sources;
+- commandability rules;
+- command confirmation intent;
+- autonomous action assumptions;
+- recovery intents;
+- generated commandability documentation.
+
+Payload, Data Product, Contact/Downlink and Commandability/Autonomy Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
 
 From that model, OrbitFabric currently provides:
 
@@ -184,6 +200,13 @@ Optional Contact and Downlink Contract Model
         -> contact window validation
         -> downlink flow consistency validation
         -> contact/downlink documentation generation
+
+Optional Commandability and Autonomy Contract Model
+        -> command source validation
+        -> commandability rule validation
+        -> autonomous action validation
+        -> recovery intent validation
+        -> commandability/autonomy documentation generation
 ```
 
 ---
@@ -233,7 +256,8 @@ examples/demo-3u/
 │   ├── policies.yaml
 │   ├── payloads.yaml
 │   ├── data_products.yaml
-│   └── contacts.yaml
+│   ├── contacts.yaml
+│   └── commandability.yaml
 └── scenarios/
     ├── battery_low_during_payload.yaml
     └── nominal_payload_acquisition.yaml
@@ -269,6 +293,18 @@ primary_ground_contact
         eligible data product: payload.radiation_histogram
 ```
 
+The demo also includes one synthetic commandability/autonomy slice:
+
+```text
+ground_operator
+        commandability rule: payload_start_ground_rule
+        command: payload.start_acquisition
+
+onboard_autonomy
+        autonomous actions: stop payload on low/critical battery faults
+        recovery intents: DEGRADED and SAFE
+```
+
 This demonstrates the relationship:
 
 ```text
@@ -278,6 +314,7 @@ Payload Contract
         -> Downlink Intent
         -> Contact Window Assumption
         -> Downlink Flow Contract
+        -> Commandability and Autonomy Contract
 ```
 
 The demo contains:
@@ -511,7 +548,8 @@ generated/
 │   ├── packets.md
 │   ├── payloads.md
 │   ├── data_products.md
-│   └── contacts.md
+│   ├── contacts.md
+│   └── commandability.md
 ├── reports/
 │   ├── lint_report.json
 │   └── battery_low_during_payload_report.json
@@ -528,6 +566,7 @@ examples/demo-3u/mission/*.yaml
 examples/demo-3u/mission/payloads.yaml
 examples/demo-3u/mission/data_products.yaml
 examples/demo-3u/mission/contacts.yaml
+examples/demo-3u/mission/commandability.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
@@ -583,6 +622,7 @@ Useful entry points:
 - `docs/reference/payload-contract-model.md`
 - `docs/reference/data-product-contract-model.md`
 - `docs/reference/contact-downlink-contract-model.md`
+- `docs/reference/commandability-contract-model.md`
 - `docs/adr/`
 
 Build the documentation site locally:

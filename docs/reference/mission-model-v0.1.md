@@ -4,7 +4,7 @@ Status: Draft
 Scope: OrbitFabric MVP v0.1
 Model version: 0.1.0
 
-This page documents the core v0.1 Mission Model surface. Optional extension domains added after v0.1, including Payload Contracts, Data Product Contracts and Contact/Downlink Contracts, are documented in their dedicated reference pages.
+This page documents the core v0.1 Mission Model surface. Optional extension domains added after v0.1, including Payload Contracts, Data Product Contracts, Contact/Downlink Contracts and Commandability/Autonomy Contracts, are documented in their dedicated reference pages.
 
 ---
 
@@ -80,13 +80,14 @@ examples/demo-3u/
 │   ├── policies.yaml
 │   ├── payloads.yaml
 │   ├── data_products.yaml
-│   └── contacts.yaml
+│   ├── contacts.yaml
+│   └── commandability.yaml
 └── scenarios/
     ├── battery_low_during_payload.yaml
     └── nominal_payload_acquisition.yaml
 ```
 
-Each YAML file must contain exactly one top-level domain key. The core v0.1 files remain required for the demo; `payloads.yaml`, `data_products.yaml` and `contacts.yaml` are optional extension domains described by later reference pages.
+Each YAML file must contain exactly one top-level domain key. The core v0.1 files remain required for the demo; `payloads.yaml`, `data_products.yaml`, `contacts.yaml` and `commandability.yaml` are optional extension domains described by later reference pages.
 
 ---
 

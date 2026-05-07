@@ -1,6 +1,6 @@
 # Commandability and Autonomy Contract Model
 
-Status: Proposed for OrbitFabric v0.5.0  
+Status: Implemented in the current v0.5 development baseline  
 Scope: Commandability and Autonomy Contract definition
 
 ---
@@ -151,7 +151,7 @@ Commandability and autonomy assumptions are expected to be defined in the option
 mission/commandability.yaml
 ```
 
-Proposed shape:
+Current shape:
 
 ```yaml
 commandability:
@@ -180,21 +180,21 @@ commandability:
   autonomous_actions:
     - id: stop_payload_on_battery_warning
       trigger:
-        fault: eps.battery_warning
+        fault: eps.battery_low_fault
       dispatches:
         command: payload.stop_acquisition
         source: onboard_autonomy
       expected_events:
         - payload.acquisition_stopped
-      description: Contract-level autonomous recovery assumption for battery warning.
+      description: Contract-level autonomous recovery assumption for low battery conditions.
 
   recovery_intents:
     - id: payload_battery_warning_recovery
-      fault: eps.battery_warning
+      fault: eps.battery_low_fault
       target_mode: DEGRADED
       commands:
         - payload.stop_acquisition
-      description: Declared recovery intent for payload activity during battery warning.
+      description: Declared recovery intent for payload activity during low battery conditions.
 ```
 
 This shape is intentionally minimal.
@@ -299,7 +299,7 @@ It exists to make recovery assumptions explicit before future scenario evidence 
 
 ## Initial Lint Direction
 
-Initial lint rules should focus on reference integrity and obvious consistency issues.
+Current lint rules focus on reference integrity and obvious consistency issues.
 
 Expected rule direction:
 
@@ -324,7 +324,7 @@ Warnings should expose engineering ambiguity without pretending to solve command
 
 ## Generated Documentation
 
-When commandability/autonomy contracts are present, OrbitFabric should generate Markdown documentation from the validated Mission Model.
+When commandability/autonomy contracts are present, OrbitFabric generates Markdown documentation from the validated Mission Model.
 
 Expected generated output:
 
@@ -350,7 +350,7 @@ Generated documentation must state that these are contract assumptions, not runt
 
 ## Current Boundary
 
-The v0.5.0 model must remain narrow.
+The v0.5 development model remains narrow.
 
 It should strengthen the Mission Data Chain without introducing command runtime or autonomy runtime behavior.
 

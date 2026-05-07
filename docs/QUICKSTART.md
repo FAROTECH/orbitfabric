@@ -18,6 +18,7 @@ Mission Model YAML
   -> Payload Contract documentation
   -> Data Product Contract documentation
   -> Contact and Downlink Contract documentation
+  -> Commandability and Autonomy Contract documentation
   -> JSON reports
   -> simulation log
 ```
@@ -172,7 +173,8 @@ generated/docs/
 ├── packets.md
 ├── payloads.md
 ├── data_products.md
-└── contacts.md
+├── contacts.md
+└── commandability.md
 ```
 
 Generated mission documentation is derived from the validated Mission Model.
@@ -213,12 +215,12 @@ generated/logs/battery_low_during_payload.log
 The current demo proves that OrbitFabric can:
 
 - load a multi-file YAML Mission Model;
-- load optional `payloads.yaml`, `data_products.yaml` and `contacts.yaml` domains;
+- load optional `payloads.yaml`, `data_products.yaml`, `contacts.yaml` and `commandability.yaml` domains;
 - validate Mission Model structure;
 - run semantic lint rules;
-- validate payload, data product and contact/downlink references;
+- validate payload, data product, contact/downlink and commandability/autonomy references;
 - generate Markdown documentation;
-- generate payload, data product and contact/downlink documentation;
+- generate payload, data product, contact/downlink and commandability/autonomy documentation;
 - inspect a Mission Model summary;
 - validate a scenario without executing it;
 - load a scenario;
@@ -247,4 +249,4 @@ The current demo does not prove:
 - orbital, attitude, power or thermal dynamics;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current v0.4.0 development preview scope.
+Those are intentionally outside the current development preview scope.

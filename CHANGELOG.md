@@ -8,9 +8,25 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
+### Added
+
+- Added the Commandability and Autonomy Contract Model as an optional mission model domain.
+- Added optional `mission/commandability.yaml` loading.
+- Added command sources.
+- Added commandability rules.
+- Added autonomous action contracts.
+- Added recovery intents.
+- Added semantic lint rules for commandability/autonomy consistency.
+- Added `OF-CAB-*`, `OF-AUT-*` and `OF-REC-*` lint rule families.
+- Added generated Commandability and Autonomy Contract documentation.
+- Added generated `commandability.md` documentation output.
+- Added one synthetic commandability/autonomy slice to the `demo-3u` mission.
+
 ### Changed
 
-- Next development focus: `v0.5 — Commandability and Autonomy Contracts`.
+- Extended the synthetic `demo-3u` mission with contract-level commandability and recovery assumptions.
+- Extended generated mission documentation to include commandability/autonomy references when commandability contracts are present.
+- Extended the Mission Data Chain from contact/downlink assumptions to commandability, autonomy and recovery assumptions.
 
 ---
 

@@ -5,7 +5,7 @@ This page documents the diagnostics and lint rules currently implemented by Orbi
 Current documented baseline:
 
 ```text
-v0.4.0 — Contact Windows and Downlink Flow Contracts
+v0.5 — Commandability and Autonomy Contracts
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -88,6 +88,9 @@ The `suggestion` field is intentionally optional, but it should be provided when
 | `OF-DP-*` | Data Product Contract lint rules. |
 | `OF-CON-*` | Contact assumption rules. |
 | `OF-DL-*` | Downlink flow assumption rules. |
+| `OF-CAB-*` | Commandability rule diagnostics. |
+| `OF-AUT-*` | Autonomous action diagnostics. |
+| `OF-REC-*` | Recovery intent diagnostics. |
 | `OF-SCN-*` | Scenario loading and scenario reference diagnostics. |
 
 ---
@@ -123,6 +126,8 @@ Current optional Mission Model files:
 ```text
 payloads.yaml
 data_products.yaml
+contacts.yaml
+commandability.yaml
 ```
 
 ---
@@ -157,6 +162,14 @@ faults
 packets
 payloads
 data_products
+contact_profiles
+link_profiles
+contact_windows
+downlink_flows
+command_sources
+commandability_rules
+autonomous_actions
+recovery_intents
 ```
 
 ---
@@ -306,6 +319,44 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 | `OF-DL-003` | `ERROR` | downlink_flows | Downlink flow references an unknown eligible data product. | Add the data product or fix `downlink_flow.eligible_data_products`. |
 | `OF-DL-004` | `WARNING` | data_products | High-priority data product has downlink intent but is not eligible in any downlink flow. | Add the data product to a downlink flow or revise its downlink intent. |
 | `OF-DL-005` | `WARNING` | downlink_flows | Estimated eligible data product volume may exceed declared contact capacity. | Increase capacity, reduce eligible volume or split the flow. |
+
+---
+
+## `OF-CAB-*` — Commandability rule diagnostics
+
+These rules validate optional Commandability and Autonomy Contracts.
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-CAB-001` | `ERROR` | commandability_rules | Commandability rule references an unknown command. | Add the command to `commands.yaml` or fix `rule.command`. |
+| `OF-CAB-002` | `ERROR` | commandability_rules | Commandability rule references an unknown mode. | Add the mode to `modes.yaml` or fix `rule.allowed_modes`. |
+| `OF-CAB-003` | `ERROR` | commandability_rules | Commandability rule references an unknown source. | Add the source to `commandability.sources` or fix `rule.sources`. |
+| `OF-CAB-004` | `WARNING` | command_sources | Ground command source requires contact but has no contact profile. | Set `contact_profile` or set `requires_contact` to false. |
+| `OF-CAB-005` | `ERROR` | command_sources | Command source references an unknown contact profile. | Add the contact profile to `contacts.yaml` or fix `source.contact_profile`. |
+| `OF-CAB-006` | `ERROR` | commandability_rules | Commandability rule references an unknown expected event. | Add the event to `events.yaml` or fix `rule.expected_events`. |
+| `OF-CAB-007` | `WARNING` | commandability_rules | Risky command lacks explicit required confirmation intent. | Add a commandability rule with `confirmation: required`, or lower the command risk if appropriate. |
+
+---
+
+## `OF-AUT-*` — Autonomous action diagnostics
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-AUT-001` | `ERROR` | autonomous_actions | Autonomous action dispatches an unknown command. | Add the command to `commands.yaml` or fix `dispatches.command`. |
+| `OF-AUT-002` | `ERROR` | autonomous_actions | Autonomous action references an unknown source. | Add the source to `commandability.sources` or fix `dispatches.source`. |
+| `OF-AUT-003` | `ERROR` | autonomous_actions | Autonomous action trigger references an unknown event, fault, telemetry item or mode. | Add the referenced object to the Mission Model or fix `action.trigger`. |
+| `OF-AUT-004` | `ERROR` | autonomous_actions | Autonomous action references an unknown expected event. | Add the event to `events.yaml` or fix `expected_events`. |
+| `OF-AUT-005` | `WARNING` | autonomous_actions | Autonomous action lacks expected events or effects. | Add `expected_events` or `expected_effects` to make the assumption testable. |
+
+---
+
+## `OF-REC-*` — Recovery intent diagnostics
+
+| Rule | Severity | Domain | Description | Suggested fix |
+|---|---|---|---|---|
+| `OF-REC-001` | `ERROR` | recovery_intents | Recovery intent references an unknown command. | Add the command to `commands.yaml` or fix `recovery_intent.commands`. |
+| `OF-REC-002` | `ERROR` | recovery_intents | Recovery intent references an unknown fault, event or mode. | Add the referenced object to the Mission Model or fix `recovery_intent`. |
+| `OF-REC-003` | `ERROR` | recovery_intents | Recovery intent references an unknown expected event. | Add the event to `events.yaml` or fix `recovery_intent.expected_events`. |
 
 ---
 
