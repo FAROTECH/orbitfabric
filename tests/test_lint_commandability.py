@@ -32,7 +32,7 @@ VALID_COMMANDABILITY_YAML = """commandability:
   autonomous_actions:
     - id: stop_payload_on_battery_warning
       trigger:
-        fault: eps.battery_warning
+        fault: eps.battery_low_fault
       dispatches:
         command: payload.stop_acquisition
         source: onboard_autonomy
@@ -41,7 +41,7 @@ VALID_COMMANDABILITY_YAML = """commandability:
       description: Contract-level autonomous recovery assumption for battery warning.
   recovery_intents:
     - id: payload_battery_warning_recovery
-      fault: eps.battery_warning
+      fault: eps.battery_low_fault
       target_mode: DEGRADED
       commands:
         - payload.stop_acquisition
@@ -155,7 +155,7 @@ def test_commandability_rule_unknown_expected_event_is_reported(tmp_path: Path) 
     assert "OF-CAB-006" in lint_codes(model)
 
 
-def test_high_risk_command_without_required_confirmation_is_warning(tmp_path: Path) -> None:
+def test_risky_command_without_required_confirmation_is_warning(tmp_path: Path) -> None:
     model = load_model_with_commandability(
         tmp_path,
         VALID_COMMANDABILITY_YAML.replace("confirmation: required", "confirmation: hinted"),
@@ -188,7 +188,7 @@ def test_autonomous_action_unknown_source_is_reported(tmp_path: Path) -> None:
 def test_autonomous_action_unknown_trigger_is_reported(tmp_path: Path) -> None:
     model = load_model_with_commandability(
         tmp_path,
-        VALID_COMMANDABILITY_YAML.replace("fault: eps.battery_warning", "fault: eps.unknown_fault"),
+        VALID_COMMANDABILITY_YAML.replace("fault: eps.battery_low_fault", "fault: eps.unknown_fault"),
     )
 
     assert "OF-AUT-003" in lint_codes(model)
@@ -237,7 +237,7 @@ def test_recovery_intent_unknown_reference_is_reported(tmp_path: Path) -> None:
     model = load_model_with_commandability(
         tmp_path,
         VALID_COMMANDABILITY_YAML.replace(
-            "fault: eps.battery_warning",
+            "fault: eps.battery_low_fault",
             "fault: eps.unknown_recovery_fault",
             2,
         ),
