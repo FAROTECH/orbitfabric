@@ -42,7 +42,8 @@ examples/demo-3u/
 │   ├── policies.yaml
 │   ├── payloads.yaml
 │   ├── data_products.yaml
-│   └── contacts.yaml
+│   ├── contacts.yaml
+│   └── commandability.yaml
 └── scenarios/
     ├── battery_low_during_payload.yaml
     └── nominal_payload_acquisition.yaml
@@ -196,6 +197,24 @@ payload.radiation_histogram
 
 This is contract intent only. It does not implement contact scheduling, RF behavior, onboard downlink queues or ground operations.
 
+### `commandability.yaml`
+
+Defines one synthetic Commandability and Autonomy Contract slice:
+
+```text
+ground_operator
+onboard_autonomy
+payload_start_ground_rule
+stop_payload_on_battery_low
+stop_payload_on_battery_critical
+payload_battery_low_recovery
+payload_battery_critical_recovery
+```
+
+The commandability contract makes explicit that `payload.start_acquisition` is ground-commandable in `NOMINAL`, while low/critical battery recovery assumptions may dispatch `payload.stop_acquisition` through `onboard_autonomy`.
+
+This is contract intent only. It does not implement live uplink, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
+
 ---
 
 ## 4. Scenarios
@@ -250,9 +269,9 @@ payload.start_acquisition
 → SCENARIO PASSED
 ```
 
-The data product and contact/downlink contracts are not executed by this scenario yet.
+The data product, contact/downlink and commandability/autonomy contracts are not executed as storage, downlink, uplink or autonomy runtime behavior by this scenario yet.
 
-They document declared mission-data and downlink-flow assumptions and prepare the model for future end-to-end mission data flow evidence.
+They document declared mission-data, downlink-flow, commandability and recovery assumptions and prepare the model for future end-to-end mission data flow evidence.
 
 ---
 
@@ -303,14 +322,17 @@ generated/docs/
 ├── packets.md
 ├── payloads.md
 ├── data_products.md
-└── contacts.md
+├── contacts.md
+└── commandability.md
 ```
 
 The generated data product documentation exposes storage and downlink intent as contract data.
 
 The generated contact/downlink documentation exposes contact profiles, link profiles, contact windows, declared capacity and downlink flow eligibility as contract data.
 
-Neither page describes runtime behavior.
+The generated commandability/autonomy documentation exposes command sources, commandability rules, autonomous actions and recovery intents as contract data.
+
+None of these pages describes runtime behavior.
 
 ---
 
@@ -330,7 +352,7 @@ During execution, OrbitFabric checks that:
 - auto-dispatched recovery commands are recorded;
 - scenario expectations pass.
 
-The simulator does not execute storage or downlink behavior in v0.4.0.
+The simulator does not execute storage, downlink, live uplink or autonomy runtime behavior in the current development preview.
 
 ---
 

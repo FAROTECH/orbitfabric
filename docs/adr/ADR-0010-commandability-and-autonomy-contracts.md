@@ -1,6 +1,6 @@
 # ADR-0010 — Commandability and Autonomy Contracts
 
-Status: Proposed  
+Status: Accepted / Implemented  
 Date: 2026-05-07
 
 ---
@@ -166,24 +166,24 @@ commandability:
   autonomous_actions:
     - id: stop_payload_on_battery_warning
       trigger:
-        fault: eps.battery_warning
+        fault: eps.battery_low_fault
       dispatches:
         command: payload.stop_acquisition
         source: onboard_autonomy
       expected_events:
         - payload.acquisition_stopped
-      description: Contract-level autonomous recovery assumption for battery warning.
+      description: Contract-level autonomous recovery assumption for low battery conditions.
 
   recovery_intents:
     - id: payload_battery_warning_recovery
-      fault: eps.battery_warning
+      fault: eps.battery_low_fault
       target_mode: DEGRADED
       commands:
         - payload.stop_acquisition
-      description: Declared recovery intent for payload activity during battery warning.
+      description: Declared recovery intent for payload activity during low battery conditions.
 ```
 
-This shape is a proposed v0.5.0 contract shape.
+This shape is the implemented current v0.5 development contract shape.
 
 It is not a frozen v1.0 schema.
 
