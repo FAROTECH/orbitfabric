@@ -52,6 +52,50 @@ VALID_CONTACTS_YAML = """contacts:
       description: Synthetic science downlink flow used to validate contact contracts.
 """
 
+VALID_COMMANDABILITY_YAML = """commandability:
+  sources:
+    - id: ground_operator
+      type: ground
+      requires_contact: true
+      contact_profile: primary_ground_contact
+      description: Abstract ground-originated command source.
+    - id: onboard_autonomy
+      type: autonomous
+      requires_contact: false
+      description: Abstract onboard autonomous command source.
+  rules:
+    - id: payload_start_ground_rule
+      command: payload.start_acquisition
+      sources:
+        - ground_operator
+      allowed_modes:
+        - NOMINAL
+      confirmation: required
+      timeout_ms: 5000
+      expected_events:
+        - payload.acquisition_started
+      description: Payload acquisition may be commanded from ground in nominal mode.
+  autonomous_actions:
+    - id: stop_payload_on_battery_warning
+      trigger:
+        fault: eps.battery_warning
+      dispatches:
+        command: payload.stop_acquisition
+        source: onboard_autonomy
+      expected_events:
+        - payload.acquisition_stopped
+      description: Contract-level autonomous recovery assumption for battery warning.
+  recovery_intents:
+    - id: payload_battery_warning_recovery
+      fault: eps.battery_warning
+      target_mode: DEGRADED
+      commands:
+        - payload.stop_acquisition
+      expected_events:
+        - payload.acquisition_stopped
+      description: Declared recovery intent for payload activity during battery warning.
+"""
+
 
 def copy_demo_mission(tmp_path: Path) -> Path:
     mission_dir = tmp_path / "mission"
@@ -82,6 +126,10 @@ def test_load_demo_mission() -> None:
     assert len(model.contacts.link_profiles) == 1
     assert len(model.contacts.contact_windows) == 1
     assert len(model.contacts.downlink_flows) == 1
+    assert model.commandability.sources == []
+    assert model.commandability.rules == []
+    assert model.commandability.autonomous_actions == []
+    assert model.commandability.recovery_intents == []
 
 
 def test_load_demo_payload_contract() -> None:
@@ -379,6 +427,113 @@ def test_duplicate_contact_profile_id_fails(tmp_path: Path) -> None:
         and diagnostic.file == "contacts.yaml"
         and diagnostic.domain == "contact_profiles"
         and diagnostic.object_id == "primary_ground_contact"
+        for diagnostic in diagnostics
+    )
+
+
+def test_optional_commandability_file_can_be_absent(tmp_path: Path) -> None:
+    mission_dir = tmp_path / "mission"
+    mission_dir.mkdir()
+
+    for source_file in DEMO_MISSION.glob("*.yaml"):
+        if source_file.name == "commandability.yaml":
+            continue
+        (mission_dir / source_file.name).write_text(
+            source_file.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    model = MissionModelLoader().load(mission_dir)
+
+    assert model.commandability.sources == []
+    assert model.commandability.rules == []
+    assert model.commandability.autonomous_actions == []
+    assert model.commandability.recovery_intents == []
+
+
+def test_load_valid_commandability_contracts(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "commandability.yaml").write_text(
+        VALID_COMMANDABILITY_YAML,
+        encoding="utf-8",
+    )
+
+    model = MissionModelLoader().load(mission_dir)
+
+    assert len(model.commandability.sources) == 2
+    assert len(model.commandability.rules) == 1
+    assert len(model.commandability.autonomous_actions) == 1
+    assert len(model.commandability.recovery_intents) == 1
+
+    source = model.commandability.sources[0]
+    rule = model.commandability.rules[0]
+    action = model.commandability.autonomous_actions[0]
+    recovery = model.commandability.recovery_intents[0]
+
+    assert source.id == "ground_operator"
+    assert source.type == "ground"
+    assert source.requires_contact is True
+    assert source.contact_profile == "primary_ground_contact"
+    assert rule.id == "payload_start_ground_rule"
+    assert rule.command == "payload.start_acquisition"
+    assert rule.sources == ["ground_operator"]
+    assert rule.allowed_modes == ["NOMINAL"]
+    assert rule.confirmation == "required"
+    assert rule.timeout_ms == 5000
+    assert rule.expected_events == ["payload.acquisition_started"]
+    assert action.id == "stop_payload_on_battery_warning"
+    assert action.trigger.fault == "eps.battery_warning"
+    assert action.dispatches.command == "payload.stop_acquisition"
+    assert action.dispatches.source == "onboard_autonomy"
+    assert action.expected_events == ["payload.acquisition_stopped"]
+    assert recovery.id == "payload_battery_warning_recovery"
+    assert recovery.fault == "eps.battery_warning"
+    assert recovery.target_mode == "DEGRADED"
+    assert recovery.commands == ["payload.stop_acquisition"]
+
+    assert model.command_source_ids == {"ground_operator", "onboard_autonomy"}
+    assert model.commandability_rule_ids == {"payload_start_ground_rule"}
+    assert model.autonomous_action_ids == {"stop_payload_on_battery_warning"}
+    assert model.recovery_intent_ids == {"payload_battery_warning_recovery"}
+
+
+def test_invalid_commandability_top_level_key_fails(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "commandability.yaml").write_text(
+        "command_policy: []\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MissionModelError) as exc_info:
+        MissionModelLoader().load(mission_dir)
+
+    codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
+    assert "OF-STR-001" in codes
+    assert "OF-STR-002" in codes
+
+
+def test_duplicate_command_source_id_fails(tmp_path: Path) -> None:
+    mission_dir = copy_demo_mission(tmp_path)
+    (mission_dir / "commandability.yaml").write_text(
+        "commandability:\n"
+        "  sources:\n"
+        "    - id: ground_operator\n"
+        "      type: ground\n"
+        "    - id: ground_operator\n"
+        "      type: onboard\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MissionModelError) as exc_info:
+        MissionModelLoader().load(mission_dir)
+
+    diagnostics = exc_info.value.diagnostics
+
+    assert any(
+        diagnostic.code == "OF-ID-001"
+        and diagnostic.file == "commandability.yaml"
+        and diagnostic.domain == "command_sources"
+        and diagnostic.object_id == "ground_operator"
         for diagnostic in diagnostics
     )
 

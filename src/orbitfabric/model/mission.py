@@ -54,6 +54,8 @@ DownlinkFlowQueuePolicy = Literal[
     "manual_selection",
     "critical_first",
 ]
+CommandSourceType = Literal["ground", "onboard", "autonomous"]
+CommandConfirmationIntent = Literal["none", "hinted", "required"]
 
 
 class StrictModel(BaseModel):
@@ -282,6 +284,65 @@ class ContactContracts(StrictModel):
     downlink_flows: list[DownlinkFlowContract] = Field(default_factory=list)
 
 
+class CommandSource(StrictModel):
+    id: str
+    type: CommandSourceType
+    requires_contact: bool = False
+    contact_profile: str | None = None
+    description: str | None = None
+
+
+class CommandabilityRule(StrictModel):
+    id: str
+    command: str
+    sources: list[str] = Field(default_factory=list)
+    allowed_modes: list[str] = Field(default_factory=list)
+    confirmation: CommandConfirmationIntent | None = None
+    timeout_ms: int | None = Field(default=None, gt=0)
+    expected_events: list[str] = Field(default_factory=list)
+    expected_effects: dict[str, Any] = Field(default_factory=dict)
+    description: str | None = None
+
+
+class AutonomousActionTrigger(StrictModel):
+    event: str | None = None
+    fault: str | None = None
+    telemetry: str | None = None
+    mode: str | None = None
+
+
+class AutonomousActionDispatch(StrictModel):
+    command: str
+    source: str
+
+
+class AutonomousActionContract(StrictModel):
+    id: str
+    trigger: AutonomousActionTrigger
+    dispatches: AutonomousActionDispatch
+    expected_events: list[str] = Field(default_factory=list)
+    expected_effects: dict[str, Any] = Field(default_factory=dict)
+    description: str | None = None
+
+
+class RecoveryIntent(StrictModel):
+    id: str
+    fault: str | None = None
+    event: str | None = None
+    target_mode: str | None = None
+    commands: list[str] = Field(default_factory=list)
+    expected_events: list[str] = Field(default_factory=list)
+    expected_effects: dict[str, Any] = Field(default_factory=dict)
+    description: str | None = None
+
+
+class CommandabilityContracts(StrictModel):
+    sources: list[CommandSource] = Field(default_factory=list)
+    rules: list[CommandabilityRule] = Field(default_factory=list)
+    autonomous_actions: list[AutonomousActionContract] = Field(default_factory=list)
+    recovery_intents: list[RecoveryIntent] = Field(default_factory=list)
+
+
 class AllowedValues(StrictModel):
     allowed_values: list[str]
 
@@ -308,6 +369,7 @@ class MissionModel(StrictModel):
     payloads: list[PayloadContract] = Field(default_factory=list)
     data_products: list[DataProductContract] = Field(default_factory=list)
     contacts: ContactContracts = Field(default_factory=ContactContracts)
+    commandability: CommandabilityContracts = Field(default_factory=CommandabilityContracts)
 
     @property
     def subsystem_ids(self) -> set[str]:
@@ -356,6 +418,22 @@ class MissionModel(StrictModel):
     @property
     def downlink_flow_ids(self) -> set[str]:
         return {item.id for item in self.contacts.downlink_flows}
+
+    @property
+    def command_source_ids(self) -> set[str]:
+        return {item.id for item in self.commandability.sources}
+
+    @property
+    def commandability_rule_ids(self) -> set[str]:
+        return {item.id for item in self.commandability.rules}
+
+    @property
+    def autonomous_action_ids(self) -> set[str]:
+        return {item.id for item in self.commandability.autonomous_actions}
+
+    @property
+    def recovery_intent_ids(self) -> set[str]:
+        return {item.id for item in self.commandability.recovery_intents}
 
     @property
     def mode_ids(self) -> set[str]:

@@ -26,6 +26,7 @@ OPTIONAL_FILES: dict[str, tuple[str, ...]] = {
     "payloads.yaml": ("payloads",),
     "data_products.yaml": ("data_products",),
     "contacts.yaml": ("contacts",),
+    "commandability.yaml": ("commandability",),
 }
 
 
@@ -291,6 +292,34 @@ class MissionModelLoader:
                 domain="downlink_flows",
                 file="contacts.yaml",
                 values=[item.id for item in model.contacts.downlink_flows],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="command_sources",
+                file="commandability.yaml",
+                values=[item.id for item in model.commandability.sources],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="commandability_rules",
+                file="commandability.yaml",
+                values=[item.id for item in model.commandability.rules],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="autonomous_actions",
+                file="commandability.yaml",
+                values=[item.id for item in model.commandability.autonomous_actions],
+            )
+        )
+        diagnostics.extend(
+            self._duplicates(
+                domain="recovery_intents",
+                file="commandability.yaml",
+                values=[item.id for item in model.commandability.recovery_intents],
             )
         )
         diagnostics.extend(
