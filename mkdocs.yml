@@ -27,6 +27,7 @@ nav:
       - Payload Contract Model: reference/payload-contract-model.md
       - Data Product Contract Model: reference/data-product-contract-model.md
       - Contact and Downlink Contract Model: reference/contact-downlink-contract-model.md
+      - Commandability and Autonomy Contract Model: reference/commandability-contract-model.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
@@ -44,6 +45,7 @@ nav:
       - ADR-0007 Mission Data Chain Before Runtime: adr/ADR-0007-mission-data-chain-before-runtime.md
       - ADR-0008 Data Product and Storage Contracts: adr/ADR-0008-data-product-and-storage-contracts.md
       - ADR-0009 Contact Windows and Downlink Flow Contracts: adr/ADR-0009-contact-windows-and-downlink-flow-contracts.md
+      - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-and-autonomy-contracts.md
 
 markdown_extensions:
   - admonition
