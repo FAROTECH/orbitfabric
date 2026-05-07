@@ -1,6 +1,6 @@
 # OrbitFabric — Roadmap
 
-Version: v0.4.0
+Version: v0.5.0
 Status: Development preview
 Scope: v0.3 to v1.0 planning
 
@@ -75,15 +75,15 @@ v0.2.2  Payload Contract Release Alignment                    completed
 v0.2.3  Mission Data Chain Roadmap Alignment                  completed
 v0.3.0  Data Product and Storage Contracts                    completed
 v0.4    Contact Windows and Downlink Flow Contracts           completed
-v0.5    Commandability and Autonomy Contracts                 next
-v0.6    End-to-End Mission Data Flow Evidence                 future
+v0.5    Commandability and Autonomy Contracts                 completed
+v0.6    End-to-End Mission Data Flow Evidence                 next
 v0.7    Generated Runtime Skeletons                           future
 v0.8    Ground Integration Artifacts                          future
 v0.9    Plugin and Extensibility Layer                        future
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target is `v0.5 — Commandability and Autonomy Contracts`.
+The immediate target is `v0.6 — End-to-End Mission Data Flow Evidence`.
 
 Runtime skeleton generation remains deferred until the Mission Data Chain is coherent enough to generate useful artifacts from it.
 
@@ -476,7 +476,7 @@ ground export generation
 Contact windows and downlink flows are contract assumptions, not physical simulation or runtime behavior.
 
 ---
-## 10. Next Milestone — v0.5 Commandability and Autonomy Contracts
+## 10. Completed Slice — v0.5.0 Commandability and Autonomy Contracts
 
 ### 10.1 Objective
 
@@ -486,24 +486,27 @@ Commands should not only exist.
 
 The model should express when they can be used, who or what may dispatch them, what they require and what evidence they should produce.
 
-### 10.2 Candidate Features
+### 10.2 Completed Capabilities
 
 ```text
-command source model: ground, onboard, autonomous
-requires_contact flag
-allowed modes refinement
-abstract operator confirmation hint
-expected events
-expected telemetry effects
-timeout expectations
-recovery command references
-command inhibition rules
-autonomy rule documentation
+ADR-0010 Commandability and Autonomy Contracts
+optional commandability.yaml domain
+CommandSource model
+CommandabilityRule model
+AutonomousActionContract model
+RecoveryIntent model
+commandability/autonomy semantic lint rules
+OF-CAB-* lint rule family
+OF-AUT-* lint rule family
+OF-REC-* lint rule family
+generated commandability/autonomy documentation
+generated commandability.md output
+one synthetic demo commandability/autonomy slice
 ```
 
 ### 10.3 Boundary
 
-v0.5 must not implement real command authentication, authorization, encryption, live uplink, operator consoles or flight-ready autonomy.
+v0.5 does not implement real command authentication, authorization, encryption, live uplink, operator consoles, command queues, onboard schedulers, autonomy runtime or real FDIR.
 
 It defines commandability and autonomy contracts only.
 
@@ -817,19 +820,18 @@ They must not become a live ground segment inside OrbitFabric.
 The immediate work package is:
 
 ```text
-v0.5 — Commandability and Autonomy Contracts
+v0.6 — End-to-End Mission Data Flow Evidence
 ```
 
 Required sequence:
 
 ```text
-1. define commandability/autonomy contract scope
-2. add ADR for Commandability and Autonomy Contracts
-3. refine command source and dispatch intent
-4. model autonomous command intent without implementing autonomy runtime
-5. add semantic lint rules for commandability consistency
-6. generate commandability/autonomy documentation
-7. update the synthetic demo mission with one clean commandability slice
+1. define end-to-end mission data flow evidence scope
+2. connect payload/data product/storage/downlink/contact assumptions into scenario evidence
+3. keep storage and downlink behavior deterministic and contract-level
+4. add scenario assertions for data product state where appropriate
+5. generate mission data flow documentation or reports
+6. update the synthetic demo mission with one clean end-to-end evidence slice
 ```
 
 Do not add runtime skeletons before the mission data chain model is coherent.
@@ -847,11 +849,13 @@ The Payload Contract Model strengthens this mission by making mission-specific a
 
 The Data Product and Storage Contract Model strengthens the mission data chain by making payload and subsystem data products, storage intent and downlink intent explicit.
 
-The v0.4 roadmap step has completed the first Contact Windows and Downlink Flow Contract slice.
+The v0.4 roadmap step completed the first Contact Windows and Downlink Flow Contract slice.
 
-The next roadmap step is to model commandability and autonomy assumptions before runtime or ground artifacts are generated.
+The v0.5 roadmap step completed the first Commandability and Autonomy Contract slice.
 
-Only after the mission data chain, commandability and autonomy contracts are clear should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
+The next roadmap step is to produce end-to-end mission data flow evidence before runtime or ground artifacts are generated.
+
+Only after the mission data chain, commandability, autonomy and end-to-end evidence contracts are clear should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.

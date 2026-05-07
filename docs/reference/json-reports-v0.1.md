@@ -5,7 +5,7 @@ This page documents the JSON reports currently produced by OrbitFabric.
 Current documented baseline:
 
 ```text
-v0.4.0 — Contact Windows and Downlink Flow Contracts
+v0.5.0 — Commandability and Autonomy Contracts
 ```
 
 OrbitFabric JSON reports are generated artifacts intended for:
@@ -25,7 +25,7 @@ The source of truth remains the Mission Model YAML and scenario YAML.
 
 The JSON report structures documented here are development-preview contracts.
 
-They are stable enough for current v0.4 workflows, but they are not a v1.0 compatibility promise.
+They are stable enough for current v0.5 workflows, but they are not a v1.0 compatibility promise.
 
 Future versions may introduce:
 
@@ -46,7 +46,7 @@ Current example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
 ```
 
@@ -163,7 +163,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "mission": "demo-3u",
   "model_version": "0.1.0",
   "result": "passed",
@@ -274,7 +274,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "mission": "demo-3u",
   "scenario": "battery_low_during_payload",
   "result": "passed",

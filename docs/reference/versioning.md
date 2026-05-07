@@ -32,7 +32,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.4.0
+orbitfabric 0.5.0
 ```
 
 This version answers the question:
@@ -85,7 +85,7 @@ Current example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -104,7 +104,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.4.0
+OrbitFabric tool/package version: 0.5.0
 Mission Model version:           0.1.0
 ```
 
@@ -112,13 +112,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts and Contact/Downlink Contracts;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts and Commandability/Autonomy Contracts;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record both pieces of information.
 
 ---
 
-## Current v0.4 rule
+## Current v0.5 rule
 
 For the current development preview:
 
@@ -153,4 +153,4 @@ Possible future additions include:
 - compatibility checks between tool version and Mission Model version;
 - JSON Schema export for Mission Model validation.
 
-These are not part of the current v0.4.0 development preview.
+These are not part of the current v0.5.0 development preview.

@@ -40,9 +40,7 @@ ground integration
 
 ## Current Status
 
-OrbitFabric's current development baseline includes `v0.5 — Commandability and Autonomy Contracts`.
-
-The package/CLI version remains `0.4.0` until the next release tag.
+OrbitFabric is currently at `v0.5.0 — Commandability and Autonomy Contracts`.
 
 The current repository includes:
 
@@ -50,7 +48,7 @@ The current repository includes:
 - the `v0.2.3 — Mission Data Chain Roadmap Alignment` direction;
 - the `v0.3.0 — Data Product and Storage Contracts` vertical slice;
 - the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice;
-- the `v0.5 — Commandability and Autonomy Contracts` development slice.
+- the `v0.5.0 — Commandability and Autonomy Contracts` vertical slice.
 
 The current vertical slice is functional:
 
@@ -406,7 +404,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.4.0
+orbitfabric 0.5.0
 ```
 
 ---
@@ -460,7 +458,8 @@ generated/docs/
 ├── packets.md
 ├── payloads.md
 ├── data_products.md
-└── contacts.md
+├── contacts.md
+└── commandability.md
 ```
 
 These files are generated from the validated Mission Model. Do not edit them manually.

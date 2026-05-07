@@ -8,6 +8,10 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
+---
+
+## [v0.5.0] — Commandability and Autonomy Contracts
+
 ### Added
 
 - Added the Commandability and Autonomy Contract Model as an optional mission model domain.
@@ -27,6 +31,21 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 - Extended the synthetic `demo-3u` mission with contract-level commandability and recovery assumptions.
 - Extended generated mission documentation to include commandability/autonomy references when commandability contracts are present.
 - Extended the Mission Data Chain from contact/downlink assumptions to commandability, autonomy and recovery assumptions.
+
+### Boundaries
+
+The Commandability and Autonomy Contract slice intentionally does not introduce:
+
+- real command authentication;
+- real command authorization;
+- live uplink services;
+- operator consoles;
+- command queues;
+- onboard schedulers;
+- autonomy runtime;
+- real FDIR or safing behavior;
+- Yamcs/OpenC3 runtime services;
+- real spacecraft operations.
 
 ---
 
