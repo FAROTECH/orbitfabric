@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from orbitfabric.lint.finding import LintReport
+from orbitfabric.lint.rules_commandability import check_commandability
 from orbitfabric.lint.rules_commands import check_commands
 from orbitfabric.lint.rules_contacts import check_contacts
 from orbitfabric.lint.rules_data_products import check_data_products
@@ -24,6 +25,7 @@ class LintEngine:
         findings.extend(check_payloads(model))
         findings.extend(check_data_products(model))
         findings.extend(check_contacts(model))
+        findings.extend(check_commandability(model))
         findings.extend(check_telemetry(model))
         findings.extend(check_commands(model))
         findings.extend(check_events(model))
