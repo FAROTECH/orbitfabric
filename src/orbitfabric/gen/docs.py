@@ -6,9 +6,9 @@ from typing import Any
 from orbitfabric.model.mission import (
     AutonomousActionContract,
     Command,
+    CommandabilityRule,
     CommandArgument,
     CommandSource,
-    CommandabilityRule,
     ContactProfile,
     ContactWindow,
     DataProductContract,
