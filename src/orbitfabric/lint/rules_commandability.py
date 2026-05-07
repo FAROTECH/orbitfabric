@@ -9,7 +9,7 @@ from orbitfabric.model.mission import (
     RecoveryIntent,
 )
 
-HIGH_RISK_COMMAND_LEVELS = {"high", "critical"}
+RISKY_COMMAND_LEVELS = {"medium", "high", "critical"}
 
 
 def check_commandability(model: MissionModel) -> list[LintFinding]:
@@ -29,7 +29,7 @@ def check_commandability(model: MissionModel) -> list[LintFinding]:
         findings.extend(_check_recovery_intent(model, recovery_intent))
 
     if _has_commandability_domain_content(model):
-        findings.extend(_check_high_risk_commands_have_confirmation_intent(model))
+        findings.extend(_check_risky_commands_have_confirmation_intent(model))
 
     return findings
 
@@ -347,7 +347,7 @@ def _unknown_recovery_reference(
     )
 
 
-def _check_high_risk_commands_have_confirmation_intent(
+def _check_risky_commands_have_confirmation_intent(
     model: MissionModel,
 ) -> list[LintFinding]:
     commandability_by_command = {
@@ -358,7 +358,7 @@ def _check_high_risk_commands_have_confirmation_intent(
     findings: list[LintFinding] = []
 
     for command in model.commands:
-        if command.risk not in HIGH_RISK_COMMAND_LEVELS:
+        if command.risk not in RISKY_COMMAND_LEVELS:
             continue
 
         rule = commandability_by_command.get(command.id)
@@ -372,7 +372,7 @@ def _check_high_risk_commands_have_confirmation_intent(
                 file="commandability.yaml",
                 domain="commandability_rules",
                 object_id=command.id,
-                message="high-risk command lacks explicit required confirmation intent",
+                message="risky command lacks explicit required confirmation intent",
                 suggestion=(
                     "Add a commandability rule with confirmation: required, or lower "
                     "the command risk if appropriate."
