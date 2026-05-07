@@ -4,8 +4,11 @@ from pathlib import Path
 from typing import Any
 
 from orbitfabric.model.mission import (
+    AutonomousActionContract,
     Command,
+    CommandabilityRule,
     CommandArgument,
+    CommandSource,
     ContactProfile,
     ContactWindow,
     DataProductContract,
@@ -21,6 +24,7 @@ from orbitfabric.model.mission import (
     Packet,
     PayloadContract,
     QualityPolicy,
+    RecoveryIntent,
     TelemetryItem,
     TelemetryLimits,
 )
@@ -52,6 +56,11 @@ def generate_markdown_docs(model: MissionModel, output_dir: Path) -> list[Path]:
     if _has_contact_contracts(model):
         generated_files.append(
             _write(output_dir / "contacts.md", _render_contacts(model))
+        )
+
+    if _has_commandability_contracts(model):
+        generated_files.append(
+            _write(output_dir / "commandability.md", _render_commandability(model))
         )
 
     return generated_files
@@ -502,6 +511,162 @@ def _render_downlink_flows(downlink_flows: list[DownlinkFlowContract]) -> str:
 
     lines.append("\n")
     return "".join(lines)
+
+
+def _has_commandability_contracts(model: MissionModel) -> bool:
+    return any(
+        (
+            model.commandability.sources,
+            model.commandability.rules,
+            model.commandability.autonomous_actions,
+            model.commandability.recovery_intents,
+        )
+    )
+
+
+def _render_commandability(model: MissionModel) -> str:
+    lines = [_header("Commandability and Autonomy Contract Reference", model)]
+
+    commandability = model.commandability
+
+    lines.append("## Summary\n\n")
+    lines.append(f"- Command sources: `{len(commandability.sources)}`\n")
+    lines.append(f"- Commandability rules: `{len(commandability.rules)}`\n")
+    lines.append(f"- Autonomous actions: `{len(commandability.autonomous_actions)}`\n")
+    lines.append(f"- Recovery intents: `{len(commandability.recovery_intents)}`\n\n")
+    lines.append(
+        "Commandability and autonomy fields describe contract assumptions only. "
+        "They do not imply command dispatch, command queues, uplink execution, "
+        "operator authentication, scheduling, autonomy runtime or FDIR behavior.\n\n"
+    )
+
+    lines.append(_render_command_sources(commandability.sources))
+    lines.append(_render_commandability_rules(commandability.rules))
+    lines.append(_render_autonomous_actions(commandability.autonomous_actions))
+    lines.append(_render_recovery_intents(commandability.recovery_intents))
+
+    return "".join(lines)
+
+
+def _render_command_sources(sources: list[CommandSource]) -> str:
+    lines = ["## Command sources\n\n"]
+
+    if not sources:
+        lines.append("No command sources declared.\n\n")
+        return "".join(lines)
+
+    lines.append("| ID | Type | Requires Contact | Contact Profile | Description |\n")
+    lines.append("|---|---|---:|---|---|\n")
+
+    for source in sorted(sources, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(source.id)} "
+            f"| {_code(source.type)} "
+            f"| {_format_bool(source.requires_contact)} "
+            f"| {_code(source.contact_profile or '-')} "
+            f"| {_text(source.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_commandability_rules(rules: list[CommandabilityRule]) -> str:
+    lines = ["## Commandability rules\n\n"]
+
+    if not rules:
+        lines.append("No commandability rules declared.\n\n")
+        return "".join(lines)
+
+    lines.append(
+        "| ID | Command | Sources | Allowed Modes | Confirmation | Timeout | "
+        "Expected Events | Expected Effects | Description |\n"
+    )
+    lines.append("|---|---|---|---|---|---:|---|---|---|\n")
+
+    for rule in sorted(rules, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(rule.id)} "
+            f"| {_code(rule.command)} "
+            f"| {_format_list(rule.sources)} "
+            f"| {_format_list(rule.allowed_modes)} "
+            f"| {_code(rule.confirmation or '-')} "
+            f"| {_format_timeout(rule.timeout_ms)} "
+            f"| {_format_list(rule.expected_events)} "
+            f"| {_format_expected_effects(rule.expected_effects)} "
+            f"| {_text(rule.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_autonomous_actions(actions: list[AutonomousActionContract]) -> str:
+    lines = ["## Autonomous actions\n\n"]
+
+    if not actions:
+        lines.append("No autonomous actions declared.\n\n")
+        return "".join(lines)
+
+    lines.append(
+        "| ID | Trigger | Dispatch Command | Dispatch Source | Expected Events | "
+        "Expected Effects | Description |\n"
+    )
+    lines.append("|---|---|---|---|---|---|---|\n")
+
+    for action in sorted(actions, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(action.id)} "
+            f"| {_format_autonomous_trigger(action)} "
+            f"| {_code(action.dispatches.command)} "
+            f"| {_code(action.dispatches.source)} "
+            f"| {_format_list(action.expected_events)} "
+            f"| {_format_expected_effects(action.expected_effects)} "
+            f"| {_text(action.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _render_recovery_intents(recovery_intents: list[RecoveryIntent]) -> str:
+    lines = ["## Recovery intents\n\n"]
+
+    if not recovery_intents:
+        lines.append("No recovery intents declared.\n\n")
+        return "".join(lines)
+
+    lines.append(
+        "| ID | Fault | Event | Target Mode | Commands | Expected Events | "
+        "Expected Effects | Description |\n"
+    )
+    lines.append("|---|---|---|---|---|---|---|---|\n")
+
+    for recovery_intent in sorted(recovery_intents, key=lambda item: item.id):
+        lines.append(
+            f"| {_code(recovery_intent.id)} "
+            f"| {_code(recovery_intent.fault or '-')} "
+            f"| {_code(recovery_intent.event or '-')} "
+            f"| {_code(recovery_intent.target_mode or '-')} "
+            f"| {_format_list(recovery_intent.commands)} "
+            f"| {_format_list(recovery_intent.expected_events)} "
+            f"| {_format_expected_effects(recovery_intent.expected_effects)} "
+            f"| {_text(recovery_intent.description or '-')} |\n"
+        )
+
+    lines.append("\n")
+    return "".join(lines)
+
+
+def _format_autonomous_trigger(action: AutonomousActionContract) -> str:
+    values = action.trigger.model_dump(exclude_none=True)
+    if not values:
+        return "-"
+
+    return _line_break_join(
+        f"{_code(key)} = {_code(value)}"
+        for key, value in sorted(values.items())
+    )
 
 
 def _producer_heading(model: MissionModel, data_product: DataProductContract) -> str:

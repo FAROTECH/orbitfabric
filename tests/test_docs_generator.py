@@ -5,6 +5,12 @@ from pathlib import Path
 from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.model.loader import MissionModelLoader
 from orbitfabric.model.mission import (
+    AutonomousActionContract,
+    AutonomousActionDispatch,
+    AutonomousActionTrigger,
+    CommandabilityContracts,
+    CommandabilityRule,
+    CommandSource,
     ContactContracts,
     ContactProfile,
     ContactWindow,
@@ -13,6 +19,7 @@ from orbitfabric.model.mission import (
     DataProductStorageIntent,
     DownlinkFlowContract,
     LinkProfile,
+    RecoveryIntent,
 )
 
 DEMO_MISSION = Path("examples/demo-3u/mission")
@@ -73,6 +80,65 @@ def make_valid_contacts() -> ContactContracts:
                 queue_policy="priority_then_age",
                 eligible_data_products=["payload.radiation_histogram"],
                 description="Synthetic science downlink flow.",
+            )
+        ],
+    )
+
+
+def make_valid_commandability() -> CommandabilityContracts:
+    return CommandabilityContracts(
+        sources=[
+            CommandSource(
+                id="ground_operator",
+                type="ground",
+                requires_contact=True,
+                contact_profile="primary_ground_contact",
+                description="Abstract ground-originated command source.",
+            ),
+            CommandSource(
+                id="onboard_autonomy",
+                type="autonomous",
+                description="Abstract onboard autonomous command source.",
+            ),
+        ],
+        rules=[
+            CommandabilityRule(
+                id="payload_start_ground_rule",
+                command="payload.start_acquisition",
+                sources=["ground_operator"],
+                allowed_modes=["NOMINAL"],
+                confirmation="required",
+                timeout_ms=5000,
+                expected_events=["payload.acquisition_started"],
+                expected_effects={
+                    "payload_lifecycle": {
+                        "payload": "demo_iod_payload",
+                        "state": "ACQUIRING",
+                    }
+                },
+                description="Payload acquisition may be commanded from ground.",
+            )
+        ],
+        autonomous_actions=[
+            AutonomousActionContract(
+                id="stop_payload_on_battery_low",
+                trigger=AutonomousActionTrigger(fault="eps.battery_low_fault"),
+                dispatches=AutonomousActionDispatch(
+                    command="payload.stop_acquisition",
+                    source="onboard_autonomy",
+                ),
+                expected_events=["payload.acquisition_stopped"],
+                description="Contract-level autonomous recovery assumption.",
+            )
+        ],
+        recovery_intents=[
+            RecoveryIntent(
+                id="payload_battery_low_recovery",
+                fault="eps.battery_low_fault",
+                target_mode="DEGRADED",
+                commands=["payload.stop_acquisition"],
+                expected_events=["payload.acquisition_stopped"],
+                description="Declared recovery intent for battery warning.",
             )
         ],
     )
@@ -198,6 +264,7 @@ def test_data_product_contract_docs_are_skipped_without_data_products(
     assert "data_products.md" not in generated_names
     assert not (tmp_path / "data_products.md").exists()
 
+
 def test_generate_contact_downlink_contract_docs(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     model.contacts = make_valid_contacts()
@@ -238,3 +305,45 @@ def test_contact_downlink_docs_are_skipped_without_contact_contracts(
 
     assert "contacts.md" not in generated_names
     assert not (tmp_path / "contacts.md").exists()
+
+
+def test_generate_commandability_contract_docs(tmp_path: Path) -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commandability = make_valid_commandability()
+
+    generated_files = generate_markdown_docs(model, tmp_path)
+
+    commandability_path = tmp_path / "commandability.md"
+    generated_names = {path.name for path in generated_files}
+
+    assert "commandability.md" in generated_names
+    assert commandability_path.exists()
+
+    content = commandability_path.read_text(encoding="utf-8")
+
+    assert "# Commandability and Autonomy Contract Reference" in content
+    assert "contract assumptions only" in content
+    assert "`ground_operator`" in content
+    assert "`onboard_autonomy`" in content
+    assert "`payload_start_ground_rule`" in content
+    assert "`payload.start_acquisition`" in content
+    assert "`payload.acquisition_started`" in content
+    assert "payload `demo_iod_payload` lifecycle -> `ACQUIRING`" in content
+    assert "`stop_payload_on_battery_low`" in content
+    assert "`eps.battery_low_fault`" in content
+    assert "`payload.stop_acquisition`" in content
+    assert "`payload_battery_low_recovery`" in content
+    assert "`DEGRADED`" in content
+
+
+def test_commandability_docs_are_skipped_without_commandability_contracts(
+    tmp_path: Path,
+) -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commandability = CommandabilityContracts()
+
+    generated_files = generate_markdown_docs(model, tmp_path)
+    generated_names = {path.name for path in generated_files}
+
+    assert "commandability.md" not in generated_names
+    assert not (tmp_path / "commandability.md").exists()
