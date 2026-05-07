@@ -3,8 +3,8 @@ from __future__ import annotations
 from orbitfabric.lint.finding import LintFinding
 from orbitfabric.model.mission import (
     AutonomousActionContract,
-    CommandSource,
     CommandabilityRule,
+    CommandSource,
     MissionModel,
     RecoveryIntent,
 )
@@ -53,7 +53,10 @@ def _check_command_source(
             )
         )
 
-    if source.contact_profile is not None and source.contact_profile not in model.contact_profile_ids:
+    if (
+        source.contact_profile is not None
+        and source.contact_profile not in model.contact_profile_ids
+    ):
         findings.append(
             LintFinding(
                 severity="ERROR",
@@ -65,7 +68,10 @@ def _check_command_source(
                     "command source references unknown contact profile "
                     f"'{source.contact_profile}'"
                 ),
-                suggestion="Add the contact profile to contacts.yaml or fix source.contact_profile.",
+                suggestion=(
+                    "Add the contact profile to contacts.yaml or fix "
+                    "source.contact_profile."
+                ),
             )
         )
 
@@ -207,7 +213,10 @@ def _check_autonomous_action(
                 domain="autonomous_actions",
                 object_id=action.id,
                 message="autonomous action lacks expected events or effects",
-                suggestion="Add expected_events or expected_effects to make the assumption testable.",
+                suggestion=(
+                    "Add expected_events or expected_effects to make the "
+                    "assumption testable."
+                ),
             )
         )
 
@@ -278,12 +287,27 @@ def _check_recovery_intent(
         )
 
     if recovery_intent.fault is not None and recovery_intent.fault not in model.fault_ids:
-        findings.append(_unknown_recovery_reference(recovery_intent, "fault", recovery_intent.fault))
+        findings.append(
+            _unknown_recovery_reference(
+                recovery_intent,
+                "fault",
+                recovery_intent.fault,
+            )
+        )
 
     if recovery_intent.event is not None and recovery_intent.event not in model.event_ids:
-        findings.append(_unknown_recovery_reference(recovery_intent, "event", recovery_intent.event))
+        findings.append(
+            _unknown_recovery_reference(
+                recovery_intent,
+                "event",
+                recovery_intent.event,
+            )
+        )
 
-    if recovery_intent.target_mode is not None and recovery_intent.target_mode not in model.mode_ids:
+    if (
+        recovery_intent.target_mode is not None
+        and recovery_intent.target_mode not in model.mode_ids
+    ):
         findings.append(
             _unknown_recovery_reference(recovery_intent, "mode", recovery_intent.target_mode)
         )
@@ -327,7 +351,9 @@ def _check_high_risk_commands_have_confirmation_intent(
     model: MissionModel,
 ) -> list[LintFinding]:
     commandability_by_command = {
-        rule.command: rule for rule in model.commandability.rules if rule.command in model.command_ids
+        rule.command: rule
+        for rule in model.commandability.rules
+        if rule.command in model.command_ids
     }
     findings: list[LintFinding] = []
 
