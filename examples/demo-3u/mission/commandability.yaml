@@ -1,0 +1,97 @@
+commandability:
+  sources:
+    - id: ground_operator
+      type: ground
+      requires_contact: true
+      contact_profile: primary_ground_contact
+      description: Abstract ground-originated command source used by the demo mission.
+
+    - id: onboard_autonomy
+      type: autonomous
+      requires_contact: false
+      description: Abstract onboard autonomous command source used by contract-level recovery assumptions.
+
+  rules:
+    - id: payload_start_ground_rule
+      command: payload.start_acquisition
+      sources:
+        - ground_operator
+      allowed_modes:
+        - NOMINAL
+      confirmation: required
+      timeout_ms: 1000
+      expected_events:
+        - payload.acquisition_started
+      expected_effects:
+        payload_lifecycle:
+          payload: demo_iod_payload
+          state: ACQUIRING
+        telemetry:
+          payload.acquisition.active: true
+        mode_transition:
+          to: PAYLOAD_ACTIVE
+      description: Payload acquisition may be commanded from ground during nominal operations.
+
+  autonomous_actions:
+    - id: stop_payload_on_battery_low
+      trigger:
+        fault: eps.battery_low_fault
+      dispatches:
+        command: payload.stop_acquisition
+        source: onboard_autonomy
+      expected_events:
+        - payload.acquisition_stopped
+      expected_effects:
+        payload_lifecycle:
+          payload: demo_iod_payload
+          state: READY
+        telemetry:
+          payload.acquisition.active: false
+      description: Contract-level autonomous recovery assumption for low battery conditions.
+
+    - id: stop_payload_on_battery_critical
+      trigger:
+        fault: eps.battery_critical_fault
+      dispatches:
+        command: payload.stop_acquisition
+        source: onboard_autonomy
+      expected_events:
+        - payload.acquisition_stopped
+      expected_effects:
+        payload_lifecycle:
+          payload: demo_iod_payload
+          state: READY
+        telemetry:
+          payload.acquisition.active: false
+      description: Contract-level autonomous recovery assumption for critical battery conditions.
+
+  recovery_intents:
+    - id: payload_battery_low_recovery
+      fault: eps.battery_low_fault
+      target_mode: DEGRADED
+      commands:
+        - payload.stop_acquisition
+      expected_events:
+        - payload.acquisition_stopped
+      expected_effects:
+        payload_lifecycle:
+          payload: demo_iod_payload
+          state: READY
+        telemetry:
+          payload.acquisition.active: false
+      description: Declared recovery intent for payload activity during low battery conditions.
+
+    - id: payload_battery_critical_recovery
+      fault: eps.battery_critical_fault
+      target_mode: SAFE
+      commands:
+        - payload.stop_acquisition
+      expected_events:
+        - payload.acquisition_stopped
+      expected_effects:
+        payload_lifecycle:
+          payload: demo_iod_payload
+          state: READY
+        telemetry:
+          payload.acquisition.active: false
+      description: Declared recovery intent for payload activity during critical battery conditions.

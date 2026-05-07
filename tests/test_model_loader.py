@@ -126,10 +126,21 @@ def test_load_demo_mission() -> None:
     assert len(model.contacts.link_profiles) == 1
     assert len(model.contacts.contact_windows) == 1
     assert len(model.contacts.downlink_flows) == 1
-    assert model.commandability.sources == []
-    assert model.commandability.rules == []
-    assert model.commandability.autonomous_actions == []
-    assert model.commandability.recovery_intents == []
+    assert len(model.commandability.sources) == 2
+    assert len(model.commandability.rules) == 1
+    assert len(model.commandability.autonomous_actions) == 2
+    assert len(model.commandability.recovery_intents) == 2
+
+    assert model.command_source_ids == {"ground_operator", "onboard_autonomy"}
+    assert model.commandability_rule_ids == {"payload_start_ground_rule"}
+    assert model.autonomous_action_ids == {
+        "stop_payload_on_battery_low",
+        "stop_payload_on_battery_critical",
+    }
+    assert model.recovery_intent_ids == {
+        "payload_battery_low_recovery",
+        "payload_battery_critical_recovery",
+    }
 
 
 def test_load_demo_payload_contract() -> None:
