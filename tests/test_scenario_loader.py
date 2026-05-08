@@ -13,6 +13,7 @@ from orbitfabric.model.errors import MissionModelError
 from orbitfabric.model.scenario_loader import ScenarioLoader
 
 DEMO_SCENARIO = Path("examples/demo-3u/scenarios/battery_low_during_payload.yaml")
+PAYLOAD_SCENARIO = Path("examples/demo-3u/scenarios/nominal_payload_acquisition.yaml")
 runner = CliRunner()
 
 
@@ -23,6 +24,13 @@ def test_load_demo_scenario() -> None:
     assert loaded.mission_model.spacecraft.id == "demo-3u"
     assert loaded.scenario.initial_state.mode == "NOMINAL"
     assert len(loaded.scenario.steps) == 13
+
+
+def test_load_payload_scenario_with_data_flow_expectation() -> None:
+    loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
+
+    assert loaded.scenario.scenario.id == "nominal_payload_acquisition"
+    assert len(loaded.scenario.steps) == 12
 
 
 def test_sim_cli_loads_demo_scenario() -> None:
@@ -141,6 +149,48 @@ def test_scenario_loader_rejects_invalid_references(
     assert any(diagnostic.suggestion for diagnostic in exc_info.value.diagnostics)
 
 
+@pytest.mark.parametrize(
+    ("old", "new", "expected_code"),
+    [
+        (
+            "data_product: payload.radiation_histogram",
+            "data_product: payload.unknown_product",
+            "OF-SCN-014",
+        ),
+        (
+            "triggered_by_command: payload.start_acquisition",
+            "triggered_by_command: payload.unknown_command",
+            "OF-SCN-015",
+        ),
+        (
+            "eligible_downlink_flow: science_next_available_contact",
+            "eligible_downlink_flow: unknown_flow",
+            "OF-SCN-016",
+        ),
+        (
+            "contact_window: demo_contact_001",
+            "contact_window: unknown_contact_window",
+            "OF-SCN-017",
+        ),
+    ],
+)
+def test_scenario_loader_rejects_invalid_data_flow_references(
+    tmp_path: Path,
+    old: str,
+    new: str,
+    expected_code: str,
+) -> None:
+    scenario_path = _copy_payload_scenario_with_replacement(tmp_path, old, new)
+
+    with pytest.raises(MissionModelError) as exc_info:
+        ScenarioLoader().load(scenario_path)
+
+    codes = {diagnostic.code for diagnostic in exc_info.value.diagnostics}
+
+    assert expected_code in codes
+    assert any(diagnostic.suggestion for diagnostic in exc_info.value.diagnostics)
+
+
 def test_scenario_loader_rejects_missing_required_top_level_key(tmp_path: Path) -> None:
     scenario_path = tmp_path / "missing-steps.yaml"
     scenario_path.write_text(
@@ -213,5 +263,21 @@ def _copy_demo_scenario_with_mutation(
     scenario_path = demo_dir / "scenarios" / "battery_low_during_payload.yaml"
     scenario = scenario_path.read_text(encoding="utf-8")
     scenario_path.write_text(mutate(scenario), encoding="utf-8")
+
+    return scenario_path
+
+
+def _copy_payload_scenario_with_replacement(
+    tmp_path: Path,
+    old: str,
+    new: str,
+) -> Path:
+    source = Path("examples/demo-3u")
+    demo_dir = tmp_path / "demo-3u"
+    shutil.copytree(source, demo_dir)
+
+    scenario_path = demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
+    scenario = scenario_path.read_text(encoding="utf-8")
+    scenario_path.write_text(scenario.replace(old, new, 1), encoding="utf-8")
 
     return scenario_path

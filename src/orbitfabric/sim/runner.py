@@ -297,6 +297,7 @@ class ScenarioRunner:
 
         if step.expect is not None:
             self._check_payload_lifecycle_expectation(step, state)
+            self._check_data_flow_expectation(step, state)
             self._check_scenario_status_expectation(step, state)
 
     def _check_telemetry_expectations(
@@ -350,6 +351,37 @@ class ScenarioRunner:
             )
         else:
             state.log(step.t, f"PAYLOAD {payload_id} LIFECYCLE={actual_state}")
+
+    def _check_data_flow_expectation(
+        self,
+        step: ScenarioStep,
+        state: SimulationState,
+    ) -> None:
+        if step.expect is None:
+            return
+
+        expected_data_flow = step.expect.get("data_flow")
+        if not isinstance(expected_data_flow, dict):
+            return
+
+        data_product_id = expected_data_flow.get("data_product")
+        if not isinstance(data_product_id, str):
+            state.fail_expectation(step.t, "invalid data flow expectation")
+            return
+
+        evidence = _find_data_flow_evidence(state, data_product_id)
+        if evidence is None:
+            state.fail_expectation(
+                step.t,
+                f"missing data flow evidence for {data_product_id}",
+            )
+            return
+
+        mismatches = _data_flow_expectation_mismatches(expected_data_flow, evidence)
+        if mismatches:
+            state.fail_expectation(step.t, "; ".join(mismatches))
+        else:
+            state.log(step.t, f"DATA_FLOW {data_product_id} EXPECTATION_MET")
 
     def _check_scenario_status_expectation(
         self,
@@ -439,6 +471,60 @@ def _downlink_intent_to_dict(
         "declared": downlink.policy is not None,
         "policy": downlink.policy,
     }
+
+
+def _find_data_flow_evidence(
+    state: SimulationState,
+    data_product_id: str,
+) -> SimDataFlowEvidenceRecord | None:
+    for evidence in reversed(state.data_flow_evidence):
+        if evidence.data_product_id == data_product_id:
+            return evidence
+
+    return None
+
+
+def _data_flow_expectation_mismatches(
+    expected: dict[str, Any],
+    evidence: SimDataFlowEvidenceRecord,
+) -> list[str]:
+    mismatches: list[str] = []
+
+    triggered_by_command = expected.get("triggered_by_command")
+    if triggered_by_command is not None and triggered_by_command != evidence.command_id:
+        mismatches.append(
+            f"expected data flow command {triggered_by_command} "
+            f"but got {evidence.command_id}"
+        )
+
+    storage_declared = expected.get("storage_intent_declared")
+    if storage_declared is not None:
+        actual = evidence.storage_intent.get("declared")
+        if storage_declared != actual:
+            mismatches.append(
+                f"expected storage_intent_declared={storage_declared} but got {actual}"
+            )
+
+    downlink_declared = expected.get("downlink_intent_declared")
+    if downlink_declared is not None:
+        actual = evidence.downlink_intent.get("declared")
+        if downlink_declared != actual:
+            mismatches.append(
+                f"expected downlink_intent_declared={downlink_declared} but got {actual}"
+            )
+
+    eligible_downlink_flow = expected.get("eligible_downlink_flow")
+    if eligible_downlink_flow is not None:
+        if eligible_downlink_flow not in evidence.eligible_downlink_flows:
+            mismatches.append(
+                f"expected eligible downlink flow {eligible_downlink_flow}"
+            )
+
+    contact_window = expected.get("contact_window")
+    if contact_window is not None and contact_window not in evidence.contact_windows:
+        mismatches.append(f"expected contact window {contact_window}")
+
+    return mismatches
 
 
 def _format_value(value: Any) -> str:
