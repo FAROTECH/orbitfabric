@@ -27,6 +27,7 @@ def test_simulation_result_to_dict_for_demo_scenario() -> None:
     assert payload["scenario"] == "battery_low_during_payload"
     assert payload["result"] == "passed"
     assert payload["summary"]["failed_expectations"] == 0
+    assert payload["summary"]["data_flow_evidence"] == 1
     assert payload["final_state"]["mode"] == "DEGRADED"
     assert payload["final_state"]["telemetry"]["payload.acquisition.active"] is False
 
@@ -40,6 +41,28 @@ def test_simulation_result_to_dict_for_demo_scenario() -> None:
         if command["dispatch"] == "AUTO"
     }
     assert "payload.stop_acquisition" in auto_commands
+
+    assert payload["data_flow_evidence"] == [
+        {
+            "t": 5,
+            "data_product_id": "payload.radiation_histogram",
+            "producer": "demo_iod_payload",
+            "producer_type": "payload",
+            "triggered_by_command": "payload.start_acquisition",
+            "storage_intent": {
+                "declared": True,
+                "class": "science",
+                "retention": "7d",
+                "overflow_policy": "drop_oldest",
+            },
+            "downlink_intent": {
+                "declared": True,
+                "policy": "next_available_contact",
+            },
+            "eligible_downlink_flows": ["science_next_available_contact"],
+            "contact_windows": ["demo_contact_001"],
+        }
+    ]
 
 
 def test_sim_command_writes_json_report(tmp_path: Path) -> None:
@@ -66,3 +89,6 @@ def test_sim_command_writes_json_report(tmp_path: Path) -> None:
     assert payload["scenario"] == "battery_low_during_payload"
     assert payload["result"] == "passed"
     assert payload["summary"]["failed_expectations"] == 0
+    assert payload["summary"]["data_flow_evidence"] == 1
+    assert payload["data_flow_evidence"][0]["data_product_id"] == "payload.radiation_histogram"
+    assert payload["data_flow_evidence"][0]["triggered_by_command"] == "payload.start_acquisition"
