@@ -12,6 +12,7 @@ from orbitfabric.sim.json_report import simulation_result_to_dict
 from orbitfabric.sim.runner import ScenarioRunner
 
 DEMO_SCENARIO = Path("examples/demo-3u/scenarios/battery_low_during_payload.yaml")
+DATA_FLOW_SCENARIO = Path("examples/demo-3u/scenarios/payload_data_flow_evidence.yaml")
 runner = CliRunner()
 
 
@@ -65,6 +66,25 @@ def test_simulation_result_to_dict_for_demo_scenario() -> None:
     ]
 
 
+def test_simulation_result_to_dict_for_data_flow_evidence_scenario() -> None:
+    loaded = ScenarioLoader().load(DATA_FLOW_SCENARIO)
+    result = ScenarioRunner().run(loaded)
+
+    payload = simulation_result_to_dict(result)
+
+    assert payload["mission"] == "demo-3u"
+    assert payload["scenario"] == "payload_data_flow_evidence"
+    assert payload["result"] == "passed"
+    assert payload["summary"]["data_flow_evidence"] == 1
+    assert payload["summary"]["failed_expectations"] == 0
+    assert payload["data_flow_evidence"][0]["data_product_id"] == (
+        "payload.radiation_histogram"
+    )
+    assert payload["data_flow_evidence"][0]["triggered_by_command"] == (
+        "payload.start_acquisition"
+    )
+
+
 def test_sim_command_writes_json_report(tmp_path: Path) -> None:
     output_path = tmp_path / "battery_low_report.json"
 
@@ -92,3 +112,31 @@ def test_sim_command_writes_json_report(tmp_path: Path) -> None:
     assert payload["summary"]["data_flow_evidence"] == 1
     assert payload["data_flow_evidence"][0]["data_product_id"] == "payload.radiation_histogram"
     assert payload["data_flow_evidence"][0]["triggered_by_command"] == "payload.start_acquisition"
+
+
+def test_sim_command_writes_data_flow_evidence_json_report(tmp_path: Path) -> None:
+    output_path = tmp_path / "payload_data_flow_evidence_report.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "sim",
+            str(DATA_FLOW_SCENARIO),
+            "--json",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert output_path.exists()
+    assert "JSON report written to" in result.output
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+    assert payload["scenario"] == "payload_data_flow_evidence"
+    assert payload["result"] == "passed"
+    assert payload["summary"]["data_flow_evidence"] == 1
+    assert payload["summary"]["failed_expectations"] == 0
+    assert payload["data_flow_evidence"][0]["data_product_id"] == (
+        "payload.radiation_histogram"
+    )
