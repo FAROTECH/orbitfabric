@@ -35,6 +35,35 @@ def test_lint_loads_demo_mission() -> None:
     assert "Result: PASSED" in result.output
 
 
+def test_gen_data_flow_docs_writes_markdown(tmp_path: Path) -> None:
+    output_file = tmp_path / "data_flow.md"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "data-flow",
+            "examples/demo-3u/mission",
+            "--output-file",
+            str(output_file),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Data Flow Docs Generator {__version__}" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert f"Generated file: {output_file}" in result.output
+    assert "Result: PASSED" in result.output
+    assert output_file.exists()
+
+    content = output_file.read_text(encoding="utf-8")
+    assert "# Mission Data Flow Evidence Reference" in content
+    assert "`payload.start_acquisition`" in content
+    assert "`payload.radiation_histogram`" in content
+    assert "`science_next_available_contact`" in content
+    assert "`demo_contact_001`" in content
+
+
 def test_inspect_mission_loads_demo_mission() -> None:
     result = runner.invoke(app, ["inspect", "mission", "examples/demo-3u/mission"])
 

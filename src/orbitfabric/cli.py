@@ -6,6 +6,7 @@ from typing import Annotated
 import typer
 
 from orbitfabric import __version__
+from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.lint.finding import LintReport
@@ -148,6 +149,50 @@ def gen_docs(
     for path in generated_files:
         typer.echo(f"  {path}")
 
+    typer.echo("\nResult: PASSED")
+
+
+@gen_app.command("data-flow")
+def gen_data_flow(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to generate data-flow documentation.",
+        ),
+    ],
+    output_file: Annotated[
+        Path,
+        typer.Option(
+            "--output-file",
+            help="Markdown file where data-flow documentation will be written.",
+        ),
+    ] = Path("generated/docs/data_flow.md"),
+) -> None:
+    """Generate Markdown data-flow documentation from a Mission Model."""
+    typer.echo(f"OrbitFabric Data Flow Docs Generator {__version__}")
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    report = LintEngine().run(model)
+    if report.has_errors:
+        _print_loaded_model_summary(model)
+        _print_lint_report(report)
+        typer.echo("\nData-flow documentation generation aborted because lint errors exist.")
+        raise typer.Exit(code=1)
+
+    generated_file = generate_data_flow_markdown_doc(model, output_file)
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo(f"Generated file: {generated_file}")
     typer.echo("\nResult: PASSED")
 
 
