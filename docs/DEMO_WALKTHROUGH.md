@@ -46,7 +46,8 @@ examples/demo-3u/
 │   └── commandability.yaml
 └── scenarios/
     ├── battery_low_during_payload.yaml
-    └── nominal_payload_acquisition.yaml
+    ├── nominal_payload_acquisition.yaml
+    └── payload_data_flow_evidence.yaml
 ```
 
 The `mission/` directory contains the Mission Model.
@@ -57,163 +58,53 @@ The `scenarios/` directory contains executable operational scenarios.
 
 ## 3. Mission Model files
 
-### `spacecraft.yaml`
+The Mission Model defines the synthetic spacecraft, subsystems, modes, telemetry, commands, events, faults, packets and policies.
 
-Defines the synthetic spacecraft identity and Mission Model version.
-
-### `subsystems.yaml`
-
-Defines the demo subsystems:
+It also defines optional contract domains:
 
 ```text
-obc
-eps
-payload
-radio
+payloads.yaml          -> synthetic IOD payload contract
+data_products.yaml     -> synthetic payload data product contract
+contacts.yaml          -> synthetic contact/downlink assumptions
+commandability.yaml    -> synthetic commandability/autonomy assumptions
 ```
 
-These are generic synthetic subsystem abstractions.
-
-### `modes.yaml`
-
-Defines the operational modes:
-
-```text
-BOOT
-NOMINAL
-PAYLOAD_ACTIVE
-DEGRADED
-SAFE
-MAINTENANCE
-```
-
-It also defines allowed mode transitions.
-
-### `telemetry.yaml`
-
-Defines telemetry items such as:
-
-```text
-obc.mode
-eps.battery.voltage
-eps.battery.current
-payload.acquisition.active
-radio.downlink.available
-```
-
-Telemetry items include source subsystem, type, unit, sampling, criticality, persistence and downlink priority.
-
-### `commands.yaml`
-
-Defines commands such as:
-
-```text
-payload.start_acquisition
-payload.stop_acquisition
-eps.get_status
-radio.downlink_housekeeping
-```
-
-Commands define target subsystem, arguments, allowed modes, ACK policy, timeout, risk, emitted events and expected effects.
-
-### `events.yaml`
-
-Defines events emitted by commands and faults.
-
-### `faults.yaml`
-
-Defines synthetic fault logic.
-
-The key fault in the demo is:
-
-```text
-eps.battery_low_fault
-```
-
-It monitors:
-
-```text
-eps.battery.voltage
-```
-
-and triggers a recovery action when voltage remains below a synthetic warning threshold.
-
-### `packets.yaml`
-
-Defines synthetic packet groupings for generated documentation and future integration artifacts.
-
-### `policies.yaml`
-
-Defines allowed policy values used by the model.
-
-### `payloads.yaml`
-
-Defines the synthetic IOD payload contract:
-
-```text
-demo_iod_payload
-```
-
-The contract describes payload lifecycle, telemetry references, accepted commands and generated events without introducing payload firmware, drivers or physical simulation.
-
-### `data_products.yaml`
-
-Defines one synthetic data product:
+The key declared data product is:
 
 ```text
 payload.radiation_histogram
+        producer: demo_iod_payload
+        type: histogram
+        estimated size: 4096 bytes
+        priority: high
+        storage class: science
+        retention: 7d
+        overflow policy: drop_oldest
+        downlink policy: next_available_contact
 ```
 
-It is produced by `demo_iod_payload` and declares:
-
-```text
-type: histogram
-estimated size: 4096 bytes
-priority: high
-storage class: science
-retention: 7d
-overflow policy: drop_oldest
-downlink policy: next_available_contact
-```
-
-This is contract intent only. It does not implement storage or downlink execution.
-
-### `contacts.yaml`
-
-Defines one synthetic Contact and Downlink Contract slice:
+The key declared downlink path is:
 
 ```text
 primary_ground_contact
-uhf_downlink_nominal
-demo_contact_001
-science_next_available_contact
+        link: uhf_downlink_nominal
+        window: demo_contact_001
+        flow: science_next_available_contact
+        eligible data product: payload.radiation_histogram
 ```
 
-The downlink flow makes this data product eligible for the declared contact/link path:
-
-```text
-payload.radiation_histogram
-```
-
-This is contract intent only. It does not implement contact scheduling, RF behavior, onboard downlink queues or ground operations.
-
-### `commandability.yaml`
-
-Defines one synthetic Commandability and Autonomy Contract slice:
+The key commandability slice is:
 
 ```text
 ground_operator
+        -> payload.start_acquisition commandability rule
+
 onboard_autonomy
-payload_start_ground_rule
-stop_payload_on_battery_low
-stop_payload_on_battery_critical
-payload_battery_low_recovery
-payload_battery_critical_recovery
+        -> stop payload on low/critical battery faults
+        -> recovery intents toward DEGRADED and SAFE
 ```
 
-The commandability contract makes explicit that `payload.start_acquisition` is ground-commandable in `NOMINAL`, while low/critical battery recovery assumptions may dispatch `payload.stop_acquisition` through `onboard_autonomy`.
-
-This is contract intent only. It does not implement live uplink, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
+These are contract assumptions only. They do not implement live uplink, operator authentication, real onboard storage, real downlink queues, real contact scheduling, RF behavior or ground operations.
 
 ---
 
@@ -224,35 +115,18 @@ The demo currently includes:
 ```text
 examples/demo-3u/scenarios/battery_low_during_payload.yaml
 examples/demo-3u/scenarios/nominal_payload_acquisition.yaml
+examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
 `battery_low_during_payload.yaml` demonstrates a degraded recovery path.
 
 `nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
 
+`payload_data_flow_evidence.yaml` demonstrates the v0.6 contract-level data-flow evidence path.
+
 ---
 
 ## 5. Scenario: battery low during payload operation
-
-The battery-low scenario starts in:
-
-```text
-NOMINAL
-```
-
-with initial telemetry:
-
-```text
-obc.mode = NOMINAL
-eps.battery.voltage = 7.4
-eps.battery.current = 0.4
-payload.acquisition.active = false
-radio.downlink.available = true
-```
-
----
-
-## 6. Scenario timeline
 
 The battery-low scenario demonstrates this operational sequence:
 
@@ -269,16 +143,65 @@ payload.start_acquisition
 → SCENARIO PASSED
 ```
 
-The data product, contact/downlink and commandability/autonomy contracts are not executed as storage, downlink, uplink or autonomy runtime behavior by this scenario yet.
+This remains a deterministic host-side operational scenario.
 
-They document declared mission-data, downlink-flow, commandability and recovery assumptions and prepare the model for future end-to-end mission data flow evidence.
+It does not execute storage, downlink, live uplink or autonomy runtime behavior.
 
 ---
 
-## 7. Run the scenario
+## 6. Scenario: payload data-flow evidence
+
+The data-flow evidence scenario demonstrates the v0.6 contract chain:
+
+```text
+payload.start_acquisition
+→ payload.acquisition_started
+→ payload lifecycle ACQUIRING
+→ payload.acquisition.active = true
+→ DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED
+→ DATA_FLOW payload.radiation_histogram EXPECTATION_MET
+→ payload.stop_acquisition
+→ payload.acquisition_stopped
+→ payload lifecycle READY
+→ payload.acquisition.active = false
+→ SCENARIO PASSED
+```
+
+The scenario checks that the command-declared data product effect is traceable to:
+
+```text
+payload.start_acquisition
+        -> payload.radiation_histogram
+        -> storage intent declared
+        -> downlink intent declared
+        -> science_next_available_contact
+        -> demo_contact_001
+```
+
+This is not real payload file generation.
+
+It is not real onboard storage.
+
+It is not downlink queue execution.
+
+It is not contact scheduling.
+
+It is deterministic contract-level evidence generated from the Mission Model and scenario expectations.
+
+---
+
+## 7. Run the scenarios
+
+Battery-low recovery:
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
+```
+
+Payload data-flow evidence:
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
 Expected result:
@@ -291,8 +214,20 @@ Result: PASSED
 
 ## 8. Generate scenario outputs
 
+Battery-low recovery outputs:
+
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+  --json generated/reports/battery_low_during_payload_report.json \
+  --log generated/logs/battery_low_during_payload.log
+```
+
+Data-flow evidence outputs:
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+  --json generated/reports/payload_data_flow_evidence_report.json \
+  --log generated/logs/payload_data_flow_evidence.log
 ```
 
 Generated files:
@@ -300,6 +235,8 @@ Generated files:
 ```text
 generated/reports/battery_low_during_payload_report.json
 generated/logs/battery_low_during_payload.log
+generated/reports/payload_data_flow_evidence_report.json
+generated/logs/payload_data_flow_evidence.log
 ```
 
 ---
@@ -323,14 +260,18 @@ generated/docs/
 ├── payloads.md
 ├── data_products.md
 ├── contacts.md
-└── commandability.md
+├── commandability.md
+└── data_flow.md
 ```
 
-The generated data product documentation exposes storage and downlink intent as contract data.
+The generated data-flow documentation exposes declared command-to-data-product paths and traces storage intent, downlink intent, eligible downlink flows and matching contact windows as contract data.
 
-The generated contact/downlink documentation exposes contact profiles, link profiles, contact windows, declared capacity and downlink flow eligibility as contract data.
+A dedicated generator is also available:
 
-The generated commandability/autonomy documentation exposes command sources, commandability rules, autonomous actions and recovery intents as contract data.
+```bash
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+```
 
 None of these pages describes runtime behavior.
 
@@ -350,9 +291,15 @@ During execution, OrbitFabric checks that:
 - fault conditions are evaluated;
 - mode transitions occur;
 - auto-dispatched recovery commands are recorded;
+- command-declared data product effects record data-flow evidence;
+- data-flow expectations match recorded evidence;
+- storage intent declaration is inspectable;
+- downlink intent declaration is inspectable;
+- eligible downlink flow evidence is inspectable;
+- matching contact window evidence is inspectable;
 - scenario expectations pass.
 
-The simulator does not execute storage, downlink, live uplink or autonomy runtime behavior in the current development preview.
+The simulator does not execute real storage, real downlink, live uplink, contact scheduling or autonomy runtime behavior in the current development preview.
 
 ---
 
@@ -367,14 +314,24 @@ payload.acquisition.active = false
 scenario_status = PASSED
 ```
 
-The important behavior is the contract-level recovery path:
+At the end of the data-flow evidence scenario:
 
 ```text
-EPS warning fault
-  -> transition to DEGRADED
-  -> auto-dispatch payload.stop_acquisition
-  -> payload acquisition inactive
-  -> payload lifecycle READY
+mode = PAYLOAD_ACTIVE
+payload lifecycle = READY
+payload.acquisition.active = false
+data_flow_evidence contains payload.radiation_histogram
+scenario_status = PASSED
+```
+
+The important v0.6 behavior is the contract-level evidence path:
+
+```text
+command accepted
+  -> payload lifecycle and telemetry effects applied
+  -> data product evidence recorded
+  -> storage/downlink/contact intent checked
+  -> scenario evidence produced
 ```
 
 ---
