@@ -11,7 +11,7 @@ From that contract, OrbitFabric validates consistency, generates documentation a
 OrbitFabric is currently at:
 
 ```text
-v0.5 — Commandability and Autonomy Contracts
+v0.6.0 — End-to-End Mission Data Flow Evidence
 ```
 
 The current public preview includes:
@@ -25,10 +25,15 @@ The current public preview includes:
 - optional Data Product and Storage Contracts;
 - optional Contact Windows and Downlink Flow Contracts;
 - optional Commandability and Autonomy Contracts;
+- command-declared data product effects;
 - generated payload documentation;
 - generated data product documentation;
 - generated contact/downlink documentation;
 - generated commandability/autonomy documentation;
+- generated data-flow evidence documentation;
+- JSON lint reports;
+- JSON simulation reports with contract-level data-flow evidence;
+- data-flow scenario assertions;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -42,7 +47,7 @@ Mission Model
   -> data product and storage contracts
   -> contact/downlink contracts
   -> commandability/autonomy contracts
-  -> future end-to-end mission data flow evidence
+  -> end-to-end mission data flow evidence
   -> future runtime and ground artifacts
 ```
 
