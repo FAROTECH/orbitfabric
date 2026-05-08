@@ -14,6 +14,7 @@ from orbitfabric.model.scenario_loader import ScenarioLoader
 
 DEMO_SCENARIO = Path("examples/demo-3u/scenarios/battery_low_during_payload.yaml")
 PAYLOAD_SCENARIO = Path("examples/demo-3u/scenarios/nominal_payload_acquisition.yaml")
+DATA_FLOW_SCENARIO = Path("examples/demo-3u/scenarios/payload_data_flow_evidence.yaml")
 runner = CliRunner()
 
 
@@ -26,10 +27,17 @@ def test_load_demo_scenario() -> None:
     assert len(loaded.scenario.steps) == 13
 
 
-def test_load_payload_scenario_with_data_flow_expectation() -> None:
+def test_load_payload_scenario() -> None:
     loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
 
     assert loaded.scenario.scenario.id == "nominal_payload_acquisition"
+    assert len(loaded.scenario.steps) == 11
+
+
+def test_load_data_flow_evidence_scenario() -> None:
+    loaded = ScenarioLoader().load(DATA_FLOW_SCENARIO)
+
+    assert loaded.scenario.scenario.id == "payload_data_flow_evidence"
     assert len(loaded.scenario.steps) == 12
 
 
@@ -62,6 +70,18 @@ def test_validate_scenario_cli_loads_demo_scenario() -> None:
     assert "Result: PASSED" in result.output
     assert "Timeline:" not in result.output
     assert "COMMAND payload.start_acquisition" not in result.output
+
+
+def test_validate_scenario_cli_loads_data_flow_evidence_scenario() -> None:
+    result = runner.invoke(app, ["validate", "scenario", str(DATA_FLOW_SCENARIO)])
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Scenario Validation {__version__}" in result.output
+    assert "Scenario: payload_data_flow_evidence" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert "Steps: 12" in result.output
+    assert "Result: PASSED" in result.output
+    assert "Timeline:" not in result.output
 
 
 def test_validate_scenario_cli_rejects_unknown_command(tmp_path: Path) -> None:
@@ -180,7 +200,7 @@ def test_scenario_loader_rejects_invalid_data_flow_references(
     new: str,
     expected_code: str,
 ) -> None:
-    scenario_path = _copy_payload_scenario_with_replacement(tmp_path, old, new)
+    scenario_path = _copy_data_flow_scenario_with_replacement(tmp_path, old, new)
 
     with pytest.raises(MissionModelError) as exc_info:
         ScenarioLoader().load(scenario_path)
@@ -267,7 +287,7 @@ def _copy_demo_scenario_with_mutation(
     return scenario_path
 
 
-def _copy_payload_scenario_with_replacement(
+def _copy_data_flow_scenario_with_replacement(
     tmp_path: Path,
     old: str,
     new: str,
@@ -276,7 +296,7 @@ def _copy_payload_scenario_with_replacement(
     demo_dir = tmp_path / "demo-3u"
     shutil.copytree(source, demo_dir)
 
-    scenario_path = demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
+    scenario_path = demo_dir / "scenarios" / "payload_data_flow_evidence.yaml"
     scenario = scenario_path.read_text(encoding="utf-8")
     scenario_path.write_text(scenario.replace(old, new, 1), encoding="utf-8")
 
