@@ -5,7 +5,7 @@ This page documents the diagnostics and lint rules currently implemented by Orbi
 Current documented baseline:
 
 ```text
-v0.5 — Commandability and Autonomy Contracts
+v0.6.0 — End-to-End Mission Data Flow Evidence
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -66,8 +66,6 @@ OrbitFabric diagnostics expose a common diagnostic shape across Mission Model lo
 | `message` | Human-readable explanation. |
 | `suggestion` | Suggested fix, when available. |
 
-The `suggestion` field is intentionally optional, but it should be provided whenever OrbitFabric can recommend a clear and safe corrective action.
-
 ---
 
 ## Rule families
@@ -96,8 +94,6 @@ The `suggestion` field is intentionally optional, but it should be provided when
 ---
 
 ## `OF-SYN-*` — Syntax and file loading diagnostics
-
-These diagnostics are produced while loading a Mission Model directory.
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -133,8 +129,6 @@ commandability.yaml
 ---
 
 ## `OF-STR-*` — Structural diagnostics
-
-These diagnostics are produced during Mission Model structural validation.
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -176,8 +170,6 @@ recovery_intents
 
 ## `OF-REF-*` — Cross-reference diagnostics
 
-These rules check that Mission Model objects reference existing objects.
-
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
 | `OF-REF-001` | `ERROR` | telemetry | Telemetry source does not reference an existing subsystem. | Add the subsystem or fix telemetry `source`. |
@@ -201,19 +193,6 @@ These rules check that Mission Model objects reference existing objects.
 | `OF-TLM-006` | `ERROR` | telemetry | Enum telemetry must define enum values. | Add a non-empty `enum` list. |
 | `OF-TLM-007` | `WARNING` | telemetry | Telemetry quality policy should be defined. | Add a `quality` policy with required/default fields. |
 
-Numeric telemetry types currently checked by `OF-TLM-001`:
-
-```text
-uint8
-uint16
-uint32
-int8
-int16
-int32
-float32
-float64
-```
-
 ---
 
 ## `OF-CMD-*` — Command rules
@@ -223,6 +202,18 @@ float64
 | `OF-CMD-005` | `WARNING` | commands | Command should define `timeout_ms`. | Add `timeout_ms` to make command behavior testable. |
 | `OF-CMD-006` | `WARNING` | commands | Command should define expected effects. | Add `expected_effects` or explicitly justify no expected effects. |
 | `OF-CMD-007` | `ERROR` | commands | A medium, high or critical-risk command is allowed in `SAFE` mode. | Remove `SAFE` from `allowed_modes` or lower the command risk. |
+| `OF-CMD-008` | `ERROR` | commands | `expected_effects.data_products` is not a list or contains a non-string entry. | Set `expected_effects.data_products` to a list of data product IDs declared in `data_products.yaml`. |
+| `OF-CMD-009` | `ERROR` | commands | Command expected effects reference an unknown data product. | Add the data product to `data_products.yaml` or fix `expected_effects.data_products`. |
+
+The v0.6 data-flow evidence path starts from command expected effects such as:
+
+```yaml
+expected_effects:
+  data_products:
+    - payload.radiation_histogram
+```
+
+These rules ensure that the command-to-data-product link is explicit and valid before scenario evidence or generated data-flow documentation depends on it.
 
 ---
 
@@ -264,8 +255,6 @@ float64
 
 ## `OF-PAY-*` — Payload Contract rules
 
-These rules validate optional Payload / IOD Payload Contracts.
-
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
 | `OF-PAY-001` | `ERROR` | payloads | Payload subsystem reference must exist. | Add the subsystem or fix `payload.subsystem`. |
@@ -284,8 +273,6 @@ Payload rules are contract-level rules. They do not validate payload firmware, d
 ---
 
 ## `OF-DP-*` — Data Product Contract rules
-
-These rules validate optional Data Product and Storage Contracts.
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -324,8 +311,6 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ## `OF-CAB-*` — Commandability rule diagnostics
 
-These rules validate optional Commandability and Autonomy Contracts.
-
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
 | `OF-CAB-001` | `ERROR` | commandability_rules | Commandability rule references an unknown command. | Add the command to `commands.yaml` or fix `rule.command`. |
@@ -362,8 +347,6 @@ These rules validate optional Commandability and Autonomy Contracts.
 
 ## `OF-SCN-*` — Scenario diagnostics
 
-These diagnostics are produced while loading or validating an OrbitFabric scenario.
-
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
 | `OF-SCN-000` | `ERROR` | scenario path | Scenario path does not exist or is not a file. | Pass an existing scenario YAML file. |
@@ -380,6 +363,10 @@ These diagnostics are produced while loading or validating an OrbitFabric scenar
 | `OF-SCN-011` | `ERROR` | scenario | A required scenario top-level key is missing. | Add the required key. |
 | `OF-SCN-012` | `ERROR` | scenario | An unexpected scenario top-level key was found. | Remove or rename the unexpected key. |
 | `OF-SCN-013` | `ERROR` | scenario model validation | Scenario typed model validation failed. | Fix the invalid field, missing field or invalid value. |
+| `OF-SCN-014` | `ERROR` | scenario | Scenario data-flow expectation references an unknown data product. | Use a data product defined in `data_products.yaml`. |
+| `OF-SCN-015` | `ERROR` | scenario | Scenario data-flow expectation references an unknown command. | Use a command defined in `commands.yaml`. |
+| `OF-SCN-016` | `ERROR` | scenario | Scenario data-flow expectation references an unknown downlink flow. | Use a downlink flow defined in `contacts.yaml`. |
+| `OF-SCN-017` | `ERROR` | scenario | Scenario data-flow expectation references an unknown contact window. | Use a contact window defined in `contacts.yaml`. |
 
 Required scenario top-level keys:
 
@@ -389,6 +376,21 @@ mission
 initial_state
 steps
 ```
+
+v0.6 data-flow expectations use this shape:
+
+```yaml
+expect:
+  data_flow:
+    data_product: payload.radiation_histogram
+    triggered_by_command: payload.start_acquisition
+    storage_intent_declared: true
+    downlink_intent_declared: true
+    eligible_downlink_flow: science_next_available_contact
+    contact_window: demo_contact_001
+```
+
+These expectations validate contract-level evidence only. They do not execute real storage, downlink, contact scheduling or ground integration behavior.
 
 ---
 
@@ -400,6 +402,7 @@ Current behavior:
 |---|---|
 | `orbitfabric lint <mission-dir>` | Mission Model loading diagnostics, structural diagnostics, semantic lint findings. |
 | `orbitfabric gen docs <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
+| `orbitfabric gen data-flow <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric sim <scenario-file>` | Scenario loading diagnostics, Mission Model loading diagnostics, scenario reference diagnostics and scenario execution failures. |
 
 ---
