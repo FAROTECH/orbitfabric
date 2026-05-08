@@ -43,7 +43,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.5.0
+orbitfabric 0.6.0
 ```
 
 ---
@@ -68,12 +68,13 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.5 Vertical Slice
+## Verify the Current v0.6 Vertical Slice
 
 Run mission lint:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/ \
+  --json generated/reports/lint_report.json
 ```
 
 Generate documentation:
@@ -82,18 +83,36 @@ Generate documentation:
 orbitfabric gen docs examples/demo-3u/mission/
 ```
 
-Run the scenario:
+Generate the dedicated data-flow evidence reference:
 
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+```
+
+Run the battery-low recovery scenario:
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+  --json generated/reports/battery_low_during_payload_report.json \
+  --log generated/logs/battery_low_during_payload.log
+```
+
+Run the data-flow evidence scenario:
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+  --json generated/reports/payload_data_flow_evidence_report.json \
+  --log generated/logs/payload_data_flow_evidence.log
 ```
 
 Expected results:
 
 ```text
-lint      -> Result: PASSED
-gen docs  -> Result: PASSED
-sim       -> Result: PASSED
+lint          -> Result: PASSED
+gen docs      -> Result: PASSED
+gen data-flow -> Result: PASSED
+sim           -> Result: PASSED
 ```
 
 The generated mission documentation should include:
@@ -109,6 +128,7 @@ generated/docs/payloads.md
 generated/docs/data_products.md
 generated/docs/contacts.md
 generated/docs/commandability.md
+generated/docs/data_flow.md
 ```
 
 ---

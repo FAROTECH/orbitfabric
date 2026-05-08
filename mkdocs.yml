@@ -28,11 +28,13 @@ nav:
       - Data Product Contract Model: reference/data-product-contract-model.md
       - Contact and Downlink Contract Model: reference/contact-downlink-contract-model.md
       - Commandability and Autonomy Contract Model: reference/commandability-contract-model.md
+      - Data Flow Evidence: reference/data-flow-evidence.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
       - v0.4.0 Contact Windows and Downlink Flow Contracts: releases/v0.4.0.md
       - v0.5.0 Commandability and Autonomy Contracts: releases/v0.5.0.md
+      - v0.6.0 End-to-End Mission Data Flow Evidence: releases/v0.6.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 

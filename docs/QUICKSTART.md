@@ -19,8 +19,10 @@ Mission Model YAML
   -> Data Product Contract documentation
   -> Contact and Downlink Contract documentation
   -> Commandability and Autonomy Contract documentation
-  -> JSON reports
-  -> simulation log
+  -> Data Flow Evidence documentation
+  -> JSON lint reports
+  -> JSON simulation reports with data-flow evidence
+  -> simulation logs
 ```
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
@@ -84,7 +86,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.5.0
+orbitfabric 0.6.0
 ```
 
 ---
@@ -115,10 +117,11 @@ Result: PASSED
 
 ---
 
-## 8. Validate the demo scenario without executing it
+## 8. Validate demo scenarios without executing them
 
 ```bash
 orbitfabric validate scenario examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric validate scenario examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
 Expected result:
@@ -144,7 +147,8 @@ Result: PASSED
 Generate a JSON lint report:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/ \
+  --json generated/reports/lint_report.json
 ```
 
 Generated output:
@@ -174,7 +178,15 @@ generated/docs/
 ├── payloads.md
 ├── data_products.md
 ├── contacts.md
-└── commandability.md
+├── commandability.md
+└── data_flow.md
+```
+
+Generate only the data-flow evidence reference:
+
+```bash
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
 ```
 
 Generated mission documentation is derived from the validated Mission Model.
@@ -183,7 +195,7 @@ Do not edit generated files manually.
 
 ---
 
-## 11. Run the demo scenario
+## 11. Run the battery-low demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -198,7 +210,9 @@ Result: PASSED
 Generate both JSON report and timeline log:
 
 ```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+  --json generated/reports/battery_low_during_payload_report.json \
+  --log generated/logs/battery_low_during_payload.log
 ```
 
 Generated outputs:
@@ -210,7 +224,35 @@ generated/logs/battery_low_during_payload.log
 
 ---
 
-## 12. What this proves
+## 12. Run the data-flow evidence scenario
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
+```
+
+Expected result:
+
+```text
+Result: PASSED
+```
+
+Generate both JSON report and timeline log:
+
+```bash
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+  --json generated/reports/payload_data_flow_evidence_report.json \
+  --log generated/logs/payload_data_flow_evidence.log
+```
+
+The JSON report includes a `data_flow_evidence` section tracing the declared contract path:
+
+```text
+command -> data product -> storage intent -> downlink intent -> downlink flow -> contact window
+```
+
+---
+
+## 13. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -219,20 +261,24 @@ The current demo proves that OrbitFabric can:
 - validate Mission Model structure;
 - run semantic lint rules;
 - validate payload, data product, contact/downlink and commandability/autonomy references;
+- validate command-declared data product effects;
+- validate scenario data-flow expectation references;
 - generate Markdown documentation;
-- generate payload, data product, contact/downlink and commandability/autonomy documentation;
+- generate payload, data product, contact/downlink, commandability/autonomy and data-flow documentation;
 - inspect a Mission Model summary;
-- validate a scenario without executing it;
-- load a scenario;
+- validate scenarios without executing them;
+- load scenarios;
 - execute deterministic operational sequences;
 - emit events;
 - apply a fault-triggered mode transition;
 - auto-dispatch a recovery command;
+- record contract-level data-flow evidence;
+- assert command-to-data-product-to-contact evidence in a scenario;
 - produce JSON reports and logs.
 
 ---
 
-## 13. What this does not prove
+## 14. What this does not prove
 
 The current demo does not prove:
 
@@ -247,6 +293,7 @@ The current demo does not prove:
 - CCSDS, PUS or CFDP compliance;
 - compatibility with cFS, F Prime, Yamcs or OpenC3;
 - orbital, attitude, power or thermal dynamics;
+- runtime skeleton generation;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current development preview scope.
