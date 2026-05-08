@@ -10,6 +10,48 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ---
 
+## [v0.6.0] — End-to-End Mission Data Flow Evidence
+
+### Added
+
+- Added command-declared data product effects through `expected_effects.data_products`.
+- Added `OF-CMD-008` and `OF-CMD-009` diagnostics for command data product effects.
+- Added simulation data-flow evidence records.
+- Added `data_flow_evidence` to simulation JSON reports.
+- Added `summary.data_flow_evidence` to simulation JSON reports.
+- Added scenario `expect.data_flow` assertions.
+- Added `OF-SCN-014` through `OF-SCN-017` diagnostics for scenario data-flow expectation references.
+- Added the synthetic `payload_data_flow_evidence` demo scenario.
+- Added generated `data_flow.md` documentation output.
+- Added the `orbitfabric gen data-flow` command.
+- Added a dedicated Data Flow Evidence reference page.
+- Added v0.6.0 release notes.
+
+### Changed
+
+- Extended the standard `orbitfabric gen docs` output to include `generated/docs/data_flow.md`.
+- Extended the synthetic `demo-3u` mission evidence chain from commandability/autonomy to contract-level data-flow evidence.
+- Updated public documentation, architecture, roadmap, quickstart, demo walkthrough and report references for v0.6.0.
+- Bumped package and CLI version to `0.6.0`.
+
+### Boundaries
+
+The End-to-End Mission Data Flow Evidence slice intentionally does not introduce:
+
+- real payload file generation;
+- real onboard storage runtime;
+- file-system behavior;
+- compression behavior;
+- real downlink queue execution;
+- real contact scheduling;
+- RF behavior;
+- live ground integration;
+- CCSDS/PUS/CFDP runtime behavior;
+- runtime skeleton generation;
+- flight-ready software.
+
+---
+
 ## [v0.5.0] — Commandability and Autonomy Contracts
 
 ### Added
