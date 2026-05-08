@@ -87,6 +87,9 @@ class ScenarioLoader:
         telemetry_ids = mission_model.telemetry_ids
         command_ids = mission_model.command_ids
         event_ids = mission_model.event_ids
+        data_product_ids = mission_model.data_product_ids
+        downlink_flow_ids = mission_model.downlink_flow_ids
+        contact_window_ids = mission_model.contact_window_ids
 
         if scenario.initial_state.mode not in mode_ids:
             findings.append(
@@ -232,6 +235,18 @@ class ScenarioLoader:
                             )
                         )
 
+            if step.expect is not None:
+                findings.extend(
+                    _validate_data_flow_expectation_references(
+                        expectation=step.expect,
+                        scenario_id=scenario.scenario.id,
+                        data_product_ids=data_product_ids,
+                        command_ids=command_ids,
+                        downlink_flow_ids=downlink_flow_ids,
+                        contact_window_ids=contact_window_ids,
+                    )
+                )
+
         return findings
 
     def _load_yaml_file(
@@ -335,3 +350,93 @@ class ScenarioLoader:
             return mission_path.resolve()
 
         return (scenario_file.parent / mission_path).resolve()
+
+
+def _validate_data_flow_expectation_references(
+    expectation: dict[str, Any],
+    scenario_id: str,
+    data_product_ids: set[str],
+    command_ids: set[str],
+    downlink_flow_ids: set[str],
+    contact_window_ids: set[str],
+) -> list[LintFinding]:
+    data_flow = expectation.get("data_flow")
+    if not isinstance(data_flow, dict):
+        return []
+
+    findings: list[LintFinding] = []
+
+    data_product_id = data_flow.get("data_product")
+    if isinstance(data_product_id, str) and data_product_id not in data_product_ids:
+        findings.append(
+            _scenario_reference_finding(
+                scenario_id=scenario_id,
+                code="OF-SCN-014",
+                message=(
+                    "scenario data flow expectation references unknown data "
+                    f"product '{data_product_id}'"
+                ),
+                suggestion="Use a data product defined in data_products.yaml.",
+            )
+        )
+
+    command_id = data_flow.get("triggered_by_command")
+    if isinstance(command_id, str) and command_id not in command_ids:
+        findings.append(
+            _scenario_reference_finding(
+                scenario_id=scenario_id,
+                code="OF-SCN-015",
+                message=(
+                    "scenario data flow expectation references unknown command "
+                    f"'{command_id}'"
+                ),
+                suggestion="Use a command defined in commands.yaml.",
+            )
+        )
+
+    downlink_flow_id = data_flow.get("eligible_downlink_flow")
+    if isinstance(downlink_flow_id, str) and downlink_flow_id not in downlink_flow_ids:
+        findings.append(
+            _scenario_reference_finding(
+                scenario_id=scenario_id,
+                code="OF-SCN-016",
+                message=(
+                    "scenario data flow expectation references unknown downlink "
+                    f"flow '{downlink_flow_id}'"
+                ),
+                suggestion="Use a downlink flow defined in contacts.yaml.",
+            )
+        )
+
+    contact_window_id = data_flow.get("contact_window")
+    if isinstance(contact_window_id, str) and contact_window_id not in contact_window_ids:
+        findings.append(
+            _scenario_reference_finding(
+                scenario_id=scenario_id,
+                code="OF-SCN-017",
+                message=(
+                    "scenario data flow expectation references unknown contact "
+                    f"window '{contact_window_id}'"
+                ),
+                suggestion="Use a contact window defined in contacts.yaml.",
+            )
+        )
+
+    return findings
+
+
+def _scenario_reference_finding(
+    scenario_id: str,
+    code: str,
+    message: str,
+    suggestion: str,
+) -> LintFinding:
+    return LintFinding(
+        severity="ERROR",
+        code=code,
+        file="scenario.yaml",
+        domain="scenario",
+        object_id=scenario_id,
+        message=message,
+        suggestion=suggestion,
+    )
