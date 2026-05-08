@@ -1,8 +1,8 @@
 # OrbitFabric — Architecture
 
-Version: 0.5.0
-Status: Development preview
-Scope: Mission Data Contract architecture through Commandability and Autonomy Contracts
+Version: 0.6.0  
+Status: Development preview  
+Scope: Mission Data Contract architecture through End-to-End Mission Data Flow Evidence
 
 ---
 
@@ -16,7 +16,7 @@ Its architecture is centered on one primary artifact:
 
 The Mission Data Contract is expressed as a structured Mission Model.
 
-It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, documentation and scenario evidence from one source of truth.
+It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, documentation and scenario evidence from one source of truth.
 
 OrbitFabric is not designed as:
 
@@ -33,9 +33,9 @@ Its architectural role is:
 
 > define, validate, simulate and document the contract between mission design, onboard software, tests, documentation, simulation and future ground integration artifacts.
 
-The current architectural baseline is `v0.5.0 — Commandability and Autonomy Contracts`.
+The current architectural baseline is `v0.6.0 — End-to-End Mission Data Flow Evidence`.
 
-The next architectural step is `v0.6 — End-to-End Mission Data Flow Evidence`.
+The next architectural step is `v0.7 — Generated Runtime Skeletons`.
 
 ---
 
@@ -61,7 +61,7 @@ Future runtime skeletons must be generated from a coherent model, not hand-desig
 
 OrbitFabric must model the Mission Data Chain before generating runtime skeletons.
 
-The current chain direction is:
+The current chain is:
 
 ```text
 Payload behavior
@@ -70,7 +70,7 @@ Payload behavior
         -> Downlink Intent
         -> Contact Windows and Downlink Flow Contracts
         -> Commandability and Autonomy Contracts
-        -> future End-to-End Mission Data Flow Evidence
+        -> End-to-End Mission Data Flow Evidence
         -> future Runtime Skeletons
         -> future Ground Integration Artifacts
 ```
@@ -113,18 +113,6 @@ Ground artifacts must consume the Mission Data Contract.
 
 They must not redefine it.
 
-### 2.8 Clean Core, Extensible Edges
-
-The core must remain small.
-
-Future integrations should be plugins, generators or adapters, not hardcoded assumptions in the core.
-
-### 2.9 Clean-Room Development
-
-All examples, scenarios and code must be original, synthetic or based on public knowledge.
-
-No proprietary mission information belongs in the architecture.
-
 ---
 
 ## 3. High-Level System View
@@ -145,6 +133,7 @@ OrbitFabric
 │   ├── data product contracts
 │   ├── contact/downlink contracts
 │   ├── commandability/autonomy contracts
+│   ├── data-flow evidence contracts
 │   └── scenarios
 │
 ├── Toolchain
@@ -152,64 +141,21 @@ OrbitFabric
 │   ├── orbitfabric validate scenario
 │   ├── orbitfabric lint
 │   ├── orbitfabric gen docs
+│   ├── orbitfabric gen data-flow
 │   └── orbitfabric sim
 │
 ├── Model Layer
-│   ├── YAML loader
-│   ├── typed model objects
-│   ├── structural validation
-│   ├── duplicate ID checks
-│   ├── reference surfaces
-│   └── diagnostics
-│
 ├── Lint Layer
-│   ├── cross-reference validation
-│   ├── engineering rules
-│   ├── payload contract rules
-│   ├── data product contract rules
-│   ├── contact/downlink contract rules
-│   ├── commandability/autonomy contract rules
-│   ├── findings
-│   └── JSON reports
-│
 ├── Simulation Layer
-│   ├── scenario loader
-│   ├── scenario reference validation
-│   ├── scenario runner
-│   ├── simulation clock
-│   ├── telemetry state
-│   ├── payload lifecycle state
-│   ├── command execution
-│   ├── event recording
-│   ├── mode transitions
-│   ├── fault monitoring
-│   └── scenario reports and logs
-│
 ├── Generation Layer
-│   ├── telemetry documentation
-│   ├── command documentation
-│   ├── event documentation
-│   ├── fault documentation
-│   ├── mode documentation
-│   ├── packet documentation
-│   ├── payload contract documentation
-│   ├── data product documentation
-│   └── contact/downlink documentation
-│
 └── Future Extension Layer
-    ├── commandability/autonomy contracts
-    ├── mission data flow evidence
-    ├── runtime skeleton generators
-    ├── ground integration exporters
-    ├── plugin lint rules
-    └── custom generators
 ```
 
 ---
 
-## 4. Current Capability Boundary — v0.5.0
+## 4. Current Capability Boundary — v0.6.0
 
-OrbitFabric v0.5.0 includes:
+OrbitFabric v0.6.0 includes:
 
 ```text
 Mission Model YAML
@@ -225,22 +171,26 @@ payload contract lint rules
 data product contract lint rules
 contact/downlink contract lint rules
 commandability/autonomy contract lint rules
+command-declared data product effect lint rules
+scenario data-flow expectation reference checks
 scenario loading
 scenario reference validation
 host-side deterministic scenario execution
 payload lifecycle scenario behavior
+contract-level data-flow evidence recording
 generated Markdown docs
 generated payload documentation
 generated data product documentation
 generated contact/downlink documentation
 generated commandability/autonomy documentation
+generated data-flow evidence documentation
 JSON lint reports
-JSON scenario reports
+JSON scenario reports with data_flow_evidence
 plain-text scenario logs
 synthetic demo mission
 ```
 
-OrbitFabric v0.5.0 excludes:
+OrbitFabric v0.6.0 excludes:
 
 ```text
 flight runtime
@@ -280,9 +230,7 @@ flight autonomy runtime
 real FDIR or safing logic
 ```
 
-These are not accidental omissions.
-
-They are intentional architectural boundaries.
+These are intentional architectural boundaries.
 
 ---
 
@@ -309,10 +257,6 @@ Typed Mission Model
 The model is loaded once and consumed by multiple downstream layers.
 
 No generator or simulator should independently reinterpret raw YAML.
-
-The Mission Model contains contract data.
-
-The downstream layers validate, render or execute contract-level behavior.
 
 ---
 
@@ -342,7 +286,7 @@ Contact Windows and Downlink Flow Contracts
 Commandability and Autonomy Contracts
       │
       ▼
-Future End-to-End Mission Data Flow Evidence
+End-to-End Mission Data Flow Evidence
 ```
 
 This is the architectural reason OrbitFabric does not jump directly from payload contracts to runtime generation.
@@ -359,9 +303,11 @@ The current CLI exposes these primary commands:
 orbitfabric --version
 orbitfabric lint examples/demo-3u/mission/
 orbitfabric gen docs examples/demo-3u/mission/
+orbitfabric gen data-flow examples/demo-3u/mission/
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 orbitfabric inspect mission examples/demo-3u/mission/
-orbitfabric validate scenario examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric validate scenario examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
 Conceptual CLI structure:
@@ -370,7 +316,8 @@ Conceptual CLI structure:
 orbitfabric
 ├── lint <mission-dir>
 ├── gen
-│   └── docs <mission-dir>
+│   ├── docs <mission-dir>
+│   └── data-flow <mission-dir>
 ├── sim <scenario-file>
 ├── inspect
 │   └── mission <mission-dir>
@@ -396,25 +343,11 @@ These are not current requirements.
 
 ## 8. Model Layer
 
-### 8.1 Responsibility
-
 The Model Layer loads and represents the Mission Model.
 
-It is responsible for:
+It is responsible for reading YAML files, validating top-level domain keys, building typed model objects, detecting duplicate IDs and exposing validated model objects to lint, simulation and generation layers.
 
-- reading YAML files;
-- validating top-level domain keys;
-- building typed model objects;
-- detecting duplicate IDs;
-- exposing object ID sets;
-- exposing validated model objects to lint, simulation and generation layers;
-- producing actionable diagnostics.
-
-### 8.2 Current Mission Model Domains
-
-The current canonical mission directory includes required and optional files.
-
-Required:
+Current required files:
 
 ```text
 spacecraft.yaml
@@ -428,7 +361,7 @@ packets.yaml
 policies.yaml
 ```
 
-Optional:
+Current optional files:
 
 ```text
 payloads.yaml
@@ -437,294 +370,11 @@ contacts.yaml
 commandability.yaml
 ```
 
-### 8.3 Current Typed Model Surface
-
-The current model surface includes:
-
-```text
-MissionModel
-├── spacecraft
-├── subsystems
-├── modes
-├── mode_transitions
-├── telemetry
-├── commands
-├── events
-├── faults
-├── packets
-├── policies
-├── payloads
-├── data_products
-├── contacts
-└── commandability
-```
-
-It also exposes ID helpers such as:
-
-```text
-subsystem_ids
-telemetry_ids
-command_ids
-event_ids
-fault_ids
-packet_ids
-payload_ids
-data_product_ids
-contact_profile_ids
-link_profile_ids
-contact_window_ids
-downlink_flow_ids
-command_source_ids
-commandability_rule_ids
-autonomous_action_ids
-recovery_intent_ids
-mode_ids
-```
-
-### 8.4 Non-Responsibility
-
-The Model Layer must not:
-
-- execute scenarios;
-- generate documentation;
-- decide operational behavior;
-- implement semantic lint policy beyond structural validation;
-- contain mission-specific behavior;
-- contain demo-specific shortcuts;
-- implement storage or downlink runtime behavior.
-
 ---
 
-## 9. Payload Contract Architecture
-
-Payload Contracts are optional Mission Model domains.
-
-They describe mission-specific or IOD payload behavior as contract data.
-
-A payload contract may define:
-
-```text
-payload identity
-linked subsystem
-payload profile
-lifecycle states
-initial lifecycle state
-produced telemetry references
-accepted command references
-generated event references
-possible fault references
-```
-
-Payload Contracts support scenario behavior through command preconditions and expected effects.
-
-Example relationship:
-
-```text
-payload.start_acquisition
-        -> requires demo_iod_payload lifecycle READY
-        -> emits payload.acquisition_started
-        -> sets payload.acquisition.active = true
-        -> moves demo_iod_payload lifecycle to ACQUIRING
-```
-
-Payload Contracts do not describe:
-
-```text
-payload firmware
-payload drivers
-payload bus protocol
-payload runtime execution
-payload scientific processing
-physical payload simulation
-```
-
----
-
-## 10. Data Product and Storage Contract Architecture
-
-Data Product Contracts are optional Mission Model domains.
-
-They describe mission-data objects produced by payloads or subsystems.
-
-A data product contract may define:
-
-```text
-data product identity
-producer reference
-producer type
-optional payload reference
-product type
-estimated size
-priority
-storage class
-retention intent
-overflow policy
-downlink intent
-```
-
-A data product is not telemetry.
-
-Telemetry describes state, measurement or status.
-
-A packet describes transport-oriented grouping.
-
-A data product describes a mission or payload output object that may require storage, retention, priority and future downlink planning.
-
-Current demo example:
-
-```text
-payload.radiation_histogram
-        producer: demo_iod_payload
-        type: histogram
-        estimated size: 4096 bytes
-        storage: science, retention 7d, drop_oldest
-        downlink: next_available_contact
-```
-
-Data Product Contracts do not describe:
-
-```text
-real storage implementation
-file-system behavior
-compression
-payload processing pipelines
-contact windows
-downlink execution
-ground delivery
-```
-
-They describe contract intent only.
-
----
-
-## 11. Contact and Downlink Contract Architecture
-
-Contact and Downlink Contracts are optional Mission Model domains.
-
-They describe declared assumptions about contact opportunities and downlink flow eligibility.
-
-A contact/downlink contract may define:
-
-```text
-contact profile identity
-abstract contact target
-link profile identity
-abstract downlink direction and rate assumption
-contact window identity
-declared start time
-declared duration
-declared capacity
-downlink flow identity
-queue policy intent
-eligible data products
-```
-
-Current demo example:
-
-```text
-primary_ground_contact
-        link: uhf_downlink_nominal
-        window: demo_contact_001
-        flow: science_next_available_contact
-        eligible data product: payload.radiation_histogram
-```
-
-Contact and Downlink Contracts do not describe:
-
-```text
-orbit propagation
-TLE parsing
-ground track computation
-antenna pointing
-RF link budget simulation
-real contact scheduling
-real downlink execution
-onboard downlink queues
-live ground links
-ground station operations
-```
-
-They describe contract assumptions only.
-
----
-
-## 12. Commandability and Autonomy Contract Architecture
-
-Commandability and Autonomy Contracts are optional Mission Model domains.
-
-They describe declared assumptions about command sources, command dispatch intent, autonomous actions and recovery intent.
-
-A commandability/autonomy contract may define:
-
-```text
-command source identity
-source type
-contact requirement
-linked contact profile
-commandability rule identity
-referenced command
-allowed command sources
-allowed modes
-confirmation intent
-timeout expectation
-expected events
-expected effects
-autonomous action trigger
-autonomous command dispatch intent
-recovery intent
-target recovery mode
-```
-
-Current demo example:
-
-```text
-ground_operator
-        -> payload.start_acquisition commandability rule
-
-onboard_autonomy
-        -> stop payload on low/critical battery faults
-        -> recovery intents toward DEGRADED and SAFE
-```
-
-Commandability and Autonomy Contracts do not describe:
-
-```text
-real command authentication
-real command authorization
-encryption
-live uplink services
-operator consoles
-command queues
-onboard schedulers
-flight autonomy runtime
-real FDIR or safing behavior
-```
-
-They describe contract assumptions only.
-
----
-
-## 13. Lint Layer
-
-### 12.1 Responsibility
+## 9. Lint Layer
 
 The Lint Layer performs mission consistency analysis.
-
-It is responsible for:
-
-- semantic validation;
-- cross-reference validation;
-- engineering rule checks;
-- payload contract checks;
-- data product contract checks;
-- contact/downlink contract checks;
-- finding generation;
-- severity assignment;
-- diagnostic formatting;
-- JSON lint report generation;
-- CI-friendly pass/fail decision.
-
-### 12.2 Rule Families
 
 Current rule families:
 
@@ -734,7 +384,7 @@ OF-STR-*   structural validation
 OF-ID-*    identifier and uniqueness rules
 OF-REF-*   cross-reference rules
 OF-TLM-*   telemetry rules
-OF-CMD-*   command rules
+OF-CMD-*   command rules, including data product expected effects
 OF-EVT-*   event rules
 OF-FLT-*   fault rules
 OF-MODE-*  mode and transition rules
@@ -746,38 +396,19 @@ OF-DL-*    downlink flow assumption rules
 OF-CAB-*   commandability rule diagnostics
 OF-AUT-*   autonomous action diagnostics
 OF-REC-*   recovery intent diagnostics
-OF-SCN-*   scenario rules
+OF-SCN-*   scenario rules, including data-flow expectation references
 ```
 
-### 12.3 Pass/Fail Policy
-
-Default behavior:
+v0.6.0 adds explicit validation for:
 
 ```text
-ERROR   -> lint fails
-WARNING -> lint passes with warnings
-INFO    -> lint passes
+command expected_effects.data_products
+scenario expect.data_flow references
 ```
-
-With:
-
-```bash
-orbitfabric lint <mission-dir> --warnings-as-errors
-```
-
-warnings also make lint fail.
-
-### 12.4 Generator Dependency on Lint
-
-Generated documentation should be produced from a structurally valid and semantically acceptable Mission Model.
-
-Documentation generation must not silently continue when lint errors exist.
 
 ---
 
-## 14. Simulation Layer
-
-### 13.1 Responsibility
+## 10. Simulation Layer
 
 The Simulation Layer executes operational scenarios against a validated Mission Model.
 
@@ -788,18 +419,16 @@ It is responsible for:
 - initializing simulation state;
 - executing timeline steps;
 - dispatching commands;
-- evaluating command allowed modes;
 - applying command expected effects;
 - tracking payload lifecycle state;
 - injecting telemetry;
 - evaluating faults;
 - emitting events;
 - applying simple recovery actions;
-- checking expectations;
+- recording contract-level data-flow evidence;
+- checking data-flow expectations;
 - producing logs;
 - producing scenario reports.
-
-### 13.2 Non-Responsibility
 
 The Simulation Layer does not model:
 
@@ -821,31 +450,50 @@ flight qualification semantics
 
 It is an operational consistency simulator, not a spacecraft physics simulator.
 
-### 13.3 Current Scenario Scope
+---
 
-The current demo scenario validates:
+## 11. Data Flow Evidence Architecture
+
+Data Flow Evidence is produced when an accepted command declares data products in `expected_effects.data_products`.
+
+The recorded evidence connects:
 
 ```text
-payload start command
-payload lifecycle READY -> ACQUIRING
-payload acquisition telemetry
-mode transition NOMINAL -> PAYLOAD_ACTIVE
-battery warning fault
-mode transition PAYLOAD_ACTIVE -> DEGRADED
-auto-dispatched payload stop command
-payload lifecycle ACQUIRING -> READY
-scenario pass/fail result
+command id
+data product id
+producer
+producer type
+storage intent
+downlink intent
+eligible downlink flows
+matching contact windows
 ```
 
-Data Product, Contact/Downlink and Commandability/Autonomy Contracts are documented and linted in v0.5.0.
+Scenario assertions may check:
 
-They are not executed as storage, downlink, uplink or autonomy runtime behavior yet.
+```text
+data_product
+triggered_by_command
+storage_intent_declared
+downlink_intent_declared
+eligible_downlink_flow
+contact_window
+```
+
+This evidence is exported in simulation JSON reports under:
+
+```text
+summary.data_flow_evidence
+data_flow_evidence[]
+```
+
+This is contract-level evidence only.
+
+It does not create payload files, write onboard storage, execute downlink queues or schedule contacts.
 
 ---
 
-## 15. Generation Layer
-
-### 14.1 Responsibility
+## 12. Generation Layer
 
 The Generation Layer derives human-readable and machine-readable artifacts from the Mission Model.
 
@@ -862,42 +510,31 @@ generated/docs/payloads.md
 generated/docs/data_products.md
 generated/docs/contacts.md
 generated/docs/commandability.md
+generated/docs/data_flow.md
 ```
 
-### 14.2 Generator Rule
+The standard docs command generates all of these when the relevant contract domains are present:
 
-Generators must consume the validated Mission Model.
+```bash
+orbitfabric gen docs examples/demo-3u/mission/
+```
 
-They must not parse YAML independently.
+The data-flow page can also be generated directly:
 
-This prevents divergence between lint, simulation and documentation.
-
-### 14.3 Current Boundary
+```bash
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+```
 
 The Generation Layer currently generates Markdown documentation and reports.
 
-It does not generate:
-
-```text
-C++ runtime skeletons
-onboard registries
-ground dictionaries
-Yamcs artifacts
-OpenC3 artifacts
-XTCE documents
-```
-
-Those belong to future milestones after the Mission Data Chain is more complete.
+It does not generate runtime skeletons, onboard registries, ground dictionaries, Yamcs artifacts, OpenC3 artifacts or XTCE documents.
 
 ---
 
-## 16. Demo Mission Architecture
+## 13. Demo Mission Architecture
 
 The canonical demo is `demo-3u`.
-
-Purpose:
-
-> demonstrate the Mission Data Contract flow with the smallest coherent synthetic spacecraft mission.
 
 Canonical structure:
 
@@ -918,140 +555,77 @@ examples/demo-3u/
 │   ├── contacts.yaml
 │   └── commandability.yaml
 └── scenarios/
-    └── battery_low_during_payload.yaml
+    ├── battery_low_during_payload.yaml
+    ├── nominal_payload_acquisition.yaml
+    └── payload_data_flow_evidence.yaml
 ```
 
-The demo contains:
+The v0.6 scenario demonstrates:
 
 ```text
-OBC mock
-EPS mock
-Payload mock
-Radio mock
-Payload Contract demo_iod_payload
-Data Product Contract payload.radiation_histogram
-Contact Profile primary_ground_contact
-Link Profile uhf_downlink_nominal
-Contact Window demo_contact_001
-Downlink Flow science_next_available_contact
-Command Source ground_operator
-Command Source onboard_autonomy
-Commandability Rule payload_start_ground_rule
-Autonomous Actions stop payload on low/critical battery faults
-Recovery Intents toward DEGRADED and SAFE
-BOOT
-NOMINAL
-PAYLOAD_ACTIVE
-DEGRADED
-SAFE
-MAINTENANCE
-battery voltage telemetry
-payload acquisition telemetry
-payload start/stop commands
-EPS warning fault
-EPS critical fault
-battery degradation scenario
+payload.start_acquisition
+        -> payload.radiation_histogram
+        -> storage intent declared
+        -> downlink intent declared
+        -> science_next_available_contact
+        -> demo_contact_001
 ```
 
-The demo must stay synthetic.
-
-It must not approximate a private mission.
+The demo must stay synthetic and clean-room.
 
 ---
 
-## 17. Repository Architecture
+## 14. Reports Architecture
 
-Current repository layout:
+Reports are JSON where machine-readable output is required.
 
-```text
-orbitfabric/
-├── README.md
-├── LICENSE
-├── pyproject.toml
-├── mkdocs.yml
-├── .gitignore
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── pages.yml
-│
-├── assets/
-│   └── brand/
-│
-├── docs/
-│   ├── PROJECT_CHARTER.md
-│   ├── CLEAN_ROOM_POLICY.md
-│   ├── ARCHITECTURE.md
-│   ├── ROADMAP.md
-│   ├── QUICKSTART.md
-│   ├── DEMO_WALKTHROUGH.md
-│   ├── reference/
-│   ├── releases/
-│   ├── comms/
-│   └── adr/
-│
-├── examples/
-│   └── demo-3u/
-│       ├── mission/
-│       └── scenarios/
-│
-├── src/
-│   └── orbitfabric/
-│       ├── __init__.py
-│       ├── cli.py
-│       ├── model/
-│       ├── lint/
-│       ├── sim/
-│       ├── gen/
-│       └── reports/
-│
-├── tests/
-└── generated/
+### 14.1 Lint Report
+
+Conceptual shape:
+
+```json
+{
+  "tool": "orbitfabric-lint",
+  "version": "0.6.0",
+  "mission": "demo-3u",
+  "model_version": "0.1.0",
+  "result": "passed",
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "findings": []
+}
 ```
+
+### 14.2 Scenario Report
+
+Conceptual shape:
+
+```json
+{
+  "tool": "orbitfabric-sim",
+  "version": "0.6.0",
+  "scenario": "payload_data_flow_evidence",
+  "mission": "demo-3u",
+  "result": "passed",
+  "summary": {
+    "events": 2,
+    "commands": 2,
+    "mode_transitions": 1,
+    "data_flow_evidence": 1,
+    "failed_expectations": 0
+  },
+  "data_flow_evidence": []
+}
+```
+
+Reports must be stable enough for tests and CI.
 
 ---
 
-## 18. Dependency Architecture
-
-OrbitFabric uses a small dependency set.
-
-Current core dependencies:
-
-```text
-Python 3.11+
-Pydantic v2
-Typer
-PyYAML
-```
-
-Development and documentation dependencies:
-
-```text
-pytest
-ruff
-MkDocs Material
-```
-
-Dependency rule:
-
-> A dependency is allowed only if it directly supports model loading, validation, linting, simulation, documentation generation, testing or CLI usability.
-
-Avoid:
-
-```text
-web frameworks
-databases
-message brokers
-heavy simulation frameworks
-hardware libraries
-CCSDS/PUS libraries
-ground system SDKs
-async frameworks unless necessary
-```
-
----
-
-## 19. Layer Dependency Rules
+## 15. Layer Dependency Rules
 
 Allowed dependencies:
 
@@ -1086,138 +660,7 @@ The Model Layer must remain the lowest stable layer.
 
 ---
 
-## 20. Error and Diagnostics Architecture
-
-OrbitFabric diagnostics should be consistent across loader, lint and simulation.
-
-Diagnostic fields:
-
-```text
-severity
-code
-message
-file
-domain
-object_id
-suggestion
-```
-
-Severity:
-
-```text
-ERROR
-WARNING
-INFO
-```
-
-All user-facing diagnostics must be actionable.
-
-Bad:
-
-```text
-Invalid command.
-```
-
-Good:
-
-```text
-ERROR OF-DP-002 data_products.yaml payload.radiation_histogram producer 'unknown_payload' does not reference an existing payload contract. Add the payload to payloads.yaml or fix data_product.producer.
-```
-
----
-
-## 21. Reports Architecture
-
-Reports are JSON where machine-readable output is required.
-
-### 20.1 Lint Report
-
-Conceptual shape:
-
-```json
-{
-  "tool": "orbitfabric-lint",
-  "version": "0.5.0",
-  "mission": "demo-3u",
-  "model_version": "0.1.0",
-  "result": "passed",
-  "summary": {
-    "errors": 0,
-    "warnings": 0,
-    "info": 0
-  },
-  "findings": []
-}
-```
-
-### 20.2 Scenario Report
-
-Conceptual shape:
-
-```json
-{
-  "tool": "orbitfabric-sim",
-  "version": "0.5.0",
-  "scenario": "battery_low_during_payload",
-  "mission": "demo-3u",
-  "result": "passed",
-  "events": [],
-  "commands": [],
-  "mode_transitions": [],
-  "failed_expectations": []
-}
-```
-
-Reports must be stable enough for tests and CI.
-
----
-
-## 22. Documentation Architecture
-
-OrbitFabric documentation has two classes.
-
-### 21.1 Hand-Written Project Documentation
-
-Examples:
-
-```text
-docs/PROJECT_CHARTER.md
-docs/CLEAN_ROOM_POLICY.md
-docs/ARCHITECTURE.md
-docs/ROADMAP.md
-docs/QUICKSTART.md
-docs/DEMO_WALKTHROUGH.md
-docs/reference/*.md
-docs/releases/*.md
-docs/adr/*.md
-```
-
-These explain the framework.
-
-### 21.2 Generated Mission Documentation
-
-Examples:
-
-```text
-generated/docs/telemetry.md
-generated/docs/commands.md
-generated/docs/events.md
-generated/docs/faults.md
-generated/docs/modes.md
-generated/docs/packets.md
-generated/docs/payloads.md
-generated/docs/data_products.md
-generated/docs/contacts.md
-generated/docs/commandability.md
-```
-
-These document a specific mission model.
-
-Generated docs must not be manually edited.
-
----
-
-## 23. Testing Architecture
+## 16. Testing Architecture
 
 Current test strategy covers:
 
@@ -1229,13 +672,14 @@ cross-reference lint tests
 engineering lint rules
 payload contract lint rules
 data product contract lint rules
-invalid payload contract fixtures
-invalid data product contract fixtures
+contact/downlink contract lint rules
+commandability/autonomy lint rules
+command data-product effect lint rules
 scenario validation tests
+scenario data-flow expectation tests
 scenario execution tests
+data-flow evidence JSON report tests
 documentation generator tests
-JSON report tests
-simulation log writer tests
 CLI smoke tests
 ```
 
@@ -1250,19 +694,15 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 mkdocs build --strict
 ```
 
-The documentation site is deployed separately through the Pages workflow.
-
 ---
 
-## 24. Future Extension Architecture
+## 17. Future Extension Architecture
 
 Future extensions should be added as generators, plugins or adapters.
 
 Possible future layers:
 
 ```text
-Commandability and Autonomy Contract Model
-Mission Data Flow Evidence Generator
 C++ Runtime Skeleton Generator
 Yamcs Export Generator
 OpenC3 Export Generator
@@ -1280,55 +720,28 @@ They must not redefine the mission contract.
 
 ---
 
-## 25. Anti-Patterns
+## 18. Anti-Patterns
 
-The following patterns are architecturally wrong.
+The following patterns are architecturally wrong:
 
-### 24.1 Runtime-First Drift
-
-Adding runtime behavior that is not represented in the Mission Model.
-
-### 24.2 Demo-Driven Special Cases
-
-Hardcoding behavior for `demo-3u` in the framework core.
-
-### 24.3 Hidden Mission Logic
-
-Putting command rules, mode rules, payload lifecycle behavior or data product semantics only in Python.
-
-### 24.4 Premature Standard Compliance
-
-Adding CCSDS/PUS/XTCE/Yamcs/OpenC3 complexity before the model is stable.
-
-### 24.5 Ground Segment Creep
-
-Turning OrbitFabric into a mission control tool.
-
-### 24.6 Flight Framework Creep
-
-Turning OrbitFabric into an incomplete cFS/F Prime alternative.
-
-### 24.7 Simulation Creep
-
-Turning OrbitFabric into a spacecraft dynamics simulator.
-
-### 24.8 Storage Runtime Creep
-
-Turning Data Product Contracts into real onboard storage software.
-
-### 24.9 Downlink Runtime Creep
-
-Turning downlink intent into a real RF link or ground delivery implementation.
-
-### 24.10 Proprietary Example Contamination
-
-Using real private mission details as examples.
+```text
+runtime-first drift
+demo-driven special cases
+hidden mission logic
+premature standard compliance
+ground segment creep
+flight framework creep
+simulation creep
+storage runtime creep
+downlink runtime creep
+proprietary example contamination
+```
 
 ---
 
-## 26. v0.5.0 Acceptance Architecture
+## 19. v0.6.0 Acceptance Architecture
 
-OrbitFabric v0.5.0 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.6.0 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -1340,9 +753,16 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric gen docs examples/demo-3u/mission/
 
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --json generated/reports/battery_low_during_payload_report.json \
   --log generated/logs/battery_low_during_payload.log
+
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+  --json generated/reports/payload_data_flow_evidence_report.json \
+  --log generated/logs/payload_data_flow_evidence.log
 ```
 
 And produces:
@@ -1354,61 +774,33 @@ payload contract documentation
 data product contract documentation
 contact/downlink contract documentation
 commandability/autonomy contract documentation
-scenario execution log
-scenario JSON report
+data-flow evidence documentation
+scenario execution logs
+scenario JSON reports
+data_flow_evidence JSON records
 ```
 
-The result must demonstrate:
-
-```text
-model loading
-structural validation
-semantic linting
-payload contract validation
-data product contract validation
-contact/downlink contract validation
-commandability/autonomy contract validation
-command validation
-event emission
-fault detection
-mode transition
-payload lifecycle transition
-auto-dispatched recovery command
-scenario pass/fail result
-generated documentation
-```
-
-No runtime skeleton, ground export, orbital propagation, RF simulation, storage/downlink runtime, live uplink or autonomy runtime is required for v0.5.0.
+No runtime skeleton, ground export, orbital propagation, RF simulation, storage/downlink runtime, live uplink or autonomy runtime is required for v0.6.0.
 
 ---
 
-## 27. Next Architectural Step — v0.6
+## 20. Next Architectural Step — v0.7
 
 The next architectural step is:
 
 ```text
-v0.6 — End-to-End Mission Data Flow Evidence
+v0.7 — Generated Runtime Skeletons
 ```
 
-The purpose is to combine payload contracts, data products, storage intent, downlink assumptions, contact windows, commandability and recovery expectations into end-to-end mission data flow evidence.
+The purpose is to start deriving onboard-oriented host-buildable skeleton artifacts from the Mission Data Contract.
 
-The expected direction is:
+v0.7 must not claim flight readiness.
 
-```text
-Payload acquisition
-        -> data product generated
-        -> stored onboard by intent
-        -> eligible for downlink by intent
-        -> contact window available by assumption
-        -> downlink flow evidence produced
-        -> recovery/commandability evidence remains inspectable
-```
-
-v0.6 must not implement real onboard storage runtime, real downlink execution, real RF behavior, a live ground segment or an operations console.
+It must not become a replacement for cFS, F Prime or an OBC framework.
 
 ---
 
-## 28. Final Architectural Statement
+## 21. Final Architectural Statement
 
 OrbitFabric is architecturally centered on the Mission Data Contract.
 
@@ -1419,6 +811,8 @@ The lint engine validates the contract.
 The simulator executes deterministic scenarios against the contract.
 
 The documentation generator explains the contract.
+
+The v0.6 data-flow evidence layer proves the first end-to-end Mission Data Chain at contract level.
 
 Future runtime and ground integrations consume the contract.
 
