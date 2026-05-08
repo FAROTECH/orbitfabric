@@ -185,6 +185,41 @@ def test_command_expected_effect_payload_lifecycle_state_must_exist() -> None:
     assert report.has_errors
 
 
+def test_command_expected_effect_data_product_must_exist() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commands[0].expected_effects["data_products"] = [
+        "payload.unknown_data_product"
+    ]
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-CMD-009" in codes
+    assert report.has_errors
+
+
+def test_command_expected_effect_data_products_must_be_list() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commands[0].expected_effects["data_products"] = "payload.radiation_histogram"
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-CMD-008" in codes
+    assert report.has_errors
+
+
+def test_command_expected_effect_data_product_entries_must_be_strings() -> None:
+    model = MissionModelLoader().load(DEMO_MISSION)
+    model.commands[0].expected_effects["data_products"] = [123]
+
+    report = LintEngine().run(model)
+
+    codes = {finding.code for finding in report.findings}
+    assert "OF-CMD-008" in codes
+    assert report.has_errors
+
+
 def test_valid_data_product_contract_has_no_lint_findings() -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     model.data_products.append(make_valid_data_product())
