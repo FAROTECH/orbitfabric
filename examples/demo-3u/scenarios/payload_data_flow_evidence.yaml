@@ -1,7 +1,7 @@
 scenario:
-  id: nominal_payload_acquisition
-  name: Nominal payload acquisition lifecycle
-  description: Synthetic scenario demonstrating a minimal IOD payload lifecycle from READY to ACQUIRING and back to READY.
+  id: payload_data_flow_evidence
+  name: Payload data flow evidence
+  description: Synthetic end-to-end scenario demonstrating contract-level evidence from payload commandability to data product, storage intent, downlink intent and contact assumptions.
 
 mission:
   path: ../mission
@@ -44,6 +44,16 @@ steps:
   - t: 8
     expect_telemetry:
       payload.acquisition.active: true
+
+  - t: 9
+    expect:
+      data_flow:
+        data_product: payload.radiation_histogram
+        triggered_by_command: payload.start_acquisition
+        storage_intent_declared: true
+        downlink_intent_declared: true
+        eligible_downlink_flow: science_next_available_contact
+        contact_window: demo_contact_001
 
   - t: 20
     command: payload.stop_acquisition

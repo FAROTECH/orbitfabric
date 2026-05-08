@@ -12,6 +12,7 @@ from orbitfabric.sim.runner import ScenarioRunner
 
 DEMO_SCENARIO = Path("examples/demo-3u/scenarios/battery_low_during_payload.yaml")
 PAYLOAD_SCENARIO = Path("examples/demo-3u/scenarios/nominal_payload_acquisition.yaml")
+DATA_FLOW_SCENARIO = Path("examples/demo-3u/scenarios/payload_data_flow_evidence.yaml")
 runner = CliRunner()
 
 
@@ -63,7 +64,7 @@ def test_runner_executes_nominal_payload_lifecycle_scenario() -> None:
 
 
 def test_runner_records_data_flow_evidence_for_declared_data_product() -> None:
-    loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
+    loaded = ScenarioLoader().load(DATA_FLOW_SCENARIO)
 
     result = ScenarioRunner().run(loaded)
 
@@ -91,7 +92,7 @@ def test_runner_records_data_flow_evidence_for_declared_data_product() -> None:
 
 
 def test_runner_checks_data_flow_expectation() -> None:
-    loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
+    loaded = ScenarioLoader().load(DATA_FLOW_SCENARIO)
 
     result = ScenarioRunner().run(loaded)
 
@@ -103,7 +104,7 @@ def test_runner_checks_data_flow_expectation() -> None:
 
 
 def test_runner_fails_missing_data_flow_expectation(tmp_path: Path) -> None:
-    scenario_path = _copy_payload_scenario_without_data_product_effect(tmp_path)
+    scenario_path = _copy_data_flow_scenario_without_data_product_effect(tmp_path)
     loaded = ScenarioLoader().load(scenario_path)
 
     result = ScenarioRunner().run(loaded)
@@ -135,13 +136,24 @@ def test_sim_cli_executes_nominal_payload_lifecycle_scenario() -> None:
     assert "PAYLOAD demo_iod_payload LIFECYCLE=READY" in result.output
     assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
     assert "PAYLOAD demo_iod_payload LIFECYCLE=ACQUIRING" in result.output
+    assert "COMMAND payload.stop_acquisition -> ACCEPTED" in result.output
+    assert "Result: PASSED" in result.output
+
+
+def test_sim_cli_executes_data_flow_evidence_scenario() -> None:
+    result = runner.invoke(app, ["sim", str(DATA_FLOW_SCENARIO)])
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Scenario Simulator {__version__}" in result.output
+    assert "Scenario: payload_data_flow_evidence" in result.output
+    assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
     assert "DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED" in result.output
     assert "DATA_FLOW payload.radiation_histogram EXPECTATION_MET" in result.output
     assert "COMMAND payload.stop_acquisition -> ACCEPTED" in result.output
     assert "Result: PASSED" in result.output
 
 
-def _copy_payload_scenario_without_data_product_effect(tmp_path: Path) -> Path:
+def _copy_data_flow_scenario_without_data_product_effect(tmp_path: Path) -> Path:
     source = Path("examples/demo-3u")
     demo_dir = tmp_path / "demo-3u"
     shutil.copytree(source, demo_dir)
@@ -158,4 +170,4 @@ def _copy_payload_scenario_without_data_product_effect(tmp_path: Path) -> Path:
         encoding="utf-8",
     )
 
-    return demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
+    return demo_dir / "scenarios" / "payload_data_flow_evidence.yaml"
