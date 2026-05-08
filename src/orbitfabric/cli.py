@@ -141,6 +141,9 @@ def gen_docs(
         raise typer.Exit(code=1)
 
     generated_files = generate_markdown_docs(model, output_dir)
+    generated_files.append(
+        generate_data_flow_markdown_doc(model, output_dir / "data_flow.md")
+    )
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
