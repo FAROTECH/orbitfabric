@@ -61,6 +61,34 @@ def test_runner_executes_nominal_payload_lifecycle_scenario() -> None:
     assert "payload.stop_acquisition" in ground_commands
 
 
+def test_runner_records_data_flow_evidence_for_declared_data_product() -> None:
+    loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
+
+    result = ScenarioRunner().run(loaded)
+
+    assert result.passed
+    assert len(result.state.data_flow_evidence) == 1
+
+    evidence = result.state.data_flow_evidence[0]
+    assert evidence.t == 5
+    assert evidence.data_product_id == "payload.radiation_histogram"
+    assert evidence.producer == "demo_iod_payload"
+    assert evidence.producer_type == "payload"
+    assert evidence.command_id == "payload.start_acquisition"
+    assert evidence.storage_intent == {
+        "declared": True,
+        "class": "science",
+        "retention": "7d",
+        "overflow_policy": "drop_oldest",
+    }
+    assert evidence.downlink_intent == {
+        "declared": True,
+        "policy": "next_available_contact",
+    }
+    assert evidence.eligible_downlink_flows == ["science_next_available_contact"]
+    assert evidence.contact_windows == ["demo_contact_001"]
+
+
 def test_sim_cli_executes_demo_scenario() -> None:
     result = runner.invoke(app, ["sim", str(DEMO_SCENARIO)])
 
@@ -82,5 +110,6 @@ def test_sim_cli_executes_nominal_payload_lifecycle_scenario() -> None:
     assert "PAYLOAD demo_iod_payload LIFECYCLE=READY" in result.output
     assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
     assert "PAYLOAD demo_iod_payload LIFECYCLE=ACQUIRING" in result.output
+    assert "DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED" in result.output
     assert "COMMAND payload.stop_acquisition -> ACCEPTED" in result.output
     assert "Result: PASSED" in result.output

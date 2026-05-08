@@ -2,12 +2,22 @@ from __future__ import annotations
 
 from typing import Any
 
+from orbitfabric.model.mission import (
+    DataProductContract,
+    DataProductDownlinkIntent,
+    DataProductStorageIntent,
+    MissionModel,
+)
 from orbitfabric.model.scenario import LoadedScenario, ScenarioStep
 from orbitfabric.sim.command_router import CommandDispatchResult, CommandRouter
 from orbitfabric.sim.event_bus import EventBus
 from orbitfabric.sim.fault_monitor import FaultMonitor, FaultTrigger
 from orbitfabric.sim.mode_manager import ModeManager
-from orbitfabric.sim.state import SimulationResult, SimulationState
+from orbitfabric.sim.state import (
+    SimDataFlowEvidenceRecord,
+    SimulationResult,
+    SimulationState,
+)
 from orbitfabric.sim.telemetry_registry import TelemetryRegistry
 
 
@@ -41,6 +51,7 @@ class ScenarioRunner:
             state.current_time = step.t
             self._execute_step(
                 step=step,
+                mission=mission,
                 state=state,
                 telemetry=telemetry,
                 event_bus=event_bus,
@@ -67,6 +78,7 @@ class ScenarioRunner:
     def _execute_step(
         self,
         step: ScenarioStep,
+        mission: MissionModel,
         state: SimulationState,
         telemetry: TelemetryRegistry,
         event_bus: EventBus,
@@ -83,6 +95,7 @@ class ScenarioRunner:
             )
             self._apply_command_effects(
                 result=result,
+                mission=mission,
                 t=step.t,
                 state=state,
                 telemetry=telemetry,
@@ -95,6 +108,7 @@ class ScenarioRunner:
             telemetry.inject(step.inject.telemetry, step.inject.value, step.t)
             self._apply_fault_triggers(
                 triggers=fault_monitor.evaluate(),
+                mission=mission,
                 t=step.t,
                 state=state,
                 telemetry=telemetry,
@@ -115,6 +129,7 @@ class ScenarioRunner:
     def _apply_command_effects(
         self,
         result: CommandDispatchResult,
+        mission: MissionModel,
         t: float,
         state: SimulationState,
         telemetry: TelemetryRegistry,
@@ -134,6 +149,7 @@ class ScenarioRunner:
 
         expected_effects = command.expected_effects
         self._apply_payload_lifecycle_effects(expected_effects, state, t)
+        self._record_data_flow_evidence(expected_effects, command.id, mission, state, t)
 
         telemetry_effects = expected_effects.get("telemetry", {})
         for telemetry_id, value in telemetry_effects.items():
@@ -165,9 +181,40 @@ class ScenarioRunner:
         state.payload_lifecycle[payload_id] = lifecycle_state
         state.log(t, f"PAYLOAD {payload_id} LIFECYCLE={lifecycle_state}")
 
+    def _record_data_flow_evidence(
+        self,
+        expected_effects: dict[str, Any],
+        command_id: str,
+        mission: MissionModel,
+        state: SimulationState,
+        t: float,
+    ) -> None:
+        data_product_ids = expected_effects.get("data_products")
+        if not isinstance(data_product_ids, list):
+            return
+
+        data_products = {data_product.id: data_product for data_product in mission.data_products}
+        for data_product_id in data_product_ids:
+            if not isinstance(data_product_id, str):
+                continue
+
+            data_product = data_products.get(data_product_id)
+            if data_product is None:
+                continue
+
+            evidence = _build_data_flow_evidence(
+                data_product=data_product,
+                command_id=command_id,
+                mission=mission,
+                t=t,
+            )
+            state.data_flow_evidence.append(evidence)
+            state.log(t, f"DATA_PRODUCT {data_product_id} CONTRACT_EVIDENCE_RECORDED")
+
     def _apply_fault_triggers(
         self,
         triggers: list[FaultTrigger],
+        mission: MissionModel,
         t: float,
         state: SimulationState,
         telemetry: TelemetryRegistry,
@@ -191,6 +238,7 @@ class ScenarioRunner:
                 )
                 self._apply_command_effects(
                     result=result,
+                    mission=mission,
                     t=t,
                     state=state,
                     telemetry=telemetry,
@@ -321,6 +369,76 @@ class ScenarioRunner:
                 step.t,
                 f"expected scenario status {expected_status} but got {actual_status}",
             )
+
+
+def _build_data_flow_evidence(
+    data_product: DataProductContract,
+    command_id: str,
+    mission: MissionModel,
+    t: float,
+) -> SimDataFlowEvidenceRecord:
+    eligible_flows = [
+        flow.id
+        for flow in mission.contacts.downlink_flows
+        if data_product.id in flow.eligible_data_products
+    ]
+    contact_windows = _contact_windows_for_flows(eligible_flows, mission)
+
+    return SimDataFlowEvidenceRecord(
+        t=t,
+        data_product_id=data_product.id,
+        producer=data_product.producer,
+        producer_type=data_product.producer_type,
+        command_id=command_id,
+        storage_intent=_storage_intent_to_dict(data_product.storage),
+        downlink_intent=_downlink_intent_to_dict(data_product.downlink),
+        eligible_downlink_flows=eligible_flows,
+        contact_windows=contact_windows,
+    )
+
+
+def _contact_windows_for_flows(
+    flow_ids: list[str],
+    mission: MissionModel,
+) -> list[str]:
+    flows = [flow for flow in mission.contacts.downlink_flows if flow.id in flow_ids]
+    windows: list[str] = []
+
+    for flow in flows:
+        for window in mission.contacts.contact_windows:
+            if window.contact_profile != flow.contact_profile:
+                continue
+            if window.link_profile != flow.link_profile:
+                continue
+            windows.append(window.id)
+
+    return sorted(set(windows))
+
+
+def _storage_intent_to_dict(
+    storage: DataProductStorageIntent | None,
+) -> dict[str, Any]:
+    if storage is None:
+        return {"declared": False}
+
+    return {
+        "declared": True,
+        "class": storage.storage_class,
+        "retention": storage.retention,
+        "overflow_policy": storage.overflow_policy,
+    }
+
+
+def _downlink_intent_to_dict(
+    downlink: DataProductDownlinkIntent | None,
+) -> dict[str, Any]:
+    if downlink is None:
+        return {"declared": False}
+
+    return {
+        "declared": downlink.policy is not None,
+        "policy": downlink.policy,
+    }
 
 
 def _format_value(value: Any) -> str:
