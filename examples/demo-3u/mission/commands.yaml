@@ -27,6 +27,8 @@ commands:
         payload.acquisition.active: true
       mode_transition:
         to: PAYLOAD_ACTIVE
+      data_products:
+        - payload.radiation_histogram
 
   - id: payload.stop_acquisition
     target: payload
