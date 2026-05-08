@@ -103,17 +103,13 @@ def test_runner_checks_data_flow_expectation() -> None:
 
 
 def test_runner_fails_missing_data_flow_expectation(tmp_path: Path) -> None:
-    scenario_path = _copy_payload_scenario_with_replacement(
-        tmp_path,
-        "data_product: payload.radiation_histogram",
-        "data_product: payload.missing_runtime_evidence",
-    )
+    scenario_path = _copy_payload_scenario_without_data_product_effect(tmp_path)
     loaded = ScenarioLoader().load(scenario_path)
 
     result = ScenarioRunner().run(loaded)
 
     assert not result.passed
-    assert "missing data flow evidence for payload.missing_runtime_evidence" in (
+    assert "missing data flow evidence for payload.radiation_histogram" in (
         result.state.failed_expectations
     )
 
@@ -145,17 +141,21 @@ def test_sim_cli_executes_nominal_payload_lifecycle_scenario() -> None:
     assert "Result: PASSED" in result.output
 
 
-def _copy_payload_scenario_with_replacement(
-    tmp_path: Path,
-    old: str,
-    new: str,
-) -> Path:
+def _copy_payload_scenario_without_data_product_effect(tmp_path: Path) -> Path:
     source = Path("examples/demo-3u")
     demo_dir = tmp_path / "demo-3u"
     shutil.copytree(source, demo_dir)
 
-    scenario_path = demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
-    scenario = scenario_path.read_text(encoding="utf-8")
-    scenario_path.write_text(scenario.replace(old, new, 1), encoding="utf-8")
+    commands_path = demo_dir / "mission" / "commands.yaml"
+    commands = commands_path.read_text(encoding="utf-8")
+    commands_path.write_text(
+        commands.replace(
+            "      data_products:\n"
+            "        - payload.radiation_histogram\n",
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
 
-    return scenario_path
+    return demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
