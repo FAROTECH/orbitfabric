@@ -39,6 +39,19 @@ class SimModeTransitionRecord:
     reason: str
 
 
+@dataclass(frozen=True)
+class SimDataFlowEvidenceRecord:
+    t: float
+    data_product_id: str
+    producer: str
+    producer_type: str
+    command_id: str
+    storage_intent: dict[str, Any]
+    downlink_intent: dict[str, Any]
+    eligible_downlink_flows: list[str]
+    contact_windows: list[str]
+
+
 @dataclass
 class SimulationState:
     current_time: float
@@ -49,6 +62,7 @@ class SimulationState:
     events: list[SimEventRecord] = field(default_factory=list)
     commands: list[SimCommandRecord] = field(default_factory=list)
     mode_transitions: list[SimModeTransitionRecord] = field(default_factory=list)
+    data_flow_evidence: list[SimDataFlowEvidenceRecord] = field(default_factory=list)
     failed_expectations: list[str] = field(default_factory=list)
 
     def log(self, t: float, message: str) -> None:
