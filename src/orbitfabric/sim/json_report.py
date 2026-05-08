@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from orbitfabric import __version__
-from orbitfabric.sim.state import SimulationResult
+from orbitfabric.sim.state import SimDataFlowEvidenceRecord, SimulationResult
 
 
 def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
@@ -20,6 +20,7 @@ def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
             "events": len(result.state.events),
             "commands": len(result.state.commands),
             "mode_transitions": len(result.state.mode_transitions),
+            "data_flow_evidence": len(result.state.data_flow_evidence),
             "failed_expectations": len(result.state.failed_expectations),
         },
         "timeline": [
@@ -57,6 +58,10 @@ def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
             }
             for transition in result.state.mode_transitions
         ],
+        "data_flow_evidence": [
+            _data_flow_evidence_to_dict(evidence)
+            for evidence in result.state.data_flow_evidence
+        ],
         "final_state": {
             "mode": result.state.current_mode,
             "telemetry": result.state.telemetry,
@@ -76,6 +81,22 @@ def write_simulation_report_json(
     with output_path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, sort_keys=True)
         handle.write("\n")
+
+
+def _data_flow_evidence_to_dict(
+    evidence: SimDataFlowEvidenceRecord,
+) -> dict[str, Any]:
+    return {
+        "t": evidence.t,
+        "data_product_id": evidence.data_product_id,
+        "producer": evidence.producer,
+        "producer_type": evidence.producer_type,
+        "triggered_by_command": evidence.command_id,
+        "storage_intent": evidence.storage_intent,
+        "downlink_intent": evidence.downlink_intent,
+        "eligible_downlink_flows": evidence.eligible_downlink_flows,
+        "contact_windows": evidence.contact_windows,
+    }
 
 
 def _json_result_label(result: SimulationResult) -> str:
