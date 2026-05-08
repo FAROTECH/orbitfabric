@@ -35,6 +35,38 @@ def test_lint_loads_demo_mission() -> None:
     assert "Result: PASSED" in result.output
 
 
+def test_gen_docs_includes_data_flow_reference(tmp_path: Path) -> None:
+    output_dir = tmp_path / "docs"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "docs",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Docs Generator {__version__}" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert f"Output directory: {output_dir}" in result.output
+    assert f"  {output_dir / 'data_flow.md'}" in result.output
+    assert "Result: PASSED" in result.output
+
+    data_flow_path = output_dir / "data_flow.md"
+    assert data_flow_path.exists()
+
+    content = data_flow_path.read_text(encoding="utf-8")
+    assert "# Mission Data Flow Evidence Reference" in content
+    assert "`payload.start_acquisition`" in content
+    assert "`payload.radiation_histogram`" in content
+    assert "`science_next_available_contact`" in content
+    assert "`demo_contact_001`" in content
+
+
 def test_gen_data_flow_docs_writes_markdown(tmp_path: Path) -> None:
     output_file = tmp_path / "data_flow.md"
 
