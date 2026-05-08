@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -89,6 +90,34 @@ def test_runner_records_data_flow_evidence_for_declared_data_product() -> None:
     assert evidence.contact_windows == ["demo_contact_001"]
 
 
+def test_runner_checks_data_flow_expectation() -> None:
+    loaded = ScenarioLoader().load(PAYLOAD_SCENARIO)
+
+    result = ScenarioRunner().run(loaded)
+
+    assert result.passed
+    assert any(
+        "DATA_FLOW payload.radiation_histogram EXPECTATION_MET" in entry.message
+        for entry in result.state.logs
+    )
+
+
+def test_runner_fails_missing_data_flow_expectation(tmp_path: Path) -> None:
+    scenario_path = _copy_payload_scenario_with_replacement(
+        tmp_path,
+        "data_product: payload.radiation_histogram",
+        "data_product: payload.missing_runtime_evidence",
+    )
+    loaded = ScenarioLoader().load(scenario_path)
+
+    result = ScenarioRunner().run(loaded)
+
+    assert not result.passed
+    assert "missing data flow evidence for payload.missing_runtime_evidence" in (
+        result.state.failed_expectations
+    )
+
+
 def test_sim_cli_executes_demo_scenario() -> None:
     result = runner.invoke(app, ["sim", str(DEMO_SCENARIO)])
 
@@ -111,5 +140,22 @@ def test_sim_cli_executes_nominal_payload_lifecycle_scenario() -> None:
     assert "COMMAND payload.start_acquisition -> ACCEPTED" in result.output
     assert "PAYLOAD demo_iod_payload LIFECYCLE=ACQUIRING" in result.output
     assert "DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED" in result.output
+    assert "DATA_FLOW payload.radiation_histogram EXPECTATION_MET" in result.output
     assert "COMMAND payload.stop_acquisition -> ACCEPTED" in result.output
     assert "Result: PASSED" in result.output
+
+
+def _copy_payload_scenario_with_replacement(
+    tmp_path: Path,
+    old: str,
+    new: str,
+) -> Path:
+    source = Path("examples/demo-3u")
+    demo_dir = tmp_path / "demo-3u"
+    shutil.copytree(source, demo_dir)
+
+    scenario_path = demo_dir / "scenarios" / "nominal_payload_acquisition.yaml"
+    scenario = scenario_path.read_text(encoding="utf-8")
+    scenario_path.write_text(scenario.replace(old, new, 1), encoding="utf-8")
+
+    return scenario_path
