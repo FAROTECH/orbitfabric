@@ -8,7 +8,7 @@ from orbitfabric.model.loader import MissionModelLoader
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
 
-def test_generate_cpp17_runtime_id_headers_and_registries(tmp_path: Path) -> None:
+def test_generate_cpp17_runtime_id_headers_registries_and_command_args(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     contract = build_runtime_contract(model)
 
@@ -26,11 +26,15 @@ def test_generate_cpp17_runtime_id_headers_and_registries(tmp_path: Path) -> Non
         / "generated"
         / "mission_registries.hpp"
     )
+    command_args = (
+        tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
+    )
 
-    assert generated_files == [mission_ids, mission_enums, mission_registries]
+    assert generated_files == [mission_ids, mission_enums, mission_registries, command_args]
     assert mission_ids.exists()
     assert mission_enums.exists()
     assert mission_registries.exists()
+    assert command_args.exists()
 
     ids_content = mission_ids.read_text(encoding="utf-8")
 
@@ -63,6 +67,14 @@ def test_generate_cpp17_runtime_id_headers_and_registries(tmp_path: Path) -> Non
     assert "DataProductId::PayloadRadiationHistogram" in registries_content
     assert "It is not flight software and contains no onboard behavior." in registries_content
 
+    command_args_content = command_args.read_text(encoding="utf-8")
+
+    assert "struct PayloadStartAcquisitionArgs" in command_args_content
+    assert "std::uint16_t duration_s;" in command_args_content
+    assert "struct PayloadStopAcquisitionArgs" in command_args_content
+    assert "struct EpsGetStatusArgs" in command_args_content
+    assert "It is not flight software and contains no onboard behavior." in command_args_content
+
 
 def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
@@ -78,6 +90,9 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     first_registries = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_registries.hpp"
     ).read_text(encoding="utf-8")
+    first_command_args = (
+        tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
+    ).read_text(encoding="utf-8")
 
     generate_cpp17_runtime_files(contract, tmp_path)
     second_ids = (
@@ -89,7 +104,11 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     second_registries = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_registries.hpp"
     ).read_text(encoding="utf-8")
+    second_command_args = (
+        tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
+    ).read_text(encoding="utf-8")
 
     assert first_ids == second_ids
     assert first_enums == second_enums
     assert first_registries == second_registries
+    assert first_command_args == second_command_args
