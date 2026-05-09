@@ -8,8 +8,8 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts and operational scenarios once.
-Validate them, document them, and execute deterministic mission scenarios from the same source of truth.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios and runtime-facing contract bindings once.
+Validate them, document them, simulate them and generate deterministic integration artifacts from the same source of truth.
 
 </div>
 
@@ -19,7 +19,7 @@ Validate them, document them, and execute deterministic mission scenarios from t
 
 OrbitFabric is a **model-first Mission Data Fabric** for small spacecraft.
 
-It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation and future onboard/ground integration artifacts.
+It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation and generated integration artifacts.
 
 OrbitFabric is not a flight software framework, not a ground segment, and not a spacecraft dynamics simulator.
 
@@ -40,7 +40,13 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently at `v0.6.0 — End-to-End Mission Data Flow Evidence`.
+OrbitFabric is currently at `v0.7.0 — Generated Runtime Skeletons`.
+
+In v0.7.0, **Generated Runtime Skeletons** means runtime-facing contract bindings.
+
+OrbitFabric does not generate onboard behavior or flight software.
+
+It generates a deterministic, host-buildable software boundary derived from the validated Mission Model.
 
 The current repository includes:
 
@@ -49,7 +55,8 @@ The current repository includes:
 - the `v0.3.0 — Data Product and Storage Contracts` vertical slice;
 - the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice;
 - the `v0.5.0 — Commandability and Autonomy Contracts` vertical slice;
-- the `v0.6.0 — End-to-End Mission Data Flow Evidence` vertical slice.
+- the `v0.6.0 — End-to-End Mission Data Flow Evidence` vertical slice;
+- the `v0.7.0 — Generated Runtime Skeletons` vertical slice.
 
 The current vertical slice is functional:
 
@@ -81,6 +88,14 @@ The current vertical slice is functional:
 - contract-level data-flow evidence recording;
 - simulation JSON report generation with `data_flow_evidence`;
 - simulation plain-text log generation;
+- RuntimeContract construction;
+- `orbitfabric gen runtime` generation;
+- C++17 runtime-facing identifier headers;
+- C++17 runtime value enums;
+- C++17 static metadata registries;
+- C++17 command argument structs;
+- C++17 abstract adapter interfaces;
+- C++17 host-build smoke files;
 - synthetic demo mission: `demo-3u`.
 
 The repository also includes a growing set of example mission slices:
@@ -104,6 +119,10 @@ pytest
 
 mkdocs build --strict
 -> passing
+
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
+-> passing after orbitfabric gen runtime
 ```
 
 ---
@@ -126,9 +145,10 @@ It models:
 - optional Data Product and Storage Contracts;
 - optional Contact Windows and Downlink Flow Contracts;
 - optional Commandability and Autonomy Contracts;
-- contract-level Mission Data Flow Evidence.
+- contract-level Mission Data Flow Evidence;
+- generated runtime-facing contract bindings.
 
-The v0.6 data-flow evidence chain connects:
+The data-flow evidence chain connects:
 
 ```text
 command expected effect
@@ -142,7 +162,18 @@ command expected effect
         -> JSON report evidence
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy and Data-Flow Evidence Contracts are part of the Mission Data Contract. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
+The v0.7 runtime-facing binding chain is:
+
+```text
+Mission Model
+        -> validation and linting
+        -> RuntimeContract
+        -> generated C++17 contract bindings
+        -> host-build smoke validation
+        -> user implementation outside generated/
+```
+
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence and Runtime Contract Binding artifacts are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
 
 ---
 
@@ -168,9 +199,13 @@ OrbitFabric is not:
 - an orbit propagator;
 - an RF/link budget simulator;
 - a real contact scheduler;
-- a runtime skeleton generator in v0.6.
+- a command dispatch runtime;
+- an onboard scheduler;
+- a HAL or RTOS abstraction.
 
-Those may become future integration targets or generated artifacts, but they are not part of the current development preview.
+Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
+
+They are not flight software.
 
 ---
 
@@ -211,9 +246,10 @@ Payload Contract
         -> Downlink Flow Contract
         -> Commandability and Autonomy Contract
         -> End-to-End Mission Data Flow Evidence
+        -> Runtime-Facing Contract Bindings
 ```
 
-The dedicated v0.6 scenario demonstrates:
+The data-flow scenario demonstrates:
 
 ```text
 payload.start_acquisition
@@ -252,7 +288,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.6.0
+orbitfabric 0.7.0
 ```
 
 ---
@@ -308,6 +344,43 @@ Generated files are derived from the validated Mission Model. Do not edit them m
 
 ---
 
+## Generate Runtime Contract Bindings
+
+Generate C++17 runtime-facing contract bindings:
+
+```bash
+orbitfabric gen runtime examples/demo-3u/mission/
+```
+
+Generated files:
+
+```text
+generated/runtime/cpp17/
+├── runtime_contract_manifest.json
+├── CMakeLists.txt
+├── include/orbitfabric/generated/
+│   ├── mission_ids.hpp
+│   ├── mission_enums.hpp
+│   ├── mission_registries.hpp
+│   ├── command_args.hpp
+│   └── adapter_interfaces.hpp
+└── src/
+    └── orbitfabric_runtime_contract_smoke.cpp
+```
+
+Validate the generated C++17 contract surface with CMake:
+
+```bash
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
+```
+
+This is host-build smoke validation only.
+
+It does not produce flight software.
+
+---
+
 ## Run Scenario Simulation
 
 Run the battery-low recovery scenario:
@@ -318,7 +391,7 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --log generated/logs/battery_low_during_payload.log
 ```
 
-Run the v0.6 data-flow evidence scenario:
+Run the data-flow evidence scenario:
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
@@ -374,9 +447,15 @@ generated/
 │   ├── lint_report.json
 │   ├── battery_low_during_payload_report.json
 │   └── payload_data_flow_evidence_report.json
-└── logs/
-    ├── battery_low_during_payload.log
-    └── payload_data_flow_evidence.log
+├── logs/
+│   ├── battery_low_during_payload.log
+│   └── payload_data_flow_evidence.log
+└── runtime/
+    └── cpp17/
+        ├── runtime_contract_manifest.json
+        ├── CMakeLists.txt
+        ├── include/orbitfabric/generated/*.hpp
+        └── src/orbitfabric_runtime_contract_smoke.cpp
 ```
 
 Generated artifacts are reproducible outputs. They are not the source of truth.
@@ -409,9 +488,10 @@ Useful entry points:
 - `docs/DEMO_WALKTHROUGH.md`
 - `docs/reference/mission-model-v0.1.md`
 - `docs/reference/data-flow-evidence.md`
+- `docs/reference/runtime-contract-bindings.md`
 - `docs/reference/json-reports-v0.1.md`
 - `docs/reference/lint-rules-v0.1.md`
-- `docs/releases/v0.6.0.md`
+- `docs/releases/v0.7.0.md`
 - `docs/adr/`
 
 Build the documentation site locally:
@@ -469,6 +549,11 @@ orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
 
 orbitfabric gen docs examples/demo-3u/mission/
+
+orbitfabric gen runtime examples/demo-3u/mission/
+
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
 
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
   --json generated/reports/payload_data_flow_evidence_report.json \
