@@ -1,6 +1,6 @@
 # Data Product Contract Model
 
-Status: Implemented in OrbitFabric v0.3.0
+Status: Implemented in OrbitFabric v0.3.0 and retained in the v0.7.0 baseline
 Scope: Data Product and Storage Contract definition
 
 ## Purpose
@@ -73,7 +73,7 @@ A data product contract does not describe:
 - RF link modeling;
 - downlink runtime;
 - ground segment implementation;
-- runtime skeleton generation.
+- flight runtime behavior.
 
 Those are intentionally outside the Data Product Contract scope.
 
@@ -103,7 +103,7 @@ data_products:
       policy: next_available_contact
 ```
 
-This shape is implemented in v0.3.0, but OrbitFabric is still pre-1.0 and the schema may evolve.
+This shape is implemented, but OrbitFabric is still pre-1.0 and the schema may evolve.
 
 ## Relationship with Payload Contracts
 
@@ -141,7 +141,7 @@ Examples include:
 
 They do not implement storage.
 
-They make it possible to validate that a produced mission object has a declared preservation strategy before contact/downlink contracts, runtime skeletons or ground artifacts consume it.
+They make it possible to validate that a produced mission object has a declared preservation strategy before contact/downlink contracts, runtime-facing bindings or ground artifacts consume it.
 
 ## Downlink Intent
 
@@ -186,10 +186,22 @@ generated/docs/data_products.md
 
 The generated page exposes data product identity, producer, type, estimated size, priority, storage intent and downlink intent.
 
+## Relationship with Data Flow Evidence and Runtime Bindings
+
+Data Product Contracts are now consumed by later OrbitFabric layers.
+
+The v0.6.0 Data Flow Evidence slice traces declared command effects to data products, storage intent, downlink intent, eligible downlink flows and matching contact windows.
+
+The v0.7.0 Runtime Contract Bindings slice exposes data products as software-facing identifiers and registry metadata.
+
+Both uses remain contract-level.
+
+They do not implement data product generation, storage, compression or downlink execution.
+
 ## Current Status
 
-This page documents the implemented v0.3.0 Data Product Contract Model.
+This page documents the implemented Data Product Contract Model.
 
 The model remains development-preview and pre-1.0.
 
-v0.4.0 adds Contact Windows and Downlink Flow Contracts as the next declared Mission Data Chain layer. Future milestones will add commandability contracts and end-to-end mission data flow evidence before runtime skeletons or ground artifacts are introduced.
+Future milestones may add ground-facing exports or additional generated artifacts that consume this contract, but the Data Product Contract itself remains a declarative Mission Data Contract layer.
