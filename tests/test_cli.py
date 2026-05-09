@@ -97,7 +97,7 @@ def test_gen_data_flow_docs_writes_markdown(tmp_path: Path) -> None:
     assert "`demo_contact_001`" in content
 
 
-def test_gen_runtime_writes_manifest(tmp_path: Path) -> None:
+def test_gen_runtime_writes_manifest_and_cpp17_headers(tmp_path: Path) -> None:
     output_dir = tmp_path / "runtime"
 
     result = runner.invoke(
@@ -111,18 +111,26 @@ def test_gen_runtime_writes_manifest(tmp_path: Path) -> None:
         ],
     )
 
-    output_file = output_dir / "cpp17" / "runtime_contract_manifest.json"
+    manifest_file = output_dir / "cpp17" / "runtime_contract_manifest.json"
+    mission_ids = output_dir / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_ids.hpp"
+    mission_enums = (
+        output_dir / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_enums.hpp"
+    )
 
     assert result.exit_code == 0
     assert f"OrbitFabric Runtime Generator {__version__}" in result.output
     assert "Mission: demo-3u" in result.output
     assert "Profile: cpp17" in result.output
-    assert f"Generated file: {output_file}" in result.output
+    assert f"  {manifest_file}" in result.output
+    assert f"  {mission_ids}" in result.output
+    assert f"  {mission_enums}" in result.output
     assert "Runtime contract counts:" in result.output
     assert "Result: PASSED" in result.output
-    assert output_file.exists()
+    assert manifest_file.exists()
+    assert mission_ids.exists()
+    assert mission_enums.exists()
 
-    manifest = json.loads(output_file.read_text(encoding="utf-8"))
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
     assert manifest["kind"] == "orbitfabric.runtime_contract_manifest"
     assert manifest["generation"]["profile"] == "cpp17"
     assert manifest["generation"]["contains_flight_runtime"] is False
