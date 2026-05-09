@@ -1,0 +1,53 @@
+name: Clean-room concern
+description: Report a possible clean-room, confidentiality or provenance concern
+title: "clean-room: "
+labels: ["clean-room"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for public, non-sensitive clean-room concerns.
+
+        Do not publish confidential, proprietary, export-controlled or NDA-protected details. If the concern is sensitive, contact the maintainer privately instead.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the concern without exposing sensitive details.
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Identify the file, page, example or discussion where the concern appears.
+    validations:
+      required: true
+  - type: dropdown
+    id: concern-type
+    attributes:
+      label: Concern type
+      options:
+        - Possible proprietary mission data
+        - Possible private spacecraft architecture
+        - Possible private packet format
+        - Possible real operational log
+        - Possible non-public payload detail
+        - Possible real bus map or pinout
+        - Possible employer-owned or customer-owned material
+        - Possible export-controlled or NDA-protected material
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-action
+    attributes:
+      label: Suggested action
+      description: Suggest whether the content should be removed, generalized, rewritten or reviewed privately.
+  - type: checkboxes
+    id: public-safety
+    attributes:
+      label: Public disclosure confirmation
+      options:
+        - label: This issue does not itself disclose confidential, proprietary, export-controlled or NDA-protected material.
+          required: true

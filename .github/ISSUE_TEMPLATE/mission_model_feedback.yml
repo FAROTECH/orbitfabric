@@ -1,0 +1,69 @@
+name: Mission Model feedback
+description: Suggest or discuss Mission Data Contract semantics
+title: "model: "
+labels: ["model", "feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for feedback on OrbitFabric Mission Model semantics.
+
+        Keep examples synthetic or based only on public information.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What Mission Model concept, field or relation should be discussed?
+    validations:
+      required: true
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Mission Model domain
+      multiple: true
+      options:
+        - spacecraft
+        - subsystems
+        - modes
+        - telemetry
+        - commands
+        - events
+        - faults
+        - packets
+        - policies
+        - payloads
+        - data_products
+        - contacts
+        - commandability
+        - scenarios
+        - data-flow evidence
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain the engineering reason for the suggested change or clarification.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed model shape or behavior
+      description: Include YAML only if it is synthetic or public-material-derived.
+      render: yaml
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Boundary
+      description: State what this suggestion should not turn OrbitFabric into.
+      placeholder: |
+        This should not introduce flight runtime behavior, real storage execution, real downlink scheduling, CCSDS/PUS/CFDP runtime behavior, or ground segment implementation.
+  - type: checkboxes
+    id: clean-room
+    attributes:
+      label: Clean-room confirmation
+      options:
+        - label: This issue does not include proprietary, confidential, export-controlled or NDA-protected material.
+          required: true

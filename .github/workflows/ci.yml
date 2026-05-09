@@ -44,11 +44,22 @@ jobs:
       - name: Generate demo mission docs
         run: orbitfabric gen docs examples/demo-3u/mission/
 
-      - name: Run demo scenario
+      - name: Generate data flow evidence docs
+        run: |
+          orbitfabric gen data-flow examples/demo-3u/mission/ \
+            --output-file generated/docs/data_flow.md
+
+      - name: Run battery-low demo scenario
         run: |
           orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
             --json generated/reports/battery_low_during_payload_report.json \
             --log generated/logs/battery_low_during_payload.log
+
+      - name: Run payload data flow evidence scenario
+        run: |
+          orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+            --json generated/reports/payload_data_flow_evidence_report.json \
+            --log generated/logs/payload_data_flow_evidence.log
 
       - name: Build documentation site
         run: mkdocs build --strict

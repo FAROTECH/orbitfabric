@@ -1,0 +1,72 @@
+name: Feature request
+description: Propose a focused OrbitFabric capability
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for focused feature proposals.
+
+        OrbitFabric grows through coherent vertical slices, not feature accumulation.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the requested capability.
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Related roadmap area
+      options:
+        - v0.7 Generated Runtime Skeletons
+        - v0.8 Ground Integration Artifacts
+        - v0.9 Plugin and Extensibility Layer
+        - v1.0 Stable Mission Data Contract
+        - Backlog / parking lot
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      multiple: true
+      options:
+        - Mission Model
+        - Lint rules
+        - Scenario simulation
+        - Documentation generation
+        - JSON reports
+        - Runtime skeleton generation
+        - Ground integration artifacts
+        - Plugin/extensibility layer
+        - Example missions
+        - CI / tooling
+        - Public documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Engineering value
+      description: Explain what problem this solves and why it belongs in OrbitFabric.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Architectural boundary
+      description: State what this feature should intentionally not implement.
+    validations:
+      required: true
+  - type: checkboxes
+    id: clean-room
+    attributes:
+      label: Clean-room confirmation
+      options:
+        - label: This request does not include proprietary, confidential, export-controlled or NDA-protected material.
+          required: true

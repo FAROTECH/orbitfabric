@@ -10,9 +10,9 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.4.0 — Contact Windows and Downlink Flow Contracts`.
+The current public baseline is `v0.6.0 — End-to-End Mission Data Flow Evidence`.
 
-The next development focus is `v0.5 — Commandability and Autonomy Contracts`.
+The next development focus is `v0.7 — Generated Runtime Skeletons`.
 
 The current baseline proves this Mission Data Chain:
 
@@ -23,6 +23,8 @@ Payload Contract
   -> Downlink Intent
   -> Contact Window Assumption
   -> Downlink Flow Contract
+  -> Commandability and Autonomy Contract
+  -> End-to-End Mission Data Flow Evidence
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -45,6 +47,8 @@ Out of scope for the current preview:
 - web UI;
 - database-backed telemetry archive;
 - real spacecraft data.
+
+The next milestone may generate runtime skeletons, but those skeletons must remain host-buildable integration starting points. They must not be presented as flight-ready software, a complete OBC framework or a replacement for cFS or F Prime.
 
 ---
 
@@ -100,7 +104,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.4.0
+orbitfabric 0.6.0
 ```
 
 ---
@@ -118,11 +122,21 @@ mkdocs build --strict
 Then verify the demo vertical slice:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/   --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/ \
+  --json generated/reports/lint_report.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml   --json generated/reports/battery_low_during_payload_report.json   --log generated/logs/battery_low_during_payload.log
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+  --json generated/reports/battery_low_during_payload_report.json \
+  --log generated/logs/battery_low_during_payload.log
+
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
+  --json generated/reports/payload_data_flow_evidence_report.json \
+  --log generated/logs/payload_data_flow_evidence.log
 ```
 
 Expected result:
@@ -133,6 +147,7 @@ pytest        -> passing
 mkdocs        -> passing
 lint          -> Result: PASSED
 gen docs      -> Result: PASSED
+gen data-flow -> Result: PASSED
 sim           -> Result: PASSED
 ```
 
@@ -202,7 +217,7 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate contact downlink documentation
-Align public documentation with v0.4
+Align public documentation with v0.6
 Fix scenario command validation
 ```
 
@@ -222,9 +237,14 @@ misc
 A good pull request should include:
 
 - a clear description of the change;
+- the affected project area or milestone;
+- explicit Mission Data Contract impact;
+- an architectural boundary statement for non-trivial changes;
 - tests when behavior changes;
 - updated documentation when user-facing behavior changes;
 - confirmation that local checks pass;
 - no generated artifacts unless explicitly required.
 
 Generated outputs under `generated/` are reproducible artifacts and should normally not be committed.
+
+Use the repository pull request template and keep the `Architectural Boundary`, `Clean-Room Confirmation` and `Validation` sections meaningful.
