@@ -5,7 +5,7 @@ This page documents the diagnostics and lint rules currently implemented by Orbi
 Current documented baseline:
 
 ```text
-v0.6.0 — End-to-End Mission Data Flow Evidence
+v0.7.0 — Generated Runtime Skeletons
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -205,7 +205,7 @@ recovery_intents
 | `OF-CMD-008` | `ERROR` | commands | `expected_effects.data_products` is not a list or contains a non-string entry. | Set `expected_effects.data_products` to a list of data product IDs declared in `data_products.yaml`. |
 | `OF-CMD-009` | `ERROR` | commands | Command expected effects reference an unknown data product. | Add the data product to `data_products.yaml` or fix `expected_effects.data_products`. |
 
-The v0.6 data-flow evidence path starts from command expected effects such as:
+The data-flow evidence path starts from command expected effects such as:
 
 ```yaml
 expected_effects:
@@ -213,7 +213,7 @@ expected_effects:
     - payload.radiation_histogram
 ```
 
-These rules ensure that the command-to-data-product link is explicit and valid before scenario evidence or generated data-flow documentation depends on it.
+These rules ensure that the command-to-data-product link is explicit and valid before scenario evidence, generated data-flow documentation or runtime-facing contract bindings depend on it.
 
 ---
 
@@ -377,7 +377,7 @@ initial_state
 steps
 ```
 
-v0.6 data-flow expectations use this shape:
+Data-flow expectations use this shape:
 
 ```yaml
 expect:
@@ -403,6 +403,7 @@ Current behavior:
 | `orbitfabric lint <mission-dir>` | Mission Model loading diagnostics, structural diagnostics, semantic lint findings. |
 | `orbitfabric gen docs <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen data-flow <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
+| `orbitfabric gen runtime <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric sim <scenario-file>` | Scenario loading diagnostics, Mission Model loading diagnostics, scenario reference diagnostics and scenario execution failures. |
 
 ---
