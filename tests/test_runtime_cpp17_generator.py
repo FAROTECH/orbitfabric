@@ -8,7 +8,7 @@ from orbitfabric.model.loader import MissionModelLoader
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
 
-def test_generate_cpp17_runtime_headers(tmp_path: Path) -> None:
+def test_generate_cpp17_runtime_headers_and_host_build_files(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     contract = build_runtime_contract(model)
 
@@ -37,6 +37,8 @@ def test_generate_cpp17_runtime_headers(tmp_path: Path) -> None:
         / "generated"
         / "adapter_interfaces.hpp"
     )
+    cmake_lists = tmp_path / "cpp17" / "CMakeLists.txt"
+    smoke_source = tmp_path / "cpp17" / "src" / "orbitfabric_runtime_contract_smoke.cpp"
 
     assert generated_files == [
         mission_ids,
@@ -44,12 +46,16 @@ def test_generate_cpp17_runtime_headers(tmp_path: Path) -> None:
         mission_registries,
         command_args,
         adapter_interfaces,
+        cmake_lists,
+        smoke_source,
     ]
     assert mission_ids.exists()
     assert mission_enums.exists()
     assert mission_registries.exists()
     assert command_args.exists()
     assert adapter_interfaces.exists()
+    assert cmake_lists.exists()
+    assert smoke_source.exists()
 
     ids_content = mission_ids.read_text(encoding="utf-8")
 
@@ -103,6 +109,25 @@ def test_generate_cpp17_runtime_headers(tmp_path: Path) -> None:
     assert "class IFaultReporter" in adapter_content
     assert "It is not flight software and contains no onboard behavior." in adapter_content
 
+    cmake_content = cmake_lists.read_text(encoding="utf-8")
+
+    assert "project(orbitfabric_runtime_contract_smoke LANGUAGES CXX)" in cmake_content
+    assert "add_library(orbitfabric_runtime_contract INTERFACE)" in cmake_content
+    assert (
+        "target_compile_features(orbitfabric_runtime_contract INTERFACE cxx_std_17)"
+        in cmake_content
+    )
+    assert "add_executable(" in cmake_content
+    assert "It is not flight software and contains no onboard behavior." in cmake_content
+
+    smoke_content = smoke_source.read_text(encoding="utf-8")
+
+    assert "#include \"orbitfabric/generated/adapter_interfaces.hpp\"" in smoke_content
+    assert "static_assert(static_cast<std::uint16_t>(CommandId::Invalid) == 0);" in smoke_content
+    assert "TelemetryRegistry.size()" in smoke_content
+    assert "return 0;" in smoke_content
+    assert "It is not flight software and contains no onboard behavior." in smoke_content
+
 
 def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
@@ -129,6 +154,10 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
         / "generated"
         / "adapter_interfaces.hpp"
     ).read_text(encoding="utf-8")
+    first_cmake_lists = (tmp_path / "cpp17" / "CMakeLists.txt").read_text(encoding="utf-8")
+    first_smoke_source = (
+        tmp_path / "cpp17" / "src" / "orbitfabric_runtime_contract_smoke.cpp"
+    ).read_text(encoding="utf-8")
 
     generate_cpp17_runtime_files(contract, tmp_path)
     second_ids = (
@@ -151,9 +180,15 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
         / "generated"
         / "adapter_interfaces.hpp"
     ).read_text(encoding="utf-8")
+    second_cmake_lists = (tmp_path / "cpp17" / "CMakeLists.txt").read_text(encoding="utf-8")
+    second_smoke_source = (
+        tmp_path / "cpp17" / "src" / "orbitfabric_runtime_contract_smoke.cpp"
+    ).read_text(encoding="utf-8")
 
     assert first_ids == second_ids
     assert first_enums == second_enums
     assert first_registries == second_registries
     assert first_command_args == second_command_args
     assert first_adapter_interfaces == second_adapter_interfaces
+    assert first_cmake_lists == second_cmake_lists
+    assert first_smoke_source == second_smoke_source
