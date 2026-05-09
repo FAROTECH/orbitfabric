@@ -8,7 +8,11 @@ import typer
 from orbitfabric import __version__
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
-from orbitfabric.gen.runtime import build_runtime_contract, write_runtime_contract_manifest
+from orbitfabric.gen.runtime import (
+    build_runtime_contract,
+    generate_cpp17_runtime_files,
+    write_runtime_contract_manifest,
+)
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.lint.finding import LintReport
 from orbitfabric.lint.json_report import write_lint_report_json
@@ -249,13 +253,16 @@ def gen_runtime(
         raise typer.Exit(code=1)
 
     contract = build_runtime_contract(model, generation_profile=profile)
-    output_file = output_dir / profile / "runtime_contract_manifest.json"
-    generated_file = write_runtime_contract_manifest(contract, output_file)
+    manifest_file = output_dir / profile / "runtime_contract_manifest.json"
+    generated_files = [write_runtime_contract_manifest(contract, manifest_file)]
+    generated_files.extend(generate_cpp17_runtime_files(contract, output_dir))
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
     typer.echo(f"Profile: {profile}")
-    typer.echo(f"Generated file: {generated_file}")
+    typer.echo("\nGenerated files:")
+    for path in generated_files:
+        typer.echo(f"  {path}")
     typer.echo("\nRuntime contract counts:")
     typer.echo(f"  modes: {len(contract.modes)}")
     typer.echo(f"  telemetry: {len(contract.telemetry)}")
