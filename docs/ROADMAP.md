@@ -1,6 +1,6 @@
 # OrbitFabric — Roadmap
 
-Version: v0.6.0  
+Version: v0.7.0  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -33,7 +33,7 @@ Mission Model
         -> contact and downlink contracts
         -> commandability and autonomy contracts
         -> end-to-end mission data flow evidence
-        -> runtime skeletons
+        -> runtime-facing contract bindings
         -> ground integration artifacts
         -> plugins and extensibility
 ```
@@ -42,7 +42,7 @@ Every milestone must reinforce the core identity:
 
 > OrbitFabric is a Mission Data Contract framework.
 
-The current architectural objective is to model the mission data chain from payload behavior to data products, onboard storage intent, downlink assumptions, contact windows, commandability, recovery behavior, evidence and future ground-facing artifacts.
+The current architectural objective is to keep the Mission Data Chain explicit and consumable by generated artifacts without turning OrbitFabric into flight software or a ground segment.
 
 ---
 
@@ -58,15 +58,15 @@ v0.3.0  Data Product and Storage Contracts                    completed
 v0.4.0  Contact Windows and Downlink Flow Contracts           completed
 v0.5.0  Commandability and Autonomy Contracts                 completed
 v0.6.0  End-to-End Mission Data Flow Evidence                 completed
-v0.7    Generated Runtime Skeletons                           next
-v0.8    Ground Integration Artifacts                          future
+v0.7.0  Generated Runtime Skeletons                           completed
+v0.8    Ground Integration Artifacts                          next
 v0.9    Plugin and Extensibility Layer                        future
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target is now `v0.7 — Generated Runtime Skeletons`.
+The immediate target after v0.7.0 is now `v0.8 — Ground Integration Artifacts`.
 
-Runtime skeleton generation remains downstream of the Mission Data Chain. v0.6 completed the first contract-level evidence layer required before that step.
+Ground integration artifacts remain downstream of the Mission Data Contract. v0.7 completed the first runtime-facing contract binding layer required before ground-facing exports are useful.
 
 ---
 
@@ -208,11 +208,9 @@ v0.5.0 did not implement real command authentication, authorization, encryption,
 
 ## 10. Completed Slice — v0.6.0 End-to-End Mission Data Flow Evidence
 
-### 10.1 Objective
+v0.6.0 combined payload contracts, data products, storage intent, downlink assumptions, contact windows and command effects into deterministic scenario evidence.
 
-v0.6.0 combines payload contracts, data products, storage intent, downlink assumptions, contact windows and command effects into deterministic scenario evidence.
-
-The objective is to make this chain inspectable:
+It made this chain inspectable:
 
 ```text
 payload acquisition command
@@ -225,8 +223,6 @@ payload acquisition command
         -> JSON evidence exported
         -> Markdown evidence documented
 ```
-
-### 10.2 Completed Capabilities
 
 v0.6.0 introduced:
 
@@ -243,107 +239,154 @@ orbitfabric gen data-flow command
 data_flow.md included in standard orbitfabric gen docs output
 ```
 
-### 10.3 Boundary
-
-v0.6.0 remains deterministic and contract-level.
-
-It does not implement:
-
-```text
-real payload file generation
-real onboard storage runtime
-real downlink queue execution
-real contact scheduling
-RF behavior
-ground integration artifacts
-CCSDS/PUS/CFDP runtime behavior
-runtime skeleton generation
-```
-
-The milestone proves that the Mission Data Chain is explicit and inspectable, not that flight or ground runtime software exists.
+v0.6.0 did not implement real payload file generation, onboard storage runtime, downlink queues, contact scheduling, RF behavior, ground integration artifacts, CCSDS/PUS/CFDP runtime behavior or runtime skeleton generation.
 
 ---
 
-## 11. Next Milestone — v0.7 Generated Runtime Skeletons
+## 11. Completed Slice — v0.7.0 Generated Runtime Skeletons
 
 ### 11.1 Objective
 
-Start deriving onboard-oriented artifacts from the Mission Data Contract after the mission data chain model is sufficiently clear.
+v0.7.0 introduced the first generated runtime-facing contract binding layer derived from the Mission Data Contract.
+
+The public milestone name is:
+
+```text
+Generated Runtime Skeletons
+```
+
+The precise architectural meaning is:
+
+```text
+runtime-facing contract bindings
+```
 
 This is not flight software.
 
-It is generated skeleton code that demonstrates how the Mission Data Contract can support future onboard runtime integration.
+It is a generated software boundary that implementation code can include, compile and implement against outside `generated/`.
 
-### 11.2 Candidate Features
+### 11.2 Completed Capabilities
+
+v0.7.0 introduced:
 
 ```text
-C++17 generated headers
-generated telemetry IDs
-generated command IDs
-generated event IDs
-generated mode IDs
-generated packet IDs
-generated payload IDs
-generated data product IDs
-generated storage policy enums
-generated downlink policy enums
+RuntimeContract intermediate model
+deterministic naming rules
+deterministic generated numeric identifiers
+orbitfabric gen runtime command
+cpp17 generation profile
+runtime_contract_manifest.json
+generated IDs and enums
+generated static metadata registries
 generated command argument structs
-generated adapter interfaces
-generated command dispatch skeleton
-generated telemetry registry skeleton
-generated data product registry skeleton
-host-buildable CMake example
+generated abstract adapter interfaces
+host-buildable CMake smoke target
+host-build smoke source including all generated headers
+Runtime Contract Bindings reference documentation
+v0.7.0 release notes
 ```
 
-### 11.3 Required Boundary
-
-v0.7 generated code must be described as:
+Generated output:
 
 ```text
-runtime skeleton
-host-buildable example
-integration starting point
+generated/runtime/cpp17/runtime_contract_manifest.json
+generated/runtime/cpp17/include/orbitfabric/generated/mission_ids.hpp
+generated/runtime/cpp17/include/orbitfabric/generated/mission_enums.hpp
+generated/runtime/cpp17/include/orbitfabric/generated/mission_registries.hpp
+generated/runtime/cpp17/include/orbitfabric/generated/command_args.hpp
+generated/runtime/cpp17/include/orbitfabric/generated/adapter_interfaces.hpp
+generated/runtime/cpp17/CMakeLists.txt
+generated/runtime/cpp17/src/orbitfabric_runtime_contract_smoke.cpp
 ```
 
-It must not be described as:
+### 11.3 Boundary
+
+v0.7.0 intentionally does not implement:
 
 ```text
 flight-ready runtime
-qualified software
 complete OBC framework
-replacement for cFS or F Prime
+command dispatch runtime
+command queues
+telemetry polling runtime
+event routing runtime
+fault manager runtime
+scheduler
+HAL
+drivers
+RTOS abstraction
+binary serialization
+CCSDS/PUS/CFDP behavior
+storage runtime
+downlink runtime
+user-code merge
+protected regions
 ```
+
+The milestone proves that the Mission Data Contract can generate deterministic, host-buildable, software-facing contract artifacts.
+
+It does not prove flight readiness.
 
 ---
 
-## 12. Future Milestone — v0.8 Ground Integration Artifacts
+## 12. Next Milestone — v0.8 Ground Integration Artifacts
+
+### 12.1 Objective
 
 Generate useful artifacts for ground integration without becoming a ground segment.
 
-Candidate features:
+v0.8 should consume the same Mission Data Contract and the same contract discipline introduced through v0.1 through v0.7.
+
+The goal is not to implement Yamcs, OpenC3, XTCE tooling or a ground database.
+
+The goal is to produce clean, inspectable exports that ground-side tools could consume or adapt.
+
+### 12.2 Candidate Features
 
 ```text
 JSON mission database export
-packet dictionary export
-simple decoder skeletons
 telemetry dictionary export
 command dictionary export
+event dictionary export
+fault dictionary export
 data product dictionary export
-downlink policy export
+packet dictionary export
+runtime contract manifest reuse for ground exports
+simple decoder skeletons
 Yamcs-like export prototype
 OpenC3-like export prototype
 XTCE exploration/prototype
+ground-facing documentation page
 ```
 
-OrbitFabric may export artifacts for ground tools.
+### 12.3 Required Boundary
 
-OrbitFabric must not become a ground tool.
+v0.8 generated artifacts must be described as:
+
+```text
+ground-facing contract exports
+integration artifacts
+development-preview dictionaries
+```
+
+They must not be described as:
+
+```text
+live ground segment
+mission control system
+operator console
+telemetry archive
+command uplink service
+Yamcs compatibility unless tested
+OpenC3 compatibility unless tested
+XTCE compliance unless verified
+```
 
 ---
 
 ## 13. Future Milestone — v0.9 Plugin and Extensibility Layer
 
-v0.9 should introduce controlled extension points after the core mission data chain has matured.
+v0.9 should introduce controlled extension points after the core mission data chain and first generated artifact layers have matured.
 
 Candidate features:
 
@@ -380,6 +423,8 @@ stable Data Product Contract schema
 stable Contact/Downlink Contract schema
 stable Commandability Contract schema
 stable data-flow evidence semantics
+stable RuntimeContract semantics
+stable runtime-facing contract binding surface
 stable CLI commands
 stable lint rule code policy
 stable generated documentation format
@@ -431,6 +476,8 @@ security policy model
 command authorization model
 second payload example
 payload lifecycle expansion
+additional runtime generation profiles
+example user implementation outside generated/
 ```
 
 ---
@@ -449,6 +496,8 @@ When deciding what to implement next, use these rules.
 8. Small Working Slice Beats Broad Incomplete Scope.
 9. Payload Contracts Are Contracts.
 10. Ground Assumptions Are Contracts.
+11. Generated Code Is Disposable.
+12. User Code Lives Outside `generated/`.
 
 ---
 
@@ -457,23 +506,23 @@ When deciding what to implement next, use these rules.
 The immediate work package is:
 
 ```text
-v0.7 — Generated Runtime Skeletons
+v0.8 — Ground Integration Artifacts
 ```
 
 Required sequence:
 
 ```text
-1. define the minimal runtime skeleton scope
-2. keep generated code downstream of the Mission Model
-3. generate IDs/enums/registries before behavior-heavy runtime code
-4. provide a host-buildable example
-5. avoid claiming flight readiness
+1. define the minimal ground export scope
+2. keep ground artifacts downstream of the Mission Model
+3. reuse RuntimeContract or a similarly explicit intermediate export model where useful
+4. generate dictionaries before tool-specific integrations
+5. avoid claiming Yamcs/OpenC3/XTCE compatibility before it is implemented and tested
 6. preserve the Mission Data Contract as source of truth
 ```
 
-Do not add ground exports before runtime skeleton boundaries are clear.
+Do not add live ground services before ground export boundaries are clear.
 
-Do not turn generated skeletons into a flight software framework.
+Do not turn OrbitFabric into a ground segment.
 
 ---
 
@@ -481,11 +530,13 @@ Do not turn generated skeletons into a flight software framework.
 
 OrbitFabric must first become excellent at one thing:
 
-> defining, validating, simulating and documenting a Mission Data Contract for a small spacecraft.
+> defining, validating, simulating, documenting and generating contract-facing artifacts from a Mission Data Contract for a small spacecraft.
 
 The v0.6 roadmap step completed the first end-to-end contract-level Mission Data Flow Evidence slice.
 
-Only after the mission data chain, commandability, autonomy and end-to-end evidence contracts are clear should OrbitFabric grow into runtime skeleton generation, ground integration artifacts and plugin extensibility.
+The v0.7 roadmap step completed the first runtime-facing contract binding slice.
+
+Only after the mission data chain, commandability, autonomy, end-to-end evidence and runtime-facing binding layers are clear should OrbitFabric grow into ground integration artifacts and plugin extensibility.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
