@@ -8,7 +8,7 @@ from orbitfabric.model.loader import MissionModelLoader
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
 
-def test_generate_cpp17_runtime_id_headers_registries_and_command_args(tmp_path: Path) -> None:
+def test_generate_cpp17_runtime_headers(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     contract = build_runtime_contract(model)
 
@@ -29,12 +29,27 @@ def test_generate_cpp17_runtime_id_headers_registries_and_command_args(tmp_path:
     command_args = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
     )
+    adapter_interfaces = (
+        tmp_path
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "adapter_interfaces.hpp"
+    )
 
-    assert generated_files == [mission_ids, mission_enums, mission_registries, command_args]
+    assert generated_files == [
+        mission_ids,
+        mission_enums,
+        mission_registries,
+        command_args,
+        adapter_interfaces,
+    ]
     assert mission_ids.exists()
     assert mission_enums.exists()
     assert mission_registries.exists()
     assert command_args.exists()
+    assert adapter_interfaces.exists()
 
     ids_content = mission_ids.read_text(encoding="utf-8")
 
@@ -75,6 +90,19 @@ def test_generate_cpp17_runtime_id_headers_registries_and_command_args(tmp_path:
     assert "struct EpsGetStatusArgs" in command_args_content
     assert "It is not flight software and contains no onboard behavior." in command_args_content
 
+    adapter_content = adapter_interfaces.read_text(encoding="utf-8")
+
+    assert "#include \"orbitfabric/generated/command_args.hpp\"" in adapter_content
+    assert "enum class CommandResult : std::uint16_t" in adapter_content
+    assert "class ICommandHandler" in adapter_content
+    assert "virtual ~ICommandHandler() = default;" in adapter_content
+    assert "virtual CommandResult handle_payload_start_acquisition" in adapter_content
+    assert "const PayloadStartAcquisitionArgs& args" in adapter_content
+    assert "class ITelemetrySink" in adapter_content
+    assert "class IEventReporter" in adapter_content
+    assert "class IFaultReporter" in adapter_content
+    assert "It is not flight software and contains no onboard behavior." in adapter_content
+
 
 def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
@@ -93,6 +121,14 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     first_command_args = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
     ).read_text(encoding="utf-8")
+    first_adapter_interfaces = (
+        tmp_path
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "adapter_interfaces.hpp"
+    ).read_text(encoding="utf-8")
 
     generate_cpp17_runtime_files(contract, tmp_path)
     second_ids = (
@@ -107,8 +143,17 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     second_command_args = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
     ).read_text(encoding="utf-8")
+    second_adapter_interfaces = (
+        tmp_path
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "adapter_interfaces.hpp"
+    ).read_text(encoding="utf-8")
 
     assert first_ids == second_ids
     assert first_enums == second_enums
     assert first_registries == second_registries
     assert first_command_args == second_command_args
+    assert first_adapter_interfaces == second_adapter_interfaces
