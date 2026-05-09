@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a reproducible OrbitFabric problem
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for reproducible problems in the OrbitFabric toolchain.
+
+        Do not include proprietary mission data, private spacecraft information, operational logs, export-controlled material or NDA-protected details.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the problem clearly.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      multiple: true
+      options:
+        - Mission Model loading / validation
+        - Semantic lint rules
+        - Scenario loading / validation
+        - Scenario simulation
+        - JSON reports
+        - Documentation generation
+        - Generated artifacts
+        - Example missions
+        - CLI
+        - CI / tooling
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the minimal public or synthetic steps required to reproduce the issue.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: command-output
+    attributes:
+      label: Command output or diagnostics
+      description: Paste only non-sensitive output.
+      render: text
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Python version, OrbitFabric version, OS and installation mode.
+      placeholder: |
+        Python:
+        OrbitFabric:
+        OS:
+        Install mode:
+  - type: checkboxes
+    id: clean-room
+    attributes:
+      label: Clean-room confirmation
+      options:
+        - label: This issue does not include proprietary, confidential, export-controlled or NDA-protected material.
+          required: true
