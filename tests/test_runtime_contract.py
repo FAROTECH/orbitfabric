@@ -14,7 +14,7 @@ def test_build_runtime_contract_from_demo_mission() -> None:
     contract = build_runtime_contract(model)
 
     assert contract.mission_id == "demo-3u"
-    assert contract.mission_name == "Demo 3U Mission"
+    assert contract.mission_name == "Demo 3U Spacecraft"
     assert contract.model_version == "0.1.0"
     assert contract.generation_profile == "cpp17"
     assert len(contract.modes) == len(model.modes)
