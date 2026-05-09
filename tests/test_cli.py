@@ -124,7 +124,14 @@ def test_gen_runtime_writes_manifest_and_cpp17_headers(tmp_path: Path) -> None:
         / "generated"
         / "mission_registries.hpp"
     )
-    command_args = output_dir / "cpp17" / "include" / "orbitfabric" / "generated" / "command_args.hpp"
+    command_args = (
+        output_dir
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "command_args.hpp"
+    )
 
     assert result.exit_code == 0
     assert f"OrbitFabric Runtime Generator {__version__}" in result.output
