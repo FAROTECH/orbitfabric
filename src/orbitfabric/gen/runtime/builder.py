@@ -11,7 +11,6 @@ from orbitfabric.gen.runtime.contract import (
 from orbitfabric.gen.runtime.naming import to_pascal_case
 from orbitfabric.model.mission import (
     Command,
-    CommandArgument,
     DataProductContract,
     MissionModel,
 )
