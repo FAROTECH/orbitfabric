@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -94,6 +95,60 @@ def test_gen_data_flow_docs_writes_markdown(tmp_path: Path) -> None:
     assert "`payload.radiation_histogram`" in content
     assert "`science_next_available_contact`" in content
     assert "`demo_contact_001`" in content
+
+
+def test_gen_runtime_writes_manifest(tmp_path: Path) -> None:
+    output_dir = tmp_path / "runtime"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "runtime",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    output_file = output_dir / "cpp17" / "runtime_contract_manifest.json"
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Runtime Generator {__version__}" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert "Profile: cpp17" in result.output
+    assert f"Generated file: {output_file}" in result.output
+    assert "Runtime contract counts:" in result.output
+    assert "Result: PASSED" in result.output
+    assert output_file.exists()
+
+    manifest = json.loads(output_file.read_text(encoding="utf-8"))
+    assert manifest["kind"] == "orbitfabric.runtime_contract_manifest"
+    assert manifest["generation"]["profile"] == "cpp17"
+    assert manifest["generation"]["contains_flight_runtime"] is False
+    assert manifest["contract"]["mission_id"] == "demo-3u"
+
+
+def test_gen_runtime_rejects_unsupported_profile(tmp_path: Path) -> None:
+    output_dir = tmp_path / "runtime"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "runtime",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+            "--profile",
+            "c99",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "Unsupported runtime generation profile: c99" in result.output
+    assert "Supported profiles: cpp17" in result.output
+    assert not output_dir.exists()
 
 
 def test_inspect_mission_loads_demo_mission() -> None:
