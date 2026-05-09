@@ -8,7 +8,7 @@ from orbitfabric.model.loader import MissionModelLoader
 DEMO_MISSION = Path("examples/demo-3u/mission")
 
 
-def test_generate_cpp17_runtime_id_headers(tmp_path: Path) -> None:
+def test_generate_cpp17_runtime_id_headers_and_registries(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
     contract = build_runtime_contract(model)
 
@@ -18,10 +18,19 @@ def test_generate_cpp17_runtime_id_headers(tmp_path: Path) -> None:
     mission_enums = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_enums.hpp"
     )
+    mission_registries = (
+        tmp_path
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "mission_registries.hpp"
+    )
 
-    assert generated_files == [mission_ids, mission_enums]
+    assert generated_files == [mission_ids, mission_enums, mission_registries]
     assert mission_ids.exists()
     assert mission_enums.exists()
+    assert mission_registries.exists()
 
     ids_content = mission_ids.read_text(encoding="utf-8")
 
@@ -39,6 +48,21 @@ def test_generate_cpp17_runtime_id_headers(tmp_path: Path) -> None:
     assert "Float32" in enums_content
     assert "Uint16" in enums_content
 
+    registries_content = mission_registries.read_text(encoding="utf-8")
+
+    assert "#include \"orbitfabric/generated/mission_ids.hpp\"" in registries_content
+    assert "struct TelemetryDescriptor" in registries_content
+    assert "struct CommandDescriptor" in registries_content
+    assert "struct EventDescriptor" in registries_content
+    assert "struct FaultDescriptor" in registries_content
+    assert "struct DataProductDescriptor" in registries_content
+    assert "inline constexpr std::array<TelemetryDescriptor" in registries_content
+    assert "inline constexpr std::array<CommandDescriptor" in registries_content
+    assert "inline constexpr std::array<DataProductDescriptor" in registries_content
+    assert "CommandId::PayloadStartAcquisition" in registries_content
+    assert "DataProductId::PayloadRadiationHistogram" in registries_content
+    assert "It is not flight software and contains no onboard behavior." in registries_content
+
 
 def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
@@ -51,6 +75,9 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     first_enums = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_enums.hpp"
     ).read_text(encoding="utf-8")
+    first_registries = (
+        tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_registries.hpp"
+    ).read_text(encoding="utf-8")
 
     generate_cpp17_runtime_files(contract, tmp_path)
     second_ids = (
@@ -59,6 +86,10 @@ def test_generate_cpp17_runtime_files_is_deterministic(tmp_path: Path) -> None:
     second_enums = (
         tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_enums.hpp"
     ).read_text(encoding="utf-8")
+    second_registries = (
+        tmp_path / "cpp17" / "include" / "orbitfabric" / "generated" / "mission_registries.hpp"
+    ).read_text(encoding="utf-8")
 
     assert first_ids == second_ids
     assert first_enums == second_enums
+    assert first_registries == second_registries
