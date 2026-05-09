@@ -113,7 +113,10 @@ def test_generate_cpp17_runtime_headers_and_host_build_files(tmp_path: Path) -> 
 
     assert "project(orbitfabric_runtime_contract_smoke LANGUAGES CXX)" in cmake_content
     assert "add_library(orbitfabric_runtime_contract INTERFACE)" in cmake_content
-    assert "target_compile_features(orbitfabric_runtime_contract INTERFACE cxx_std_17)" in cmake_content
+    assert (
+        "target_compile_features(orbitfabric_runtime_contract INTERFACE cxx_std_17)"
+        in cmake_content
+    )
     assert "add_executable(" in cmake_content
     assert "It is not flight software and contains no onboard behavior." in cmake_content
 
