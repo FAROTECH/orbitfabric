@@ -2,11 +2,66 @@
 
 All notable changes to OrbitFabric will be documented in this file.
 
-This project follows a lightweight pre-1.0 changelog style while the Mission Model, Payload Contract Model, Data Product Contract Model and CLI stabilize.
+This project follows a lightweight pre-1.0 changelog style while the Mission Model, contract layers, generated artifacts and CLI stabilize.
 
 ---
 
 ## [Unreleased]
+
+---
+
+## [v0.7.0] — Generated Runtime Skeletons
+
+### Added
+
+- Added the `RuntimeContract` intermediate model for software-facing generation.
+- Added deterministic runtime naming and symbol generation.
+- Added deterministic generated numeric identifiers with `Invalid = 0` reserved per enum domain.
+- Added the `orbitfabric gen runtime` command.
+- Added the initial `cpp17` runtime generation profile.
+- Added `runtime_contract_manifest.json` generation.
+- Added generated C++17 mission identifier headers through `mission_ids.hpp`.
+- Added generated C++17 runtime value enums through `mission_enums.hpp`.
+- Added generated C++17 static metadata registries through `mission_registries.hpp`.
+- Added generated C++17 command argument structs through `command_args.hpp`.
+- Added generated C++17 abstract adapter interfaces through `adapter_interfaces.hpp`.
+- Added generated C++17 host-build smoke files through `CMakeLists.txt` and `src/orbitfabric_runtime_contract_smoke.cpp`.
+- Added host-build smoke validation for generated runtime-facing contract bindings.
+- Added Runtime Contract Bindings reference documentation.
+- Added v0.7.0 release notes.
+
+### Changed
+
+- Extended the public documentation baseline from v0.6.0 to v0.7.0.
+- Extended the Mission Data Chain from data-flow evidence to runtime-facing contract bindings.
+- Updated README, architecture, roadmap, quickstart, development guide, contributing guide and versioning documentation for v0.7.0.
+- Updated the package and CLI version to `0.7.0`.
+- Marked `v0.8 — Ground Integration Artifacts` as the next roadmap milestone.
+
+### Boundaries
+
+The Generated Runtime Skeletons slice intentionally does not introduce:
+
+- flight-ready runtime;
+- complete OBC framework;
+- command dispatch runtime;
+- command queues;
+- telemetry polling runtime;
+- event routing runtime;
+- fault manager runtime;
+- scheduler;
+- HAL;
+- drivers;
+- RTOS abstraction;
+- binary serialization;
+- CCSDS/PUS/CFDP behavior;
+- storage runtime;
+- downlink runtime;
+- user-code merge;
+- protected regions;
+- flight-ready software.
+
+Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings only.
 
 ---
 

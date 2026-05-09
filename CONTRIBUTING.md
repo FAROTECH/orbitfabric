@@ -10,9 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.6.0 — End-to-End Mission Data Flow Evidence`.
+The current public baseline is `v0.7.0 — Generated Runtime Skeletons`.
 
-The next development focus is `v0.7 — Generated Runtime Skeletons`.
+In v0.7.0, Generated Runtime Skeletons means runtime-facing contract bindings.
+
+The next development focus is `v0.8 — Ground Integration Artifacts`.
 
 The current baseline proves this Mission Data Chain:
 
@@ -25,6 +27,7 @@ Payload Contract
   -> Downlink Flow Contract
   -> Commandability and Autonomy Contract
   -> End-to-End Mission Data Flow Evidence
+  -> Runtime-Facing Contract Bindings
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -40,6 +43,10 @@ Out of scope for the current preview:
 - command uplink runtime;
 - flight autonomy runtime;
 - operator console;
+- command dispatch runtime;
+- command queues;
+- onboard scheduler;
+- HAL;
 - CCSDS/PUS/CFDP implementation;
 - Yamcs/OpenC3 full integration;
 - Basilisk integration;
@@ -48,7 +55,11 @@ Out of scope for the current preview:
 - database-backed telemetry archive;
 - real spacecraft data.
 
-The next milestone may generate runtime skeletons, but those skeletons must remain host-buildable integration starting points. They must not be presented as flight-ready software, a complete OBC framework or a replacement for cFS or F Prime.
+Runtime-facing contract bindings must remain generated, deterministic and disposable.
+
+User implementation code must live outside `generated/`.
+
+The next milestone may generate ground integration artifacts, but those artifacts must remain exports or dictionaries derived from the Mission Data Contract. They must not be presented as a live ground segment, operator console, command uplink service or telemetry archive.
 
 ---
 
@@ -104,7 +115,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.6.0
+orbitfabric 0.7.0
 ```
 
 ---
@@ -130,6 +141,11 @@ orbitfabric gen docs examples/demo-3u/mission/
 orbitfabric gen data-flow examples/demo-3u/mission/ \
   --output-file generated/docs/data_flow.md
 
+orbitfabric gen runtime examples/demo-3u/mission/
+
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
+
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --json generated/reports/battery_low_during_payload_report.json \
   --log generated/logs/battery_low_during_payload.log
@@ -148,6 +164,8 @@ mkdocs        -> passing
 lint          -> Result: PASSED
 gen docs      -> Result: PASSED
 gen data-flow -> Result: PASSED
+gen runtime   -> Result: PASSED
+cmake build   -> passing
 sim           -> Result: PASSED
 ```
 
@@ -190,6 +208,8 @@ cli -> sim
 
 lint -> model
 gen -> model
+gen -> RuntimeContract builder
+RuntimeContract builder -> model
 sim -> model
 ```
 
@@ -202,6 +222,8 @@ model -> gen
 lint -> sim
 gen -> sim
 sim -> gen
+RuntimeContract builder -> raw YAML files
+profile-specific generator -> raw YAML files
 ```
 
 Do not hardcode behavior for `demo-3u` inside the framework core.
@@ -217,7 +239,7 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate contact downlink documentation
-Align public documentation with v0.6
+Align public documentation with v0.7
 Fix scenario command validation
 ```
 

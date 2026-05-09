@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation and deterministic scenario execution.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution and generated runtime-facing contract bindings.
 
 ---
 
@@ -122,7 +122,7 @@ examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 
 `nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
 
-`payload_data_flow_evidence.yaml` demonstrates the v0.6 contract-level data-flow evidence path.
+`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the v0.7 baseline.
 
 ---
 
@@ -151,7 +151,7 @@ It does not execute storage, downlink, live uplink or autonomy runtime behavior.
 
 ## 6. Scenario: payload data-flow evidence
 
-The data-flow evidence scenario demonstrates the v0.6 contract chain:
+The data-flow evidence scenario demonstrates the contract chain:
 
 ```text
 payload.start_acquisition
@@ -190,7 +190,54 @@ It is deterministic contract-level evidence generated from the Mission Model and
 
 ---
 
-## 7. Run the scenarios
+## 7. Generate runtime-facing contract bindings
+
+v0.7.0 adds generated runtime-facing contract bindings for the same `demo-3u` Mission Model.
+
+Run:
+
+```bash
+orbitfabric gen runtime examples/demo-3u/mission/
+```
+
+Generated files:
+
+```text
+generated/runtime/cpp17/
+├── runtime_contract_manifest.json
+├── CMakeLists.txt
+├── include/orbitfabric/generated/
+│   ├── mission_ids.hpp
+│   ├── mission_enums.hpp
+│   ├── mission_registries.hpp
+│   ├── command_args.hpp
+│   └── adapter_interfaces.hpp
+└── src/
+    └── orbitfabric_runtime_contract_smoke.cpp
+```
+
+The generated C++17 files expose the contract surface as identifiers, metadata registries, command argument structs and abstract adapter interfaces.
+
+They do not implement command dispatch, telemetry polling, scheduling, HAL, drivers, storage, downlink or flight behavior.
+
+---
+
+## 8. Validate the generated C++17 host-build smoke target
+
+After generating runtime bindings, run:
+
+```bash
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
+```
+
+This confirms that the generated contract-binding surface is syntactically valid and host-buildable as C++17.
+
+It does not validate flight behavior.
+
+---
+
+## 9. Run the scenarios
 
 Battery-low recovery:
 
@@ -212,7 +259,7 @@ Result: PASSED
 
 ---
 
-## 8. Generate scenario outputs
+## 10. Generate scenario outputs
 
 Battery-low recovery outputs:
 
@@ -241,7 +288,7 @@ generated/logs/payload_data_flow_evidence.log
 
 ---
 
-## 9. Generate mission documentation
+## 11. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -277,7 +324,7 @@ None of these pages describes runtime behavior.
 
 ---
 
-## 10. What the simulator checks
+## 12. What the simulator checks
 
 During execution, OrbitFabric checks that:
 
@@ -303,7 +350,7 @@ The simulator does not execute real storage, real downlink, live uplink, contact
 
 ---
 
-## 11. Expected final state
+## 13. Expected final state
 
 At the end of the battery-low scenario:
 
@@ -324,7 +371,7 @@ data_flow_evidence contains payload.radiation_histogram
 scenario_status = PASSED
 ```
 
-The important v0.6 behavior is the contract-level evidence path:
+The important contract-level behavior is the evidence path:
 
 ```text
 command accepted
@@ -332,11 +379,12 @@ command accepted
   -> data product evidence recorded
   -> storage/downlink/contact intent checked
   -> scenario evidence produced
+  -> runtime-facing bindings generated from the same model
 ```
 
 ---
 
-## 12. Clean-room boundary
+## 14. Clean-room boundary
 
 This demo is deliberately synthetic.
 

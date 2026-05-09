@@ -6,7 +6,8 @@ OrbitFabric currently distinguishes between:
 
 - the OrbitFabric tool/package version;
 - the Mission Model version declared by a mission;
-- the version field written into generated JSON reports.
+- the version field written into generated JSON reports;
+- the generated runtime contract manifest version context.
 
 These versions are related, but they are not the same thing.
 
@@ -32,7 +33,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.5.0
+orbitfabric 0.7.0
 ```
 
 This version answers the question:
@@ -42,6 +43,8 @@ Which version of the OrbitFabric tool generated, validated or executed this arti
 ```
 
 Generated JSON reports use this version in their top-level `version` field.
+
+Generated runtime contract manifests also record the generation profile and contract metadata produced by the tool.
 
 ---
 
@@ -85,7 +88,7 @@ Current example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -97,6 +100,32 @@ The `model_version` identifies the Mission Model version declared by the mission
 
 ---
 
+## Runtime contract manifest context
+
+v0.7.0 introduces runtime-facing contract bindings.
+
+The generated runtime manifest is written to:
+
+```text
+generated/runtime/cpp17/runtime_contract_manifest.json
+```
+
+It records the software-facing contract surface generated from the Mission Model.
+
+It also records generation metadata such as:
+
+```text
+generation profile
+contains_flight_runtime = false
+generated_artifacts_are_disposable = true
+```
+
+The runtime manifest is generated from the current OrbitFabric tool and the declared Mission Model.
+
+It is not a separate schema version promise for v1.0 compatibility.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -104,7 +133,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.5.0
+OrbitFabric tool/package version: 0.7.0
 Mission Model version:           0.1.0
 ```
 
@@ -112,13 +141,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts and Commandability/Autonomy Contracts;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence and Runtime Contract Bindings;
 - the demo mission still declares the v0.1 Mission Model contract;
-- generated artifacts record both pieces of information.
+- generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.5 rule
+## Current v0.7 rule
 
 For the current development preview:
 
@@ -128,6 +157,8 @@ For the current development preview:
 | JSON report top-level `version` | OrbitFabric tool version that produced the report. |
 | `spacecraft.model_version` | Mission Model contract version declared by the mission. |
 | JSON report `model_version` | Mission Model version copied from mission YAML. |
+| Runtime manifest `generation.profile` | Runtime generation profile, currently `cpp17`. |
+| Runtime manifest `contains_flight_runtime` | Explicit boundary flag, currently `false`. |
 
 ---
 
@@ -138,7 +169,8 @@ Do not assume that:
 - the OrbitFabric package version and Mission Model version are always identical;
 - a Mission Model version bump always requires a Python package major/minor bump;
 - a Python package patch/dev version always changes the Mission Model contract;
-- generated artifacts are valid without checking both tool version and mission model version.
+- generated artifacts are valid without checking both tool version and mission model version;
+- generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees.
 
 ---
 
@@ -149,8 +181,10 @@ Future versions may introduce a more explicit schema versioning mechanism.
 Possible future additions include:
 
 - a dedicated Mission Model schema version field;
+- a dedicated RuntimeContract schema version;
 - schema migration helpers;
 - compatibility checks between tool version and Mission Model version;
-- JSON Schema export for Mission Model validation.
+- JSON Schema export for Mission Model validation;
+- compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.5.0 development preview.
+These are not part of the current v0.7.0 development preview.

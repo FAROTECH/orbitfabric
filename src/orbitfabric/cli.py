@@ -8,6 +8,11 @@ import typer
 from orbitfabric import __version__
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
+from orbitfabric.gen.runtime import (
+    build_runtime_contract,
+    generate_cpp17_runtime_files,
+    write_runtime_contract_manifest,
+)
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.lint.finding import LintReport
 from orbitfabric.lint.json_report import write_lint_report_json
@@ -196,6 +201,77 @@ def gen_data_flow(
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
     typer.echo(f"Generated file: {generated_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@gen_app.command("runtime")
+def gen_runtime(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to generate runtime-facing artifacts.",
+        ),
+    ],
+    output_dir: Annotated[
+        Path,
+        typer.Option(
+            "--output-dir",
+            help="Directory where runtime generation artifacts will be written.",
+        ),
+    ] = Path("generated/runtime"),
+    profile: Annotated[
+        str,
+        typer.Option(
+            "--profile",
+            help="Runtime generation profile. Currently only 'cpp17' is supported.",
+        ),
+    ] = "cpp17",
+) -> None:
+    """Generate runtime-facing contract artifacts from a Mission Model."""
+    typer.echo(f"OrbitFabric Runtime Generator {__version__}")
+
+    if profile != "cpp17":
+        typer.echo(f"\nUnsupported runtime generation profile: {profile}")
+        typer.echo("Supported profiles: cpp17")
+        raise typer.Exit(code=1)
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    report = LintEngine().run(model)
+    if report.has_errors:
+        _print_loaded_model_summary(model)
+        _print_lint_report(report)
+        typer.echo("\nRuntime generation aborted because lint errors exist.")
+        raise typer.Exit(code=1)
+
+    contract = build_runtime_contract(model, generation_profile=profile)
+    manifest_file = output_dir / profile / "runtime_contract_manifest.json"
+    generated_files = [write_runtime_contract_manifest(contract, manifest_file)]
+    generated_files.extend(generate_cpp17_runtime_files(contract, output_dir))
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo(f"Profile: {profile}")
+    typer.echo("\nGenerated files:")
+    for path in generated_files:
+        typer.echo(f"  {path}")
+    typer.echo("\nRuntime contract counts:")
+    typer.echo(f"  modes: {len(contract.modes)}")
+    typer.echo(f"  telemetry: {len(contract.telemetry)}")
+    typer.echo(f"  commands: {len(contract.commands)}")
+    typer.echo(f"  events: {len(contract.events)}")
+    typer.echo(f"  faults: {len(contract.faults)}")
+    typer.echo(f"  packets: {len(contract.packets)}")
+    typer.echo(f"  payloads: {len(contract.payloads)}")
+    typer.echo(f"  data products: {len(contract.data_products)}")
     typer.echo("\nResult: PASSED")
 
 
