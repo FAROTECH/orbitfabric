@@ -132,6 +132,14 @@ def test_gen_runtime_writes_manifest_and_cpp17_headers(tmp_path: Path) -> None:
         / "generated"
         / "command_args.hpp"
     )
+    adapter_interfaces = (
+        output_dir
+        / "cpp17"
+        / "include"
+        / "orbitfabric"
+        / "generated"
+        / "adapter_interfaces.hpp"
+    )
 
     assert result.exit_code == 0
     assert f"OrbitFabric Runtime Generator {__version__}" in result.output
@@ -142,6 +150,7 @@ def test_gen_runtime_writes_manifest_and_cpp17_headers(tmp_path: Path) -> None:
     assert f"  {mission_enums}" in result.output
     assert f"  {mission_registries}" in result.output
     assert f"  {command_args}" in result.output
+    assert f"  {adapter_interfaces}" in result.output
     assert "Runtime contract counts:" in result.output
     assert "Result: PASSED" in result.output
     assert manifest_file.exists()
@@ -149,6 +158,7 @@ def test_gen_runtime_writes_manifest_and_cpp17_headers(tmp_path: Path) -> None:
     assert mission_enums.exists()
     assert mission_registries.exists()
     assert command_args.exists()
+    assert adapter_interfaces.exists()
 
     manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
     assert manifest["kind"] == "orbitfabric.runtime_contract_manifest"
