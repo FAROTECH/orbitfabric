@@ -1,13 +1,13 @@
 # Data Flow Evidence
 
 Status: Development preview  
-Scope: OrbitFabric v0.6.0
+Scope: Introduced in OrbitFabric v0.6.0 and retained in the v0.7.0 baseline
 
 ---
 
 ## 1. Purpose
 
-Data Flow Evidence is the v0.6 contract-level link between command behavior and mission data movement assumptions.
+Data Flow Evidence is the contract-level link between command behavior and mission data movement assumptions.
 
 It lets OrbitFabric trace a declared path from a command to a data product and then to the storage, downlink and contact assumptions already present in the Mission Model.
 
@@ -22,7 +22,7 @@ command expected effect
         -> matching contact window
 ```
 
-This keeps the Mission Data Chain explicit before runtime skeletons or ground integration artifacts are generated.
+This keeps the Mission Data Chain explicit before runtime-facing contract bindings or ground integration artifacts consume it.
 
 ---
 
@@ -204,7 +204,7 @@ Matching Contact Windows
 
 ## 8. Demo scenario
 
-The canonical v0.6 demo scenario is:
+The canonical data-flow evidence demo scenario is:
 
 ```text
 examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
@@ -246,7 +246,7 @@ contact scheduling
 RF behavior
 ground station operations
 CCSDS/PUS/CFDP behavior
-runtime skeleton generation
+runtime behavior
 ```
 
 It is deterministic contract-level evidence.
@@ -259,7 +259,7 @@ It does not prove that real flight or ground software exists.
 
 ## 10. Architectural meaning
 
-v0.6 completes the first end-to-end Mission Data Chain evidence slice:
+v0.6 completed the first end-to-end Mission Data Chain evidence slice:
 
 ```text
 Payload Contract
@@ -272,4 +272,6 @@ Payload Contract
         -> End-to-End Mission Data Flow Evidence
 ```
 
-This is the correct precondition before OrbitFabric moves to generated runtime skeletons in v0.7.
+v0.7 builds on this by deriving runtime-facing contract bindings from the same validated Mission Model.
+
+Data Flow Evidence remains a contract-level precondition for meaningful runtime-facing and ground-facing generated artifacts.

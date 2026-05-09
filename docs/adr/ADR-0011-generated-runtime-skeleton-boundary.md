@@ -1,6 +1,6 @@
 # ADR-0011 — Generated Runtime Skeleton Boundary
 
-Status: Proposed for v0.7.0  
+Status: Accepted for v0.7.0  
 Date: 2026-05-09
 
 ---
@@ -9,9 +9,9 @@ Date: 2026-05-09
 
 OrbitFabric is a model-first Mission Data Contract framework for small spacecraft.
 
-The current v0.6.0 baseline introduced End-to-End Mission Data Flow Evidence.
+The v0.6.0 baseline introduced End-to-End Mission Data Flow Evidence.
 
-The Mission Data Chain now connects:
+The Mission Data Chain connects:
 
 ```text
 command expected effect
@@ -25,9 +25,7 @@ command expected effect
         -> JSON report evidence
 ```
 
-The next roadmap milestone is v0.7.0 — Generated Runtime Skeletons.
-
-This milestone introduces the first explicit bridge between the Mission Data Contract and software-facing implementation artifacts.
+The v0.7.0 milestone introduces the first explicit bridge between the Mission Data Contract and software-facing implementation artifacts.
 
 That bridge is valuable, but it is architecturally sensitive.
 
@@ -35,17 +33,17 @@ OrbitFabric must not become flight software, an onboard runtime, a scheduler, a 
 
 The source of truth must remain the Mission Model.
 
-Generated runtime skeletons must therefore be defined as runtime-facing contract bindings, not runtime behavior.
+Generated runtime skeletons are therefore defined as runtime-facing contract bindings, not runtime behavior.
 
 ---
 
 ## Decision
 
-OrbitFabric v0.7.0 will introduce Generated Runtime Skeletons as deterministic, host-buildable, inspectable and regenerable software-facing artifacts derived from the validated Mission Model.
+OrbitFabric v0.7.0 introduces Generated Runtime Skeletons as deterministic, host-buildable, inspectable and regenerable software-facing artifacts derived from the validated Mission Model.
 
-The generated artifacts will expose contract-aligned identifiers, descriptors, typed command argument structures, static registries and narrow adapter interfaces.
+The generated artifacts expose contract-aligned identifiers, descriptors, typed command argument structures, static registries and narrow adapter interfaces.
 
-They will not implement onboard behavior.
+They do not implement onboard behavior.
 
 The architectural interpretation is:
 
@@ -94,7 +92,7 @@ Every v0.7 feature must be evaluated against it.
 
 ## RuntimeContract Intermediate Model
 
-v0.7.0 must introduce a RuntimeContract intermediate model.
+v0.7.0 introduces a RuntimeContract intermediate model.
 
 The generator must not read raw YAML in scattered places.
 
@@ -121,7 +119,7 @@ The RuntimeContract is intentionally smaller than the full Mission Model.
 
 It contains only the contract surface that is meaningful for software-facing generated artifacts.
 
-Candidate RuntimeContract domains include:
+RuntimeContract domains include:
 
 ```text
 mission identity
@@ -139,7 +137,7 @@ downlink policy identifiers
 generation metadata
 ```
 
-Each exported element should carry a deterministic software symbol, a stable generated numeric identifier and a reference to the Mission Model source identity.
+Each exported element carries a deterministic software symbol, a stable generated numeric identifier and a reference to the Mission Model source identity.
 
 ---
 
@@ -151,36 +149,31 @@ The first supported generation profile is:
 cpp17
 ```
 
-The first generated output root is:
+The generated output root is:
 
 ```text
 generated/runtime/cpp17/
 ```
 
-The initial output should be host-buildable using CMake.
-
-The first slice may include files such as:
+The current v0.7.0 output is:
 
 ```text
 generated/runtime/cpp17/
+├── runtime_contract_manifest.json
 ├── CMakeLists.txt
 ├── include/
 │   └── orbitfabric/
 │       └── generated/
 │           ├── mission_ids.hpp
 │           ├── mission_enums.hpp
+│           ├── mission_registries.hpp
 │           ├── command_args.hpp
-│           ├── registries.hpp
-│           └── adapters.hpp
+│           └── adapter_interfaces.hpp
 └── src/
-    └── main.cpp
+    └── orbitfabric_runtime_contract_smoke.cpp
 ```
 
-The exact file split may evolve during implementation.
-
-The boundary is fixed.
-
-Generated C++17 code must be simple, static, readable and dependency-light.
+Generated C++17 code is simple, static, readable and dependency-light.
 
 ---
 
@@ -202,15 +195,15 @@ They may be overwritten on every generation.
 
 Users must not place handwritten implementation code inside generated files.
 
-OrbitFabric must not rely on protected regions in v0.7.0.
+OrbitFabric does not rely on protected regions in v0.7.0.
 
 User implementation must live outside the generated tree and integrate through generated identifiers, descriptors, typed structures and interfaces.
 
 ---
 
-## Initial v0.7.0 Scope
+## v0.7.0 Scope
 
-The v0.7.0 core scope should include:
+The v0.7.0 core scope includes:
 
 ```text
 RuntimeContract intermediate model
@@ -223,13 +216,13 @@ generated descriptors
 generated static registries
 generated command argument structs
 generated narrow adapter interfaces
-generation manifest or equivalent determinism evidence
-host-buildable CMake example
-tests for determinism, output structure, naming and host buildability
+generation manifest
+generated host-buildable CMake smoke target
+tests for determinism, output structure and naming
 documentation of scope, boundary and non-goals
 ```
 
-The first implementation must remain narrow.
+The implementation remains narrow.
 
 The goal is to prove a stable contract-binding architecture, not to maximize the amount of generated code.
 
@@ -413,7 +406,7 @@ Ordering must be stable and testable.
 
 Generated numeric identifiers must be deterministic.
 
-The initial strategy should prefer a simple stable ordering per domain, with `Invalid = 0` reserved where enum-style identifiers are generated.
+The initial strategy reserves `Invalid = 0` and assigns deterministic identifiers per domain.
 
 Generated numeric identifiers are skeleton identifiers unless the Mission Model later introduces explicit normative IDs.
 
@@ -423,7 +416,7 @@ They must not be presented as flight protocol IDs by default.
 
 ## Testing Direction
 
-v0.7.0 must include tests for:
+v0.7.0 includes tests for:
 
 ```text
 RuntimeContract construction
@@ -433,7 +426,6 @@ CLI runtime generation
 expected output tree structure
 generated file content smoke checks
 regeneration stability
-host-buildability of the C++17 example
 ```
 
 The required local release checks remain:
@@ -444,7 +436,7 @@ pytest
 mkdocs build --strict
 ```
 
-The runtime generation flow should additionally support checks similar to:
+The runtime generation flow additionally supports:
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/
@@ -453,17 +445,15 @@ cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 ```
 
-CMake-dependent tests may be structured as integration tests if required.
-
 The release candidate must still be host-built before tagging v0.7.0.
 
 ---
 
 ## Branch and Release Process
 
-v0.7.0 should be developed through a milestone integration branch.
+v0.7.0 was developed through a milestone integration branch.
 
-The intended process is:
+The process was:
 
 ```text
 main
@@ -474,12 +464,15 @@ feature/v0.7-runtime-boundary-adr
 feature/v0.7-runtime-contract-model
 feature/v0.7-runtime-cli-minimal
 feature/v0.7-cpp17-ids-enums
-feature/v0.7-registries
-feature/v0.7-host-cmake
-feature/v0.7-docs-release
+feature/v0.7-runtime-registries
+feature/v0.7-command-args
+feature/v0.7-adapter-interfaces
+feature/v0.7-host-build-smoke
+feature/v0.7-runtime-docs
+feature/v0.7-release-alignment
 ```
 
-Feature branches should converge into the release branch first.
+Feature branches converged into the release branch first.
 
 The release branch should merge into main only when the v0.7.0 core is stable.
 
@@ -529,6 +522,6 @@ This ADR is satisfied when:
 
 Generated Runtime Skeletons are valuable only if they preserve OrbitFabric's identity.
 
-The v0.7.0 milestone must generate the software boundary derived from the Mission Model.
+The v0.7.0 milestone generates the software boundary derived from the Mission Model.
 
-It must not generate the spacecraft runtime that lives behind that boundary.
+It does not generate the spacecraft runtime that lives behind that boundary.

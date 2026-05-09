@@ -20,12 +20,17 @@ Mission Model YAML
   -> Contact and Downlink Contract documentation
   -> Commandability and Autonomy Contract documentation
   -> Data Flow Evidence documentation
+  -> RuntimeContract generation
+  -> C++17 runtime-facing contract bindings
+  -> C++17 host-build smoke validation
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
 ```
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
+
+Generated runtime-facing contract bindings are not flight software.
 
 ---
 
@@ -36,6 +41,13 @@ OrbitFabric currently requires:
 ```text
 Python 3.11 or newer
 Git
+```
+
+The generated C++17 host-build smoke validation additionally requires:
+
+```text
+CMake
+A C++17-capable compiler
 ```
 
 The CI validates Python 3.11 and Python 3.12.
@@ -86,7 +98,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.6.0
+orbitfabric 0.7.0
 ```
 
 ---
@@ -195,7 +207,58 @@ Do not edit generated files manually.
 
 ---
 
-## 11. Run the battery-low demo scenario
+## 11. Generate runtime-facing contract bindings
+
+```bash
+orbitfabric gen runtime examples/demo-3u/mission/
+```
+
+Generated output:
+
+```text
+generated/runtime/cpp17/
+├── runtime_contract_manifest.json
+├── CMakeLists.txt
+├── include/orbitfabric/generated/
+│   ├── mission_ids.hpp
+│   ├── mission_enums.hpp
+│   ├── mission_registries.hpp
+│   ├── command_args.hpp
+│   └── adapter_interfaces.hpp
+└── src/
+    └── orbitfabric_runtime_contract_smoke.cpp
+```
+
+The generated C++17 files are runtime-facing contract bindings.
+
+They expose IDs, metadata, command argument structs, abstract adapter interfaces and a host-build smoke target.
+
+They do not implement onboard behavior.
+
+---
+
+## 12. Validate the generated C++17 host-build smoke target
+
+After generating runtime bindings, run:
+
+```bash
+cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
+cmake --build generated/runtime/cpp17/build
+```
+
+Expected result:
+
+```text
+build passed
+```
+
+This confirms that the generated contract-binding surface is syntactically valid and buildable as C++17 on the host.
+
+It does not validate flight behavior.
+
+---
+
+## 13. Run the battery-low demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -224,7 +287,7 @@ generated/logs/battery_low_during_payload.log
 
 ---
 
-## 12. Run the data-flow evidence scenario
+## 14. Run the data-flow evidence scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
@@ -252,7 +315,7 @@ command -> data product -> storage intent -> downlink intent -> downlink flow ->
 
 ---
 
-## 13. What this proves
+## 15. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -271,14 +334,17 @@ The current demo proves that OrbitFabric can:
 - execute deterministic operational sequences;
 - emit events;
 - apply a fault-triggered mode transition;
-- auto-dispatch a recovery command;
+- auto-dispatch a recovery command in the host-side scenario simulator;
 - record contract-level data-flow evidence;
 - assert command-to-data-product-to-contact evidence in a scenario;
-- produce JSON reports and logs.
+- produce JSON reports and logs;
+- build a RuntimeContract from the validated Mission Model;
+- generate deterministic C++17 runtime-facing contract bindings;
+- validate generated C++17 contract bindings with a host-build smoke target.
 
 ---
 
-## 14. What this does not prove
+## 16. What this does not prove
 
 The current demo does not prove:
 
@@ -293,7 +359,9 @@ The current demo does not prove:
 - CCSDS, PUS or CFDP compliance;
 - compatibility with cFS, F Prime, Yamcs or OpenC3;
 - orbital, attitude, power or thermal dynamics;
-- runtime skeleton generation;
+- command dispatch runtime behavior;
+- telemetry polling runtime behavior;
+- HAL or RTOS integration;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current development preview scope.

@@ -1,6 +1,6 @@
 # Commandability and Autonomy Contract Model
 
-Status: Implemented in the current v0.5 development baseline  
+Status: Implemented in OrbitFabric v0.5.0 and retained in the v0.7.0 baseline  
 Scope: Commandability and Autonomy Contract definition
 
 ---
@@ -135,17 +135,17 @@ onboard command dispatcher
 real FDIR implementation
 real safing logic
 Yamcs/OpenC3 runtime services
-runtime skeleton generation
+runtime behavior
 ground export artifacts
 ```
 
-Those are intentionally outside the v0.5.0 scope.
+Those are intentionally outside the commandability/autonomy contract scope.
 
 ---
 
 ## YAML Shape
 
-Commandability and autonomy assumptions are expected to be defined in the optional file:
+Commandability and autonomy assumptions are defined in the optional file:
 
 ```text
 mission/commandability.yaml
@@ -293,15 +293,15 @@ expected evidence
 
 A recovery intent is not FDIR implementation.
 
-It exists to make recovery assumptions explicit before future scenario evidence and runtime skeletons consume them.
+It exists to make recovery assumptions explicit before scenario evidence, runtime-facing contract bindings and future ground artifacts consume them.
 
 ---
 
-## Initial Lint Direction
+## Implemented Lint Direction
 
 Current lint rules focus on reference integrity and obvious consistency issues.
 
-Expected rule direction:
+Implemented rule direction:
 
 ```text
 ERROR: commandability rule references an unknown command.
@@ -318,7 +318,7 @@ WARNING: high-risk command lacks explicit confirmation intent.
 WARNING: autonomous recovery command lacks expected events or effects.
 ```
 
-Warnings should expose engineering ambiguity without pretending to solve command routing, scheduling or autonomy execution.
+Warnings expose engineering ambiguity without pretending to solve command routing, scheduling or autonomy execution.
 
 ---
 
@@ -326,13 +326,13 @@ Warnings should expose engineering ambiguity without pretending to solve command
 
 When commandability/autonomy contracts are present, OrbitFabric generates Markdown documentation from the validated Mission Model.
 
-Expected generated output:
+Generated output:
 
 ```text
 generated/docs/commandability.md
 ```
 
-The generated page should expose:
+The generated page exposes:
 
 ```text
 command sources
@@ -344,17 +344,17 @@ referenced modes
 referenced events, faults and telemetry
 ```
 
-Generated documentation must state that these are contract assumptions, not runtime behavior.
+Generated documentation states that these are contract assumptions, not runtime behavior.
 
 ---
 
 ## Current Boundary
 
-The v0.5 development model remains narrow.
+The commandability/autonomy model remains narrow.
 
-It should strengthen the Mission Data Chain without introducing command runtime or autonomy runtime behavior.
+It strengthens the Mission Data Chain without introducing command runtime or autonomy runtime behavior.
 
-The correct v0.5.0 outcome is:
+The correct outcome is:
 
 ```text
 Command Definition
@@ -362,9 +362,11 @@ Command Definition
         -> Autonomy/Recovery Contract Assumption
         -> Lintable Consistency
         -> Generated Documentation
+        -> Scenario Evidence
+        -> Runtime-Facing Contract Bindings
 ```
 
-The incorrect v0.5.0 outcome is:
+The incorrect outcome is:
 
 ```text
 command uplink runtime

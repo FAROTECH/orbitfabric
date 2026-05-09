@@ -3,4 +3,4 @@
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 """
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
