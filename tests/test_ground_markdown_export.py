@@ -44,7 +44,10 @@ def test_ground_readme_is_human_reviewable(tmp_path: Path) -> None:
     assert "`ground_contract_manifest.json`" in content
     assert "`ground_dictionaries.md`" in content
     assert "The Mission Model remains the source of truth." in content
-    assert "They also do not claim compatibility with Yamcs, OpenC3, XTCE, CCSDS, PUS or CFDP." in content
+    assert (
+        "They also do not claim compatibility with Yamcs, OpenC3, XTCE, CCSDS, "
+        "PUS or CFDP."
+    ) in content
 
 
 def test_ground_dictionaries_markdown_contains_review_sections(tmp_path: Path) -> None:
