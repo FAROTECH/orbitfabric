@@ -394,7 +394,7 @@ def _arguments(arguments: tuple[Any, ...]) -> str:
             rendered.append(f"`{argument.name}` ({argument.value_type}, {metadata})")
         else:
             rendered.append(f"`{argument.name}` ({argument.value_type})")
-    return "<br>".join(rendered)
+    return "; ".join(rendered)
 
 
 def _argument_metadata(argument: Any) -> str:
@@ -417,7 +417,7 @@ def _argument_metadata(argument: Any) -> str:
 def _list(values: tuple[str, ...] | list[str] | None) -> str:
     if not values:
         return ""
-    return "<br>".join(_code(value) for value in values)
+    return ", ".join(_code(value) for value in values)
 
 
 def _compact(value: Any) -> str:
@@ -425,12 +425,12 @@ def _compact(value: Any) -> str:
         return ""
 
     if isinstance(value, dict):
-        return "<br>".join(
+        return "; ".join(
             _compact_key_value(key, item) for key, item in value.items()
         )
 
     if isinstance(value, list | tuple):
-        return "<br>".join(_compact(item) for item in value)
+        return ", ".join(_compact(item) for item in value)
 
     return _text(value)
 
