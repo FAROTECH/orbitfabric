@@ -1,8 +1,8 @@
-# OrbitFabric — Architecture
+# OrbitFabric - Architecture
 
-Version: 0.7.0  
+Version: 0.8.0  
 Status: Development preview  
-Scope: Mission Data Contract architecture through Generated Runtime Skeletons
+Scope: Mission Data Contract architecture through Ground Integration Artifacts
 
 ---
 
@@ -16,13 +16,16 @@ Its architecture is centered on one primary artifact:
 
 The Mission Data Contract is expressed as a structured Mission Model.
 
-It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, documentation and scenario evidence from one source of truth.
+It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, documentation and scenario evidence from one source of truth.
 
 OrbitFabric is not designed as:
 
 ```text
 flight software framework
 ground segment
+mission control system
+operator console
+telemetry archive
 spacecraft dynamics simulator
 payload runtime framework
 CCSDS/PUS/CFDP implementation
@@ -31,13 +34,13 @@ hardware abstraction layer
 
 Its architectural role is:
 
-> define, validate, simulate, document and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation and future ground integration artifacts.
+> define, validate, simulate, document and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings and ground-facing integration.
 
-The current architectural baseline is `v0.7.0 — Generated Runtime Skeletons`.
+The current architectural baseline is `v0.8.0 - Ground Integration Artifacts`.
 
-In v0.7.0, Generated Runtime Skeletons means runtime-facing contract bindings.
+In v0.8.0, Ground Integration Artifacts means ground-facing Mission Data Contract exports.
 
-The next architectural step is `v0.8 — Ground Integration Artifacts`.
+The next architectural step is `v0.9 - Plugin and Extensibility Layer`.
 
 ---
 
@@ -47,21 +50,23 @@ The next architectural step is `v0.8 — Ground Integration Artifacts`.
 
 The Mission Model is the source of truth.
 
-Runtime-facing bindings, simulation behavior, generated documentation and future integration artifacts must derive from the model.
+Runtime-facing bindings, ground-facing artifacts, simulation behavior and generated documentation must derive from the model.
 
 No important mission behavior should live only in Python code, documentation, generated files or simulator internals.
 
 ### 2.2 Contract Before Runtime
 
-OrbitFabric does not implement a flight runtime.
+OrbitFabric does not implement a flight runtime or a ground runtime.
 
 It implements a host-side toolchain that proves and hardens the Mission Data Contract.
 
-v0.7.0 introduces generated runtime-facing contract bindings, not onboard behavior.
+v0.7.0 introduced generated runtime-facing contract bindings, not onboard behavior.
 
-### 2.3 Chain Before Runtime Bindings
+v0.8.0 introduced generated ground-facing contract exports, not ground behavior.
 
-OrbitFabric models the Mission Data Chain before generating software-facing artifacts.
+### 2.3 Chain Before Generated Artifacts
+
+OrbitFabric models the Mission Data Chain before generating downstream artifacts.
 
 The current chain is:
 
@@ -74,16 +79,18 @@ Payload behavior
         -> Commandability and Autonomy Contracts
         -> End-to-End Mission Data Flow Evidence
         -> Runtime-Facing Contract Bindings
-        -> future Ground Integration Artifacts
+        -> Ground-Facing Integration Artifacts
 ```
 
-### 2.4 Runtime Bindings Are Not Runtime Behavior
+### 2.4 Generated Bindings and Exports Are Not Behavior
 
 Generated Runtime Skeletons are contract bindings.
 
-They may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces and host-build smoke validation.
+Generated Ground Integration Artifacts are contract exports.
 
-They must not implement command dispatch, queues, scheduling, HAL, drivers, RTOS integration, telemetry polling, fault management, storage runtime, downlink runtime or flight-ready behavior.
+They may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces, manifests, dictionaries and review documents.
+
+They must not implement command dispatch, queues, scheduling, HAL, drivers, RTOS integration, telemetry polling, fault management, storage runtime, downlink runtime, decoder runtime, database behavior, operator workflows or live ground operations.
 
 ### 2.5 Lint as Engineering Judgment
 
@@ -115,7 +122,7 @@ It is not a real-time onboard runtime.
 
 ### 2.8 Ground by Construction
 
-OrbitFabric should eventually produce artifacts useful for ground integration.
+OrbitFabric produces artifacts useful for ground integration.
 
 It must not become a ground segment.
 
@@ -145,6 +152,7 @@ OrbitFabric
 │   ├── commandability/autonomy contracts
 │   ├── data-flow evidence contracts
 │   ├── runtime-facing contract binding inputs
+│   ├── ground-facing contract export inputs
 │   └── scenarios
 │
 ├── Toolchain
@@ -154,21 +162,23 @@ OrbitFabric
 │   ├── orbitfabric gen docs
 │   ├── orbitfabric gen data-flow
 │   ├── orbitfabric gen runtime
+│   ├── orbitfabric gen ground
 │   └── orbitfabric sim
 │
 ├── Model Layer
 ├── Lint Layer
 ├── Simulation Layer
 ├── RuntimeContract Layer
+├── GroundContract Layer
 ├── Generation Layer
 └── Future Extension Layer
 ```
 
 ---
 
-## 4. Current Capability Boundary — v0.7.0
+## 4. Current Capability Boundary - v0.8.0
 
-OrbitFabric v0.7.0 includes:
+OrbitFabric v0.8.0 includes:
 
 ```text
 Mission Model YAML
@@ -180,39 +190,27 @@ optional commandability.yaml domain
 Pydantic typed validation
 structural validation
 semantic lint
-payload contract lint rules
-data product contract lint rules
-contact/downlink contract lint rules
-commandability/autonomy contract lint rules
-command-declared data product effect lint rules
-scenario data-flow expectation reference checks
-scenario loading
-scenario reference validation
+scenario loading and reference validation
 host-side deterministic scenario execution
-payload lifecycle scenario behavior
 contract-level data-flow evidence recording
 generated Markdown docs
-generated payload documentation
-generated data product documentation
-generated contact/downlink documentation
-generated commandability/autonomy documentation
-generated data-flow evidence documentation
 JSON lint reports
 JSON scenario reports with data_flow_evidence
 plain-text scenario logs
 RuntimeContract intermediate model
 orbitfabric gen runtime command
-runtime_contract_manifest.json
-C++17 mission identifier headers
-C++17 runtime value enums
-C++17 static metadata registries
-C++17 command argument structs
-C++17 abstract adapter interfaces
+C++17 runtime-facing contract bindings
 C++17 host-build smoke CMake target
+GroundContract intermediate model
+orbitfabric gen ground command
+generic ground contract manifest
+JSON ground dictionaries
+CSV ground dictionaries
+human-reviewable ground Markdown artifacts
 synthetic demo mission
 ```
 
-OrbitFabric v0.7.0 excludes:
+OrbitFabric v0.8.0 excludes:
 
 ```text
 flight runtime
@@ -221,32 +219,26 @@ RTOS integration
 Linux onboard service
 hardware drivers
 real onboard storage runtime
-file-system abstraction
-compression engine
-payload data processing pipeline
-orbit propagation
-TLE parsing
-ground track computation
-antenna pointing
-RF link budget simulation
-real contact scheduling
 real downlink execution
-onboard downlink queues
-live ground links
 downlink runtime
 ground segment
+mission control system
+operator console
+telemetry archive
+telemetry database
+command uplink service
+telecommand transport
+network/session/routing behavior
+binary packet decoder
+binary telecommand encoder
+Yamcs integration
+OpenC3 integration
+XTCE compliance
 CCSDS/PUS/CFDP implementation
-Yamcs/OpenC3 integration
-Basilisk bridge
-cFS/F Prime bridge
-formal verification
-security model
+security enforcement
 real command authentication
 real command authorization
 live uplink services
-operator consoles
-command queues
-onboard schedulers
 flight autonomy runtime
 real FDIR or safing logic
 ```
@@ -274,7 +266,9 @@ Typed Mission Model
       │
       ├──────────────► Scenario Runner ─────────► Simulation Log + Scenario Report
       │
-      └──────────────► RuntimeContract Builder ─► Runtime-Facing Contract Bindings
+      ├──────────────► RuntimeContract Builder ─► Runtime-Facing Contract Bindings
+      │
+      └──────────────► GroundContract Builder ──► Ground-Facing Integration Artifacts
 ```
 
 The model is loaded once and consumed by multiple downstream layers.
@@ -313,11 +307,14 @@ End-to-End Mission Data Flow Evidence
       │
       ▼
 Runtime-Facing Contract Bindings
+      │
+      ▼
+Ground-Facing Integration Artifacts
 ```
 
-This is the architectural reason OrbitFabric did not jump directly from payload contracts to runtime generation.
+This is the architectural reason OrbitFabric did not jump directly from payload contracts to ground exports.
 
-Runtime-facing contract bindings are useful only after the mission data chain is explicit enough to generate meaningful integration artifacts.
+Ground-facing artifacts are useful only after the mission data chain and runtime-facing contract surface are explicit enough to generate meaningful integration evidence.
 
 ---
 
@@ -331,6 +328,7 @@ orbitfabric lint examples/demo-3u/mission/
 orbitfabric gen docs examples/demo-3u/mission/
 orbitfabric gen data-flow examples/demo-3u/mission/
 orbitfabric gen runtime examples/demo-3u/mission/
+orbitfabric gen ground examples/demo-3u/mission/
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 orbitfabric inspect mission examples/demo-3u/mission/
@@ -345,7 +343,8 @@ orbitfabric
 ├── gen
 │   ├── docs <mission-dir>
 │   ├── data-flow <mission-dir>
-│   └── runtime <mission-dir>
+│   ├── runtime <mission-dir>
+│   └── ground <mission-dir>
 ├── sim <scenario-file>
 ├── inspect
 │   └── mission <mission-dir>
@@ -353,173 +352,13 @@ orbitfabric
     └── scenario <scenario-file>
 ```
 
-Future commands may include:
-
-```text
-orbitfabric init
-orbitfabric gen yamcs
-orbitfabric gen openc3
-orbitfabric gen xtce
-orbitfabric export ground
-orbitfabric validate mission
-```
-
-These are not current requirements.
+Future commands may include tool-specific exporters only after their semantics are implemented and tested explicitly.
 
 ---
 
-## 8. Model Layer
+## 8. RuntimeContract Architecture
 
-The Model Layer loads and represents the Mission Model.
-
-It is responsible for reading YAML files, validating top-level domain keys, building typed model objects, detecting duplicate IDs and exposing validated model objects to lint, simulation and generation layers.
-
-Current required files:
-
-```text
-spacecraft.yaml
-subsystems.yaml
-modes.yaml
-telemetry.yaml
-commands.yaml
-events.yaml
-faults.yaml
-packets.yaml
-policies.yaml
-```
-
-Current optional files:
-
-```text
-payloads.yaml
-data_products.yaml
-contacts.yaml
-commandability.yaml
-```
-
----
-
-## 9. Lint Layer
-
-The Lint Layer performs mission consistency analysis.
-
-Current rule families:
-
-```text
-OF-SYN-*   syntax and file parsing
-OF-STR-*   structural validation
-OF-ID-*    identifier and uniqueness rules
-OF-REF-*   cross-reference rules
-OF-TLM-*   telemetry rules
-OF-CMD-*   command rules, including data product expected effects
-OF-EVT-*   event rules
-OF-FLT-*   fault rules
-OF-MODE-*  mode and transition rules
-OF-PKT-*   packet rules
-OF-PAY-*   payload contract rules
-OF-DP-*    data product contract rules
-OF-CON-*   contact assumption rules
-OF-DL-*    downlink flow assumption rules
-OF-CAB-*   commandability rule diagnostics
-OF-AUT-*   autonomous action diagnostics
-OF-REC-*   recovery intent diagnostics
-OF-SCN-*   scenario rules, including data-flow expectation references
-```
-
-v0.7.0 does not change Mission Data Contract lint semantics.
-
-It consumes the validated contract for runtime-facing generation.
-
----
-
-## 10. Simulation Layer
-
-The Simulation Layer executes operational scenarios against a validated Mission Model.
-
-It is responsible for:
-
-- loading scenario YAML;
-- validating scenario references;
-- initializing simulation state;
-- executing timeline steps;
-- dispatching commands in the host-side simulator;
-- applying command expected effects;
-- tracking payload lifecycle state;
-- injecting telemetry;
-- evaluating faults;
-- emitting events;
-- applying simple recovery actions;
-- recording contract-level data-flow evidence;
-- checking data-flow expectations;
-- producing logs;
-- producing scenario reports.
-
-The Simulation Layer does not model:
-
-```text
-orbital dynamics
-attitude dynamics
-power system physics
-thermal behavior
-RF link budget
-contact visibility
-real-time scheduling
-hardware communication
-embedded resource constraints
-storage runtime behavior
-downlink runtime behavior
-contact visibility behavior
-flight qualification semantics
-```
-
-It is an operational consistency simulator, not a spacecraft physics simulator.
-
----
-
-## 11. Data Flow Evidence Architecture
-
-Data Flow Evidence is produced when an accepted command declares data products in `expected_effects.data_products`.
-
-The recorded evidence connects:
-
-```text
-command id
-data product id
-producer
-producer type
-storage intent
-downlink intent
-eligible downlink flows
-matching contact windows
-```
-
-Scenario assertions may check:
-
-```text
-data_product
-triggered_by_command
-storage_intent_declared
-downlink_intent_declared
-eligible_downlink_flow
-contact_window
-```
-
-This evidence is exported in simulation JSON reports under:
-
-```text
-summary.data_flow_evidence
-data_flow_evidence[]
-```
-
-This is contract-level evidence only.
-
-It does not create payload files, write onboard storage, execute downlink queues or schedule contacts.
-
----
-
-## 12. RuntimeContract Architecture
-
-v0.7.0 introduces RuntimeContract as the mandatory intermediate model for runtime-facing generation.
+RuntimeContract is the intermediate model for runtime-facing generation.
 
 The required dependency direction is:
 
@@ -531,38 +370,109 @@ Mission Model
         -> generated runtime-facing files
 ```
 
-The disallowed direction is:
+RuntimeContract contains the software-facing subset of the Mission Data Contract.
 
-```text
-profile-specific generator
-        -> raw YAML files
-        -> simulator internals
-        -> documentation generator internals
-```
-
-RuntimeContract contains the software-facing subset of the Mission Data Contract:
-
-```text
-mission identity
-modes
-telemetry
-commands
-command arguments
-events
-faults
-packets
-payloads
-data products
-storage policy identifiers
-downlink policy identifiers
-generation metadata
-```
-
-It is smaller than the full Mission Model by design.
+It is not flight software and it is not the source of truth.
 
 ---
 
-## 13. Runtime-Facing Generation Layer
+## 9. GroundContract Architecture
+
+v0.8.0 introduces GroundContract as the intermediate model for ground-facing generation.
+
+The required dependency direction is:
+
+```text
+Mission Model
+        -> validation and linting
+        -> GroundContract builder
+        -> generic ground exporter
+        -> generated ground-facing package
+```
+
+The disallowed direction is:
+
+```text
+ground exporter
+        -> raw YAML files
+        -> simulator internals
+        -> runtime generator internals
+        -> generated runtime files
+```
+
+GroundContract contains the ground-facing subset of the Mission Data Contract:
+
+```text
+mission identity
+telemetry dictionaries
+command dictionaries
+event dictionaries
+fault dictionaries
+data product dictionaries
+packet dictionaries
+generation metadata
+boundary flags
+```
+
+It is not a mission database runtime.
+
+It is not a ground segment configuration format.
+
+It is not the source of truth.
+
+---
+
+## 10. Ground-Facing Generation Layer
+
+The generic ground profile generates:
+
+```text
+generated/ground/generic/
+├── ground_contract_manifest.json
+├── README.md
+├── dictionaries/*.json
+├── csv/*.csv
+└── ground_dictionaries.md
+```
+
+These artifacts expose:
+
+```text
+telemetry contract metadata
+command contract metadata
+event contract metadata
+fault contract metadata
+data product contract metadata
+packet membership metadata
+review-oriented documentation
+machine-readable dictionaries
+spreadsheet-friendly dictionaries
+manifest boundary flags
+```
+
+They do not expose:
+
+```text
+binary packet decoder
+ground runtime
+telemetry archive
+database implementation
+operator console
+command uplink service
+Yamcs compatibility
+OpenC3 compatibility
+XTCE compliance
+CCSDS/PUS/CFDP behavior
+security enforcement
+```
+
+Generated ground artifacts are disposable.
+
+Downstream ground integration code must live outside generated OrbitFabric output unless explicitly generated by a future tool-specific profile.
+
+---
+
+## 11. Runtime-Facing Generation Layer
 
 The C++17 runtime profile generates:
 
@@ -577,29 +487,9 @@ generated/runtime/cpp17/CMakeLists.txt
 generated/runtime/cpp17/src/orbitfabric_runtime_contract_smoke.cpp
 ```
 
-These artifacts expose:
+These artifacts expose stable generated identifiers, typed command argument structs, static metadata registries, abstract adapter interfaces and host-build smoke validation.
 
-```text
-stable generated identifiers
-typed command argument structs
-static metadata registries
-abstract adapter interfaces
-host-build smoke validation
-```
-
-They do not expose:
-
-```text
-runtime loops
-command queues
-command dispatch implementation
-scheduler behavior
-HAL or driver abstractions
-RTOS integration
-binary serialization
-CCSDS/PUS/CFDP behavior
-flight software behavior
-```
+They do not implement flight behavior.
 
 Generated runtime-facing artifacts are disposable.
 
@@ -607,9 +497,9 @@ User implementation code must live outside `generated/`.
 
 ---
 
-## 14. Host-Build Smoke Validation
+## 12. Host-Build and Ground Export Validation
 
-v0.7.0 generated C++17 bindings can be validated with:
+Runtime-facing bindings can be validated with:
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -617,13 +507,19 @@ cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 ```
 
-This confirms that generated headers and smoke source are syntactically valid and buildable as C++17 on the host.
+Ground-facing artifacts can be validated with:
 
-It does not validate flight behavior.
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+This confirms that the generated contract surfaces are syntactically valid and reproducible on the host.
+
+It does not validate flight behavior or live ground behavior.
 
 ---
 
-## 15. Documentation Generation Layer
+## 13. Documentation Generation Layer
 
 The Generation Layer derives human-readable and machine-readable artifacts from the Mission Model.
 
@@ -643,22 +539,17 @@ generated/docs/commandability.md
 generated/docs/data_flow.md
 ```
 
-The standard docs command generates all of these when the relevant contract domains are present:
+Ground-facing review artifacts are generated under:
 
-```bash
-orbitfabric gen docs examples/demo-3u/mission/
+```text
+generated/ground/generic/
 ```
 
-The data-flow page can also be generated directly:
-
-```bash
-orbitfabric gen data-flow examples/demo-3u/mission/ \
-  --output-file generated/docs/data_flow.md
-```
+Generated documentation is not the source of truth.
 
 ---
 
-## 16. Demo Mission Architecture
+## 14. Demo Mission Architecture
 
 The canonical demo is `demo-3u`.
 
@@ -686,72 +577,31 @@ examples/demo-3u/
     └── payload_data_flow_evidence.yaml
 ```
 
-The data-flow scenario demonstrates:
-
-```text
-payload.start_acquisition
-        -> payload.radiation_histogram
-        -> storage intent declared
-        -> downlink intent declared
-        -> science_next_available_contact
-        -> demo_contact_001
-```
-
 The demo must stay synthetic and clean-room.
 
 ---
 
-## 17. Reports Architecture
+## 15. Reports and Generated Artifact Architecture
 
 Reports are JSON where machine-readable output is required.
 
-### 17.1 Lint Report
+Generated artifact manifests are also JSON where deterministic downstream inspection is required.
 
-Conceptual shape:
+Current generated JSON families include:
 
-```json
-{
-  "tool": "orbitfabric-lint",
-  "version": "0.7.0",
-  "mission": "demo-3u",
-  "model_version": "0.1.0",
-  "result": "passed",
-  "summary": {
-    "errors": 0,
-    "warnings": 0,
-    "info": 0
-  },
-  "findings": []
-}
+```text
+lint reports
+simulation reports
+runtime contract manifest
+ground contract manifest
+ground dictionaries
 ```
 
-### 17.2 Scenario Report
-
-Conceptual shape:
-
-```json
-{
-  "tool": "orbitfabric-sim",
-  "version": "0.7.0",
-  "scenario": "payload_data_flow_evidence",
-  "mission": "demo-3u",
-  "result": "passed",
-  "summary": {
-    "events": 2,
-    "commands": 2,
-    "mode_transitions": 1,
-    "data_flow_evidence": 1,
-    "failed_expectations": 0
-  },
-  "data_flow_evidence": []
-}
-```
-
-Reports must be stable enough for tests and CI.
+Reports and manifests must remain stable enough for tests and CI, but they are still development-preview artifacts before v1.0.
 
 ---
 
-## 18. Layer Dependency Rules
+## 16. Layer Dependency Rules
 
 Allowed dependencies:
 
@@ -767,7 +617,9 @@ sim -> model
 sim -> reports
 gen -> model
 gen -> RuntimeContract builder
+gen -> GroundContract builder
 RuntimeContract builder -> model
+GroundContract builder -> model
 reports -> lint report data
 reports -> simulation report data
 ```
@@ -783,6 +635,7 @@ lint -> sim
 sim -> gen
 gen -> sim
 RuntimeContract builder -> raw YAML files
+GroundContract builder -> raw YAML files
 profile-specific generator -> raw YAML files
 ```
 
@@ -790,7 +643,7 @@ The Model Layer must remain the lowest stable layer.
 
 ---
 
-## 19. Testing Architecture
+## 17. Testing Architecture
 
 Current test strategy covers:
 
@@ -812,6 +665,11 @@ data-flow evidence JSON report tests
 documentation generator tests
 RuntimeContract builder tests
 C++17 runtime generator tests
+GroundContract builder tests
+ground manifest tests
+ground JSON export tests
+ground CSV export tests
+ground Markdown export tests
 CLI smoke tests
 ```
 
@@ -834,24 +692,25 @@ Release validation additionally includes:
 orbitfabric gen runtime examples/demo-3u/mission/
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
+orbitfabric gen ground examples/demo-3u/mission/
 ```
 
 ---
 
-## 20. Future Extension Architecture
+## 18. Future Extension Architecture
 
 Future extensions should be added as generators, plugins or adapters.
 
 Possible future layers:
 
 ```text
-Ground Integration Artifact Generators
-Yamcs Export Generator
-OpenC3 Export Generator
-XTCE Export Generator
+Custom Ground Exporters
 Custom Lint Rule Plugins
 Custom Mission Model Extensions
 Runtime Adapter SDK
+Yamcs Export Generator
+OpenC3 Export Generator
+XTCE Export Generator
 Basilisk Bridge
 cFS/F Prime Integration Bridges
 ```
@@ -862,12 +721,13 @@ They must not redefine the mission contract.
 
 ---
 
-## 21. Anti-Patterns
+## 19. Anti-Patterns
 
 The following patterns are architecturally wrong:
 
 ```text
 runtime-first drift
+ground-first drift
 demo-driven special cases
 hidden mission logic
 premature standard compliance
@@ -881,9 +741,9 @@ proprietary example contamination
 
 ---
 
-## 22. v0.7.0 Acceptance Architecture
+## 20. v0.8.0 Acceptance Architecture
 
-OrbitFabric v0.7.0 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.8.0 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -910,6 +770,8 @@ orbitfabric gen runtime examples/demo-3u/mission/
 
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
+
+orbitfabric gen ground examples/demo-3u/mission/
 ```
 
 And produces:
@@ -917,38 +779,35 @@ And produces:
 ```text
 valid lint output
 Markdown mission documentation
-payload contract documentation
-data product contract documentation
-contact/downlink contract documentation
-commandability/autonomy contract documentation
-data-flow evidence documentation
 scenario execution logs
 scenario JSON reports
 data_flow_evidence JSON records
 RuntimeContract manifest
 C++17 runtime-facing contract headers
 host-build smoke validation
+GroundContract manifest
+JSON ground dictionaries
+CSV ground dictionaries
+human-reviewable ground Markdown artifacts
 ```
 
-No flight runtime, ground export, orbital propagation, RF simulation, storage/downlink runtime, live uplink or autonomy runtime is required for v0.7.0.
+No flight runtime, live ground segment, orbital propagation, RF simulation, storage/downlink runtime, live uplink, decoder runtime, telemetry archive, operator console or autonomy runtime is required for v0.8.0.
 
 ---
 
-## 23. Next Architectural Step — v0.8
+## 21. Next Architectural Step - v0.9
 
 The next architectural step is:
 
 ```text
-v0.8 — Ground Integration Artifacts
+v0.9 - Plugin and Extensibility Layer
 ```
 
-The purpose is to start deriving ground-facing artifacts from the Mission Data Contract without becoming a ground segment.
-
-v0.8 must not claim Yamcs/OpenC3/XTCE compatibility unless specific exported artifacts are implemented and tested.
+The purpose is to introduce controlled extension points without letting plugins redefine core OrbitFabric semantics or bypass Mission Model validation.
 
 ---
 
-## 24. Final Architectural Statement
+## 22. Final Architectural Statement
 
 OrbitFabric is architecturally centered on the Mission Data Contract.
 
@@ -964,7 +823,9 @@ The v0.6 data-flow evidence layer proves the first end-to-end Mission Data Chain
 
 The v0.7 runtime-facing binding layer exposes that contract to implementation code without generating flight behavior.
 
-Future ground integrations consume the contract.
+The v0.8 ground-facing artifact layer exposes that contract to ground integration work without generating ground behavior.
+
+Future plugins must consume the contract.
 
 Nothing should bypass the contract.
 
