@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution and generated runtime-facing contract bindings.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings and ground-facing integration artifacts.
 
 ---
 
@@ -122,7 +122,7 @@ examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 
 `nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
 
-`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the v0.7 baseline.
+`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the v0.8 baseline.
 
 ---
 
@@ -132,15 +132,15 @@ The battery-low scenario demonstrates this operational sequence:
 
 ```text
 payload.start_acquisition
-→ payload.acquisition_started
-→ NOMINAL -> PAYLOAD_ACTIVE
-→ battery voltage degradation
-→ eps.battery_low
-→ PAYLOAD_ACTIVE -> DEGRADED
-→ payload.stop_acquisition AUTO_DISPATCHED
-→ payload.acquisition_stopped
-→ payload.acquisition.active = false
-→ SCENARIO PASSED
+-> payload.acquisition_started
+-> NOMINAL -> PAYLOAD_ACTIVE
+-> battery voltage degradation
+-> eps.battery_low
+-> PAYLOAD_ACTIVE -> DEGRADED
+-> payload.stop_acquisition AUTO_DISPATCHED
+-> payload.acquisition_stopped
+-> payload.acquisition.active = false
+-> SCENARIO PASSED
 ```
 
 This remains a deterministic host-side operational scenario.
@@ -155,16 +155,16 @@ The data-flow evidence scenario demonstrates the contract chain:
 
 ```text
 payload.start_acquisition
-→ payload.acquisition_started
-→ payload lifecycle ACQUIRING
-→ payload.acquisition.active = true
-→ DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED
-→ DATA_FLOW payload.radiation_histogram EXPECTATION_MET
-→ payload.stop_acquisition
-→ payload.acquisition_stopped
-→ payload lifecycle READY
-→ payload.acquisition.active = false
-→ SCENARIO PASSED
+-> payload.acquisition_started
+-> payload lifecycle ACQUIRING
+-> payload.acquisition.active = true
+-> DATA_PRODUCT payload.radiation_histogram CONTRACT_EVIDENCE_RECORDED
+-> DATA_FLOW payload.radiation_histogram EXPECTATION_MET
+-> payload.stop_acquisition
+-> payload.acquisition_stopped
+-> payload lifecycle READY
+-> payload.acquisition.active = false
+-> SCENARIO PASSED
 ```
 
 The scenario checks that the command-declared data product effect is traceable to:
@@ -178,21 +178,15 @@ payload.start_acquisition
         -> demo_contact_001
 ```
 
-This is not real payload file generation.
+This is deterministic contract-level evidence generated from the Mission Model and scenario expectations.
 
-It is not real onboard storage.
-
-It is not downlink queue execution.
-
-It is not contact scheduling.
-
-It is deterministic contract-level evidence generated from the Mission Model and scenario expectations.
+It is not real payload file generation, onboard storage, downlink queue execution or contact scheduling.
 
 ---
 
 ## 7. Generate runtime-facing contract bindings
 
-v0.7.0 adds generated runtime-facing contract bindings for the same `demo-3u` Mission Model.
+v0.7.0 added generated runtime-facing contract bindings for the same `demo-3u` Mission Model.
 
 Run:
 
@@ -237,7 +231,46 @@ It does not validate flight behavior.
 
 ---
 
-## 9. Run the scenarios
+## 9. Generate ground-facing integration artifacts
+
+v0.8.0 adds generated ground-facing integration artifacts for the same `demo-3u` Mission Model.
+
+Run:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+Generated files:
+
+```text
+generated/ground/generic/
+├── ground_contract_manifest.json
+├── README.md
+├── dictionaries/
+│   ├── telemetry_dictionary.json
+│   ├── command_dictionary.json
+│   ├── event_dictionary.json
+│   ├── fault_dictionary.json
+│   ├── data_product_dictionary.json
+│   └── packet_dictionary.json
+├── csv/
+│   ├── telemetry_dictionary.csv
+│   ├── command_dictionary.csv
+│   ├── event_dictionary.csv
+│   ├── fault_dictionary.csv
+│   ├── data_product_dictionary.csv
+│   └── packet_dictionary.csv
+└── ground_dictionaries.md
+```
+
+These artifacts expose the mission data contract to ground-side review and downstream integration workflows.
+
+They do not implement a ground segment, decoder, telemetry archive, database, operator console, command uplink service, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
+
+---
+
+## 10. Run the scenarios
 
 Battery-low recovery:
 
@@ -259,7 +292,7 @@ Result: PASSED
 
 ---
 
-## 10. Generate scenario outputs
+## 11. Generate scenario outputs
 
 Battery-low recovery outputs:
 
@@ -288,7 +321,7 @@ generated/logs/payload_data_flow_evidence.log
 
 ---
 
-## 11. Generate mission documentation
+## 12. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -311,8 +344,6 @@ generated/docs/
 └── data_flow.md
 ```
 
-The generated data-flow documentation exposes declared command-to-data-product paths and traces storage intent, downlink intent, eligible downlink flows and matching contact windows as contract data.
-
 A dedicated generator is also available:
 
 ```bash
@@ -324,7 +355,7 @@ None of these pages describes runtime behavior.
 
 ---
 
-## 12. What the simulator checks
+## 13. What the simulator checks
 
 During execution, OrbitFabric checks that:
 
@@ -332,7 +363,6 @@ During execution, OrbitFabric checks that:
 - commands are allowed in the current mode;
 - expected command effects are applied;
 - payload lifecycle preconditions are respected;
-- payload lifecycle expected effects are applied;
 - events are emitted;
 - telemetry injections update simulation state;
 - fault conditions are evaluated;
@@ -350,7 +380,7 @@ The simulator does not execute real storage, real downlink, live uplink, contact
 
 ---
 
-## 13. Expected final state
+## 14. Expected final state
 
 At the end of the battery-low scenario:
 
@@ -380,11 +410,12 @@ command accepted
   -> storage/downlink/contact intent checked
   -> scenario evidence produced
   -> runtime-facing bindings generated from the same model
+  -> ground-facing artifacts generated from the same model
 ```
 
 ---
 
-## 14. Clean-room boundary
+## 15. Clean-room boundary
 
 This demo is deliberately synthetic.
 

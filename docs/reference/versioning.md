@@ -7,7 +7,8 @@ OrbitFabric currently distinguishes between:
 - the OrbitFabric tool/package version;
 - the Mission Model version declared by a mission;
 - the version field written into generated JSON reports;
-- the generated runtime contract manifest version context.
+- the generated runtime contract manifest context;
+- the generated ground contract manifest context.
 
 These versions are related, but they are not the same thing.
 
@@ -33,7 +34,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.7.0
+orbitfabric 0.8.0
 ```
 
 This version answers the question:
@@ -42,9 +43,7 @@ This version answers the question:
 Which version of the OrbitFabric tool generated, validated or executed this artifact?
 ```
 
-Generated JSON reports use this version in their top-level `version` field.
-
-Generated runtime contract manifests also record the generation profile and contract metadata produced by the tool.
+Generated JSON reports and generated manifests record this tool context where applicable.
 
 ---
 
@@ -88,7 +87,7 @@ Current example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -102,7 +101,7 @@ The `model_version` identifies the Mission Model version declared by the mission
 
 ## Runtime contract manifest context
 
-v0.7.0 introduces runtime-facing contract bindings.
+v0.7.0 introduced runtime-facing contract bindings.
 
 The generated runtime manifest is written to:
 
@@ -126,6 +125,38 @@ It is not a separate schema version promise for v1.0 compatibility.
 
 ---
 
+## Ground contract manifest context
+
+v0.8.0 introduced ground-facing contract exports.
+
+The generated ground manifest is written to:
+
+```text
+generated/ground/generic/ground_contract_manifest.json
+```
+
+It records the generated ground-facing package, artifact paths and architectural boundary flags.
+
+It also records generation metadata such as:
+
+```text
+generation profile
+generated_artifacts_are_disposable = true
+contains_ground_runtime = false
+contains_operator_console = false
+contains_transport = false
+contains_database = false
+claims_yamcs_compatibility = false
+claims_openc3_compatibility = false
+claims_xtce_compliance = false
+```
+
+The ground manifest is generated from the current OrbitFabric tool and the declared Mission Model.
+
+It is not a ground segment schema, mission database compatibility promise or v1.0 compatibility guarantee.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -133,7 +164,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.7.0
+OrbitFabric tool/package version: 0.8.0
 Mission Model version:           0.1.0
 ```
 
@@ -141,13 +172,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence and Runtime Contract Bindings;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings and Ground Integration Artifacts;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.7 rule
+## Current v0.8 rule
 
 For the current development preview:
 
@@ -159,6 +190,9 @@ For the current development preview:
 | JSON report `model_version` | Mission Model version copied from mission YAML. |
 | Runtime manifest `generation.profile` | Runtime generation profile, currently `cpp17`. |
 | Runtime manifest `contains_flight_runtime` | Explicit boundary flag, currently `false`. |
+| Ground manifest `generation.profile` | Ground generation profile, currently `generic`. |
+| Ground manifest `contains_ground_runtime` | Explicit boundary flag, currently `false`. |
+| Ground manifest `claims_*` compatibility fields | Explicit tool-specific claim flags, currently `false`. |
 
 ---
 
@@ -170,7 +204,8 @@ Do not assume that:
 - a Mission Model version bump always requires a Python package major/minor bump;
 - a Python package patch/dev version always changes the Mission Model contract;
 - generated artifacts are valid without checking both tool version and mission model version;
-- generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees.
+- generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees;
+- generated ground-facing artifacts imply ground runtime behavior or tool-specific compatibility.
 
 ---
 
@@ -182,9 +217,10 @@ Possible future additions include:
 
 - a dedicated Mission Model schema version field;
 - a dedicated RuntimeContract schema version;
+- a dedicated GroundContract schema version;
 - schema migration helpers;
 - compatibility checks between tool version and Mission Model version;
 - JSON Schema export for Mission Model validation;
 - compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.7.0 development preview.
+These are not part of the current v0.8.0 development preview.

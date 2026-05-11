@@ -5,7 +5,7 @@ This page documents the diagnostics and lint rules currently implemented by Orbi
 Current documented baseline:
 
 ```text
-v0.7.0 — Generated Runtime Skeletons
+v0.8.0 - Ground Integration Artifacts
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -93,7 +93,7 @@ OrbitFabric diagnostics expose a common diagnostic shape across Mission Model lo
 
 ---
 
-## `OF-SYN-*` — Syntax and file loading diagnostics
+## `OF-SYN-*` - Syntax and file loading diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -128,7 +128,7 @@ commandability.yaml
 
 ---
 
-## `OF-STR-*` — Structural diagnostics
+## `OF-STR-*` - Structural diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -138,7 +138,7 @@ commandability.yaml
 
 ---
 
-## `OF-ID-*` — Identifier diagnostics
+## `OF-ID-*` - Identifier diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -168,7 +168,7 @@ recovery_intents
 
 ---
 
-## `OF-REF-*` — Cross-reference diagnostics
+## `OF-REF-*` - Cross-reference diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -185,7 +185,7 @@ recovery_intents
 
 ---
 
-## `OF-TLM-*` — Telemetry rules
+## `OF-TLM-*` - Telemetry rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -195,7 +195,7 @@ recovery_intents
 
 ---
 
-## `OF-CMD-*` — Command rules
+## `OF-CMD-*` - Command rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -213,11 +213,11 @@ expected_effects:
     - payload.radiation_histogram
 ```
 
-These rules ensure that the command-to-data-product link is explicit and valid before scenario evidence, generated data-flow documentation or runtime-facing contract bindings depend on it.
+These rules ensure that the command-to-data-product link is explicit and valid before scenario evidence, generated data-flow documentation, runtime-facing contract bindings or ground-facing artifacts depend on it.
 
 ---
 
-## `OF-EVT-*` — Event rules
+## `OF-EVT-*` - Event rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -226,7 +226,7 @@ These rules ensure that the command-to-data-product link is explicit and valid b
 
 ---
 
-## `OF-FLT-*` — Fault rules
+## `OF-FLT-*` - Fault rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -235,7 +235,7 @@ These rules ensure that the command-to-data-product link is explicit and valid b
 
 ---
 
-## `OF-MODE-*` — Mode rules
+## `OF-MODE-*` - Mode rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -244,7 +244,7 @@ These rules ensure that the command-to-data-product link is explicit and valid b
 
 ---
 
-## `OF-PKT-*` — Packet rules
+## `OF-PKT-*` - Packet rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -253,7 +253,7 @@ These rules ensure that the command-to-data-product link is explicit and valid b
 
 ---
 
-## `OF-PAY-*` — Payload Contract rules
+## `OF-PAY-*` - Payload Contract rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -272,7 +272,7 @@ Payload rules are contract-level rules. They do not validate payload firmware, d
 
 ---
 
-## `OF-DP-*` — Data Product Contract rules
+## `OF-DP-*` - Data Product Contract rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -288,7 +288,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-CON-*` — Contact assumption rules
+## `OF-CON-*` - Contact assumption rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -297,7 +297,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-DL-*` — Downlink flow assumption rules
+## `OF-DL-*` - Downlink flow assumption rules
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -309,7 +309,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-CAB-*` — Commandability rule diagnostics
+## `OF-CAB-*` - Commandability rule diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -323,7 +323,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-AUT-*` — Autonomous action diagnostics
+## `OF-AUT-*` - Autonomous action diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -335,7 +335,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-REC-*` — Recovery intent diagnostics
+## `OF-REC-*` - Recovery intent diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -345,7 +345,7 @@ Data Product rules are contract-level rules. They do not validate real storage, 
 
 ---
 
-## `OF-SCN-*` — Scenario diagnostics
+## `OF-SCN-*` - Scenario diagnostics
 
 | Rule | Severity | Domain | Description | Suggested fix |
 |---|---|---|---|---|
@@ -404,7 +404,10 @@ Current behavior:
 | `orbitfabric gen docs <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen data-flow <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen runtime <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
+| `orbitfabric gen ground <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric sim <scenario-file>` | Scenario loading diagnostics, Mission Model loading diagnostics, scenario reference diagnostics and scenario execution failures. |
+
+Ground artifact generation consumes the already validated Mission Model and aborts when lint errors exist. It does not add a dedicated ground-specific diagnostic family in v0.8.0.
 
 ---
 

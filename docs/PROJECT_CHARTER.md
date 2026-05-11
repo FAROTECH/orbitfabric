@@ -1,6 +1,6 @@
-# OrbitFabric — Project Charter
+# OrbitFabric - Project Charter
 
-Version: 0.7
+Version: 0.8
 Status: Draft
 Scope: Mission Data Contract foundation, Mission Data Chain and generated contract-facing artifacts
 
@@ -10,11 +10,11 @@ Scope: Mission Data Contract foundation, Mission Data Chain and generated contra
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions, operational scenarios and runtime-facing contract bindings once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
+Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions, operational scenarios, runtime-facing contract bindings and ground-facing integration artifacts once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration artifacts for onboard and ground systems.
 
 OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool or a payload runtime framework.
 
-It is the contract layer between mission design, onboard software, simulation, testing, documentation and ground integration.
+It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing integration and ground integration.
 
 The guiding principle is:
 
@@ -45,7 +45,8 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - autonomy and recovery expectations;
 - operational scenarios;
 - validation and linting rules;
-- runtime-facing generated contract bindings.
+- runtime-facing generated contract bindings;
+- ground-facing generated integration artifacts.
 
 The Mission Data Contract is the single source of truth for all derived artifacts.
 
@@ -88,7 +89,8 @@ The initial target users are:
 - embedded engineers entering the small spacecraft domain;
 - small space startups and technical teams needing disciplined mission-data organization;
 - research labs needing repeatable mission simulations and test scenarios;
-- space software architects who need a coherent contract between payload behavior, onboard data handling and ground-facing artifacts.
+- space software architects who need a coherent contract between payload behavior, onboard data handling and ground-facing artifacts;
+- ground software engineers who need reviewable mission data dictionaries before integration starts.
 
 The target is not purely educational.
 
@@ -122,19 +124,19 @@ The correct long-term role is:
 
 ### 6.1 Mission Model First
 
-OrbitFabric starts from the Mission Model, not from the onboard runtime.
+OrbitFabric starts from the Mission Model, not from the onboard runtime or the ground system.
 
-The runtime-facing bindings, simulator, documentation and ground artifacts must be derived from the model, not the other way around.
+The runtime-facing bindings, ground-facing artifacts, simulator and documentation must be derived from the model, not the other way around.
 
 ### 6.2 Contract Before Code
 
 The first valuable artifact is the contract.
 
-Code generation, runtime execution and integration bridges are secondary and must not be designed before the model has sufficient clarity.
+Code generation, runtime execution, ground integration and integration bridges are secondary and must not redefine the model.
 
-### 6.3 Mission Data Chain Before Runtime-Facing Bindings
+### 6.3 Mission Data Chain Before Generated Artifacts
 
-OrbitFabric must make the mission data chain explicit before generating software-facing artifacts.
+OrbitFabric must make the mission data chain explicit before generating software-facing or ground-facing artifacts.
 
 The current chain is:
 
@@ -148,37 +150,26 @@ payload behavior
         -> autonomy and recovery expectations
         -> end-to-end scenario evidence
         -> runtime-facing contract bindings
+        -> ground-facing integration artifacts
 ```
 
-Only after these concepts are sufficiently clear should OrbitFabric derive ground integration artifacts from them.
+Only after these concepts are sufficiently clear should OrbitFabric derive plugin, tool-specific or external integration layers from them.
 
-### 6.4 Generated Code Is Disposable
+### 6.4 Generated Artifacts Are Disposable
 
-Generated runtime-facing contract bindings are reproducible outputs.
+Generated runtime-facing contract bindings and ground-facing integration artifacts are reproducible outputs.
 
 They are not the source of truth.
 
 Users must not place handwritten implementation code inside generated files.
 
-User implementation code must live outside `generated/` and integrate through generated identifiers, descriptors, typed structures and abstract interfaces.
+User implementation code and downstream integration code must live outside `generated/` and integrate through generated identifiers, descriptors, typed structures, abstract interfaces, manifests or dictionaries.
 
 ### 6.5 Linting as Engineering Judgment
 
 OrbitFabric linting must not be limited to YAML syntax validation.
 
 It must perform mission consistency analysis.
-
-Examples:
-
-- high-criticality telemetry without limits is an error;
-- a command allowed in SAFE mode despite operational risk is an error;
-- a fault emitting an unknown event is an error;
-- a packet referencing unknown telemetry is an error;
-- a command without timeout is at least a warning;
-- an event without downlink priority is at least a warning;
-- an incomplete data product storage intent is at least a warning;
-- a high-priority data product without downlink intent is at least a warning;
-- a contact profile referenced by downlink policy but missing from the model is an error.
 
 The lint system is a core feature, not a utility.
 
@@ -200,13 +191,13 @@ OrbitFabric must not become a full ground segment.
 
 However, it must generate artifacts useful for ground integration:
 
-- Markdown or HTML documentation;
-- JSON mission database exports;
-- packet descriptions;
-- decoder skeletons;
+- generated review documentation;
+- JSON ground dictionaries;
+- CSV review dictionaries;
+- packet membership dictionaries;
 - data product dictionaries;
 - downlink policy descriptions;
-- future Yamcs/OpenC3/XTCE exports.
+- future Yamcs/OpenC3/XTCE exports when explicitly implemented and tested.
 
 ### 6.8 Clean-Room Development
 
@@ -230,14 +221,14 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 ## 7. Completed Early Scope
 
-The current v0.7.0 baseline includes:
+The current v0.8.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
 - structural validation;
 - semantic linting;
 - generated Markdown documentation;
-- simple deterministic host-side scenario simulation;
+- deterministic host-side scenario simulation;
 - scenario runner;
 - payload contract model;
 - data product contract model;
@@ -247,11 +238,11 @@ The current v0.7.0 baseline includes:
 - RuntimeContract intermediate model;
 - generated C++17 runtime-facing contract bindings;
 - C++17 host-build smoke validation;
-- generated payload documentation;
-- generated data product documentation;
-- generated contact/downlink documentation;
-- generated commandability/autonomy documentation;
-- generated data-flow documentation;
+- GroundContract intermediate model;
+- generated generic ground-facing dictionaries;
+- generated JSON ground dictionaries;
+- generated CSV ground dictionaries;
+- generated ground Markdown review artifacts;
 - readable logs;
 - JSON reports;
 - one complete demo mission named `demo-3u`.
@@ -263,43 +254,42 @@ orbitfabric lint examples/demo-3u/mission/
 orbitfabric gen docs examples/demo-3u/mission/
 orbitfabric gen data-flow examples/demo-3u/mission/
 orbitfabric gen runtime examples/demo-3u/mission/
+orbitfabric gen ground examples/demo-3u/mission/
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
 ---
 
-## 8. Payload Contract Direction
+## 8. Ground Integration Artifact Direction
 
-The Payload / IOD Payload Contract Model makes mission-specific payload behavior explicit without turning OrbitFabric into a payload runtime framework.
+The Ground Integration Artifacts slice makes mission data visible to ground-side engineering workflows without turning OrbitFabric into ground software.
 
-A payload contract may describe:
+A ground artifact may describe:
 
-- payload identity;
-- payload profile;
-- linked subsystem;
-- lifecycle states;
-- telemetry references;
-- command references;
-- event references;
-- fault references;
-- command preconditions;
-- expected effects;
-- scenario-level behavior;
-- generated documentation.
+- telemetry identity and metadata;
+- command identity, arguments and allowed modes;
+- event identity and severity;
+- fault identity and recovery intent metadata;
+- data product identity, storage intent and downlink intent;
+- packet membership;
+- manifest boundary flags;
+- human-reviewable dictionary documentation.
 
-A payload contract must not describe:
+A ground artifact must not describe or implement:
 
-- payload firmware;
-- payload drivers;
-- hardware buses;
-- physical payload simulation;
-- scientific data processing pipelines;
-- real payload acquisition implementation.
+- live telemetry transport;
+- binary packet decoding;
+- command uplink;
+- authentication or authorization;
+- telemetry archive storage;
+- operator displays;
+- ground station scheduling;
+- Yamcs/OpenC3/XTCE compatibility unless explicitly implemented and tested.
 
-Payload contracts are part of the Mission Data Contract.
+Ground artifacts are part of the Mission Data Contract output chain.
 
-They are the foundation for later data product, storage and downlink modeling.
+They are the foundation for later tool-specific exporters and plugin extensibility.
 
 ---
 
@@ -318,7 +308,8 @@ Payload or subsystem activity
         -> commandability and autonomy constraints
         -> end-to-end scenario evidence
         -> runtime-facing contract bindings
-        -> future ground artifacts
+        -> ground-facing integration artifacts
+        -> future plugins and tool-specific exporters
 ```
 
 This direction is essential for small spacecraft and CubeSat missions because the value of mission data depends on the full path from onboard generation to ground consumption.
@@ -349,6 +340,10 @@ Early OrbitFabric versions must not include:
 - F Prime integration;
 - Yamcs integration as a live service;
 - OpenC3 integration as a live service;
+- XTCE compliance;
+- telemetry archive implementation;
+- operator console implementation;
+- command uplink implementation;
 - Basilisk integration as a dynamics simulator;
 - formal verification;
 - advanced security;
@@ -369,57 +364,9 @@ The initial demo mission is `demo-3u`.
 
 It is a synthetic 3U CubeSat-like mission used only to demonstrate OrbitFabric concepts.
 
-It contains:
+It contains the full current Mission Data Chain from telemetry, commands, events, faults and modes through payload contracts, data products, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings and ground-facing integration artifacts.
 
-- OBC;
-- EPS mock;
-- Payload mock;
-- Radio mock;
-- operational modes:
-  - BOOT;
-  - NOMINAL;
-  - PAYLOAD_ACTIVE;
-  - DEGRADED;
-  - SAFE;
-  - MAINTENANCE;
-- battery-voltage telemetry;
-- payload acquisition state telemetry;
-- payload start/stop commands;
-- EPS status command;
-- battery warning fault;
-- battery critical fault;
-- payload contract `demo_iod_payload`;
-- data product contract `payload.radiation_histogram`;
-- contact profile `primary_ground_contact`;
-- link profile `uhf_downlink_nominal`;
-- contact window `demo_contact_001`;
-- downlink flow `science_next_available_contact`;
-- command sources `ground_operator` and `onboard_autonomy`;
-- commandability rule `payload_start_ground_rule`;
-- autonomous actions for low/critical battery recovery assumptions;
-- recovery intents toward DEGRADED and SAFE;
-- one nominal payload acquisition scenario;
-- one scenario where the payload is active, battery voltage degrades, a warning event is emitted, the spacecraft transitions to DEGRADED and the payload is automatically stopped;
-- one scenario demonstrating contract-level data-flow evidence;
-- generated runtime-facing contract bindings derived from the same model.
-
-The expected battery-low scenario narrative is:
-
-```text
-[00:00] MODE=NOMINAL
-[00:05] COMMAND payload.start_acquisition -> ACCEPTED
-[00:05] EVENT payload.acquisition_started
-[00:05] PAYLOAD demo_iod_payload LIFECYCLE=ACQUIRING
-[00:32] EVENT eps.battery_low severity=WARNING
-[00:32] MODE TRANSITION PAYLOAD_ACTIVE -> DEGRADED
-[00:32] COMMAND payload.stop_acquisition -> AUTO_DISPATCHED
-[00:32] PAYLOAD demo_iod_payload LIFECYCLE=READY
-[00:40] SCENARIO PASSED
-```
-
-The demo also includes synthetic contact/downlink, commandability/autonomy, data-flow and runtime-binding slices.
-
-Those assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
+The demo assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
 
 ---
 
@@ -437,12 +384,17 @@ The recommended technical baseline is:
 - MkDocs Material for documentation;
 - C++17 for the first generated runtime-facing binding profile;
 - CMake for host-build smoke validation;
+- JSON, CSV and Markdown for the first generated ground-facing artifact package;
 - GitHub Actions for CI;
 - Apache-2.0 license.
 
 The generated C++17 surface is intentionally contract-facing and host-buildable.
 
 It is not a flight runtime.
+
+The generated ground-facing package is intentionally tool-neutral and reviewable.
+
+It is not a ground runtime.
 
 ---
 
@@ -456,7 +408,7 @@ The repository should contain:
 - documentation;
 - examples;
 - tests;
-- generated artifacts examples;
+- generated artifact examples only when explicitly required;
 - architectural decision records.
 
 Initial repository structure:
@@ -490,10 +442,11 @@ OrbitFabric is successful in the early public preview if a user can:
 6. generate Markdown documentation from the same Mission Model;
 7. generate runtime-facing C++17 contract bindings from the same Mission Model;
 8. validate those generated bindings through a host-side C++17 smoke build;
-9. understand the project positioning from the README in less than one minute;
-10. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
-11. understand how payload contracts fit into the Mission Data Contract;
-12. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints, recovery expectations and runtime-facing bindings fit into the roadmap before ground artifacts.
+9. generate ground-facing JSON, CSV and Markdown artifacts from the same Mission Model;
+10. understand the project positioning from the README in less than one minute;
+11. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
+12. understand how payload contracts fit into the Mission Data Contract;
+13. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints, recovery expectations, runtime-facing bindings and ground-facing artifacts fit into the roadmap before plugin extensibility.
 
 A minimal but strong preview is better than a broad, fragile and unfinished feature set.
 
@@ -549,7 +502,7 @@ The project should prefer:
 - generated documentation over manually duplicated references;
 - generated contract-facing artifacts over hidden implementation assumptions;
 - clean interfaces over premature integrations;
-- mission data chain modeling before runtime-facing and ground-facing generation.
+- mission data chain modeling before runtime-facing, ground-facing and plugin generation.
 
 The project should reject:
 
@@ -560,7 +513,8 @@ The project should reject:
 - undocumented assumptions;
 - private mission-derived examples;
 - flight runtime generation from an immature model;
-- ground integration exports before the contract they export is clear.
+- ground integration exports that imply unimplemented ground behavior;
+- plugins that bypass or redefine the Mission Data Contract.
 
 ---
 
@@ -574,7 +528,7 @@ The first versions must prove one thing convincingly:
 
 > A small spacecraft mission can be described once, validated semantically, simulated operationally, tested through scenarios, documented automatically and exposed through generated contract-facing artifacts from a single source of truth.
 
-The next versions must extend that proof to the ground-facing side:
+The current version extends that proof to the ground-facing side:
 
 > Payload behavior, data products, onboard storage intent, downlink priorities, contact assumptions, commandability constraints, recovery expectations and runtime-facing contract bindings can feed ground integration artifacts without duplicating or redefining the mission contract.
 

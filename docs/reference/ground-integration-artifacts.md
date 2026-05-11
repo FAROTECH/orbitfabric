@@ -1,6 +1,6 @@
 # Ground Integration Artifacts
 
-Status: Planned for v0.8.0  
+Status: Introduced in v0.8.0  
 Scope: Ground-facing Mission Data Contract exports
 
 ---
@@ -25,9 +25,9 @@ They are not a Yamcs, OpenC3 or XTCE integration.
 
 ---
 
-## Intended Flow
+## Implemented Flow
 
-The intended v0.8.0 flow is:
+The v0.8.0 flow is:
 
 ```text
 Mission Model
@@ -67,7 +67,7 @@ Which assumptions remain external implementation concerns?
 
 ## Generated Package
 
-The planned generic output package is:
+The generic output package is:
 
 ```text
 generated/ground/generic/
@@ -96,9 +96,31 @@ It is not intended to be executed.
 
 ---
 
+## Command
+
+Ground artifacts are generated with:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+Default output:
+
+```text
+generated/ground/generic/
+```
+
+The currently supported generation profile is:
+
+```text
+generic
+```
+
+---
+
 ## GroundContract
 
-GroundContract is the planned v0.8.0 intermediate model for ground-facing generation.
+GroundContract is the v0.8.0 intermediate model for ground-facing generation.
 
 It is derived from the validated Mission Model.
 
@@ -137,12 +159,12 @@ Future tool-specific profiles may be considered only when their outputs are impl
 
 ## Telemetry Dictionary
 
-The telemetry dictionary may expose:
+The telemetry dictionary exposes:
 
 ```text
-id
+model_id
 name
-type
+value_type
 unit
 source
 sampling
@@ -150,7 +172,7 @@ criticality
 persistence
 downlink_priority
 limits
-enum
+enum_values
 quality
 description
 ```
@@ -161,10 +183,10 @@ It does not implement telemetry decoding, telemetry polling, alarm runtime, arch
 
 ## Command Dictionary
 
-The command dictionary may expose:
+The command dictionary exposes:
 
 ```text
-id
+model_id
 target
 description
 arguments
@@ -179,7 +201,7 @@ expected_effects
 
 It does not implement command encoding, command uplink, authentication, authorization, queuing, routing, retry logic or runtime ACK handling.
 
-The existing command `risk` metadata may be exported because it is already part of the Mission Model.
+The existing command `risk` metadata is exported because it is already part of the Mission Model.
 
 This does not create a security model.
 
@@ -187,10 +209,10 @@ This does not create a security model.
 
 ## Event Dictionary
 
-The event dictionary may expose:
+The event dictionary exposes:
 
 ```text
-id
+model_id
 source
 severity
 description
@@ -204,10 +226,10 @@ It does not implement event routing, event storage, alerting or operator notific
 
 ## Fault Dictionary
 
-The fault dictionary may expose:
+The fault dictionary exposes:
 
 ```text
-id
+model_id
 source
 severity
 description
@@ -222,10 +244,10 @@ It does not implement fault detection, FDIR, safing behavior, command dispatch o
 
 ## Data Product Dictionary
 
-The data product dictionary may expose:
+The data product dictionary exposes:
 
 ```text
-id
+model_id
 producer
 producer_type
 type
@@ -243,10 +265,10 @@ It does not implement payload processing, file creation, compression, storage, r
 
 ## Packet Dictionary
 
-The packet dictionary may expose:
+The packet dictionary exposes:
 
 ```text
-id
+model_id
 name
 type
 max_payload_bytes
@@ -261,15 +283,15 @@ It is not a binary decoder specification.
 
 The current Mission Model does not define byte offsets, bit offsets, endianness, scaling rules, calibration curves, APID, VCID, CCSDS headers, PUS service/subservice fields, framing or transport.
 
-Therefore v0.8.0 must not claim decoder generation, CCSDS compliance, PUS compliance or CFDP behavior.
+Therefore v0.8.0 does not claim decoder generation, CCSDS compliance, PUS compliance or CFDP behavior.
 
 ---
 
 ## Manifest
 
-The generated manifest should explicitly describe the generated package and its boundary.
+The generated manifest explicitly describes the generated package and its boundary.
 
-Expected boundary flags include:
+Boundary flags include:
 
 ```json
 {
@@ -295,21 +317,17 @@ They prevent generated dictionaries from being mistaken for live ground software
 
 ---
 
-## CLI
+## JSON, CSV and Markdown Outputs
 
-The planned CLI command is:
-
-```bash
-orbitfabric gen ground examples/demo-3u/mission/
-```
-
-Default output:
+The generic profile writes three review layers:
 
 ```text
-generated/ground/generic/
+JSON dictionaries  -> machine-readable contract artifacts
+CSV dictionaries   -> spreadsheet-style review artifacts
+Markdown documents -> human-reviewable engineering artifacts
 ```
 
-Only the `generic` profile is planned for v0.8.0.
+The generated Markdown avoids HTML table line-break tags so that it remains readable in common Markdown editors.
 
 ---
 
@@ -367,9 +385,9 @@ Neither should bypass Mission Model validation.
 
 ## Relationship with Security Assumptions
 
-v0.8.0 may export existing command `risk` metadata.
+v0.8.0 exports existing command `risk` metadata.
 
-It must not introduce security assumptions, command authorization, authentication, audit runtime, cryptography, key management or enforcement behavior.
+It does not introduce security assumptions, command authorization, authentication, audit runtime, cryptography, key management or enforcement behavior.
 
 Security assumptions are a separate future contract-model topic.
 

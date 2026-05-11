@@ -2,19 +2,19 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios and runtime-facing contract bindings in a single Mission Data Contract.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings and ground-facing integration artifacts in a single Mission Data Contract.
 
-From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic host-buildable software-facing artifacts.
+From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration artifacts.
 
 ## Current development preview
 
 OrbitFabric is currently at:
 
 ```text
-v0.7.0 — Generated Runtime Skeletons
+v0.8.0 - Ground Integration Artifacts
 ```
 
-In v0.7.0, Generated Runtime Skeletons means **runtime-facing contract bindings**.
+In v0.8.0, Ground Integration Artifacts means **ground-facing Mission Data Contract exports**.
 
 The current public preview includes:
 
@@ -37,10 +37,13 @@ The current public preview includes:
 - JSON simulation reports with contract-level data-flow evidence;
 - data-flow scenario assertions;
 - RuntimeContract generation;
-- generated C++17 identifiers, enums and registries;
-- generated C++17 command argument structs;
-- generated C++17 abstract adapter interfaces;
+- generated C++17 runtime-facing contract bindings;
 - generated C++17 host-build smoke files;
+- GroundContract generation;
+- generated ground contract manifest;
+- generated JSON ground dictionaries;
+- generated CSV ground dictionaries;
+- generated human-reviewable ground Markdown artifacts;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -57,11 +60,14 @@ Mission Model
   -> end-to-end mission data flow evidence
   -> RuntimeContract
   -> generated runtime-facing contract bindings
-  -> future ground integration artifacts
+  -> GroundContract
+  -> generated ground-facing integration artifacts
 ```
 
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
 
-It is the contract layer between mission design, onboard software, simulation, testing, documentation and future ground integration artifacts.
+It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing bindings and ground-facing integration artifacts.
 
 Generated runtime-facing contract bindings are not flight software.
+
+Generated ground integration artifacts are not ground software.

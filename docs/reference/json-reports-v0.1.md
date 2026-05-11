@@ -5,7 +5,7 @@ This page documents the JSON reports currently produced by OrbitFabric.
 Current documented baseline:
 
 ```text
-v0.7.0 — Generated Runtime Skeletons
+v0.8.0 - Ground Integration Artifacts
 ```
 
 OrbitFabric JSON reports are generated artifacts intended for:
@@ -25,7 +25,7 @@ The source of truth remains the Mission Model YAML and scenario YAML.
 
 The JSON report structures documented here are development-preview contracts.
 
-They are stable enough for current v0.7 workflows, but they are not a v1.0 compatibility promise.
+They are stable enough for current v0.8 workflows, but they are not a v1.0 compatibility promise.
 
 Future versions may introduce:
 
@@ -46,7 +46,7 @@ Current example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.7.0"
+  "version": "0.8.0"
 }
 ```
 
@@ -225,6 +225,30 @@ It does not imply real payload file generation, onboard storage writes, downlink
 
 ---
 
+## Ground artifacts and JSON dictionaries
+
+v0.8.0 also generates JSON ground dictionaries through:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+The JSON ground dictionaries are generated under:
+
+```text
+generated/ground/generic/dictionaries/
+```
+
+They are ground-facing generated artifacts, not JSON reports.
+
+They are documented separately in:
+
+```text
+Reference -> Ground Integration Artifacts
+```
+
+---
+
 ## Simulation report example
 
 Compact example:
@@ -232,7 +256,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "mission": "demo-3u",
   "scenario": "payload_data_flow_evidence",
   "result": "passed",

@@ -1,7 +1,7 @@
 # Data Flow Evidence
 
 Status: Development preview  
-Scope: Introduced in OrbitFabric v0.6.0 and retained in the v0.7.0 baseline
+Scope: Introduced in OrbitFabric v0.6.0 and retained in the v0.8.0 baseline
 
 ---
 
@@ -48,7 +48,7 @@ scenarios/*.yaml
         expect.data_flow assertions
 ```
 
-Generated documentation and JSON reports are derived artifacts.
+Generated documentation, JSON reports, runtime-facing bindings and ground-facing artifacts are derived outputs.
 
 They are not the source of truth.
 
@@ -202,7 +202,17 @@ Matching Contact Windows
 
 ---
 
-## 8. Demo scenario
+## 8. Relationship with runtime and ground artifacts
+
+v0.7 builds on Data Flow Evidence by deriving runtime-facing contract bindings from the same validated Mission Model.
+
+v0.8 builds on the same chain by deriving ground-facing contract exports from the same validated Mission Model.
+
+Data Flow Evidence remains a contract-level precondition for meaningful runtime-facing and ground-facing generated artifacts.
+
+---
+
+## 9. Demo scenario
 
 The canonical data-flow evidence demo scenario is:
 
@@ -231,7 +241,7 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
 
 ---
 
-## 9. Boundary
+## 10. Boundary
 
 Data Flow Evidence does not implement:
 
@@ -247,6 +257,7 @@ RF behavior
 ground station operations
 CCSDS/PUS/CFDP behavior
 runtime behavior
+ground runtime behavior
 ```
 
 It is deterministic contract-level evidence.
@@ -257,7 +268,7 @@ It does not prove that real flight or ground software exists.
 
 ---
 
-## 10. Architectural meaning
+## 11. Architectural meaning
 
 v0.6 completed the first end-to-end Mission Data Chain evidence slice:
 
@@ -272,6 +283,8 @@ Payload Contract
         -> End-to-End Mission Data Flow Evidence
 ```
 
-v0.7 builds on this by deriving runtime-facing contract bindings from the same validated Mission Model.
+v0.7 exposed that chain through runtime-facing contract bindings.
 
-Data Flow Evidence remains a contract-level precondition for meaningful runtime-facing and ground-facing generated artifacts.
+v0.8 exposed that chain through ground-facing contract artifacts.
+
+Both remain downstream of the Mission Model.
