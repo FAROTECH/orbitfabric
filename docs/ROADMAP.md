@@ -1,6 +1,6 @@
-# OrbitFabric — Roadmap
+# OrbitFabric - Roadmap
 
-Version: v0.7.0  
+Version: v0.8.0  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -59,18 +59,18 @@ v0.4.0  Contact Windows and Downlink Flow Contracts           completed
 v0.5.0  Commandability and Autonomy Contracts                 completed
 v0.6.0  End-to-End Mission Data Flow Evidence                 completed
 v0.7.0  Generated Runtime Skeletons                           completed
-v0.8    Ground Integration Artifacts                          next
-v0.9    Plugin and Extensibility Layer                        future
+v0.8.0  Ground Integration Artifacts                          completed
+v0.9    Plugin and Extensibility Layer                        next
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target after v0.7.0 is now `v0.8 — Ground Integration Artifacts`.
+The immediate target after v0.8.0 is now `v0.9 - Plugin and Extensibility Layer`.
 
-Ground integration artifacts remain downstream of the Mission Data Contract. v0.7 completed the first runtime-facing contract binding layer required before ground-facing exports are useful.
+Ground integration artifacts remain downstream of the Mission Data Contract. v0.8 completed the first ground-facing contract export layer required before tool-specific integrations or extension points are useful.
 
 ---
 
-## 3. Completed Baseline — v0.1 Mission Contract MVP
+## 3. Completed Baseline - v0.1 Mission Contract MVP
 
 v0.1 proved that a user can:
 
@@ -82,7 +82,7 @@ v0.1 proved that a user can:
 
 ---
 
-## 4. Completed Slice — v0.2.1 Payload Contract Model
+## 4. Completed Slice - v0.2.1 Payload Contract Model
 
 v0.2.1 introduced the first narrow vertical slice for Payload / IOD Payload Contracts.
 
@@ -103,7 +103,7 @@ They must not describe payload firmware, payload drivers, hardware buses, onboar
 
 ---
 
-## 5. Completed Alignment — v0.2.2 Payload Contract Release Alignment
+## 5. Completed Alignment - v0.2.2 Payload Contract Release Alignment
 
 v0.2.2 aligned README, public documentation, roadmap, changelog, release notes and public communication with the Payload Contract Model.
 
@@ -111,7 +111,7 @@ It did not introduce new model semantics.
 
 ---
 
-## 6. Completed Alignment — v0.2.3 Mission Data Chain Roadmap Alignment
+## 6. Completed Alignment - v0.2.3 Mission Data Chain Roadmap Alignment
 
 v0.2.3 formalized the post-payload direction:
 
@@ -131,7 +131,7 @@ It remained architecture-first and documentation-first.
 
 ---
 
-## 7. Completed Slice — v0.3.0 Data Product and Storage Contracts
+## 7. Completed Slice - v0.3.0 Data Product and Storage Contracts
 
 v0.3.0 introduced data products as first-class mission data artifacts.
 
@@ -157,7 +157,7 @@ v0.3.0 did not implement real storage, file systems, compression, payload proces
 
 ---
 
-## 8. Completed Slice — v0.4.0 Contact Windows and Downlink Flow Contracts
+## 8. Completed Slice - v0.4.0 Contact Windows and Downlink Flow Contracts
 
 v0.4.0 modeled contact windows and downlink flow assumptions without becoming a ground segment, an orbital dynamics simulator, an RF simulator or a downlink runtime.
 
@@ -181,7 +181,7 @@ It did not implement real contact scheduling, real downlink execution, RF behavi
 
 ---
 
-## 9. Completed Slice — v0.5.0 Commandability and Autonomy Contracts
+## 9. Completed Slice - v0.5.0 Commandability and Autonomy Contracts
 
 v0.5.0 made command use and autonomous behavior explicit in the Mission Data Contract.
 
@@ -206,7 +206,7 @@ v0.5.0 did not implement real command authentication, authorization, encryption,
 
 ---
 
-## 10. Completed Slice — v0.6.0 End-to-End Mission Data Flow Evidence
+## 10. Completed Slice - v0.6.0 End-to-End Mission Data Flow Evidence
 
 v0.6.0 combined payload contracts, data products, storage intent, downlink assumptions, contact windows and command effects into deterministic scenario evidence.
 
@@ -243,13 +243,11 @@ v0.6.0 did not implement real payload file generation, onboard storage runtime, 
 
 ---
 
-## 11. Completed Slice — v0.7.0 Generated Runtime Skeletons
-
-### 11.1 Objective
+## 11. Completed Slice - v0.7.0 Generated Runtime Skeletons
 
 v0.7.0 introduced the first generated runtime-facing contract binding layer derived from the Mission Data Contract.
 
-The public milestone name is:
+The public milestone name was:
 
 ```text
 Generated Runtime Skeletons
@@ -264,8 +262,6 @@ runtime-facing contract bindings
 This is not flight software.
 
 It is a generated software boundary that implementation code can include, compile and implement against outside `generated/`.
-
-### 11.2 Completed Capabilities
 
 v0.7.0 introduced:
 
@@ -286,105 +282,119 @@ Runtime Contract Bindings reference documentation
 v0.7.0 release notes
 ```
 
-Generated output:
-
-```text
-generated/runtime/cpp17/runtime_contract_manifest.json
-generated/runtime/cpp17/include/orbitfabric/generated/mission_ids.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/mission_enums.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/mission_registries.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/command_args.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/adapter_interfaces.hpp
-generated/runtime/cpp17/CMakeLists.txt
-generated/runtime/cpp17/src/orbitfabric_runtime_contract_smoke.cpp
-```
-
-### 11.3 Boundary
-
-v0.7.0 intentionally does not implement:
-
-```text
-flight-ready runtime
-complete OBC framework
-command dispatch runtime
-command queues
-telemetry polling runtime
-event routing runtime
-fault manager runtime
-scheduler
-HAL
-drivers
-RTOS abstraction
-binary serialization
-CCSDS/PUS/CFDP behavior
-storage runtime
-downlink runtime
-user-code merge
-protected regions
-```
-
-The milestone proves that the Mission Data Contract can generate deterministic, host-buildable, software-facing contract artifacts.
-
-It does not prove flight readiness.
+v0.7.0 intentionally did not implement flight-ready runtime, command dispatch runtime, command queues, telemetry polling runtime, event routing runtime, fault manager runtime, scheduler, HAL, drivers, RTOS abstraction, binary serialization, CCSDS/PUS/CFDP behavior, storage runtime, downlink runtime, user-code merge or protected regions.
 
 ---
 
-## 12. Next Milestone — v0.8 Ground Integration Artifacts
+## 12. Completed Slice - v0.8.0 Ground Integration Artifacts
 
 ### 12.1 Objective
 
-Generate useful artifacts for ground integration without becoming a ground segment.
+v0.8.0 introduced the first generated ground-facing artifact package derived from the Mission Data Contract.
 
-v0.8 should consume the same Mission Data Contract and the same contract discipline introduced through v0.1 through v0.7.
-
-The goal is not to implement Yamcs, OpenC3, XTCE tooling or a ground database.
-
-The goal is to produce clean, inspectable exports that ground-side tools could consume or adapt.
-
-### 12.2 Candidate Features
+The public milestone name is:
 
 ```text
-JSON mission database export
-telemetry dictionary export
-command dictionary export
-event dictionary export
-fault dictionary export
-data product dictionary export
-packet dictionary export
-runtime contract manifest reuse for ground exports
-simple decoder skeletons
-Yamcs-like export prototype
-OpenC3-like export prototype
-XTCE exploration/prototype
-ground-facing documentation page
+Ground Integration Artifacts
 ```
 
-### 12.3 Required Boundary
-
-v0.8 generated artifacts must be described as:
+The precise architectural meaning is:
 
 ```text
-ground-facing contract exports
-integration artifacts
-development-preview dictionaries
+ground-facing Mission Data Contract exports
 ```
 
-They must not be described as:
+This is not a ground segment.
+
+It is a deterministic, inspectable, tool-neutral artifact package that ground software teams can review, adapt or consume downstream.
+
+### 12.2 Completed Capabilities
+
+v0.8.0 introduced:
+
+```text
+GroundContract intermediate model
+orbitfabric gen ground command
+generic generation profile
+ground_contract_manifest.json
+JSON telemetry dictionary
+JSON command dictionary
+JSON event dictionary
+JSON fault dictionary
+JSON data product dictionary
+JSON packet dictionary
+CSV telemetry dictionary
+CSV command dictionary
+CSV event dictionary
+CSV fault dictionary
+CSV data product dictionary
+CSV packet dictionary
+generated ground artifact README.md
+generated ground_dictionaries.md review document
+Ground Integration Artifacts reference documentation
+ADR-0012 Ground Integration Artifacts Boundary
+v0.8.0 release notes
+```
+
+Generated output:
+
+```text
+generated/ground/generic/
+├── ground_contract_manifest.json
+├── README.md
+├── dictionaries/
+│   ├── telemetry_dictionary.json
+│   ├── command_dictionary.json
+│   ├── event_dictionary.json
+│   ├── fault_dictionary.json
+│   ├── data_product_dictionary.json
+│   └── packet_dictionary.json
+├── csv/
+│   ├── telemetry_dictionary.csv
+│   ├── command_dictionary.csv
+│   ├── event_dictionary.csv
+│   ├── fault_dictionary.csv
+│   ├── data_product_dictionary.csv
+│   └── packet_dictionary.csv
+└── ground_dictionaries.md
+```
+
+### 12.3 Boundary
+
+v0.8.0 intentionally does not implement:
 
 ```text
 live ground segment
 mission control system
 operator console
 telemetry archive
+telemetry database
 command uplink service
-Yamcs compatibility unless tested
-OpenC3 compatibility unless tested
-XTCE compliance unless verified
+telecommand transport
+telemetry downlink runtime
+network/session/routing behavior
+command authentication or authorization
+security enforcement
+Yamcs integration
+OpenC3 integration
+XTCE compliance
+CCSDS/PUS/CFDP implementation
+binary packet decoder
+binary telecommand encoder
+offset/bitfield layout model
+calibration model
+RF/link-budget behavior
+pass scheduling
+station automation
 ```
+
+The milestone proves that the Mission Data Contract can generate deterministic, reviewable and machine-readable ground-facing artifacts.
+
+It does not prove live ground-system readiness.
 
 ---
 
-## 13. Future Milestone — v0.9 Plugin and Extensibility Layer
+## 13. Next Milestone - v0.9 Plugin and Extensibility Layer
 
 v0.9 should introduce controlled extension points after the core mission data chain and first generated artifact layers have matured.
 
@@ -410,7 +420,7 @@ Plugins must extend OrbitFabric without silently redefining core semantics.
 
 ---
 
-## 14. Future Milestone — v1.0 Stable Mission Data Contract
+## 14. Future Milestone - v1.0 Stable Mission Data Contract
 
 v1.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
 
@@ -424,7 +434,9 @@ stable Contact/Downlink Contract schema
 stable Commandability Contract schema
 stable data-flow evidence semantics
 stable RuntimeContract semantics
+stable GroundContract semantics
 stable runtime-facing contract binding surface
+stable ground-facing artifact package
 stable CLI commands
 stable lint rule code policy
 stable generated documentation format
@@ -498,6 +510,7 @@ When deciding what to implement next, use these rules.
 10. Ground Assumptions Are Contracts.
 11. Generated Code Is Disposable.
 12. User Code Lives Outside `generated/`.
+13. Tool-specific Claims Require Tests.
 
 ---
 
@@ -506,23 +519,23 @@ When deciding what to implement next, use these rules.
 The immediate work package is:
 
 ```text
-v0.8 — Ground Integration Artifacts
+v0.9 - Plugin and Extensibility Layer
 ```
 
 Required sequence:
 
 ```text
-1. define the minimal ground export scope
-2. keep ground artifacts downstream of the Mission Model
-3. reuse RuntimeContract or a similarly explicit intermediate export model where useful
-4. generate dictionaries before tool-specific integrations
-5. avoid claiming Yamcs/OpenC3/XTCE compatibility before it is implemented and tested
+1. define extension boundaries before adding plugin execution behavior
+2. keep plugins downstream of the Mission Model
+3. define explicit plugin metadata
+4. avoid plugins silently redefining core semantics
+5. provide one minimal example plugin only after the extension contract is clear
 6. preserve the Mission Data Contract as source of truth
 ```
 
-Do not add live ground services before ground export boundaries are clear.
+Do not add broad plugin machinery before the extension boundary is clear.
 
-Do not turn OrbitFabric into a ground segment.
+Do not let plugins bypass validation or generated artifact contracts.
 
 ---
 
@@ -536,7 +549,9 @@ The v0.6 roadmap step completed the first end-to-end contract-level Mission Data
 
 The v0.7 roadmap step completed the first runtime-facing contract binding slice.
 
-Only after the mission data chain, commandability, autonomy, end-to-end evidence and runtime-facing binding layers are clear should OrbitFabric grow into ground integration artifacts and plugin extensibility.
+The v0.8 roadmap step completed the first ground-facing contract export slice.
+
+Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer and ground-facing artifact layer are clear should OrbitFabric grow into plugin extensibility.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
