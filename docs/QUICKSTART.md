@@ -13,7 +13,6 @@ Mission Model YAML
   -> generated Markdown docs
   -> mission inspection
   -> scenario validation
-  -> scenario loading
   -> deterministic scenario execution
   -> Payload Contract documentation
   -> Data Product Contract documentation
@@ -23,6 +22,10 @@ Mission Model YAML
   -> RuntimeContract generation
   -> C++17 runtime-facing contract bindings
   -> C++17 host-build smoke validation
+  -> GroundContract generation
+  -> ground-facing JSON dictionaries
+  -> ground-facing CSV dictionaries
+  -> human-reviewable ground Markdown artifacts
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -31,6 +34,8 @@ Mission Model YAML
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
 Generated runtime-facing contract bindings are not flight software.
+
+Generated ground integration artifacts are not ground software.
 
 ---
 
@@ -98,7 +103,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.7.0
+orbitfabric 0.8.0
 ```
 
 ---
@@ -161,12 +166,6 @@ Generate a JSON lint report:
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
-```
-
-Generated output:
-
-```text
-generated/reports/lint_report.json
 ```
 
 ---
@@ -258,7 +257,44 @@ It does not validate flight behavior.
 
 ---
 
-## 13. Run the battery-low demo scenario
+## 13. Generate ground integration artifacts
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+Generated output:
+
+```text
+generated/ground/generic/
+├── ground_contract_manifest.json
+├── README.md
+├── dictionaries/
+│   ├── telemetry_dictionary.json
+│   ├── command_dictionary.json
+│   ├── event_dictionary.json
+│   ├── fault_dictionary.json
+│   ├── data_product_dictionary.json
+│   └── packet_dictionary.json
+├── csv/
+│   ├── telemetry_dictionary.csv
+│   ├── command_dictionary.csv
+│   ├── event_dictionary.csv
+│   ├── fault_dictionary.csv
+│   ├── data_product_dictionary.csv
+│   └── packet_dictionary.csv
+└── ground_dictionaries.md
+```
+
+The generated ground files are ground-facing contract exports.
+
+They are intended for engineering review, scripts and downstream integration work.
+
+They do not implement a live ground segment, decoder, telemetry archive, database, operator console or command uplink service.
+
+---
+
+## 14. Run the battery-low demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -278,16 +314,9 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --log generated/logs/battery_low_during_payload.log
 ```
 
-Generated outputs:
-
-```text
-generated/reports/battery_low_during_payload_report.json
-generated/logs/battery_low_during_payload.log
-```
-
 ---
 
-## 14. Run the data-flow evidence scenario
+## 15. Run the data-flow evidence scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
@@ -315,7 +344,7 @@ command -> data product -> storage intent -> downlink intent -> downlink flow ->
 
 ---
 
-## 15. What this proves
+## 16. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -323,28 +352,22 @@ The current demo proves that OrbitFabric can:
 - load optional `payloads.yaml`, `data_products.yaml`, `contacts.yaml` and `commandability.yaml` domains;
 - validate Mission Model structure;
 - run semantic lint rules;
-- validate payload, data product, contact/downlink and commandability/autonomy references;
-- validate command-declared data product effects;
-- validate scenario data-flow expectation references;
 - generate Markdown documentation;
-- generate payload, data product, contact/downlink, commandability/autonomy and data-flow documentation;
 - inspect a Mission Model summary;
 - validate scenarios without executing them;
-- load scenarios;
 - execute deterministic operational sequences;
-- emit events;
-- apply a fault-triggered mode transition;
-- auto-dispatch a recovery command in the host-side scenario simulator;
 - record contract-level data-flow evidence;
 - assert command-to-data-product-to-contact evidence in a scenario;
 - produce JSON reports and logs;
 - build a RuntimeContract from the validated Mission Model;
 - generate deterministic C++17 runtime-facing contract bindings;
-- validate generated C++17 contract bindings with a host-build smoke target.
+- validate generated C++17 contract bindings with a host-build smoke target;
+- build a GroundContract from the validated Mission Model;
+- generate deterministic JSON, CSV and Markdown ground-facing contract artifacts.
 
 ---
 
-## 16. What this does not prove
+## 17. What this does not prove
 
 The current demo does not prove:
 
@@ -358,6 +381,12 @@ The current demo does not prove:
 - RF link budget simulation;
 - CCSDS, PUS or CFDP compliance;
 - compatibility with cFS, F Prime, Yamcs or OpenC3;
+- XTCE compliance;
+- binary decoder behavior;
+- command uplink behavior;
+- telemetry archive behavior;
+- database behavior;
+- operator console behavior;
 - orbital, attitude, power or thermal dynamics;
 - command dispatch runtime behavior;
 - telemetry polling runtime behavior;
