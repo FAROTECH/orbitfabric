@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.7.0 — Generated Runtime Skeletons`.
+The current public baseline is `v0.8.0 - Ground Integration Artifacts`.
 
-In v0.7.0, Generated Runtime Skeletons means runtime-facing contract bindings.
+In v0.8.0, Ground Integration Artifacts means ground-facing Mission Data Contract exports.
 
-The next development focus is `v0.8 — Ground Integration Artifacts`.
+The next development focus is `v0.9 - Plugin and Extensibility Layer`.
 
 The current baseline proves this Mission Data Chain:
 
@@ -28,6 +28,7 @@ Payload Contract
   -> Commandability and Autonomy Contract
   -> End-to-End Mission Data Flow Evidence
   -> Runtime-Facing Contract Bindings
+  -> Ground-Facing Integration Artifacts
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -49,17 +50,22 @@ Out of scope for the current preview:
 - HAL;
 - CCSDS/PUS/CFDP implementation;
 - Yamcs/OpenC3 full integration;
+- XTCE compliance;
+- binary packet decoders;
+- telemetry archive runtime;
+- ground database implementation;
 - Basilisk integration;
 - cFS/F Prime bridge;
 - web UI;
-- database-backed telemetry archive;
 - real spacecraft data.
 
 Runtime-facing contract bindings must remain generated, deterministic and disposable.
 
-User implementation code must live outside `generated/`.
+Ground-facing integration artifacts must remain generated, deterministic, tool-neutral and disposable.
 
-The next milestone may generate ground integration artifacts, but those artifacts must remain exports or dictionaries derived from the Mission Data Contract. They must not be presented as a live ground segment, operator console, command uplink service or telemetry archive.
+User implementation code and downstream integration code must live outside `generated/`.
+
+Future plugin and extensibility work must not allow plugins to silently redefine core Mission Data Contract semantics or bypass validation.
 
 ---
 
@@ -115,7 +121,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.7.0
+orbitfabric 0.8.0
 ```
 
 ---
@@ -146,6 +152,8 @@ orbitfabric gen runtime examples/demo-3u/mission/
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 
+orbitfabric gen ground examples/demo-3u/mission/
+
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --json generated/reports/battery_low_during_payload_report.json \
   --log generated/logs/battery_low_during_payload.log
@@ -166,6 +174,7 @@ gen docs      -> Result: PASSED
 gen data-flow -> Result: PASSED
 gen runtime   -> Result: PASSED
 cmake build   -> passing
+gen ground    -> Result: PASSED
 sim           -> Result: PASSED
 ```
 
@@ -209,7 +218,9 @@ cli -> sim
 lint -> model
 gen -> model
 gen -> RuntimeContract builder
+gen -> GroundContract builder
 RuntimeContract builder -> model
+GroundContract builder -> model
 sim -> model
 ```
 
@@ -223,6 +234,7 @@ lint -> sim
 gen -> sim
 sim -> gen
 RuntimeContract builder -> raw YAML files
+GroundContract builder -> raw YAML files
 profile-specific generator -> raw YAML files
 ```
 
@@ -238,8 +250,8 @@ Good examples:
 
 ```text
 Add contact downlink consistency rules
-Generate contact downlink documentation
-Align public documentation with v0.7
+Generate ground dictionaries
+Align public documentation with v0.8
 Fix scenario command validation
 ```
 
