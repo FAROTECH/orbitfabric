@@ -11,6 +11,7 @@ from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.gen.ground import (
     build_ground_contract,
     write_ground_contract_manifest,
+    write_ground_dictionary_csv_files,
     write_ground_dictionary_json_files,
 )
 from orbitfabric.gen.runtime import (
@@ -333,6 +334,7 @@ def gen_ground(
     manifest_file = profile_output_dir / "ground_contract_manifest.json"
     generated_files = [write_ground_contract_manifest(contract, manifest_file)]
     generated_files.extend(write_ground_dictionary_json_files(contract, profile_output_dir))
+    generated_files.extend(write_ground_dictionary_csv_files(contract, profile_output_dir))
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
