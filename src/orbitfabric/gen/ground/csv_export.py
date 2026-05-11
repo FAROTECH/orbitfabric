@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from orbitfabric.gen.ground import ground_dictionary_documents
 from orbitfabric.gen.ground.contract import GroundContract
+from orbitfabric.gen.ground.json_export import ground_dictionary_documents
 
 CSV_DICTIONARY_HEADERS: dict[str, tuple[str, ...]] = {
     "telemetry_dictionary": (
