@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from orbitfabric.gen.ground.contract import GroundContract
+from orbitfabric.gen.ground.json_safe import json_safe
 
 
 def ground_contract_manifest(contract: GroundContract) -> dict[str, Any]:
@@ -37,7 +38,7 @@ def ground_contract_manifest(contract: GroundContract) -> dict[str, Any]:
             "data_products": len(contract.data_products),
             "packets": len(contract.packets),
         },
-        "contract": asdict(contract),
+        "contract": json_safe(asdict(contract)),
     }
 
 
