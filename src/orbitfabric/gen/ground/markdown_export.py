@@ -389,14 +389,29 @@ def _arguments(arguments: tuple[Any, ...]) -> str:
 
     rendered = []
     for argument in arguments:
-        constraints = _compact(argument.constraints)
-        if constraints:
-            rendered.append(
-                f"`{argument.name}` ({argument.value_type}, {constraints})"
-            )
+        metadata = _argument_metadata(argument)
+        if metadata:
+            rendered.append(f"`{argument.name}` ({argument.value_type}, {metadata})")
         else:
             rendered.append(f"`{argument.name}` ({argument.value_type})")
     return "<br>".join(rendered)
+
+
+def _argument_metadata(argument: Any) -> str:
+    metadata: list[str] = []
+
+    if argument.minimum is not None:
+        metadata.append(f"min: {_text(argument.minimum)}")
+    if argument.maximum is not None:
+        metadata.append(f"max: {_text(argument.maximum)}")
+    if argument.enum_values:
+        metadata.append(f"enum: {_list(argument.enum_values)}")
+    if argument.default is not None:
+        metadata.append(f"default: {_text(argument.default)}")
+    if argument.description:
+        metadata.append(f"description: {_text(argument.description)}")
+
+    return "; ".join(metadata)
 
 
 def _list(values: tuple[str, ...] | list[str] | None) -> str:
