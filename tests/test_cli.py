@@ -218,6 +218,12 @@ def test_gen_ground_writes_manifest_and_json_dictionaries(tmp_path: Path) -> Non
         output_dir / "generic" / "dictionaries" / "data_product_dictionary.json"
     )
     packet_dictionary = output_dir / "generic" / "dictionaries" / "packet_dictionary.json"
+    telemetry_csv = output_dir / "generic" / "csv" / "telemetry_dictionary.csv"
+    command_csv = output_dir / "generic" / "csv" / "command_dictionary.csv"
+    event_csv = output_dir / "generic" / "csv" / "event_dictionary.csv"
+    fault_csv = output_dir / "generic" / "csv" / "fault_dictionary.csv"
+    data_product_csv = output_dir / "generic" / "csv" / "data_product_dictionary.csv"
+    packet_csv = output_dir / "generic" / "csv" / "packet_dictionary.csv"
 
     assert result.exit_code == 0
     assert f"OrbitFabric Ground Generator {__version__}" in result.output
@@ -230,6 +236,12 @@ def test_gen_ground_writes_manifest_and_json_dictionaries(tmp_path: Path) -> Non
     assert f"  {fault_dictionary}" in result.output
     assert f"  {data_product_dictionary}" in result.output
     assert f"  {packet_dictionary}" in result.output
+    assert f"  {telemetry_csv}" in result.output
+    assert f"  {command_csv}" in result.output
+    assert f"  {event_csv}" in result.output
+    assert f"  {fault_csv}" in result.output
+    assert f"  {data_product_csv}" in result.output
+    assert f"  {packet_csv}" in result.output
     assert "Ground contract counts:" in result.output
     assert "Result: PASSED" in result.output
     assert manifest_file.exists()
@@ -239,6 +251,12 @@ def test_gen_ground_writes_manifest_and_json_dictionaries(tmp_path: Path) -> Non
     assert fault_dictionary.exists()
     assert data_product_dictionary.exists()
     assert packet_dictionary.exists()
+    assert telemetry_csv.exists()
+    assert command_csv.exists()
+    assert event_csv.exists()
+    assert fault_csv.exists()
+    assert data_product_csv.exists()
+    assert packet_csv.exists()
 
     manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
     assert manifest["kind"] == "orbitfabric.ground_contract_manifest"
