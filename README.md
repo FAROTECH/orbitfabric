@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios and runtime-facing contract bindings once.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings and ground-facing integration artifacts once.
 Validate them, document them, simulate them and generate deterministic integration artifacts from the same source of truth.
 
 </div>
@@ -19,9 +19,9 @@ Validate them, document them, simulate them and generate deterministic integrati
 
 OrbitFabric is a **model-first Mission Data Fabric** for small spacecraft.
 
-It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation and generated integration artifacts.
+It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation, runtime-facing bindings and ground-facing integration artifacts.
 
-OrbitFabric is not a flight software framework, not a ground segment, and not a spacecraft dynamics simulator.
+OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
 It is the contract layer between:
 
@@ -31,6 +31,7 @@ onboard software
 simulation
 testing
 documentation
+runtime-facing integration
 ground integration
 ```
 
@@ -40,71 +41,53 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently at `v0.7.0 — Generated Runtime Skeletons`.
+OrbitFabric is currently at `v0.8.0 - Ground Integration Artifacts`.
 
-In v0.7.0, **Generated Runtime Skeletons** means runtime-facing contract bindings.
+In v0.8.0, **Ground Integration Artifacts** means ground-facing Mission Data Contract exports.
 
-OrbitFabric does not generate onboard behavior or flight software.
+OrbitFabric does not generate a ground segment, mission control system, telemetry archive, command uplink service, operator console, decoder runtime, database, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
-It generates a deterministic, host-buildable software boundary derived from the validated Mission Model.
+It generates deterministic, inspectable, tool-neutral ground-facing artifacts derived from the validated Mission Model.
 
 The current repository includes:
 
-- the `v0.2.1 — Payload Contract Model` vertical slice;
-- the `v0.2.3 — Mission Data Chain Roadmap Alignment` direction;
-- the `v0.3.0 — Data Product and Storage Contracts` vertical slice;
-- the `v0.4.0 — Contact Windows and Downlink Flow Contracts` vertical slice;
-- the `v0.5.0 — Commandability and Autonomy Contracts` vertical slice;
-- the `v0.6.0 — End-to-End Mission Data Flow Evidence` vertical slice;
-- the `v0.7.0 — Generated Runtime Skeletons` vertical slice.
+- the `v0.2.1 - Payload Contract Model` vertical slice;
+- the `v0.2.3 - Mission Data Chain Roadmap Alignment` direction;
+- the `v0.3.0 - Data Product and Storage Contracts` vertical slice;
+- the `v0.4.0 - Contact Windows and Downlink Flow Contracts` vertical slice;
+- the `v0.5.0 - Commandability and Autonomy Contracts` vertical slice;
+- the `v0.6.0 - End-to-End Mission Data Flow Evidence` vertical slice;
+- the `v0.7.0 - Generated Runtime Skeletons` vertical slice;
+- the `v0.8.0 - Ground Integration Artifacts` vertical slice.
 
 The current vertical slice is functional:
 
 - Mission Model YAML loading;
-- optional `payloads.yaml` loading;
-- optional `data_products.yaml` loading;
-- optional `contacts.yaml` loading;
-- optional `commandability.yaml` loading;
 - structural validation;
 - semantic linting;
-- engineering lint rules;
-- payload contract lint rules;
-- data product contract lint rules;
-- contact/downlink contract lint rules;
-- commandability/autonomy contract lint rules;
-- command-declared data product effect linting;
-- scenario data-flow expectation reference validation;
-- JSON lint report generation;
 - generated Markdown documentation;
-- generated payload contract documentation;
-- generated data product contract documentation;
-- generated contact/downlink contract documentation;
-- generated commandability/autonomy contract documentation;
-- generated data-flow evidence documentation;
-- scenario YAML loading;
-- scenario reference validation;
+- scenario YAML loading and validation;
 - deterministic scenario execution;
-- minimal payload lifecycle simulation;
-- contract-level data-flow evidence recording;
-- simulation JSON report generation with `data_flow_evidence`;
-- simulation plain-text log generation;
+- JSON lint and simulation reports;
 - RuntimeContract construction;
 - `orbitfabric gen runtime` generation;
-- C++17 runtime-facing identifier headers;
-- C++17 runtime value enums;
-- C++17 static metadata registries;
-- C++17 command argument structs;
-- C++17 abstract adapter interfaces;
-- C++17 host-build smoke files;
+- C++17 runtime-facing contract bindings;
+- host-build smoke validation for generated C++17 bindings;
+- GroundContract construction;
+- `orbitfabric gen ground` generation;
+- generic ground contract manifest;
+- JSON ground dictionaries;
+- CSV ground dictionaries;
+- human-reviewable ground Markdown artifacts;
 - synthetic demo mission: `demo-3u`.
 
 The repository also includes a growing set of example mission slices:
 
-- `examples/demo-3u/` — synthetic clean-room demo mission;
-- `examples/university-cubesat-minislice/` — generic university CubeSat minislice;
-- `examples/oresat-inspired-minislice/` — public-material-derived low-power / beacon / constrained-downlink minislice;
-- `examples/finch-inspired-minislice/` — public-material-derived imaging acquisition / ADCS readiness / compression / constrained-downlink minislice;
-- `examples/spacelab-inspired-communications-minislice/` — public-material-derived TT&C / OBDH / beacon / telecommanded data-request / decoder-evidence minislice.
+- `examples/demo-3u/` - synthetic clean-room demo mission;
+- `examples/university-cubesat-minislice/` - generic university CubeSat minislice;
+- `examples/oresat-inspired-minislice/` - public-material-derived low-power / beacon / constrained-downlink minislice;
+- `examples/finch-inspired-minislice/` - public-material-derived imaging acquisition / ADCS readiness / compression / constrained-downlink minislice;
+- `examples/spacelab-inspired-communications-minislice/` - public-material-derived TT&C / OBDH / beacon / telecommanded data-request / decoder-evidence minislice.
 
 The `*-inspired-*` examples are conceptual public demos. They are not official models, not endorsed by the original project teams, and do not imply adoption of OrbitFabric by those teams.
 
@@ -123,6 +106,9 @@ mkdocs build --strict
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 -> passing after orbitfabric gen runtime
+
+orbitfabric gen ground examples/demo-3u/mission/
+-> passing
 ```
 
 ---
@@ -146,7 +132,8 @@ It models:
 - optional Contact Windows and Downlink Flow Contracts;
 - optional Commandability and Autonomy Contracts;
 - contract-level Mission Data Flow Evidence;
-- generated runtime-facing contract bindings.
+- generated runtime-facing contract bindings;
+- generated ground-facing integration artifacts.
 
 The data-flow evidence chain connects:
 
@@ -160,20 +147,22 @@ command expected effect
         -> scenario evidence
         -> generated documentation
         -> JSON report evidence
+        -> runtime-facing bindings
+        -> ground-facing artifacts
 ```
 
-The v0.7 runtime-facing binding chain is:
+The v0.8 ground-facing generation chain is:
 
 ```text
 Mission Model
         -> validation and linting
-        -> RuntimeContract
-        -> generated C++17 contract bindings
-        -> host-build smoke validation
-        -> user implementation outside generated/
+        -> GroundContract
+        -> generic ground-facing dictionaries
+        -> JSON / CSV / Markdown artifacts
+        -> downstream ground-system integration outside OrbitFabric
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence and Runtime Contract Binding artifacts are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime or real FDIR behavior.
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding and Ground Integration artifacts are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
 
 ---
 
@@ -190,6 +179,10 @@ OrbitFabric is not:
 - a hardware abstraction layer;
 - a CubeSat tutorial;
 - a ground segment;
+- a mission control system;
+- an operator console;
+- a telemetry archive;
+- a command uplink service;
 - a payload firmware framework;
 - a payload driver framework;
 - a payload physical simulator;
@@ -205,7 +198,9 @@ OrbitFabric is not:
 
 Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
 
-They are not flight software.
+Ground Integration Artifacts in v0.8.0 are ground-facing contract exports.
+
+Neither is flight software or ground software.
 
 ---
 
@@ -247,22 +242,7 @@ Payload Contract
         -> Commandability and Autonomy Contract
         -> End-to-End Mission Data Flow Evidence
         -> Runtime-Facing Contract Bindings
-```
-
-The data-flow scenario demonstrates:
-
-```text
-payload.start_acquisition
-        -> payload.acquisition_started
-        -> payload lifecycle ACQUIRING
-        -> payload.acquisition.active = true
-        -> payload.radiation_histogram evidence recorded
-        -> storage intent declared
-        -> downlink intent declared
-        -> science_next_available_contact eligible
-        -> demo_contact_001 matched
-        -> DATA_FLOW expectation met
-        -> SCENARIO PASSED
+        -> Ground-Facing Integration Artifacts
 ```
 
 ---
@@ -288,7 +268,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.7.0
+orbitfabric 0.8.0
 ```
 
 ---
@@ -333,15 +313,6 @@ generated/docs/
 └── data_flow.md
 ```
 
-A dedicated data-flow generator is also available:
-
-```bash
-orbitfabric gen data-flow examples/demo-3u/mission/ \
-  --output-file generated/docs/data_flow.md
-```
-
-Generated files are derived from the validated Mission Model. Do not edit them manually.
-
 ---
 
 ## Generate Runtime Contract Bindings
@@ -378,6 +349,43 @@ cmake --build generated/runtime/cpp17/build
 This is host-build smoke validation only.
 
 It does not produce flight software.
+
+---
+
+## Generate Ground Integration Artifacts
+
+Generate the generic ground-facing mission data package:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+Generated files:
+
+```text
+generated/ground/generic/
+├── ground_contract_manifest.json
+├── README.md
+├── dictionaries/
+│   ├── telemetry_dictionary.json
+│   ├── command_dictionary.json
+│   ├── event_dictionary.json
+│   ├── fault_dictionary.json
+│   ├── data_product_dictionary.json
+│   └── packet_dictionary.json
+├── csv/
+│   ├── telemetry_dictionary.csv
+│   ├── command_dictionary.csv
+│   ├── event_dictionary.csv
+│   ├── fault_dictionary.csv
+│   ├── data_product_dictionary.csv
+│   └── packet_dictionary.csv
+└── ground_dictionaries.md
+```
+
+These files are ground-facing contract exports.
+
+They are not a ground runtime, decoder, telemetry archive, database, operator console, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
 ---
 
@@ -432,30 +440,12 @@ The current vertical slice can produce:
 ```text
 generated/
 ├── docs/
-│   ├── telemetry.md
-│   ├── commands.md
-│   ├── events.md
-│   ├── faults.md
-│   ├── modes.md
-│   ├── packets.md
-│   ├── payloads.md
-│   ├── data_products.md
-│   ├── contacts.md
-│   ├── commandability.md
-│   └── data_flow.md
 ├── reports/
-│   ├── lint_report.json
-│   ├── battery_low_during_payload_report.json
-│   └── payload_data_flow_evidence_report.json
 ├── logs/
-│   ├── battery_low_during_payload.log
-│   └── payload_data_flow_evidence.log
-└── runtime/
-    └── cpp17/
-        ├── runtime_contract_manifest.json
-        ├── CMakeLists.txt
-        ├── include/orbitfabric/generated/*.hpp
-        └── src/orbitfabric_runtime_contract_smoke.cpp
+├── runtime/
+│   └── cpp17/
+└── ground/
+    └── generic/
 ```
 
 Generated artifacts are reproducible outputs. They are not the source of truth.
@@ -486,12 +476,9 @@ Useful entry points:
 - `docs/DEVELOPMENT.md`
 - `docs/QUICKSTART.md`
 - `docs/DEMO_WALKTHROUGH.md`
-- `docs/reference/mission-model-v0.1.md`
-- `docs/reference/data-flow-evidence.md`
 - `docs/reference/runtime-contract-bindings.md`
-- `docs/reference/json-reports-v0.1.md`
-- `docs/reference/lint-rules-v0.1.md`
-- `docs/releases/v0.7.0.md`
+- `docs/reference/ground-integration-artifacts.md`
+- `docs/releases/v0.8.0.md`
 - `docs/adr/`
 
 Build the documentation site locally:
@@ -550,10 +537,15 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric gen docs examples/demo-3u/mission/
 
+orbitfabric gen data-flow examples/demo-3u/mission/ \
+  --output-file generated/docs/data_flow.md
+
 orbitfabric gen runtime examples/demo-3u/mission/
 
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
+
+orbitfabric gen ground examples/demo-3u/mission/
 
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
   --json generated/reports/payload_data_flow_evidence_report.json \
