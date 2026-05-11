@@ -26,11 +26,21 @@ def _render_readme(contract: GroundContract) -> str:
     lines = [
         "# OrbitFabric Ground Integration Artifacts",
         "",
-        "This directory contains generated ground-facing artifacts derived from the OrbitFabric Mission Model.",
+        (
+            "This directory contains generated ground-facing artifacts derived from "
+            "the OrbitFabric Mission Model."
+        ),
         "",
-        "These files are intended to help ground software engineers, mission operators and integration teams review what the spacecraft contract exposes to the ground side.",
+        (
+            "These files are intended to help ground software engineers, mission "
+            "operators and integration teams review what the spacecraft contract "
+            "exposes to the ground side."
+        ),
         "",
-        "The Mission Model remains the source of truth. These artifacts are generated outputs and can be deleted and regenerated at any time.",
+        (
+            "The Mission Model remains the source of truth. These artifacts are "
+            "generated outputs and can be deleted and regenerated at any time."
+        ),
         "",
         "## Mission",
         "",
@@ -43,11 +53,26 @@ def _render_readme(contract: GroundContract) -> str:
         "",
         "| Path | Purpose | Primary audience |",
         "| --- | --- | --- |",
-        "| `ground_contract_manifest.json` | Machine-readable manifest and boundary declaration. | Tooling and integration checks |",
-        "| `dictionaries/*.json` | Machine-readable ground dictionaries. | Ground tooling, scripts and automated checks |",
-        "| `csv/*.csv` | Review-friendly tabular dictionaries. | Engineers and reviewers |",
-        "| `ground_dictionaries.md` | Human-readable review document. | Engineers, operators and reviewers |",
-        "| `README.md` | This generated orientation file. | Everyone opening the artifact directory |",
+        (
+            "| `ground_contract_manifest.json` | Machine-readable manifest and "
+            "boundary declaration. | Tooling and integration checks |"
+        ),
+        (
+            "| `dictionaries/*.json` | Machine-readable ground dictionaries. | "
+            "Ground tooling, scripts and automated checks |"
+        ),
+        (
+            "| `csv/*.csv` | Review-friendly tabular dictionaries. | "
+            "Engineers and reviewers |"
+        ),
+        (
+            "| `ground_dictionaries.md` | Human-readable review document. | "
+            "Engineers, operators and reviewers |"
+        ),
+        (
+            "| `README.md` | This generated orientation file. | Everyone "
+            "opening the artifact directory |"
+        ),
         "",
         "## Contract coverage",
         "",
@@ -62,16 +87,33 @@ def _render_readme(contract: GroundContract) -> str:
         "",
         "## Boundary",
         "",
-        "These artifacts do not implement a ground system. They do not contain runtime behavior, transport behavior, database behavior, decoder logic or command uplink logic.",
+        (
+            "These artifacts do not implement a ground system. They do not contain "
+            "runtime behavior, transport behavior, database behavior, decoder logic "
+            "or command uplink logic."
+        ),
         "",
-        "They also do not claim compatibility with Yamcs, OpenC3, XTCE, CCSDS, PUS or CFDP. They provide generic, tool-neutral mission contract evidence that other tools can consume or map later.",
+        (
+            "They also do not claim compatibility with Yamcs, OpenC3, XTCE, CCSDS, "
+            "PUS or CFDP. They provide generic, tool-neutral mission contract "
+            "evidence that other tools can consume or map later."
+        ),
         "",
         "## Recommended review flow",
         "",
-        "1. Start from `ground_contract_manifest.json` to verify the mission identity, generation profile and declared boundary.",
-        "2. Read `ground_dictionaries.md` to review the contract as a coherent engineering document.",
+        (
+            "1. Start from `ground_contract_manifest.json` to verify the mission "
+            "identity, generation profile and declared boundary."
+        ),
+        (
+            "2. Read `ground_dictionaries.md` to review the contract as a coherent "
+            "engineering document."
+        ),
         "3. Use `csv/*.csv` for spreadsheet-style inspection and review comments.",
-        "4. Use `dictionaries/*.json` for scripts, tooling and deterministic integration checks.",
+        (
+            "4. Use `dictionaries/*.json` for scripts, tooling and deterministic "
+            "integration checks."
+        ),
         "",
     ]
     return "\n".join(lines)
@@ -87,13 +129,23 @@ def _render_ground_dictionaries(contract: GroundContract) -> str:
         "",
         f"Ground generation profile: `{contract.generation_profile}`",
         "",
-        "This document is generated from the OrbitFabric `GroundContract` and is intended for human review.",
+        (
+            "This document is generated from the OrbitFabric `GroundContract` and "
+            "is intended for human review."
+        ),
         "",
-        "It summarizes the ground-facing telemetry, commands, events, faults, data products and packets exposed by the Mission Model.",
+        (
+            "It summarizes the ground-facing telemetry, commands, events, faults, "
+            "data products and packets exposed by the Mission Model."
+        ),
         "",
         "## Review boundary",
         "",
-        "This document is not a ground runtime specification. It does not define binary packet decoding, transport protocols, database schemas, command uplink execution or operator console behavior.",
+        (
+            "This document is not a ground runtime specification. It does not "
+            "define binary packet decoding, transport protocols, database schemas, "
+            "command uplink execution or operator console behavior."
+        ),
         "",
         "It is a tool-neutral review layer over the mission data contract.",
         "",
@@ -105,7 +157,10 @@ def _render_ground_dictionaries(contract: GroundContract) -> str:
         f"| Commands | {len(contract.commands)} | Ground-callable command contract |",
         f"| Events | {len(contract.events)} | Operational event vocabulary |",
         f"| Faults | {len(contract.faults)} | Fault vocabulary and recovery hints |",
-        f"| Data products | {len(contract.data_products)} | Products to store, downlink or process |",
+        (
+            f"| Data products | {len(contract.data_products)} | Products to store, "
+            "downlink or process |"
+        ),
         f"| Packets | {len(contract.packets)} | Logical packet membership |",
         "",
     ]
@@ -124,9 +179,15 @@ def _render_telemetry(contract: GroundContract) -> list[str]:
     lines = [
         "## Telemetry dictionary",
         "",
-        "Telemetry entries describe values expected by the ground side. Limits and quality metadata are shown where available.",
+        (
+            "Telemetry entries describe values expected by the ground side. Limits "
+            "and quality metadata are shown where available."
+        ),
         "",
-        "| Model ID | Name | Type | Unit | Source | Sampling | Criticality | Persistence | Downlink | Limits | Quality |",
+        (
+            "| Model ID | Name | Type | Unit | Source | Sampling | Criticality | "
+            "Persistence | Downlink | Limits | Quality |"
+        ),
         "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for item in contract.telemetry:
@@ -157,9 +218,15 @@ def _render_commands(contract: GroundContract) -> list[str]:
     lines = [
         "## Command dictionary",
         "",
-        "Command entries describe the callable contract visible to the ground side. This is not a command encoder or uplink implementation.",
+        (
+            "Command entries describe the callable contract visible to the ground "
+            "side. This is not a command encoder or uplink implementation."
+        ),
         "",
-        "| Model ID | Target | Modes | Ack | Timeout ms | Risk | Arguments | Emits | Expected effects | Preconditions |",
+        (
+            "| Model ID | Target | Modes | Ack | Timeout ms | Risk | Arguments | "
+            "Emits | Expected effects | Preconditions |"
+        ),
         "| --- | --- | --- | --- | ---: | --- | --- | --- | --- | --- |",
     ]
     for item in contract.commands:
@@ -217,7 +284,10 @@ def _render_faults(contract: GroundContract) -> list[str]:
     lines = [
         "## Fault dictionary",
         "",
-        "Fault entries summarize fault identifiers, severity and recovery hints. They do not implement onboard or ground fault handling.",
+        (
+            "Fault entries summarize fault identifiers, severity and recovery "
+            "hints. They do not implement onboard or ground fault handling."
+        ),
         "",
         "| Model ID | Source | Severity | Condition | Emits | Recovery | Description |",
         "| --- | --- | --- | --- | --- | --- | --- |",
@@ -246,9 +316,15 @@ def _render_data_products(contract: GroundContract) -> list[str]:
     lines = [
         "## Data product dictionary",
         "",
-        "Data products describe files or logical products expected to be stored, downlinked or processed by the ground side.",
+        (
+            "Data products describe files or logical products expected to be "
+            "stored, downlinked or processed by the ground side."
+        ),
         "",
-        "| Model ID | Producer | Type | Size bytes | Priority | Storage | Downlink | Description |",
+        (
+            "| Model ID | Producer | Type | Size bytes | Priority | Storage | "
+            "Downlink | Description |"
+        ),
         "| --- | --- | --- | ---: | --- | --- | --- | --- |",
     ]
     for item in contract.data_products:
@@ -276,9 +352,15 @@ def _render_packets(contract: GroundContract) -> list[str]:
     lines = [
         "## Packet dictionary",
         "",
-        "Packets describe logical membership of model fields. They do not define binary layout, offsets, framing or transport.",
+        (
+            "Packets describe logical membership of model fields. They do not "
+            "define binary layout, offsets, framing or transport."
+        ),
         "",
-        "| Model ID | Name | Type | Max payload bytes | Period | Telemetry membership | Description |",
+        (
+            "| Model ID | Name | Type | Max payload bytes | Period | Telemetry "
+            "membership | Description |"
+        ),
         "| --- | --- | --- | ---: | --- | --- | --- |",
     ]
     for item in contract.packets:
@@ -329,14 +411,22 @@ def _compact(value: Any) -> str:
 
     if isinstance(value, dict):
         return "<br>".join(
-            f"{_text(key)}: {_compact(item) if isinstance(item, dict | list | tuple) else _text(item)}"
-            for key, item in value.items()
+            _compact_key_value(key, item) for key, item in value.items()
         )
 
     if isinstance(value, list | tuple):
         return "<br>".join(_compact(item) for item in value)
 
     return _text(value)
+
+
+def _compact_key_value(key: Any, value: Any) -> str:
+    if isinstance(value, dict | list | tuple):
+        rendered_value = _compact(value)
+    else:
+        rendered_value = _text(value)
+
+    return f"{_text(key)}: {rendered_value}"
 
 
 def _bool(value: bool) -> str:
