@@ -10,7 +10,63 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ---
 
-## [v0.7.0] — Generated Runtime Skeletons
+## [v0.8.0] - Ground Integration Artifacts
+
+### Added
+
+- Added the `GroundContract` intermediate model for ground-facing generation.
+- Added the `orbitfabric gen ground` command.
+- Added the initial `generic` ground generation profile.
+- Added `ground_contract_manifest.json` generation.
+- Added JSON ground dictionaries for telemetry, commands, events, faults, data products and packets.
+- Added CSV ground dictionaries for review workflows.
+- Added generated `README.md` for the ground artifact directory.
+- Added generated `ground_dictionaries.md` for human engineering review.
+- Added manifest boundary flags for ground runtime, operator console, transport, database, Yamcs, OpenC3 and XTCE claims.
+- Added Ground Integration Artifacts reference documentation.
+- Added ADR-0012 for the Ground Integration Artifacts boundary.
+- Added v0.8.0 release notes.
+
+### Changed
+
+- Extended the public documentation baseline from v0.7.0 to v0.8.0.
+- Extended the Mission Data Chain from runtime-facing contract bindings to ground-facing contract exports.
+- Updated README, architecture, roadmap, quickstart, development guide, contributing guide, versioning documentation and demo walkthrough for v0.8.0.
+- Updated the package and CLI version to `0.8.0`.
+- Marked `v0.9 - Plugin and Extensibility Layer` as the next roadmap milestone.
+
+### Boundaries
+
+The Ground Integration Artifacts slice intentionally does not introduce:
+
+- live ground segment;
+- mission control system;
+- operator console;
+- telemetry archive;
+- telemetry database;
+- command uplink service;
+- telecommand transport;
+- telemetry downlink runtime;
+- network/session/routing behavior;
+- command authentication or authorization;
+- security enforcement;
+- Yamcs integration;
+- OpenC3 integration;
+- XTCE compliance;
+- CCSDS/PUS/CFDP implementation;
+- binary packet decoder;
+- binary telecommand encoder;
+- offset/bitfield layout model;
+- calibration model;
+- RF/link-budget behavior;
+- pass scheduling;
+- station automation.
+
+Ground Integration Artifacts in v0.8.0 are ground-facing contract exports only.
+
+---
+
+## [v0.7.0] - Generated Runtime Skeletons
 
 ### Added
 
@@ -36,7 +92,7 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 - Extended the Mission Data Chain from data-flow evidence to runtime-facing contract bindings.
 - Updated README, architecture, roadmap, quickstart, development guide, contributing guide and versioning documentation for v0.7.0.
 - Updated the package and CLI version to `0.7.0`.
-- Marked `v0.8 — Ground Integration Artifacts` as the next roadmap milestone.
+- Marked `v0.8 - Ground Integration Artifacts` as the next roadmap milestone.
 
 ### Boundaries
 
@@ -65,7 +121,7 @@ Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings only.
 
 ---
 
-## [v0.6.0] — End-to-End Mission Data Flow Evidence
+## [v0.6.0] - End-to-End Mission Data Flow Evidence
 
 ### Added
 
@@ -107,7 +163,7 @@ The End-to-End Mission Data Flow Evidence slice intentionally does not introduce
 
 ---
 
-## [v0.5.0] — Commandability and Autonomy Contracts
+## [v0.5.0] - Commandability and Autonomy Contracts
 
 ### Added
 
@@ -146,7 +202,7 @@ The Commandability and Autonomy Contract slice intentionally does not introduce:
 
 ---
 
-## [v0.4.0] — Contact Windows and Downlink Flow Contracts
+## [v0.4.0] - Contact Windows and Downlink Flow Contracts
 
 ### Added
 
@@ -196,7 +252,7 @@ The Contact Windows and Downlink Flow Contract slice intentionally does not intr
 
 ---
 
-## [v0.3.0] — Data Product and Storage Contracts
+## [v0.3.0] - Data Product and Storage Contracts
 
 ### Added
 
@@ -248,7 +304,7 @@ The Data Product and Storage Contract slice intentionally does not introduce:
 
 ---
 
-## [v0.2.2] — Payload Contract Release Alignment
+## [v0.2.2] - Payload Contract Release Alignment
 
 ### Changed
 
@@ -259,7 +315,7 @@ The Data Product and Storage Contract slice intentionally does not introduce:
 
 ---
 
-## [v0.2.1] — Payload Contract Model
+## [v0.2.1] - Payload Contract Model
 
 ### Added
 
@@ -274,7 +330,7 @@ The Data Product and Storage Contract slice intentionally does not introduce:
 - Added generated payload contract documentation.
 - Added generated `payloads.md` documentation output.
 - Added minimal payload-aware scenario behavior.
-- Added nominal payload lifecycle simulation for `READY → ACQUIRING → READY`.
+- Added nominal payload lifecycle simulation for `READY -> ACQUIRING -> READY`.
 - Added invalid payload contract fixtures.
 - Added negative tests for mutated payload contract fixtures.
 - Added ADR-0006 for the Payload Contract Model.
