@@ -195,6 +195,86 @@ def test_gen_runtime_rejects_unsupported_profile(tmp_path: Path) -> None:
     assert not output_dir.exists()
 
 
+def test_gen_ground_writes_manifest_and_json_dictionaries(tmp_path: Path) -> None:
+    output_dir = tmp_path / "ground"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "ground",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    manifest_file = output_dir / "generic" / "ground_contract_manifest.json"
+    telemetry_dictionary = output_dir / "generic" / "dictionaries" / "telemetry_dictionary.json"
+    command_dictionary = output_dir / "generic" / "dictionaries" / "command_dictionary.json"
+    event_dictionary = output_dir / "generic" / "dictionaries" / "event_dictionary.json"
+    fault_dictionary = output_dir / "generic" / "dictionaries" / "fault_dictionary.json"
+    data_product_dictionary = (
+        output_dir / "generic" / "dictionaries" / "data_product_dictionary.json"
+    )
+    packet_dictionary = output_dir / "generic" / "dictionaries" / "packet_dictionary.json"
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Ground Generator {__version__}" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert "Profile: generic" in result.output
+    assert f"  {manifest_file}" in result.output
+    assert f"  {telemetry_dictionary}" in result.output
+    assert f"  {command_dictionary}" in result.output
+    assert f"  {event_dictionary}" in result.output
+    assert f"  {fault_dictionary}" in result.output
+    assert f"  {data_product_dictionary}" in result.output
+    assert f"  {packet_dictionary}" in result.output
+    assert "Ground contract counts:" in result.output
+    assert "Result: PASSED" in result.output
+    assert manifest_file.exists()
+    assert telemetry_dictionary.exists()
+    assert command_dictionary.exists()
+    assert event_dictionary.exists()
+    assert fault_dictionary.exists()
+    assert data_product_dictionary.exists()
+    assert packet_dictionary.exists()
+
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+    assert manifest["kind"] == "orbitfabric.ground_contract_manifest"
+    assert manifest["generation"]["profile"] == "generic"
+    assert manifest["generation"]["contains_ground_runtime"] is False
+    assert manifest["generation"]["claims_yamcs_compatibility"] is False
+    assert manifest["generation"]["claims_openc3_compatibility"] is False
+    assert manifest["generation"]["claims_xtce_compliance"] is False
+    assert manifest["contract"]["mission_id"] == "demo-3u"
+
+    commands = json.loads(command_dictionary.read_text(encoding="utf-8"))
+    assert any(command["model_id"] == "payload.start_acquisition" for command in commands)
+
+
+def test_gen_ground_rejects_unsupported_profile(tmp_path: Path) -> None:
+    output_dir = tmp_path / "ground"
+
+    result = runner.invoke(
+        app,
+        [
+            "gen",
+            "ground",
+            "examples/demo-3u/mission",
+            "--output-dir",
+            str(output_dir),
+            "--profile",
+            "yamcs",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "Unsupported ground generation profile: yamcs" in result.output
+    assert "Supported profiles: generic" in result.output
+    assert not output_dir.exists()
+
+
 def test_inspect_mission_loads_demo_mission() -> None:
     result = runner.invoke(app, ["inspect", "mission", "examples/demo-3u/mission"])
 

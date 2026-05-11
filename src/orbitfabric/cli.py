@@ -8,6 +8,11 @@ import typer
 from orbitfabric import __version__
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
+from orbitfabric.gen.ground import (
+    build_ground_contract,
+    write_ground_contract_manifest,
+    write_ground_dictionary_json_files,
+)
 from orbitfabric.gen.runtime import (
     build_runtime_contract,
     generate_cpp17_runtime_files,
@@ -272,6 +277,76 @@ def gen_runtime(
     typer.echo(f"  packets: {len(contract.packets)}")
     typer.echo(f"  payloads: {len(contract.payloads)}")
     typer.echo(f"  data products: {len(contract.data_products)}")
+    typer.echo("\nResult: PASSED")
+
+
+@gen_app.command("ground")
+def gen_ground(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to generate ground-facing artifacts.",
+        ),
+    ],
+    output_dir: Annotated[
+        Path,
+        typer.Option(
+            "--output-dir",
+            help="Directory where ground generation artifacts will be written.",
+        ),
+    ] = Path("generated/ground"),
+    profile: Annotated[
+        str,
+        typer.Option(
+            "--profile",
+            help="Ground generation profile. Currently only 'generic' is supported.",
+        ),
+    ] = "generic",
+) -> None:
+    """Generate ground-facing contract artifacts from a Mission Model."""
+    typer.echo(f"OrbitFabric Ground Generator {__version__}")
+
+    if profile != "generic":
+        typer.echo(f"\nUnsupported ground generation profile: {profile}")
+        typer.echo("Supported profiles: generic")
+        raise typer.Exit(code=1)
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    report = LintEngine().run(model)
+    if report.has_errors:
+        _print_loaded_model_summary(model)
+        _print_lint_report(report)
+        typer.echo("\nGround generation aborted because lint errors exist.")
+        raise typer.Exit(code=1)
+
+    contract = build_ground_contract(model, generation_profile=profile)
+    profile_output_dir = output_dir / profile
+    manifest_file = profile_output_dir / "ground_contract_manifest.json"
+    generated_files = [write_ground_contract_manifest(contract, manifest_file)]
+    generated_files.extend(write_ground_dictionary_json_files(contract, profile_output_dir))
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo(f"Profile: {profile}")
+    typer.echo("\nGenerated files:")
+    for path in generated_files:
+        typer.echo(f"  {path}")
+    typer.echo("\nGround contract counts:")
+    typer.echo(f"  telemetry: {len(contract.telemetry)}")
+    typer.echo(f"  commands: {len(contract.commands)}")
+    typer.echo(f"  events: {len(contract.events)}")
+    typer.echo(f"  faults: {len(contract.faults)}")
+    typer.echo(f"  data products: {len(contract.data_products)}")
+    typer.echo(f"  packets: {len(contract.packets)}")
     typer.echo("\nResult: PASSED")
 
 
