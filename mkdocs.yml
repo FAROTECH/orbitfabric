@@ -30,6 +30,7 @@ nav:
       - Commandability and Autonomy Contract Model: reference/commandability-contract-model.md
       - Data Flow Evidence: reference/data-flow-evidence.md
       - Runtime Contract Bindings: reference/runtime-contract-bindings.md
+      - Ground Integration Artifacts: reference/ground-integration-artifacts.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
@@ -52,6 +53,7 @@ nav:
       - ADR-0009 Contact Windows and Downlink Flow Contracts: adr/ADR-0009-contact-windows-and-downlink-flow-contracts.md
       - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-and-autonomy-contracts.md
       - ADR-0011 Generated Runtime Skeleton Boundary: adr/ADR-0011-generated-runtime-skeleton-boundary.md
+      - ADR-0012 Ground Integration Artifacts Boundary: adr/ADR-0012-ground-integration-artifacts-boundary.md
 
 markdown_extensions:
   - admonition
