@@ -11,6 +11,9 @@ from orbitfabric.gen.ground.manifest import (
     ground_contract_manifest,
     write_ground_contract_manifest,
 )
+from orbitfabric.gen.ground.markdown_export import (
+    write_ground_markdown_review_artifacts,
+)
 
 __all__ = [
     "GroundContract",
@@ -20,4 +23,5 @@ __all__ = [
     "write_ground_contract_manifest",
     "write_ground_dictionary_csv_files",
     "write_ground_dictionary_json_files",
+    "write_ground_markdown_review_artifacts",
 ]
