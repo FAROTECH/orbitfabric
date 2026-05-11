@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.7.0
+orbitfabric 0.8.0
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.7 Vertical Slice
+## Verify the Current v0.8 Vertical Slice
 
 Run mission lint:
 
@@ -110,6 +110,12 @@ cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 ```
 
+Generate ground-facing integration artifacts:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
 Run the battery-low recovery scenario:
 
 ```bash
@@ -134,6 +140,7 @@ gen docs      -> Result: PASSED
 gen data-flow -> Result: PASSED
 gen runtime   -> Result: PASSED
 cmake build   -> passing
+gen ground    -> Result: PASSED
 sim           -> Result: PASSED
 ```
 
@@ -166,6 +173,26 @@ generated/runtime/cpp17/CMakeLists.txt
 generated/runtime/cpp17/src/orbitfabric_runtime_contract_smoke.cpp
 ```
 
+The generated ground-facing integration artifacts should include:
+
+```text
+generated/ground/generic/ground_contract_manifest.json
+generated/ground/generic/README.md
+generated/ground/generic/dictionaries/telemetry_dictionary.json
+generated/ground/generic/dictionaries/command_dictionary.json
+generated/ground/generic/dictionaries/event_dictionary.json
+generated/ground/generic/dictionaries/fault_dictionary.json
+generated/ground/generic/dictionaries/data_product_dictionary.json
+generated/ground/generic/dictionaries/packet_dictionary.json
+generated/ground/generic/csv/telemetry_dictionary.csv
+generated/ground/generic/csv/command_dictionary.csv
+generated/ground/generic/csv/event_dictionary.csv
+generated/ground/generic/csv/fault_dictionary.csv
+generated/ground/generic/csv/data_product_dictionary.csv
+generated/ground/generic/csv/packet_dictionary.csv
+generated/ground/generic/ground_dictionaries.md
+```
+
 ---
 
 ## Generated Outputs
@@ -177,7 +204,8 @@ generated/
 ├── docs/
 ├── reports/
 ├── logs/
-└── runtime/
+├── runtime/
+└── ground/
 ```
 
 These files are reproducible outputs.
@@ -197,7 +225,9 @@ examples/demo-3u/scenarios/*.yaml
 
 Generated runtime-facing contract bindings are disposable.
 
-User implementation code must live outside `generated/`.
+Generated ground-facing integration artifacts are disposable.
+
+User implementation code and downstream integration code must live outside `generated/`.
 
 ---
 
@@ -239,6 +269,8 @@ Do not add generated artifacts that bypass validation.
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
 Do not put user code inside generated runtime bindings.
+
+Do not present generated ground artifacts as live ground behavior.
 
 ---
 
