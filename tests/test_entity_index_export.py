@@ -95,15 +95,15 @@ def test_entity_index_contains_id_bearing_entities() -> None:
     assert entities[("commands", "payload.start_acquisition")]["display_name"] == (
         "payload.start_acquisition"
     )
-    assert entities[("telemetry", "eps.battery_voltage")]["entity_type"] == "telemetry"
-    assert entities[("payloads", "radiation_monitor")]["entity_type"] == "payload"
+    assert entities[("telemetry", "eps.battery.voltage")]["entity_type"] == "telemetry"
+    assert entities[("payloads", "demo_iod_payload")]["entity_type"] == "payload"
     assert entities[("data_products", "payload.radiation_histogram")]["entity_type"] == (
         "data_product"
     )
     assert entities[("contact_windows", "demo_contact_001")]["entity_type"] == (
         "contact_window"
     )
-    assert entities[("command_sources", "ground_station")]["entity_type"] == (
+    assert entities[("command_sources", "ground_operator")]["entity_type"] == (
         "command_source"
     )
 
