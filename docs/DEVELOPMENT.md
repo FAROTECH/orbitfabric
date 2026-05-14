@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.8.1
+orbitfabric 0.8.2
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.8.1 Vertical Slice
+## Verify the Current v0.8.2 Vertical Slice
 
 Run mission lint:
 
@@ -89,6 +89,13 @@ Export the Core-owned model summary report:
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
+```
+
+Export the Core-owned entity index report:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
 ```
 
 Generate documentation:
@@ -144,6 +151,7 @@ Expected results:
 ```text
 lint                  -> Result: PASSED
 export model-summary  -> Result: PASSED
+export entity-index   -> Result: PASSED
 gen docs              -> Result: PASSED
 gen data-flow         -> Result: PASSED
 gen runtime           -> Result: PASSED
@@ -152,10 +160,11 @@ gen ground            -> Result: PASSED
 sim                   -> Result: PASSED
 ```
 
-The generated model summary report should include:
+The generated Core-owned structured reports should include:
 
 ```text
 generated/reports/model_summary.json
+generated/reports/entity_index.json
 ```
 
 The generated mission documentation should include:
@@ -243,6 +252,8 @@ Generated ground-facing integration artifacts are disposable.
 
 Generated contract introspection reports are disposable.
 
+Generated entity index reports are disposable.
+
 User implementation code and downstream integration code must live outside `generated/`.
 
 ---
@@ -290,7 +301,9 @@ Do not put user code inside generated runtime bindings.
 
 Do not present generated ground artifacts as live ground behavior.
 
-Do not present contract introspection reports as entity indexes, relationship graphs or Studio-specific APIs.
+Do not present contract introspection reports as relationship graphs or Studio-specific APIs.
+
+Do not present entity index reports as relationship graphs, dependency graphs, plugin APIs or Studio-specific APIs.
 
 ---
 
