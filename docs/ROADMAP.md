@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.8.1-prep  
+Version: v0.8.1  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -62,17 +62,17 @@ v0.5.0  Commandability and Autonomy Contracts                 completed
 v0.6.0  End-to-End Mission Data Flow Evidence                 completed
 v0.7.0  Generated Runtime Skeletons                           completed
 v0.8.0  Ground Integration Artifacts                          completed
-v0.8.1  Contract Introspection Surface                        next
-v0.8.2  Entity Index Surface                                  planned
+v0.8.1  Contract Introspection Surface                        completed
+v0.8.2  Entity Index Surface                                  next
 v0.9    Plugin and Extensibility Layer                        planned
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target after v0.8.0 is now `v0.8.1 - Contract Introspection Surface`.
+The immediate target after v0.8.1 is now `v0.8.2 - Entity Index Surface`.
 
-This is an intentional roadmap alignment. Contract introspection and entity indexing are not plugin features. They are Core-owned, read-only surfaces required before plugins and downstream tools can safely consume the Mission Data Contract.
+This is intentional. Contract introspection and entity indexing are Core-owned, read-only surfaces required before plugins and downstream tools can safely consume the Mission Data Contract.
 
-Ground integration artifacts remain downstream of the Mission Data Contract. v0.8 completed the first ground-facing contract export layer. v0.8.1 and v0.8.2 prepare the Core to expose structured, stable and machine-readable contract surfaces before v0.9 introduces controlled extension points.
+Ground integration artifacts remain downstream of the Mission Data Contract. v0.8.0 completed the first ground-facing contract export layer. v0.8.1 completed the first Core-owned domain-level introspection surface. v0.8.2 should expose the first Core-owned entity index before v0.9 introduces controlled extension points.
 
 ---
 
@@ -294,8 +294,6 @@ v0.7.0 intentionally did not implement flight-ready runtime, command dispatch ru
 
 ## 12. Completed Slice - v0.8.0 Ground Integration Artifacts
 
-### 12.1 Objective
-
 v0.8.0 introduced the first generated ground-facing artifact package derived from the Mission Data Contract.
 
 The public milestone name is:
@@ -313,8 +311,6 @@ ground-facing Mission Data Contract exports
 This is not a ground segment.
 
 It is a deterministic, inspectable, tool-neutral artifact package that ground software teams can review, adapt or consume downstream.
-
-### 12.2 Completed Capabilities
 
 v0.8.0 introduced:
 
@@ -341,31 +337,6 @@ Ground Integration Artifacts reference documentation
 ADR-0012 Ground Integration Artifacts Boundary
 v0.8.0 release notes
 ```
-
-Generated output:
-
-```text
-generated/ground/generic/
-├── ground_contract_manifest.json
-├── README.md
-├── dictionaries/
-│   ├── telemetry_dictionary.json
-│   ├── command_dictionary.json
-│   ├── event_dictionary.json
-│   ├── fault_dictionary.json
-│   ├── data_product_dictionary.json
-│   └── packet_dictionary.json
-├── csv/
-│   ├── telemetry_dictionary.csv
-│   ├── command_dictionary.csv
-│   ├── event_dictionary.csv
-│   ├── fault_dictionary.csv
-│   ├── data_product_dictionary.csv
-│   └── packet_dictionary.csv
-└── ground_dictionaries.md
-```
-
-### 12.3 Boundary
 
 v0.8.0 intentionally does not implement:
 
@@ -394,17 +365,11 @@ pass scheduling
 station automation
 ```
 
-The milestone proves that the Mission Data Contract can generate deterministic, reviewable and machine-readable ground-facing artifacts.
-
-It does not prove live ground-system readiness.
-
 ---
 
-## 13. Next Slice - v0.8.1 Contract Introspection Surface
+## 13. Completed Slice - v0.8.1 Contract Introspection Surface
 
-### 13.1 Objective
-
-v0.8.1 should introduce the first Core-owned read-only contract introspection surface.
+v0.8.1 introduced the first Core-owned read-only contract introspection surface.
 
 The purpose is to let downstream tools ask:
 
@@ -412,53 +377,35 @@ The purpose is to let downstream tools ask:
 What contract domains are present in this mission?
 ```
 
-This must be answered by the Core, not by downstream tools parsing YAML, generated files or human-oriented CLI output.
+This is answered by the Core, not by downstream tools parsing YAML, generated files or human-oriented CLI output.
 
-### 13.2 Candidate Capability
+v0.8.1 introduced:
 
-v0.8.1 should add a deterministic machine-readable model summary export.
+```text
+orbitfabric.export package
+model_summary_to_dict(model, mission_dir)
+write_model_summary(model, mission_dir, output_file)
+orbitfabric export model-summary command
+model_summary.json report
+summary_version 0.1
+kind orbitfabric.model_summary
+contract domain records
+domain-level counts
+source file metadata
+required/present status
+explicit boundary flags
+Contract Introspection Surface reference documentation
+v0.8.1 release notes
+```
 
-Candidate command:
+Command:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
 ```
 
-Candidate output:
-
-```text
-model_summary.json
-```
-
-The final command and filename must be selected during implementation, but the boundary is fixed: this is a Core-derived report, not a generated runtime binding, not a ground artifact and not a Studio-specific API.
-
-### 13.3 Required Content
-
-The initial surface should include only information the Core already owns authoritatively:
-
-```text
-report schema version
-OrbitFabric Core version
-mission id
-mission name
-Mission Model version
-source mission directory
-contract domains
-domain id
-domain display name
-expected source file
-required or optional classification
-source file presence
-loaded count when derivable from MissionModel
-count provenance
-summary counts
-explicit boundary flags
-```
-
-### 13.4 Boundary
-
-v0.8.1 intentionally must not introduce:
+v0.8.1 intentionally does not introduce:
 
 ```text
 entity index
@@ -469,7 +416,7 @@ source line or column tracking
 YAML node location tracking
 plugin mechanism
 plugin API
-Studio-specific formatting
+Studio-specific API
 scenario evidence duplication
 generated artifact explorer
 new Mission Model semantics
@@ -477,9 +424,7 @@ new Mission Model semantics
 
 ---
 
-## 14. Planned Slice - v0.8.2 Entity Index Surface
-
-### 14.1 Objective
+## 14. Next Slice - v0.8.2 Entity Index Surface
 
 v0.8.2 should introduce a Core-owned read-only entity index surface.
 
@@ -489,9 +434,7 @@ The purpose is to let downstream tools ask:
 What contract entities are defined in this mission?
 ```
 
-This surface should be built from the loaded and validated Mission Model, not from raw YAML scanning.
-
-### 14.2 Candidate Capability
+This surface must be built from the loaded and validated Mission Model, not from raw YAML scanning.
 
 Candidate command:
 
@@ -505,8 +448,6 @@ Candidate output:
 ```text
 entity_index.json
 ```
-
-### 14.3 Required Content
 
 The initial surface should include:
 
@@ -524,18 +465,17 @@ provenance
 domain summary
 ```
 
-### 14.4 Boundary
-
 v0.8.2 intentionally must not introduce:
 
 ```text
 relationship graph
 dependency graph
+plugin API
+plugin discovery
 UI concerns
-Studio-specific formatting
+Studio-specific API
 source line or column data unless the Core supports it reliably
 semantic expansion beyond the real Mission Model
-plugin mechanism
 ```
 
 ---
@@ -684,22 +624,22 @@ When deciding what to implement next, use these rules.
 The immediate work package is:
 
 ```text
-v0.8.1 - Contract Introspection Surface
+v0.8.2 - Entity Index Surface
 ```
 
 Required sequence:
 
 ```text
-1. define model summary shape
+1. define entity index shape
 2. keep the surface Core-owned and read-only
-3. derive all counts and domain status from the loaded Mission Model and canonical loader knowledge
+3. derive entity records from the loaded Mission Model
 4. expose machine-readable JSON through an explicit export command
-5. avoid entity-level output until v0.8.2
-6. avoid relationship output until v0.9 or later
+5. avoid relationship output until v0.9 or later
+6. avoid plugin machinery until entity index semantics are clear
 7. preserve the Mission Data Contract as source of truth
 ```
 
-Do not add plugin machinery before introspection and entity index surfaces are clear.
+Do not add plugin machinery before the entity index surface is clear.
 
 Do not let downstream tools reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -715,9 +655,11 @@ The v0.6 roadmap step completed the first end-to-end contract-level Mission Data
 
 The v0.7 roadmap step completed the first runtime-facing contract binding slice.
 
-The v0.8 roadmap step completed the first ground-facing contract export slice.
+The v0.8.0 roadmap step completed the first ground-facing contract export slice.
 
-The v0.8.1 and v0.8.2 roadmap steps prepare stable Core-owned read-only surfaces for downstream tools.
+The v0.8.1 roadmap step completed the first Core-owned contract introspection surface.
+
+The v0.8.2 roadmap step should add a stable Core-owned entity index surface for downstream tools.
 
 Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection and entity indexing are clear should OrbitFabric grow into plugin extensibility.
 

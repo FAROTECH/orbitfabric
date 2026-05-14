@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.8.0
+orbitfabric 0.8.1
 ```
 
 ---
@@ -75,13 +75,20 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.8 Vertical Slice
+## Verify the Current v0.8.1 Vertical Slice
 
 Run mission lint:
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
+```
+
+Export the Core-owned model summary report:
+
+```bash
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
 ```
 
 Generate documentation:
@@ -135,13 +142,20 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
 Expected results:
 
 ```text
-lint          -> Result: PASSED
-gen docs      -> Result: PASSED
-gen data-flow -> Result: PASSED
-gen runtime   -> Result: PASSED
-cmake build   -> passing
-gen ground    -> Result: PASSED
-sim           -> Result: PASSED
+lint                  -> Result: PASSED
+export model-summary  -> Result: PASSED
+gen docs              -> Result: PASSED
+gen data-flow         -> Result: PASSED
+gen runtime           -> Result: PASSED
+cmake build           -> passing
+gen ground            -> Result: PASSED
+sim                   -> Result: PASSED
+```
+
+The generated model summary report should include:
+
+```text
+generated/reports/model_summary.json
 ```
 
 The generated mission documentation should include:
@@ -227,6 +241,8 @@ Generated runtime-facing contract bindings are disposable.
 
 Generated ground-facing integration artifacts are disposable.
 
+Generated contract introspection reports are disposable.
+
 User implementation code and downstream integration code must live outside `generated/`.
 
 ---
@@ -258,7 +274,7 @@ For new behavior, follow this order:
 2. add or update lint rules
 3. add tests
 4. update generated docs or reports if needed
-5. update runtime-facing or ground-facing generators if needed
+5. update runtime-facing, ground-facing or introspection exporters if needed
 6. update user-facing documentation
 ```
 
@@ -268,9 +284,13 @@ Do not add generated artifacts that bypass validation.
 
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
+Do not add plugin mechanisms before Core-owned introspection and entity surfaces exist.
+
 Do not put user code inside generated runtime bindings.
 
 Do not present generated ground artifacts as live ground behavior.
+
+Do not present contract introspection reports as entity indexes, relationship graphs or Studio-specific APIs.
 
 ---
 

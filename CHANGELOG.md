@@ -8,23 +8,49 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
+### Next
+
+- Prepare `v0.8.2 - Entity Index Surface` as the next Core-owned read-only surface.
+
+---
+
+## [v0.8.1] - Contract Introspection Surface
+
+### Added
+
+- Added the `orbitfabric.export` package.
+- Added `model_summary_to_dict(model, mission_dir)`.
+- Added `write_model_summary(model, mission_dir, output_file)`.
+- Added the `orbitfabric export model-summary` command.
+- Added deterministic `model_summary.json` generation.
+- Added the first Core-owned read-only Contract Introspection Surface.
+- Added domain-level contract counts.
+- Added domain source file metadata.
+- Added required/present domain status.
+- Added explicit boundary flags for the model summary report.
+- Added Contract Introspection Surface reference documentation.
+- Added v0.8.1 release notes.
+
 ### Changed
 
-- Aligned the public roadmap to introduce `v0.8.1 - Contract Introspection Surface` and `v0.8.2 - Entity Index Surface` before `v0.9 - Plugin and Extensibility Layer`.
-- Clarified that contract introspection and entity indexing are Core-owned read-only surfaces, not plugin features.
-- Clarified that downstream tools should consume Core-generated structured surfaces instead of reconstructing Mission Model semantics from YAML, generated files or textual CLI output.
+- Updated the package and CLI version to `0.8.1`.
+- Aligned the public roadmap so `v0.8.1 - Contract Introspection Surface` is completed and `v0.8.2 - Entity Index Surface` is the next milestone.
+- Reinforced that downstream tools should consume Core-generated structured surfaces instead of reconstructing Mission Model semantics from YAML, generated files or textual CLI output.
 
 ### Boundaries
 
-The roadmap alignment intentionally does not introduce:
+The Contract Introspection Surface intentionally does not introduce:
 
 - new Mission Model semantics;
-- new CLI commands;
-- model summary export implementation;
 - entity index export implementation;
+- entity-level records;
 - relationship manifest export implementation;
+- relationship graph;
+- source line or column tracking;
+- YAML AST export;
 - plugin API;
 - plugin discovery;
+- Studio-specific API;
 - runtime behavior;
 - ground behavior.
 

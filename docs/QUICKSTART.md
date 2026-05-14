@@ -26,6 +26,7 @@ Mission Model YAML
   -> ground-facing JSON dictionaries
   -> ground-facing CSV dictionaries
   -> human-reviewable ground Markdown artifacts
+  -> model_summary.json contract introspection report
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -36,6 +37,8 @@ OrbitFabric is not a flight software framework, not a ground segment and not a s
 Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
+
+Contract introspection surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
 
 ---
 
@@ -103,7 +106,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.8.0
+orbitfabric 0.8.1
 ```
 
 ---
@@ -170,7 +173,32 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 ---
 
-## 10. Generate mission documentation
+## 10. Export the model summary
+
+```bash
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
+```
+
+Generated output:
+
+```text
+generated/reports/model_summary.json
+```
+
+This report is the first Core-owned Contract Introspection Surface.
+
+It answers:
+
+```text
+What contract domains are present in this mission?
+```
+
+It does not expose entity records, relationship graphs, plugin APIs or Studio-specific APIs.
+
+---
+
+## 11. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -206,7 +234,7 @@ Do not edit generated files manually.
 
 ---
 
-## 11. Generate runtime-facing contract bindings
+## 12. Generate runtime-facing contract bindings
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -236,7 +264,7 @@ They do not implement onboard behavior.
 
 ---
 
-## 12. Validate the generated C++17 host-build smoke target
+## 13. Validate the generated C++17 host-build smoke target
 
 After generating runtime bindings, run:
 
@@ -257,7 +285,7 @@ It does not validate flight behavior.
 
 ---
 
-## 13. Generate ground integration artifacts
+## 14. Generate ground integration artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
@@ -294,7 +322,7 @@ They do not implement a live ground segment, decoder, telemetry archive, databas
 
 ---
 
-## 14. Run the battery-low demo scenario
+## 15. Run the battery-low demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -316,7 +344,7 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
 
 ---
 
-## 15. Run the data-flow evidence scenario
+## 16. Run the data-flow evidence scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
@@ -344,7 +372,7 @@ command -> data product -> storage intent -> downlink intent -> downlink flow ->
 
 ---
 
-## 16. What this proves
+## 17. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -363,11 +391,12 @@ The current demo proves that OrbitFabric can:
 - generate deterministic C++17 runtime-facing contract bindings;
 - validate generated C++17 contract bindings with a host-build smoke target;
 - build a GroundContract from the validated Mission Model;
-- generate deterministic JSON, CSV and Markdown ground-facing contract artifacts.
+- generate deterministic JSON, CSV and Markdown ground-facing contract artifacts;
+- export a deterministic Core-owned model summary report for downstream inspection tools.
 
 ---
 
-## 17. What this does not prove
+## 18. What this does not prove
 
 The current demo does not prove:
 
@@ -391,6 +420,9 @@ The current demo does not prove:
 - command dispatch runtime behavior;
 - telemetry polling runtime behavior;
 - HAL or RTOS integration;
+- entity indexing;
+- relationship graph export;
+- plugin API behavior;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current development preview scope.

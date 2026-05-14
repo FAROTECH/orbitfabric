@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings and ground-facing integration artifacts.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts and Core-owned introspection surfaces.
 
 ---
 
@@ -122,7 +122,7 @@ examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 
 `nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
 
-`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the v0.8 baseline.
+`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the current baseline.
 
 ---
 
@@ -184,7 +184,36 @@ It is not real payload file generation, onboard storage, downlink queue executio
 
 ---
 
-## 7. Generate runtime-facing contract bindings
+## 7. Export the model summary
+
+v0.8.1 adds the first Core-owned Contract Introspection Surface for the same `demo-3u` Mission Model.
+
+Run:
+
+```bash
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
+```
+
+Generated file:
+
+```text
+generated/reports/model_summary.json
+```
+
+The report answers:
+
+```text
+What contract domains are present in this mission?
+```
+
+It includes domain-level counts, required/present status, source file metadata and explicit boundary flags.
+
+It does not expose entity records, relationship graphs, plugin APIs or Studio-specific APIs.
+
+---
+
+## 8. Generate runtime-facing contract bindings
 
 v0.7.0 added generated runtime-facing contract bindings for the same `demo-3u` Mission Model.
 
@@ -216,7 +245,7 @@ They do not implement command dispatch, telemetry polling, scheduling, HAL, driv
 
 ---
 
-## 8. Validate the generated C++17 host-build smoke target
+## 9. Validate the generated C++17 host-build smoke target
 
 After generating runtime bindings, run:
 
@@ -231,7 +260,7 @@ It does not validate flight behavior.
 
 ---
 
-## 9. Generate ground-facing integration artifacts
+## 10. Generate ground-facing integration artifacts
 
 v0.8.0 adds generated ground-facing integration artifacts for the same `demo-3u` Mission Model.
 
@@ -270,7 +299,7 @@ They do not implement a ground segment, decoder, telemetry archive, database, op
 
 ---
 
-## 10. Run the scenarios
+## 11. Run the scenarios
 
 Battery-low recovery:
 
@@ -292,7 +321,7 @@ Result: PASSED
 
 ---
 
-## 11. Generate scenario outputs
+## 12. Generate scenario outputs
 
 Battery-low recovery outputs:
 
@@ -321,7 +350,7 @@ generated/logs/payload_data_flow_evidence.log
 
 ---
 
-## 12. Generate mission documentation
+## 13. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -355,7 +384,7 @@ None of these pages describes runtime behavior.
 
 ---
 
-## 13. What the simulator checks
+## 14. What the simulator checks
 
 During execution, OrbitFabric checks that:
 
@@ -380,7 +409,7 @@ The simulator does not execute real storage, real downlink, live uplink, contact
 
 ---
 
-## 14. Expected final state
+## 15. Expected final state
 
 At the end of the battery-low scenario:
 
@@ -411,11 +440,12 @@ command accepted
   -> scenario evidence produced
   -> runtime-facing bindings generated from the same model
   -> ground-facing artifacts generated from the same model
+  -> model summary exported from the same model
 ```
 
 ---
 
-## 15. Clean-room boundary
+## 16. Clean-room boundary
 
 This demo is deliberately synthetic.
 

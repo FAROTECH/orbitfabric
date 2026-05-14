@@ -8,8 +8,8 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings and ground-facing integration artifacts once.
-Validate them, document them, simulate them and generate deterministic integration artifacts from the same source of truth.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts and Core-owned introspection surfaces once.
+Validate them, document them, simulate them and generate deterministic integration and inspection artifacts from the same source of truth.
 
 </div>
 
@@ -19,7 +19,7 @@ Validate them, document them, simulate them and generate deterministic integrati
 
 OrbitFabric is a **model-first Mission Data Fabric** for small spacecraft.
 
-It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation, runtime-facing bindings and ground-facing integration artifacts.
+It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation, runtime-facing bindings, ground-facing integration artifacts and Core-owned introspection surfaces.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -33,6 +33,7 @@ testing
 documentation
 runtime-facing integration
 ground integration
+downstream inspection tools
 ```
 
 > Define once. Validate. Simulate. Test. Document. Integrate.
@@ -41,13 +42,15 @@ ground integration
 
 ## Current Status
 
-OrbitFabric is currently at `v0.8.0 - Ground Integration Artifacts`.
+OrbitFabric is currently at `v0.8.1 - Contract Introspection Surface`.
 
-In v0.8.0, **Ground Integration Artifacts** means ground-facing Mission Data Contract exports.
+In v0.8.1, **Contract Introspection Surface** means the first Core-owned read-only machine-readable surface for inspecting the loaded Mission Model at contract-domain level.
+
+It introduces `model_summary.json` and the `orbitfabric export model-summary` command.
 
 OrbitFabric does not generate a ground segment, mission control system, telemetry archive, command uplink service, operator console, decoder runtime, database, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
-It generates deterministic, inspectable, tool-neutral ground-facing artifacts derived from the validated Mission Model.
+It generates deterministic, inspectable, tool-neutral artifacts derived from the validated Mission Model.
 
 The current repository includes:
 
@@ -58,7 +61,8 @@ The current repository includes:
 - the `v0.5.0 - Commandability and Autonomy Contracts` vertical slice;
 - the `v0.6.0 - End-to-End Mission Data Flow Evidence` vertical slice;
 - the `v0.7.0 - Generated Runtime Skeletons` vertical slice;
-- the `v0.8.0 - Ground Integration Artifacts` vertical slice.
+- the `v0.8.0 - Ground Integration Artifacts` vertical slice;
+- the `v0.8.1 - Contract Introspection Surface` vertical slice.
 
 The current vertical slice is functional:
 
@@ -79,6 +83,8 @@ The current vertical slice is functional:
 - JSON ground dictionaries;
 - CSV ground dictionaries;
 - human-reviewable ground Markdown artifacts;
+- `orbitfabric export model-summary` generation;
+- Core-owned `model_summary.json` contract introspection report;
 - synthetic demo mission: `demo-3u`.
 
 The repository also includes a growing set of example mission slices:
@@ -109,6 +115,9 @@ cmake --build generated/runtime/cpp17/build
 
 orbitfabric gen ground examples/demo-3u/mission/
 -> passing
+
+orbitfabric export model-summary examples/demo-3u/mission/ --json generated/reports/model_summary.json
+-> passing
 ```
 
 ---
@@ -133,7 +142,8 @@ It models:
 - optional Commandability and Autonomy Contracts;
 - contract-level Mission Data Flow Evidence;
 - generated runtime-facing contract bindings;
-- generated ground-facing integration artifacts.
+- generated ground-facing integration artifacts;
+- Core-owned contract introspection surfaces.
 
 The data-flow evidence chain connects:
 
@@ -149,6 +159,7 @@ command expected effect
         -> JSON report evidence
         -> runtime-facing bindings
         -> ground-facing artifacts
+        -> Core-owned introspection surfaces
 ```
 
 The v0.8 ground-facing generation chain is:
@@ -162,7 +173,17 @@ Mission Model
         -> downstream ground-system integration outside OrbitFabric
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding and Ground Integration artifacts are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
+The v0.8.1 introspection chain is:
+
+```text
+Mission Model
+        -> canonical loader
+        -> validated MissionModel
+        -> model_summary.json
+        -> downstream tools consume Core-owned structured surfaces
+```
+
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts and Contract Introspection Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
 
 ---
 
@@ -194,13 +215,16 @@ OrbitFabric is not:
 - a real contact scheduler;
 - a command dispatch runtime;
 - an onboard scheduler;
-- a HAL or RTOS abstraction.
+- a HAL or RTOS abstraction;
+- a Studio-specific backend API.
 
 Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
 
 Ground Integration Artifacts in v0.8.0 are ground-facing contract exports.
 
-Neither is flight software or ground software.
+Contract Introspection Surface in v0.8.1 is a Core-derived read-only model summary.
+
+None of them is flight software, ground software or a visual modeling tool.
 
 ---
 
@@ -243,6 +267,7 @@ Payload Contract
         -> End-to-End Mission Data Flow Evidence
         -> Runtime-Facing Contract Bindings
         -> Ground-Facing Integration Artifacts
+        -> Contract Introspection Surface
 ```
 
 ---
@@ -268,7 +293,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.8.0
+orbitfabric 0.8.1
 ```
 
 ---
@@ -285,6 +310,27 @@ Expected result:
 ```text
 Result: PASSED
 ```
+
+---
+
+## Export the Model Summary
+
+Generate the Core-owned contract introspection report:
+
+```bash
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
+```
+
+Generated file:
+
+```text
+generated/reports/model_summary.json
+```
+
+This report is a read-only Core-derived summary of the contract domains present in the loaded Mission Model.
+
+It is not an entity index, relationship graph, plugin API or Studio-specific API.
 
 ---
 
@@ -441,6 +487,7 @@ The current vertical slice can produce:
 generated/
 ├── docs/
 ├── reports/
+│   └── model_summary.json
 ├── logs/
 ├── runtime/
 │   └── cpp17/
@@ -478,7 +525,8 @@ Useful entry points:
 - `docs/DEMO_WALKTHROUGH.md`
 - `docs/reference/runtime-contract-bindings.md`
 - `docs/reference/ground-integration-artifacts.md`
-- `docs/releases/v0.8.0.md`
+- `docs/reference/contract-introspection-surface.md`
+- `docs/releases/v0.8.1.md`
 - `docs/adr/`
 
 Build the documentation site locally:
@@ -534,6 +582,9 @@ Also verify the demo vertical slice:
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
+
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 

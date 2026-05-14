@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.8.0 - Ground Integration Artifacts`.
+The current public baseline is `v0.8.1 - Contract Introspection Surface`.
 
-In v0.8.0, Ground Integration Artifacts means ground-facing Mission Data Contract exports.
+In v0.8.1, Contract Introspection Surface means the first Core-owned read-only model summary surface derived from the loaded Mission Model.
 
-The next development focus is `v0.9 - Plugin and Extensibility Layer`.
+The next development focus is `v0.8.2 - Entity Index Surface`.
 
 The current baseline proves this Mission Data Chain:
 
@@ -29,6 +29,7 @@ Payload Contract
   -> End-to-End Mission Data Flow Evidence
   -> Runtime-Facing Contract Bindings
   -> Ground-Facing Integration Artifacts
+  -> Contract Introspection Surface
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -57,11 +58,15 @@ Out of scope for the current preview:
 - Basilisk integration;
 - cFS/F Prime bridge;
 - web UI;
+- plugin API;
+- relationship graph export;
 - real spacecraft data.
 
 Runtime-facing contract bindings must remain generated, deterministic and disposable.
 
 Ground-facing integration artifacts must remain generated, deterministic, tool-neutral and disposable.
+
+Contract introspection reports must remain Core-owned, deterministic, read-only and disposable.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -121,7 +126,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.8.0
+orbitfabric 0.8.1
 ```
 
 ---
@@ -141,6 +146,9 @@ Then verify the demo vertical slice:
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
+
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 
@@ -166,16 +174,17 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
 Expected result:
 
 ```text
-ruff check .  -> All checks passed
-pytest        -> passing
-mkdocs        -> passing
-lint          -> Result: PASSED
-gen docs      -> Result: PASSED
-gen data-flow -> Result: PASSED
-gen runtime   -> Result: PASSED
-cmake build   -> passing
-gen ground    -> Result: PASSED
-sim           -> Result: PASSED
+ruff check .          -> All checks passed
+pytest                -> passing
+mkdocs                -> passing
+lint                  -> Result: PASSED
+export model-summary  -> Result: PASSED
+gen docs              -> Result: PASSED
+gen data-flow         -> Result: PASSED
+gen runtime           -> Result: PASSED
+cmake build           -> passing
+gen ground            -> Result: PASSED
+sim                   -> Result: PASSED
 ```
 
 ---
@@ -195,10 +204,10 @@ Rules:
 
 - keep modules small;
 - keep the Mission Model as the source of truth;
-- do not parse YAML independently in generators or simulators;
+- do not parse YAML independently in generators, simulators or exporters;
 - consume validated model objects;
 - prefer explicit diagnostics;
-- write tests for new lint rules, generators and simulator behavior;
+- write tests for new lint rules, generators, exporters and simulator behavior;
 - do not introduce heavy dependencies without a clear reason.
 
 ---
@@ -214,11 +223,13 @@ cli -> model
 cli -> lint
 cli -> gen
 cli -> sim
+cli -> export
 
 lint -> model
 gen -> model
 gen -> RuntimeContract builder
 gen -> GroundContract builder
+export -> model
 RuntimeContract builder -> model
 GroundContract builder -> model
 sim -> model
@@ -230,12 +241,14 @@ Forbidden patterns:
 model -> cli
 model -> sim
 model -> gen
+model -> export
 lint -> sim
 gen -> sim
 sim -> gen
 RuntimeContract builder -> raw YAML files
 GroundContract builder -> raw YAML files
 profile-specific generator -> raw YAML files
+exporter -> raw YAML files
 ```
 
 Do not hardcode behavior for `demo-3u` inside the framework core.
@@ -251,7 +264,7 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate ground dictionaries
-Align public documentation with v0.8
+Align public documentation with v0.8.1
 Fix scenario command validation
 ```
 
