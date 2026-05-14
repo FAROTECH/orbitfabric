@@ -6,7 +6,7 @@ from typing import Annotated
 import typer
 
 from orbitfabric import __version__
-from orbitfabric.export import write_model_summary
+from orbitfabric.export import write_entity_index, write_model_summary
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.gen.ground import (
@@ -388,6 +388,43 @@ def export_model_summary(
         raise typer.Exit(code=1) from exc
 
     written_file = write_model_summary(model, mission_dir, json_output)
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@export_app.command("entity-index")
+def export_entity_index(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to export the entity index.",
+        ),
+    ],
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the machine-readable entity index to this JSON file.",
+        ),
+    ] = Path("generated/reports/entity_index.json"),
+) -> None:
+    """Export a Core-owned read-only Mission Model entity index."""
+    typer.echo(f"OrbitFabric Entity Index Export {__version__}")
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    written_file = write_entity_index(model, mission_dir, json_output)
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
