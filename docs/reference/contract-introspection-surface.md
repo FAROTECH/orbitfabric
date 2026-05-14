@@ -1,6 +1,6 @@
 # Contract Introspection Surface
 
-OrbitFabric v0.8.1 introduces the first Core-owned contract introspection surface.
+OrbitFabric v0.8.1 introduced the first Core-owned contract introspection surface.
 
 The initial surface is:
 
@@ -12,6 +12,18 @@ It answers one deliberately narrow question:
 
 ```text
 What contract domains are present in this mission?
+```
+
+OrbitFabric v0.8.2 adds a related but separate entity-level surface:
+
+```text
+entity_index.json
+```
+
+It answers:
+
+```text
+What contract entities are defined in this mission?
 ```
 
 ---
@@ -197,7 +209,41 @@ It does not introduce new Mission Model semantics.
 
 ---
 
-## Relationship to v0.8.2 and v0.9
+## Relationship to the Entity Index Surface
+
+`model_summary.json` and `entity_index.json` are separate Core-owned surfaces.
+
+`model_summary.json` is domain-level.
+
+It answers:
+
+```text
+What contract domains are present in this mission?
+```
+
+`entity_index.json` is entity-level.
+
+It answers:
+
+```text
+What contract entities are defined in this mission?
+```
+
+The entity index is documented separately in:
+
+```text
+Reference -> Entity Index Surface
+```
+
+Neither surface is a relationship graph.
+
+Neither surface is a plugin API.
+
+Neither surface is a Studio-specific API.
+
+---
+
+## Relationship to v0.9
 
 The planned sequence is:
 
@@ -205,18 +251,6 @@ The planned sequence is:
 v0.8.1 - Contract Introspection Surface
 v0.8.2 - Entity Index Surface
 v0.9   - Plugin and Extensibility Layer
-```
-
-v0.8.1 answers:
-
-```text
-What contract domains are present in this mission?
-```
-
-v0.8.2 should answer:
-
-```text
-What contract entities are defined in this mission?
 ```
 
 v0.9 should introduce controlled extension points only after Core-owned introspection and entity surfaces exist.
