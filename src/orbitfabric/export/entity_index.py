@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from orbitfabric import __version__
-from orbitfabric.model.loader import OPTIONAL_FILES, REQUIRED_FILES
+from orbitfabric.model.loader import REQUIRED_FILES, OPTIONAL_FILES
 from orbitfabric.model.mission import MissionModel
 
 
