@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts and Core-owned introspection surfaces once.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces once.
 Validate them, document them, simulate them and generate deterministic integration and inspection artifacts from the same source of truth.
 
 </div>
@@ -19,7 +19,7 @@ Validate them, document them, simulate them and generate deterministic integrati
 
 OrbitFabric is a **model-first Mission Data Fabric** for small spacecraft.
 
-It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation, runtime-facing bindings, ground-facing integration artifacts and Core-owned introspection surfaces.
+It lets teams define mission data contracts once, using a structured Mission Model, and then reuse that contract across validation, documentation, testing, simulation, runtime-facing bindings, ground-facing integration artifacts, Core-owned introspection surfaces and downstream inspection tools.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -42,11 +42,13 @@ downstream inspection tools
 
 ## Current Status
 
-OrbitFabric is currently at `v0.8.1 - Contract Introspection Surface`.
+OrbitFabric is currently at `v0.8.2 - Entity Index Surface`.
 
-In v0.8.1, **Contract Introspection Surface** means the first Core-owned read-only machine-readable surface for inspecting the loaded Mission Model at contract-domain level.
+In v0.8.2, **Entity Index Surface** means the first Core-owned read-only machine-readable surface for inspecting the loaded Mission Model at contract-entity level.
 
-It introduces `model_summary.json` and the `orbitfabric export model-summary` command.
+It introduces `entity_index.json` and the `orbitfabric export entity-index` command.
+
+It builds on v0.8.1, which introduced `model_summary.json` and the `orbitfabric export model-summary` command.
 
 OrbitFabric does not generate a ground segment, mission control system, telemetry archive, command uplink service, operator console, decoder runtime, database, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
@@ -62,7 +64,8 @@ The current repository includes:
 - the `v0.6.0 - End-to-End Mission Data Flow Evidence` vertical slice;
 - the `v0.7.0 - Generated Runtime Skeletons` vertical slice;
 - the `v0.8.0 - Ground Integration Artifacts` vertical slice;
-- the `v0.8.1 - Contract Introspection Surface` vertical slice.
+- the `v0.8.1 - Contract Introspection Surface` vertical slice;
+- the `v0.8.2 - Entity Index Surface` vertical slice.
 
 The current vertical slice is functional:
 
@@ -85,6 +88,8 @@ The current vertical slice is functional:
 - human-reviewable ground Markdown artifacts;
 - `orbitfabric export model-summary` generation;
 - Core-owned `model_summary.json` contract introspection report;
+- `orbitfabric export entity-index` generation;
+- Core-owned `entity_index.json` entity index report;
 - synthetic demo mission: `demo-3u`.
 
 The repository also includes a growing set of example mission slices:
@@ -118,6 +123,9 @@ orbitfabric gen ground examples/demo-3u/mission/
 
 orbitfabric export model-summary examples/demo-3u/mission/ --json generated/reports/model_summary.json
 -> passing
+
+orbitfabric export entity-index examples/demo-3u/mission/ --json generated/reports/entity_index.json
+-> passing
 ```
 
 ---
@@ -143,7 +151,8 @@ It models:
 - contract-level Mission Data Flow Evidence;
 - generated runtime-facing contract bindings;
 - generated ground-facing integration artifacts;
-- Core-owned contract introspection surfaces.
+- Core-owned contract introspection surfaces;
+- Core-owned entity index surfaces.
 
 The data-flow evidence chain connects:
 
@@ -159,31 +168,22 @@ command expected effect
         -> JSON report evidence
         -> runtime-facing bindings
         -> ground-facing artifacts
-        -> Core-owned introspection surfaces
+        -> model summary surface
+        -> entity index surface
 ```
 
-The v0.8 ground-facing generation chain is:
-
-```text
-Mission Model
-        -> validation and linting
-        -> GroundContract
-        -> generic ground-facing dictionaries
-        -> JSON / CSV / Markdown artifacts
-        -> downstream ground-system integration outside OrbitFabric
-```
-
-The v0.8.1 introspection chain is:
+The v0.8.2 introspection and indexing chain is:
 
 ```text
 Mission Model
         -> canonical loader
         -> validated MissionModel
         -> model_summary.json
+        -> entity_index.json
         -> downstream tools consume Core-owned structured surfaces
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts and Contract Introspection Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts, Contract Introspection Surfaces and Entity Index Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
 
 ---
 
@@ -216,6 +216,8 @@ OrbitFabric is not:
 - a command dispatch runtime;
 - an onboard scheduler;
 - a HAL or RTOS abstraction;
+- a relationship graph;
+- a plugin API;
 - a Studio-specific backend API.
 
 Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
@@ -223,6 +225,8 @@ Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
 Ground Integration Artifacts in v0.8.0 are ground-facing contract exports.
 
 Contract Introspection Surface in v0.8.1 is a Core-derived read-only model summary.
+
+Entity Index Surface in v0.8.2 is a Core-derived read-only entity index.
 
 None of them is flight software, ground software or a visual modeling tool.
 
@@ -268,6 +272,7 @@ Payload Contract
         -> Runtime-Facing Contract Bindings
         -> Ground-Facing Integration Artifacts
         -> Contract Introspection Surface
+        -> Entity Index Surface
 ```
 
 ---
@@ -293,7 +298,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.8.1
+orbitfabric 0.8.2
 ```
 
 ---
@@ -313,24 +318,42 @@ Result: PASSED
 
 ---
 
-## Export the Model Summary
+## Export Core-Owned Structured Surfaces
 
-Generate the Core-owned contract introspection report:
+Generate the domain-level model summary report:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
 ```
 
-Generated file:
+Generate the entity-level index report:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
+```
+
+Generated files:
 
 ```text
 generated/reports/model_summary.json
+generated/reports/entity_index.json
 ```
 
-This report is a read-only Core-derived summary of the contract domains present in the loaded Mission Model.
+`model_summary.json` answers:
 
-It is not an entity index, relationship graph, plugin API or Studio-specific API.
+```text
+What contract domains are present in this mission?
+```
+
+`entity_index.json` answers:
+
+```text
+What contract entities are defined in this mission?
+```
+
+Neither surface is a relationship graph, plugin API or Studio-specific API.
 
 ---
 
@@ -342,23 +365,6 @@ Generate Markdown documentation from the Mission Model:
 orbitfabric gen docs examples/demo-3u/mission/
 ```
 
-Generated files:
-
-```text
-generated/docs/
-├── telemetry.md
-├── commands.md
-├── events.md
-├── faults.md
-├── modes.md
-├── packets.md
-├── payloads.md
-├── data_products.md
-├── contacts.md
-├── commandability.md
-└── data_flow.md
-```
-
 ---
 
 ## Generate Runtime Contract Bindings
@@ -367,22 +373,6 @@ Generate C++17 runtime-facing contract bindings:
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
-```
-
-Generated files:
-
-```text
-generated/runtime/cpp17/
-├── runtime_contract_manifest.json
-├── CMakeLists.txt
-├── include/orbitfabric/generated/
-│   ├── mission_ids.hpp
-│   ├── mission_enums.hpp
-│   ├── mission_registries.hpp
-│   ├── command_args.hpp
-│   └── adapter_interfaces.hpp
-└── src/
-    └── orbitfabric_runtime_contract_smoke.cpp
 ```
 
 Validate the generated C++17 contract surface with CMake:
@@ -404,29 +394,6 @@ Generate the generic ground-facing mission data package:
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
-```
-
-Generated files:
-
-```text
-generated/ground/generic/
-├── ground_contract_manifest.json
-├── README.md
-├── dictionaries/
-│   ├── telemetry_dictionary.json
-│   ├── command_dictionary.json
-│   ├── event_dictionary.json
-│   ├── fault_dictionary.json
-│   ├── data_product_dictionary.json
-│   └── packet_dictionary.json
-├── csv/
-│   ├── telemetry_dictionary.csv
-│   ├── command_dictionary.csv
-│   ├── event_dictionary.csv
-│   ├── fault_dictionary.csv
-│   ├── data_product_dictionary.csv
-│   └── packet_dictionary.csv
-└── ground_dictionaries.md
 ```
 
 These files are ground-facing contract exports.
@@ -487,7 +454,8 @@ The current vertical slice can produce:
 generated/
 ├── docs/
 ├── reports/
-│   └── model_summary.json
+│   ├── model_summary.json
+│   └── entity_index.json
 ├── logs/
 ├── runtime/
 │   └── cpp17/
@@ -526,7 +494,8 @@ Useful entry points:
 - `docs/reference/runtime-contract-bindings.md`
 - `docs/reference/ground-integration-artifacts.md`
 - `docs/reference/contract-introspection-surface.md`
-- `docs/releases/v0.8.1.md`
+- `docs/reference/entity-index-surface.md`
+- `docs/releases/v0.8.2.md`
 - `docs/adr/`
 
 Build the documentation site locally:
@@ -585,6 +554,9 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
+
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 

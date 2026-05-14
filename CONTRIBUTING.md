@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.8.1 - Contract Introspection Surface`.
+The current public baseline is `v0.8.2 - Entity Index Surface`.
 
-In v0.8.1, Contract Introspection Surface means the first Core-owned read-only model summary surface derived from the loaded Mission Model.
+In v0.8.2, Entity Index Surface means the first Core-owned read-only entity index surface derived from the loaded Mission Model.
 
-The next development focus is `v0.8.2 - Entity Index Surface`.
+The next development focus is `v0.9 - Plugin and Extensibility Layer`.
 
 The current baseline proves this Mission Data Chain:
 
@@ -30,6 +30,7 @@ Payload Contract
   -> Runtime-Facing Contract Bindings
   -> Ground-Facing Integration Artifacts
   -> Contract Introspection Surface
+  -> Entity Index Surface
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -67,6 +68,8 @@ Runtime-facing contract bindings must remain generated, deterministic and dispos
 Ground-facing integration artifacts must remain generated, deterministic, tool-neutral and disposable.
 
 Contract introspection reports must remain Core-owned, deterministic, read-only and disposable.
+
+Entity index reports must remain Core-owned, deterministic, read-only and disposable.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -126,7 +129,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.8.1
+orbitfabric 0.8.2
 ```
 
 ---
@@ -149,6 +152,9 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
+
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 
@@ -179,6 +185,7 @@ pytest                -> passing
 mkdocs                -> passing
 lint                  -> Result: PASSED
 export model-summary  -> Result: PASSED
+export entity-index   -> Result: PASSED
 gen docs              -> Result: PASSED
 gen data-flow         -> Result: PASSED
 gen runtime           -> Result: PASSED
@@ -264,7 +271,7 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate ground dictionaries
-Align public documentation with v0.8.1
+Align public documentation with v0.8.2
 Fix scenario command validation
 ```
 

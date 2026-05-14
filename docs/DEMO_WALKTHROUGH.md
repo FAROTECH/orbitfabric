@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts and Core-owned introspection surfaces.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces.
 
 ---
 
@@ -184,7 +184,7 @@ It is not real payload file generation, onboard storage, downlink queue executio
 
 ---
 
-## 7. Export the model summary
+## 7. Export Core-owned structured surfaces
 
 v0.8.1 adds the first Core-owned Contract Introspection Surface for the same `demo-3u` Mission Model.
 
@@ -207,9 +207,28 @@ The report answers:
 What contract domains are present in this mission?
 ```
 
-It includes domain-level counts, required/present status, source file metadata and explicit boundary flags.
+v0.8.2 adds the first Core-owned Entity Index Surface for the same `demo-3u` Mission Model.
 
-It does not expose entity records, relationship graphs, plugin APIs or Studio-specific APIs.
+Run:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
+```
+
+Generated file:
+
+```text
+generated/reports/entity_index.json
+```
+
+The report answers:
+
+```text
+What contract entities are defined in this mission?
+```
+
+Neither report exposes relationship graphs, plugin APIs or Studio-specific APIs.
 
 ---
 
@@ -441,6 +460,7 @@ command accepted
   -> runtime-facing bindings generated from the same model
   -> ground-facing artifacts generated from the same model
   -> model summary exported from the same model
+  -> entity index exported from the same model
 ```
 
 ---

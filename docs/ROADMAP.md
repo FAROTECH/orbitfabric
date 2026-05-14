@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.8.1  
+Version: v0.8.2  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -63,16 +63,14 @@ v0.6.0  End-to-End Mission Data Flow Evidence                 completed
 v0.7.0  Generated Runtime Skeletons                           completed
 v0.8.0  Ground Integration Artifacts                          completed
 v0.8.1  Contract Introspection Surface                        completed
-v0.8.2  Entity Index Surface                                  next
-v0.9    Plugin and Extensibility Layer                        planned
+v0.8.2  Entity Index Surface                                  completed
+v0.9    Plugin and Extensibility Layer                        next
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target after v0.8.1 is now `v0.8.2 - Entity Index Surface`.
+The immediate target after v0.8.2 is now `v0.9 - Plugin and Extensibility Layer`.
 
-This is intentional. Contract introspection and entity indexing are Core-owned, read-only surfaces required before plugins and downstream tools can safely consume the Mission Data Contract.
-
-Ground integration artifacts remain downstream of the Mission Data Contract. v0.8.0 completed the first ground-facing contract export layer. v0.8.1 completed the first Core-owned domain-level introspection surface. v0.8.2 should expose the first Core-owned entity index before v0.9 introduces controlled extension points.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9 can now introduce controlled extension points without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files or human-oriented CLI output.
 
 ---
 
@@ -88,168 +86,38 @@ v0.1 proved that a user can:
 
 ---
 
-## 4. Completed Slice - v0.2.1 Payload Contract Model
+## 4. Completed Model and Mission Data Chain Slices
 
-v0.2.1 introduced the first narrow vertical slice for Payload / IOD Payload Contracts.
-
-It added:
+OrbitFabric has completed the following model and Mission Data Chain slices:
 
 ```text
-optional payloads.yaml domain
-PayloadContract model
-minimal payload lifecycle model
-payload semantic lint rules
-generated payload contract documentation
-payload-aware scenario behavior
+v0.2.1  Payload Contract Model
+v0.2.2  Payload Contract Release Alignment
+v0.2.3  Mission Data Chain Roadmap Alignment
+v0.3.0  Data Product and Storage Contracts
+v0.4.0  Contact Windows and Downlink Flow Contracts
+v0.5.0  Commandability and Autonomy Contracts
+v0.6.0  End-to-End Mission Data Flow Evidence
 ```
 
-Payload contracts may describe expected mission-data behavior.
-
-They must not describe payload firmware, payload drivers, hardware buses, onboard runtime services, physical instrument simulation or scientific processing pipelines.
-
----
-
-## 5. Completed Alignment - v0.2.2 Payload Contract Release Alignment
-
-v0.2.2 aligned README, public documentation, roadmap, changelog, release notes and public communication with the Payload Contract Model.
-
-It did not introduce new model semantics.
-
----
-
-## 6. Completed Alignment - v0.2.3 Mission Data Chain Roadmap Alignment
-
-v0.2.3 formalized the post-payload direction:
+Together, these slices formalized the chain:
 
 ```text
 Payload behavior
         -> data products
-        -> onboard storage and retention
+        -> onboard storage and retention intent
         -> downlink queue intent
         -> contact window assumptions
         -> commandability constraints
         -> autonomy and recovery expectations
         -> end-to-end scenario evidence
-        -> future runtime and ground artifacts
 ```
 
-It remained architecture-first and documentation-first.
+They intentionally did not implement payload firmware, physical payload simulation, real onboard storage, real downlink execution, RF behavior, live command uplink, real FDIR or live spacecraft operations.
 
 ---
 
-## 7. Completed Slice - v0.3.0 Data Product and Storage Contracts
-
-v0.3.0 introduced data products as first-class mission data artifacts.
-
-It added:
-
-```text
-optional data_products.yaml domain
-DataProductContract model
-data product producer reference
-data product type
-estimated size
-priority
-storage intent
-retention intent
-overflow policy
-downlink intent
-data product semantic lint rules
-generated data product documentation
-synthetic demo mission data product
-```
-
-v0.3.0 did not implement real storage, file systems, compression, payload processing pipelines, contact windows or downlink runtime behavior.
-
----
-
-## 8. Completed Slice - v0.4.0 Contact Windows and Downlink Flow Contracts
-
-v0.4.0 modeled contact windows and downlink flow assumptions without becoming a ground segment, an orbital dynamics simulator, an RF simulator or a downlink runtime.
-
-It added:
-
-```text
-optional contacts.yaml domain
-contact profile model
-link profile model
-contact window model
-declared contact capacity assumption
-downlink flow contract model
-data product downlink eligibility
-contact/downlink reference validation
-minimal contact/downlink semantic lint rules
-generated contact/downlink documentation
-one synthetic demo contact/downlink slice
-```
-
-It did not implement real contact scheduling, real downlink execution, RF behavior, CCSDS/PUS/CFDP, Yamcs/OpenC3 services or runtime skeleton generation.
-
----
-
-## 9. Completed Slice - v0.5.0 Commandability and Autonomy Contracts
-
-v0.5.0 made command use and autonomous behavior explicit in the Mission Data Contract.
-
-It added:
-
-```text
-optional commandability.yaml domain
-CommandSource model
-CommandabilityRule model
-AutonomousActionContract model
-RecoveryIntent model
-commandability/autonomy semantic lint rules
-OF-CAB-* lint rule family
-OF-AUT-* lint rule family
-OF-REC-* lint rule family
-generated commandability/autonomy documentation
-generated commandability.md output
-one synthetic demo commandability/autonomy slice
-```
-
-v0.5.0 did not implement real command authentication, authorization, encryption, live uplink, operator consoles, command queues, onboard schedulers, autonomy runtime or real FDIR.
-
----
-
-## 10. Completed Slice - v0.6.0 End-to-End Mission Data Flow Evidence
-
-v0.6.0 combined payload contracts, data products, storage intent, downlink assumptions, contact windows and command effects into deterministic scenario evidence.
-
-It made this chain inspectable:
-
-```text
-payload acquisition command
-        -> data product declared as expected effect
-        -> storage intent inspectable
-        -> downlink intent inspectable
-        -> eligible downlink flow inspectable
-        -> matching contact window inspectable
-        -> scenario evidence generated
-        -> JSON evidence exported
-        -> Markdown evidence documented
-```
-
-v0.6.0 introduced:
-
-```text
-command expected_effects.data_products
-OF-CMD-008 / OF-CMD-009 lint rules
-simulation data-flow evidence records
-JSON data_flow_evidence report output
-scenario expect.data_flow assertions
-OF-SCN-014 through OF-SCN-017 scenario reference checks
-payload_data_flow_evidence demo scenario
-generated data_flow.md documentation
-orbitfabric gen data-flow command
-data_flow.md included in standard orbitfabric gen docs output
-```
-
-v0.6.0 did not implement real payload file generation, onboard storage runtime, downlink queues, contact scheduling, RF behavior, ground integration artifacts, CCSDS/PUS/CFDP runtime behavior or runtime skeleton generation.
-
----
-
-## 11. Completed Slice - v0.7.0 Generated Runtime Skeletons
+## 5. Completed Slice - v0.7.0 Generated Runtime Skeletons
 
 v0.7.0 introduced the first generated runtime-facing contract binding layer derived from the Mission Data Contract.
 
@@ -265,16 +133,10 @@ The precise architectural meaning is:
 runtime-facing contract bindings
 ```
 
-This is not flight software.
-
-It is a generated software boundary that implementation code can include, compile and implement against outside `generated/`.
-
 v0.7.0 introduced:
 
 ```text
 RuntimeContract intermediate model
-deterministic naming rules
-deterministic generated numeric identifiers
 orbitfabric gen runtime command
 cpp17 generation profile
 runtime_contract_manifest.json
@@ -283,7 +145,6 @@ generated static metadata registries
 generated command argument structs
 generated abstract adapter interfaces
 host-buildable CMake smoke target
-host-build smoke source including all generated headers
 Runtime Contract Bindings reference documentation
 v0.7.0 release notes
 ```
@@ -292,7 +153,7 @@ v0.7.0 intentionally did not implement flight-ready runtime, command dispatch ru
 
 ---
 
-## 12. Completed Slice - v0.8.0 Ground Integration Artifacts
+## 6. Completed Slice - v0.8.0 Ground Integration Artifacts
 
 v0.8.0 introduced the first generated ground-facing artifact package derived from the Mission Data Contract.
 
@@ -308,10 +169,6 @@ The precise architectural meaning is:
 ground-facing Mission Data Contract exports
 ```
 
-This is not a ground segment.
-
-It is a deterministic, inspectable, tool-neutral artifact package that ground software teams can review, adapt or consume downstream.
-
 v0.8.0 introduced:
 
 ```text
@@ -319,18 +176,8 @@ GroundContract intermediate model
 orbitfabric gen ground command
 generic generation profile
 ground_contract_manifest.json
-JSON telemetry dictionary
-JSON command dictionary
-JSON event dictionary
-JSON fault dictionary
-JSON data product dictionary
-JSON packet dictionary
-CSV telemetry dictionary
-CSV command dictionary
-CSV event dictionary
-CSV fault dictionary
-CSV data product dictionary
-CSV packet dictionary
+JSON ground dictionaries
+CSV ground dictionaries
 generated ground artifact README.md
 generated ground_dictionaries.md review document
 Ground Integration Artifacts reference documentation
@@ -338,46 +185,19 @@ ADR-0012 Ground Integration Artifacts Boundary
 v0.8.0 release notes
 ```
 
-v0.8.0 intentionally does not implement:
-
-```text
-live ground segment
-mission control system
-operator console
-telemetry archive
-telemetry database
-command uplink service
-telecommand transport
-telemetry downlink runtime
-network/session/routing behavior
-command authentication or authorization
-security enforcement
-Yamcs integration
-OpenC3 integration
-XTCE compliance
-CCSDS/PUS/CFDP implementation
-binary packet decoder
-binary telecommand encoder
-offset/bitfield layout model
-calibration model
-RF/link-budget behavior
-pass scheduling
-station automation
-```
+v0.8.0 intentionally did not implement a live ground segment, mission control system, telemetry archive, telemetry database, command uplink service, Yamcs integration, OpenC3 integration, XTCE compliance, CCSDS/PUS/CFDP implementation, binary packet decoder, binary telecommand encoder, RF behavior, pass scheduling or station automation.
 
 ---
 
-## 13. Completed Slice - v0.8.1 Contract Introspection Surface
+## 7. Completed Slice - v0.8.1 Contract Introspection Surface
 
 v0.8.1 introduced the first Core-owned read-only contract introspection surface.
 
-The purpose is to let downstream tools ask:
+It answers:
 
 ```text
 What contract domains are present in this mission?
 ```
-
-This is answered by the Core, not by downstream tools parsing YAML, generated files or human-oriented CLI output.
 
 v0.8.1 introduced:
 
@@ -398,89 +218,66 @@ Contract Introspection Surface reference documentation
 v0.8.1 release notes
 ```
 
-Command:
-
-```bash
-orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json generated/reports/model_summary.json
-```
-
-v0.8.1 intentionally does not introduce:
-
-```text
-entity index
-entity list
-relationship manifest
-relationship graph
-source line or column tracking
-YAML node location tracking
-plugin mechanism
-plugin API
-Studio-specific API
-scenario evidence duplication
-generated artifact explorer
-new Mission Model semantics
-```
+v0.8.1 intentionally did not introduce entity records, relationship manifests, relationship graphs, source locations, YAML AST export, plugin API, Studio-specific API, runtime behavior, ground behavior or new Mission Model semantics.
 
 ---
 
-## 14. Next Slice - v0.8.2 Entity Index Surface
+## 8. Completed Slice - v0.8.2 Entity Index Surface
 
-v0.8.2 should introduce a Core-owned read-only entity index surface.
+v0.8.2 introduced the first Core-owned read-only entity index surface.
 
-The purpose is to let downstream tools ask:
+It answers:
 
 ```text
 What contract entities are defined in this mission?
 ```
 
-This surface must be built from the loaded and validated Mission Model, not from raw YAML scanning.
+v0.8.2 introduced:
 
-Candidate command:
+```text
+entity_index_to_dict(model, mission_dir)
+write_entity_index(model, mission_dir, output_file)
+orbitfabric export entity-index command
+entity_index.json report
+index_version 0.1
+kind orbitfabric.entity_index
+entity-level records
+per-domain entity counts
+per-domain model counts
+source file metadata
+required/present domain status
+indexed/not-indexed domain status
+explicit boundary flags
+Entity Index Surface reference documentation
+v0.8.2 release notes
+```
+
+Command:
 
 ```bash
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
 ```
 
-Candidate output:
+v0.8.2 intentionally does not introduce:
 
 ```text
-entity_index.json
-```
-
-The initial surface should include:
-
-```text
-schema version
-OrbitFabric Core version
-mission identity
-entities
-domain
-entity id
-entity type
-display name when available
-source file
-provenance
-domain summary
-```
-
-v0.8.2 intentionally must not introduce:
-
-```text
+new Mission Model semantics
+relationship manifest
 relationship graph
 dependency graph
+source line or column tracking
+YAML AST export
 plugin API
 plugin discovery
-UI concerns
 Studio-specific API
-source line or column data unless the Core supports it reliably
-semantic expansion beyond the real Mission Model
+runtime behavior
+ground behavior
 ```
 
 ---
 
-## 15. Planned Milestone - v0.9 Plugin and Extensibility Layer
+## 9. Next Milestone - v0.9 Plugin and Extensibility Layer
 
 v0.9 should introduce controlled extension points only after the Core exposes the required introspection and entity surfaces.
 
@@ -520,7 +317,7 @@ The relationship manifest must remain partial or experimental if the Core does n
 
 ---
 
-## 16. Future Milestone - v1.0 Stable Mission Data Contract
+## 10. Future Milestone - v1.0 Stable Mission Data Contract
 
 v1.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
 
@@ -555,7 +352,7 @@ v1.0 should mean stable Mission Data Contract framework, not a complete space so
 
 ---
 
-## 17. Backlog Parking Lot
+## 11. Backlog Parking Lot
 
 These ideas are valid but must not distract from the active milestone.
 
@@ -597,7 +394,7 @@ example user implementation outside generated/
 
 ---
 
-## 18. Priority Rules
+## 12. Priority Rules
 
 When deciding what to implement next, use these rules.
 
@@ -619,33 +416,33 @@ When deciding what to implement next, use these rules.
 
 ---
 
-## 19. Immediate Work Plan
+## 13. Immediate Work Plan
 
 The immediate work package is:
 
 ```text
-v0.8.2 - Entity Index Surface
+v0.9 - Plugin and Extensibility Layer
 ```
 
 Required sequence:
 
 ```text
-1. define entity index shape
-2. keep the surface Core-owned and read-only
-3. derive entity records from the loaded Mission Model
-4. expose machine-readable JSON through an explicit export command
-5. avoid relationship output until v0.9 or later
-6. avoid plugin machinery until entity index semantics are clear
+1. classify public versus internal Core surfaces
+2. define plugin boundaries without allowing semantic override
+3. define discovery and metadata rules
+4. start with narrow, testable extension points
+5. require plugins to consume loaded MissionModel or Core-owned structured surfaces
+6. keep relationship manifests out unless they can be derived deterministically
 7. preserve the Mission Data Contract as source of truth
 ```
 
-Do not add plugin machinery before the entity index surface is clear.
+Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
-Do not let downstream tools reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
+Do not let downstream tools become a second source of truth.
 
 ---
 
-## 20. Final Roadmap Statement
+## 14. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
 
@@ -659,7 +456,7 @@ The v0.8.0 roadmap step completed the first ground-facing contract export slice.
 
 The v0.8.1 roadmap step completed the first Core-owned contract introspection surface.
 
-The v0.8.2 roadmap step should add a stable Core-owned entity index surface for downstream tools.
+The v0.8.2 roadmap step completed the first Core-owned entity index surface for downstream tools.
 
 Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection and entity indexing are clear should OrbitFabric grow into plugin extensibility.
 

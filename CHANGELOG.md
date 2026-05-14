@@ -10,7 +10,7 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ### Next
 
-- Prepare final release alignment for `v0.8.2 - Entity Index Surface`, including package version bump and current-baseline documentation updates.
+- Prepare `v0.9 - Plugin and Extensibility Layer` as the next controlled extension milestone after Core-owned introspection and entity index surfaces.
 
 ---
 
@@ -38,7 +38,10 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ### Changed
 
+- Updated the package and CLI version to `0.8.2`.
 - Extended the Core-owned structured surfaces from domain-level model summary to entity-level indexing.
+- Aligned the public roadmap so `v0.8.2 - Entity Index Surface` is completed and `v0.9 - Plugin and Extensibility Layer` is the next milestone.
+- Updated README, architecture, project charter, quickstart, development guide, contributing guide and versioning documentation for v0.8.2.
 - Reinforced that downstream tools should consume Core-generated structured surfaces instead of reconstructing Mission Model entities from YAML, generated files or textual CLI output.
 - Clarified the relationship between `model_summary.json` and `entity_index.json`.
 

@@ -9,7 +9,8 @@ OrbitFabric currently distinguishes between:
 - the version field written into generated JSON reports;
 - the generated runtime contract manifest context;
 - the generated ground contract manifest context;
-- the generated contract introspection report context.
+- the generated contract introspection report context;
+- the generated entity index report context.
 
 These versions are related, but they are not the same thing.
 
@@ -35,7 +36,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.8.1
+orbitfabric 0.8.2
 ```
 
 This version answers the question:
@@ -88,7 +89,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -189,6 +190,37 @@ It is not an entity index, relationship manifest, plugin API or Studio-specific 
 
 ---
 
+## Entity index report context
+
+v0.8.2 introduced the first Core-owned Entity Index Surface.
+
+The generated entity index report is written to:
+
+```text
+generated/reports/entity_index.json
+```
+
+It records the entity-level contract index derived from the loaded Mission Model.
+
+It includes:
+
+```text
+index_version
+kind = orbitfabric.entity_index
+OrbitFabric tool version
+mission identity
+source mission directory
+boundary flags
+domain summaries
+entity records
+```
+
+The entity index report is generated from the current OrbitFabric tool and the declared Mission Model.
+
+It is not a relationship manifest, dependency graph, plugin API or Studio-specific API.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -196,7 +228,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.8.1
+OrbitFabric tool/package version: 0.8.2
 Mission Model version:           0.1.0
 ```
 
@@ -204,13 +236,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts and Contract Introspection Surfaces;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces and Entity Index Surfaces;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.8.1 rule
+## Current v0.8.2 rule
 
 For the current development preview:
 
@@ -227,6 +259,8 @@ For the current development preview:
 | Ground manifest `claims_*` compatibility fields | Explicit tool-specific claim flags, currently `false`. |
 | Model summary `summary_version` | Contract introspection report format version, currently `0.1`. |
 | Model summary `kind` | Contract introspection report kind, currently `orbitfabric.model_summary`. |
+| Entity index `index_version` | Entity index report format version, currently `0.1`. |
+| Entity index `kind` | Entity index report kind, currently `orbitfabric.entity_index`. |
 
 ---
 
@@ -240,7 +274,8 @@ Do not assume that:
 - generated artifacts are valid without checking both tool version and mission model version;
 - generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees;
 - generated ground-facing artifacts imply ground runtime behavior or tool-specific compatibility;
-- model summary reports imply entity-level indexing, relationship graphs or plugin APIs.
+- model summary reports imply entity-level indexing, relationship graphs or plugin APIs;
+- entity index reports imply relationship graphs, dependency graphs or plugin APIs.
 
 ---
 
@@ -259,4 +294,4 @@ Possible future additions include:
 - JSON Schema export for Mission Model validation;
 - compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.8.1 development preview.
+These are not part of the current v0.8.2 development preview.
