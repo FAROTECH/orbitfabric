@@ -31,6 +31,7 @@ nav:
       - Data Flow Evidence: reference/data-flow-evidence.md
       - Runtime Contract Bindings: reference/runtime-contract-bindings.md
       - Ground Integration Artifacts: reference/ground-integration-artifacts.md
+      - Contract Introspection Surface: reference/contract-introspection-surface.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
@@ -39,6 +40,7 @@ nav:
       - v0.6.0 End-to-End Mission Data Flow Evidence: releases/v0.6.0.md
       - v0.7.0 Generated Runtime Skeletons: releases/v0.7.0.md
       - v0.8.0 Ground Integration Artifacts: releases/v0.8.0.md
+      - v0.8.1 Contract Introspection Surface: releases/v0.8.1.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 
