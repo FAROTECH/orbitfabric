@@ -293,6 +293,60 @@ def test_gen_ground_rejects_unsupported_profile(tmp_path: Path) -> None:
     assert not output_dir.exists()
 
 
+def test_export_model_summary_writes_json_report(tmp_path: Path) -> None:
+    output_file = tmp_path / "model_summary.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "export",
+            "model-summary",
+            "examples/demo-3u/mission",
+            "--json",
+            str(output_file),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert f"OrbitFabric Model Summary Export {__version__}" in result.output
+    assert "Mission: demo-3u" in result.output
+    assert "Model version: 0.1.0" in result.output
+    assert f"JSON report written to: {output_file}" in result.output
+    assert "Result: PASSED" in result.output
+    assert output_file.exists()
+
+    summary = json.loads(output_file.read_text(encoding="utf-8"))
+    assert summary["kind"] == "orbitfabric.model_summary"
+    assert summary["mission"]["id"] == "demo-3u"
+    assert summary["counts"]["spacecraft"] == 1
+    assert summary["counts"]["payloads"] == 1
+    assert summary["boundaries"]["contains_entity_index"] is False
+    assert summary["boundaries"]["contains_relationship_manifest"] is False
+    assert summary["boundaries"]["contains_plugin_api"] is False
+
+
+def test_export_model_summary_rejects_invalid_mission(tmp_path: Path) -> None:
+    mission_dir = _copy_demo_mission_missing_required_file(tmp_path)
+    output_file = tmp_path / "model_summary.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "export",
+            "model-summary",
+            str(mission_dir),
+            "--json",
+            str(output_file),
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "OF-SYN-002" in result.output
+    assert "required Mission Model file is missing" in result.output
+    assert "Result: FAILED" in result.output
+    assert not output_file.exists()
+
+
 def test_inspect_mission_loads_demo_mission() -> None:
     result = runner.invoke(app, ["inspect", "mission", "examples/demo-3u/mission"])
 
