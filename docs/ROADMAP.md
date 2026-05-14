@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.8.0  
+Version: v0.8.1-prep  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -35,6 +35,8 @@ Mission Model
         -> end-to-end mission data flow evidence
         -> runtime-facing contract bindings
         -> ground integration artifacts
+        -> contract introspection surfaces
+        -> entity index surfaces
         -> plugins and extensibility
 ```
 
@@ -42,7 +44,7 @@ Every milestone must reinforce the core identity:
 
 > OrbitFabric is a Mission Data Contract framework.
 
-The current architectural objective is to keep the Mission Data Chain explicit and consumable by generated artifacts without turning OrbitFabric into flight software or a ground segment.
+The current architectural objective is to keep the Mission Data Chain explicit, inspectable and consumable by generated artifacts and downstream tools without turning OrbitFabric into flight software, a ground segment or a visual modeling tool.
 
 ---
 
@@ -60,13 +62,17 @@ v0.5.0  Commandability and Autonomy Contracts                 completed
 v0.6.0  End-to-End Mission Data Flow Evidence                 completed
 v0.7.0  Generated Runtime Skeletons                           completed
 v0.8.0  Ground Integration Artifacts                          completed
-v0.9    Plugin and Extensibility Layer                        next
+v0.8.1  Contract Introspection Surface                        next
+v0.8.2  Entity Index Surface                                  planned
+v0.9    Plugin and Extensibility Layer                        planned
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target after v0.8.0 is now `v0.9 - Plugin and Extensibility Layer`.
+The immediate target after v0.8.0 is now `v0.8.1 - Contract Introspection Surface`.
 
-Ground integration artifacts remain downstream of the Mission Data Contract. v0.8 completed the first ground-facing contract export layer required before tool-specific integrations or extension points are useful.
+This is an intentional roadmap alignment. Contract introspection and entity indexing are not plugin features. They are Core-owned, read-only surfaces required before plugins and downstream tools can safely consume the Mission Data Contract.
+
+Ground integration artifacts remain downstream of the Mission Data Contract. v0.8 completed the first ground-facing contract export layer. v0.8.1 and v0.8.2 prepare the Core to expose structured, stable and machine-readable contract surfaces before v0.9 introduces controlled extension points.
 
 ---
 
@@ -394,13 +400,155 @@ It does not prove live ground-system readiness.
 
 ---
 
-## 13. Next Milestone - v0.9 Plugin and Extensibility Layer
+## 13. Next Slice - v0.8.1 Contract Introspection Surface
 
-v0.9 should introduce controlled extension points after the core mission data chain and first generated artifact layers have matured.
+### 13.1 Objective
+
+v0.8.1 should introduce the first Core-owned read-only contract introspection surface.
+
+The purpose is to let downstream tools ask:
+
+```text
+What contract domains are present in this mission?
+```
+
+This must be answered by the Core, not by downstream tools parsing YAML, generated files or human-oriented CLI output.
+
+### 13.2 Candidate Capability
+
+v0.8.1 should add a deterministic machine-readable model summary export.
+
+Candidate command:
+
+```bash
+orbitfabric export model-summary examples/demo-3u/mission/ \
+  --json generated/reports/model_summary.json
+```
+
+Candidate output:
+
+```text
+model_summary.json
+```
+
+The final command and filename must be selected during implementation, but the boundary is fixed: this is a Core-derived report, not a generated runtime binding, not a ground artifact and not a Studio-specific API.
+
+### 13.3 Required Content
+
+The initial surface should include only information the Core already owns authoritatively:
+
+```text
+report schema version
+OrbitFabric Core version
+mission id
+mission name
+Mission Model version
+source mission directory
+contract domains
+domain id
+domain display name
+expected source file
+required or optional classification
+source file presence
+loaded count when derivable from MissionModel
+count provenance
+summary counts
+explicit boundary flags
+```
+
+### 13.4 Boundary
+
+v0.8.1 intentionally must not introduce:
+
+```text
+entity index
+entity list
+relationship manifest
+relationship graph
+source line or column tracking
+YAML node location tracking
+plugin mechanism
+plugin API
+Studio-specific formatting
+scenario evidence duplication
+generated artifact explorer
+new Mission Model semantics
+```
+
+---
+
+## 14. Planned Slice - v0.8.2 Entity Index Surface
+
+### 14.1 Objective
+
+v0.8.2 should introduce a Core-owned read-only entity index surface.
+
+The purpose is to let downstream tools ask:
+
+```text
+What contract entities are defined in this mission?
+```
+
+This surface should be built from the loaded and validated Mission Model, not from raw YAML scanning.
+
+### 14.2 Candidate Capability
+
+Candidate command:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
+```
+
+Candidate output:
+
+```text
+entity_index.json
+```
+
+### 14.3 Required Content
+
+The initial surface should include:
+
+```text
+schema version
+OrbitFabric Core version
+mission identity
+entities
+domain
+entity id
+entity type
+display name when available
+source file
+provenance
+domain summary
+```
+
+### 14.4 Boundary
+
+v0.8.2 intentionally must not introduce:
+
+```text
+relationship graph
+dependency graph
+UI concerns
+Studio-specific formatting
+source line or column data unless the Core supports it reliably
+semantic expansion beyond the real Mission Model
+plugin mechanism
+```
+
+---
+
+## 15. Planned Milestone - v0.9 Plugin and Extensibility Layer
+
+v0.9 should introduce controlled extension points only after the Core exposes the required introspection and entity surfaces.
 
 Candidate features:
 
 ```text
+extension boundary documentation
+public versus internal surface classification
 custom lint rule plugins
 custom generator plugins
 custom data product validators
@@ -418,9 +566,21 @@ semantic versioning policy
 
 Plugins must extend OrbitFabric without silently redefining core semantics.
 
+Plugins must not bypass Mission Model loading, validation, linting or Core-owned structured surfaces.
+
+Relationship manifests may be introduced in v0.9 only if the Core can derive them deterministically and without fragile heuristics.
+
+Candidate relationship surface:
+
+```text
+relationship_manifest.json
+```
+
+The relationship manifest must remain partial or experimental if the Core does not yet own enough explicit relationship semantics.
+
 ---
 
-## 14. Future Milestone - v1.0 Stable Mission Data Contract
+## 16. Future Milestone - v1.0 Stable Mission Data Contract
 
 v1.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
 
@@ -435,6 +595,8 @@ stable Commandability Contract schema
 stable data-flow evidence semantics
 stable RuntimeContract semantics
 stable GroundContract semantics
+stable contract introspection surface
+stable entity index surface
 stable runtime-facing contract binding surface
 stable ground-facing artifact package
 stable CLI commands
@@ -453,7 +615,7 @@ v1.0 should mean stable Mission Data Contract framework, not a complete space so
 
 ---
 
-## 15. Backlog Parking Lot
+## 17. Backlog Parking Lot
 
 These ideas are valid but must not distract from the active milestone.
 
@@ -486,6 +648,7 @@ ADCS abstract mode examples
 thermal abstract mode examples
 security policy model
 command authorization model
+relationship manifest
 second payload example
 payload lifecycle expansion
 additional runtime generation profiles
@@ -494,7 +657,7 @@ example user implementation outside generated/
 
 ---
 
-## 16. Priority Rules
+## 18. Priority Rules
 
 When deciding what to implement next, use these rules.
 
@@ -511,39 +674,42 @@ When deciding what to implement next, use these rules.
 11. Generated Code Is Disposable.
 12. User Code Lives Outside `generated/`.
 13. Tool-specific Claims Require Tests.
+14. Core Surfaces Before Plugins.
+15. Downstream Tools Consume, Not Infer.
 
 ---
 
-## 17. Immediate Work Plan
+## 19. Immediate Work Plan
 
 The immediate work package is:
 
 ```text
-v0.9 - Plugin and Extensibility Layer
+v0.8.1 - Contract Introspection Surface
 ```
 
 Required sequence:
 
 ```text
-1. define extension boundaries before adding plugin execution behavior
-2. keep plugins downstream of the Mission Model
-3. define explicit plugin metadata
-4. avoid plugins silently redefining core semantics
-5. provide one minimal example plugin only after the extension contract is clear
-6. preserve the Mission Data Contract as source of truth
+1. define model summary shape
+2. keep the surface Core-owned and read-only
+3. derive all counts and domain status from the loaded Mission Model and canonical loader knowledge
+4. expose machine-readable JSON through an explicit export command
+5. avoid entity-level output until v0.8.2
+6. avoid relationship output until v0.9 or later
+7. preserve the Mission Data Contract as source of truth
 ```
 
-Do not add broad plugin machinery before the extension boundary is clear.
+Do not add plugin machinery before introspection and entity index surfaces are clear.
 
-Do not let plugins bypass validation or generated artifact contracts.
+Do not let downstream tools reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
 ---
 
-## 18. Final Roadmap Statement
+## 20. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
 
-> defining, validating, simulating, documenting and generating contract-facing artifacts from a Mission Data Contract for a small spacecraft.
+> defining, validating, simulating, documenting, introspecting and generating contract-facing artifacts from a Mission Data Contract for a small spacecraft.
 
 The v0.6 roadmap step completed the first end-to-end contract-level Mission Data Flow Evidence slice.
 
@@ -551,7 +717,9 @@ The v0.7 roadmap step completed the first runtime-facing contract binding slice.
 
 The v0.8 roadmap step completed the first ground-facing contract export slice.
 
-Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer and ground-facing artifact layer are clear should OrbitFabric grow into plugin extensibility.
+The v0.8.1 and v0.8.2 roadmap steps prepare stable Core-owned read-only surfaces for downstream tools.
+
+Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection and entity indexing are clear should OrbitFabric grow into plugin extensibility.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
