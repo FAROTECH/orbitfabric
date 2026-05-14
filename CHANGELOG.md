@@ -8,6 +8,26 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
+### Changed
+
+- Aligned the public roadmap to introduce `v0.8.1 - Contract Introspection Surface` and `v0.8.2 - Entity Index Surface` before `v0.9 - Plugin and Extensibility Layer`.
+- Clarified that contract introspection and entity indexing are Core-owned read-only surfaces, not plugin features.
+- Clarified that downstream tools should consume Core-generated structured surfaces instead of reconstructing Mission Model semantics from YAML, generated files or textual CLI output.
+
+### Boundaries
+
+The roadmap alignment intentionally does not introduce:
+
+- new Mission Model semantics;
+- new CLI commands;
+- model summary export implementation;
+- entity index export implementation;
+- relationship manifest export implementation;
+- plugin API;
+- plugin discovery;
+- runtime behavior;
+- ground behavior.
+
 ---
 
 ## [v0.8.0] - Ground Integration Artifacts

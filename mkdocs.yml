@@ -55,6 +55,7 @@ nav:
       - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-and-autonomy-contracts.md
       - ADR-0011 Generated Runtime Skeleton Boundary: adr/ADR-0011-generated-runtime-skeleton-boundary.md
       - ADR-0012 Ground Integration Artifacts Boundary: adr/ADR-0012-ground-integration-artifacts-boundary.md
+      - ADR-0013 Contract Introspection Surfaces: adr/ADR-0013-contract-introspection-surfaces.md
 
 markdown_extensions:
   - admonition
