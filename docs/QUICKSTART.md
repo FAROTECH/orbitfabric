@@ -27,6 +27,7 @@ Mission Model YAML
   -> ground-facing CSV dictionaries
   -> human-reviewable ground Markdown artifacts
   -> model_summary.json contract introspection report
+  -> entity_index.json entity index report
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -38,7 +39,7 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
+Contract introspection and entity index surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
 
 ---
 
@@ -106,7 +107,7 @@ orbitfabric --help
 Expected version for the current development preview:
 
 ```text
-orbitfabric 0.8.1
+orbitfabric 0.8.2
 ```
 
 ---
@@ -173,28 +174,42 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 ---
 
-## 10. Export the model summary
+## 10. Export Core-owned structured surfaces
+
+Generate the domain-level model summary:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
 ```
 
+Generate the entity-level index:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
+```
+
 Generated output:
 
 ```text
 generated/reports/model_summary.json
+generated/reports/entity_index.json
 ```
 
-This report is the first Core-owned Contract Introspection Surface.
-
-It answers:
+`model_summary.json` answers:
 
 ```text
 What contract domains are present in this mission?
 ```
 
-It does not expose entity records, relationship graphs, plugin APIs or Studio-specific APIs.
+`entity_index.json` answers:
+
+```text
+What contract entities are defined in this mission?
+```
+
+Neither surface exposes relationship graphs, plugin APIs or Studio-specific APIs.
 
 ---
 
@@ -202,23 +217,6 @@ It does not expose entity records, relationship graphs, plugin APIs or Studio-sp
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
-```
-
-Generated output:
-
-```text
-generated/docs/
-├── telemetry.md
-├── commands.md
-├── events.md
-├── faults.md
-├── modes.md
-├── packets.md
-├── payloads.md
-├── data_products.md
-├── contacts.md
-├── commandability.md
-└── data_flow.md
 ```
 
 Generate only the data-flow evidence reference:
@@ -238,22 +236,6 @@ Do not edit generated files manually.
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
-```
-
-Generated output:
-
-```text
-generated/runtime/cpp17/
-├── runtime_contract_manifest.json
-├── CMakeLists.txt
-├── include/orbitfabric/generated/
-│   ├── mission_ids.hpp
-│   ├── mission_enums.hpp
-│   ├── mission_registries.hpp
-│   ├── command_args.hpp
-│   └── adapter_interfaces.hpp
-└── src/
-    └── orbitfabric_runtime_contract_smoke.cpp
 ```
 
 The generated C++17 files are runtime-facing contract bindings.
@@ -289,29 +271,6 @@ It does not validate flight behavior.
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
-```
-
-Generated output:
-
-```text
-generated/ground/generic/
-├── ground_contract_manifest.json
-├── README.md
-├── dictionaries/
-│   ├── telemetry_dictionary.json
-│   ├── command_dictionary.json
-│   ├── event_dictionary.json
-│   ├── fault_dictionary.json
-│   ├── data_product_dictionary.json
-│   └── packet_dictionary.json
-├── csv/
-│   ├── telemetry_dictionary.csv
-│   ├── command_dictionary.csv
-│   ├── event_dictionary.csv
-│   ├── fault_dictionary.csv
-│   ├── data_product_dictionary.csv
-│   └── packet_dictionary.csv
-└── ground_dictionaries.md
 ```
 
 The generated ground files are ground-facing contract exports.
@@ -382,6 +341,7 @@ The current demo proves that OrbitFabric can:
 - run semantic lint rules;
 - generate Markdown documentation;
 - inspect a Mission Model summary;
+- export an entity index from the loaded Mission Model;
 - validate scenarios without executing them;
 - execute deterministic operational sequences;
 - record contract-level data-flow evidence;
@@ -392,7 +352,7 @@ The current demo proves that OrbitFabric can:
 - validate generated C++17 contract bindings with a host-build smoke target;
 - build a GroundContract from the validated Mission Model;
 - generate deterministic JSON, CSV and Markdown ground-facing contract artifacts;
-- export a deterministic Core-owned model summary report for downstream inspection tools.
+- export deterministic Core-owned structured surfaces for downstream inspection tools.
 
 ---
 
@@ -420,7 +380,6 @@ The current demo does not prove:
 - command dispatch runtime behavior;
 - telemetry polling runtime behavior;
 - HAL or RTOS integration;
-- entity indexing;
 - relationship graph export;
 - plugin API behavior;
 - qualification for operational spacecraft use.
