@@ -2,7 +2,7 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts and Core-owned introspection surfaces in a single Mission Data Contract.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces in a single Mission Data Contract.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
@@ -11,10 +11,12 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.8.1 - Contract Introspection Surface
+v0.8.2 - Entity Index Surface
 ```
 
-In v0.8.1, Contract Introspection Surface means the first **Core-owned read-only model summary surface** derived from the loaded Mission Model.
+In v0.8.2, Entity Index Surface means the first **Core-owned read-only entity index surface** derived from the loaded Mission Model.
+
+It builds on v0.8.1, which introduced the domain-level `model_summary.json` surface.
 
 The current public preview includes:
 
@@ -46,6 +48,8 @@ The current public preview includes:
 - generated human-reviewable ground Markdown artifacts;
 - `orbitfabric export model-summary`;
 - generated `model_summary.json` contract introspection report;
+- `orbitfabric export entity-index`;
+- generated `entity_index.json` entity index report;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -65,6 +69,7 @@ Mission Model
   -> GroundContract
   -> generated ground-facing integration artifacts
   -> Core-owned contract introspection surfaces
+  -> Core-owned entity index surfaces
 ```
 
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
@@ -75,4 +80,4 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
+Contract introspection and entity index surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
