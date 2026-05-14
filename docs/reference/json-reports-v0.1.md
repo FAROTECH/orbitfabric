@@ -47,7 +47,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.8.1"
+  "version": "0.8.2"
 }
 ```
 
@@ -373,7 +373,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "mission": "demo-3u",
   "scenario": "payload_data_flow_evidence",
   "result": "passed",
