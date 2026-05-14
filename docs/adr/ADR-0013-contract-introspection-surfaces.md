@@ -1,6 +1,6 @@
 # ADR-0013 - Contract Introspection Surfaces
 
-Status: Proposed  
+Status: Accepted  
 Date: 2026-05-14
 
 ---
@@ -58,19 +58,42 @@ v0.8.2 - Entity Index Surface
 v0.9   - Plugin and Extensibility Layer
 ```
 
-v0.8.1 will focus on a model summary surface that answers:
+v0.8.1 focuses on a model summary surface that answers:
 
 ```text
 What contract domains are present in this mission?
 ```
 
-v0.8.2 will focus on an entity index surface that answers:
+v0.8.2 focuses on an entity index surface that answers:
 
 ```text
 What contract entities are defined in this mission?
 ```
 
 v0.9 may introduce relationship manifests and plugin-safe extension boundaries only after the model summary and entity index surfaces are defined.
+
+---
+
+## Implementation status
+
+The first two Core-owned surfaces are now implemented as separate reports:
+
+```text
+model_summary.json
+entity_index.json
+```
+
+`model_summary.json` is domain-level.
+
+`entity_index.json` is entity-level.
+
+They are intentionally separate.
+
+Neither surface is a relationship graph.
+
+Neither surface is a plugin API.
+
+Neither surface is a Studio-specific API.
 
 ---
 
@@ -112,9 +135,9 @@ ground-facing exports
 future plugin extension points
 ```
 
-The v0.8.1 model summary should not expose entity lists or relationships.
+The v0.8.1 model summary does not expose entity lists or relationships.
 
-The v0.8.2 entity index should not expose relationship graphs.
+The v0.8.2 entity index does not expose relationship graphs.
 
 The v0.9 relationship manifest should be introduced only if relationships can be derived without fragile heuristics.
 
@@ -125,8 +148,6 @@ The v0.9 relationship manifest should be introduced only if relationships can be
 This ADR does not introduce:
 
 ```text
-model_summary.json implementation
-entity_index.json implementation
 relationship_manifest.json implementation
 source line or column tracking
 plugin API

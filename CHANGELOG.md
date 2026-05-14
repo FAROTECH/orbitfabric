@@ -10,7 +10,53 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ### Next
 
-- Prepare `v0.8.2 - Entity Index Surface` as the next Core-owned read-only surface.
+- Prepare final release alignment for `v0.8.2 - Entity Index Surface`, including package version bump and current-baseline documentation updates.
+
+---
+
+## [v0.8.2] - Entity Index Surface
+
+### Added
+
+- Added `entity_index_to_dict(model, mission_dir)`.
+- Added `write_entity_index(model, mission_dir, output_file)`.
+- Added deterministic `entity_index.json` generation.
+- Added the `orbitfabric export entity-index` command.
+- Added `index_version 0.1` for the entity index surface.
+- Added `kind orbitfabric.entity_index` for the entity index report.
+- Added entity-level records derived from the loaded Mission Model.
+- Added per-domain entity counts.
+- Added per-domain model counts.
+- Added source file metadata for entity records and domain summaries.
+- Added required/present domain status for the entity index surface.
+- Added indexed/not-indexed domain status.
+- Added explicit boundary flags for the entity index report.
+- Added entity index export tests.
+- Added entity index CLI tests.
+- Added Entity Index Surface reference documentation.
+- Added v0.8.2 release notes.
+
+### Changed
+
+- Extended the Core-owned structured surfaces from domain-level model summary to entity-level indexing.
+- Reinforced that downstream tools should consume Core-generated structured surfaces instead of reconstructing Mission Model entities from YAML, generated files or textual CLI output.
+- Clarified the relationship between `model_summary.json` and `entity_index.json`.
+
+### Boundaries
+
+The Entity Index Surface intentionally does not introduce:
+
+- new Mission Model semantics;
+- relationship manifest export implementation;
+- relationship graph;
+- dependency graph;
+- source line or column tracking;
+- YAML AST export;
+- plugin API;
+- plugin discovery;
+- Studio-specific API;
+- runtime behavior;
+- ground behavior.
 
 ---
 
