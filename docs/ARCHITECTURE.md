@@ -1,8 +1,8 @@
 # OrbitFabric - Architecture
 
-Version: 0.8.1  
+Version: 0.8.2  
 Status: Development preview  
-Scope: Mission Data Contract architecture through Contract Introspection Surface
+Scope: Mission Data Contract architecture through Entity Index Surface
 
 ---
 
@@ -16,7 +16,7 @@ Its architecture is centered on one primary artifact:
 
 The Mission Data Contract is expressed as a structured Mission Model.
 
-It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, documentation and scenario evidence from one source of truth.
+It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, documentation and scenario evidence from one source of truth.
 
 OrbitFabric is not designed as:
 
@@ -36,13 +36,13 @@ Studio-specific backend API
 
 Its architectural role is:
 
-> define, validate, simulate, document, introspect and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings, ground-facing integration and downstream inspection tools.
+> define, validate, simulate, document, introspect, index and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings, ground-facing integration and downstream inspection tools.
 
-The current architectural baseline is `v0.8.1 - Contract Introspection Surface`.
+The current architectural baseline is `v0.8.2 - Entity Index Surface`.
 
-In v0.8.1, Contract Introspection Surface means the first Core-owned read-only model summary surface derived from the loaded Mission Model.
+v0.8.1 introduced the first Core-owned read-only model summary surface derived from the loaded Mission Model.
 
-The next architectural step is `v0.8.2 - Entity Index Surface`.
+v0.8.2 introduces the first Core-owned read-only entity index surface derived from the loaded Mission Model.
 
 ---
 
@@ -52,7 +52,7 @@ The next architectural step is `v0.8.2 - Entity Index Surface`.
 
 The Mission Model is the source of truth.
 
-Runtime-facing bindings, ground-facing artifacts, contract introspection reports, simulation behavior and generated documentation must derive from the model.
+Runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, simulation behavior and generated documentation must derive from the model.
 
 No important mission behavior should live only in Python code, documentation, generated files, simulator internals or downstream tools.
 
@@ -66,7 +66,9 @@ v0.7.0 introduced generated runtime-facing contract bindings, not onboard behavi
 
 v0.8.0 introduced generated ground-facing contract exports, not ground behavior.
 
-v0.8.1 introduced a Core-owned model summary report, not entity indexing, relationship graphs or plugins.
+v0.8.1 introduced a Core-owned model summary report, not relationship graphs or plugins.
+
+v0.8.2 introduced a Core-owned entity index report, not relationship graphs or plugins.
 
 ### 2.3 Chain Before Generated Artifacts
 
@@ -85,6 +87,7 @@ Payload behavior
         -> Runtime-Facing Contract Bindings
         -> Ground-Facing Integration Artifacts
         -> Contract Introspection Surface
+        -> Entity Index Surface
 ```
 
 ### 2.4 Generated Bindings, Exports and Reports Are Not Behavior
@@ -95,9 +98,11 @@ Generated Ground Integration Artifacts are contract exports.
 
 Generated Contract Introspection reports are Core-owned read-only summaries.
 
-They may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces, manifests, dictionaries, review documents and domain-level model summaries.
+Generated Entity Index reports are Core-owned read-only entity indexes.
 
-They must not implement command dispatch, queues, scheduling, HAL, drivers, RTOS integration, telemetry polling, fault management, storage runtime, downlink runtime, decoder runtime, database behavior, operator workflows, live ground operations, entity indexing, relationship graphs or plugin behavior unless those surfaces are explicitly implemented and tested in a later milestone.
+They may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces, manifests, dictionaries, review documents, domain-level model summaries and entity-level records.
+
+They must not implement command dispatch, queues, scheduling, HAL, drivers, RTOS integration, telemetry polling, fault management, storage runtime, downlink runtime, decoder runtime, database behavior, operator workflows, live ground operations, relationship graphs or plugin behavior unless those surfaces are explicitly implemented and tested in a later milestone.
 
 ### 2.5 Lint as Engineering Judgment
 
@@ -105,7 +110,7 @@ They must not implement command dispatch, queues, scheduling, HAL, drivers, RTOS
 
 It must detect mission consistency issues, not merely invalid YAML.
 
-A concept that can become operationally ambiguous should have a lint rule before downstream runtime-facing, ground-facing or introspection artifacts depend on it.
+A concept that can become operationally ambiguous should have a lint rule before downstream runtime-facing, ground-facing, introspection or entity-index artifacts depend on it.
 
 ### 2.6 Docs from Model
 
@@ -135,7 +140,7 @@ They must not reconstruct Mission Model semantics from raw YAML, generated files
 
 v0.8.1 establishes this principle with `model_summary.json`.
 
-v0.8.2 should extend it with an entity index surface.
+v0.8.2 extends it with `entity_index.json`.
 
 ---
 
@@ -161,6 +166,7 @@ OrbitFabric
 │   ├── runtime-facing contract binding inputs
 │   ├── ground-facing contract export inputs
 │   ├── contract introspection inputs
+│   ├── entity index inputs
 │   └── scenarios
 │
 ├── Toolchain
@@ -172,6 +178,7 @@ OrbitFabric
 │   ├── orbitfabric gen runtime
 │   ├── orbitfabric gen ground
 │   ├── orbitfabric export model-summary
+│   ├── orbitfabric export entity-index
 │   └── orbitfabric sim
 │
 ├── Model Layer
@@ -186,9 +193,9 @@ OrbitFabric
 
 ---
 
-## 4. Current Capability Boundary - v0.8.1
+## 4. Current Capability Boundary - v0.8.2
 
-OrbitFabric v0.8.1 includes:
+OrbitFabric v0.8.2 includes:
 
 ```text
 Mission Model YAML
@@ -219,10 +226,12 @@ CSV ground dictionaries
 human-reviewable ground Markdown artifacts
 orbitfabric export model-summary command
 model_summary.json contract introspection report
+orbitfabric export entity-index command
+entity_index.json entity index report
 synthetic demo mission
 ```
 
-OrbitFabric v0.8.1 excludes:
+OrbitFabric v0.8.2 excludes:
 
 ```text
 flight runtime
@@ -253,7 +262,6 @@ real command authorization
 live uplink services
 flight autonomy runtime
 real FDIR or safing logic
-entity index
 relationship manifest
 relationship graph
 plugin API
@@ -288,7 +296,7 @@ Typed Mission Model
       │
       ├──────────────► GroundContract Builder ──► Ground-Facing Integration Artifacts
       │
-      └──────────────► Export Layer ────────────► Contract Introspection Reports
+      └──────────────► Export Layer ────────────► Core-Owned Structured Surfaces
 ```
 
 The model is loaded once and consumed by multiple downstream layers.
@@ -333,6 +341,9 @@ Ground-Facing Integration Artifacts
       │
       ▼
 Contract Introspection Surface
+      │
+      ▼
+Entity Index Surface
 ```
 
 This is the architectural reason OrbitFabric did not jump directly from payload contracts to plugins.
@@ -353,6 +364,7 @@ orbitfabric gen data-flow examples/demo-3u/mission/
 orbitfabric gen runtime examples/demo-3u/mission/
 orbitfabric gen ground examples/demo-3u/mission/
 orbitfabric export model-summary examples/demo-3u/mission/ --json generated/reports/model_summary.json
+orbitfabric export entity-index examples/demo-3u/mission/ --json generated/reports/entity_index.json
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 orbitfabric inspect mission examples/demo-3u/mission/
@@ -370,7 +382,8 @@ orbitfabric
 │   ├── runtime <mission-dir>
 │   └── ground <mission-dir>
 ├── export
-│   └── model-summary <mission-dir>
+│   ├── model-summary <mission-dir>
+│   └── entity-index <mission-dir>
 ├── sim <scenario-file>
 ├── inspect
 │   └── mission <mission-dir>
@@ -378,7 +391,7 @@ orbitfabric
     └── scenario <scenario-file>
 ```
 
-Future commands may include entity index export and tool-specific exporters only after their semantics are implemented and tested explicitly.
+Future commands may include relationship manifest export and tool-specific exporters only after their semantics are implemented and tested explicitly.
 
 ---
 
@@ -438,10 +451,16 @@ It is not the source of truth.
 
 ## 10. Export Layer Architecture
 
-v0.8.1 introduces the first export layer surface:
+v0.8.1 introduced the first export layer surface:
 
 ```text
 model_summary.json
+```
+
+v0.8.2 introduced the second export layer surface:
+
+```text
+entity_index.json
 ```
 
 The required dependency direction is:
@@ -452,6 +471,7 @@ Mission Model
         -> validated MissionModel
         -> export layer
         -> model_summary.json
+        -> entity_index.json
 ```
 
 The disallowed direction is:
@@ -467,7 +487,9 @@ export layer
 
 The model summary report contains domain-level information only.
 
-It does not contain entity-level records, relationship records, source locations, plugin definitions or Studio-specific formatting.
+The entity index report contains entity-level records only.
+
+Neither surface contains relationship records, source locations, plugin definitions or Studio-specific formatting.
 
 ---
 
@@ -519,7 +541,7 @@ User implementation code must live outside `generated/`.
 
 ---
 
-## 13. Host-Build, Ground Export and Introspection Validation
+## 13. Host-Build, Ground Export and Structured Surface Validation
 
 Runtime-facing bindings can be validated with:
 
@@ -542,9 +564,16 @@ orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
 ```
 
+The entity index surface can be validated with:
+
+```bash
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
+```
+
 These commands confirm that the generated contract surfaces are syntactically valid and reproducible on the host.
 
-They do not validate flight behavior, live ground behavior, entity indexing, relationship graphs or plugin behavior.
+They do not validate flight behavior, live ground behavior, relationship graphs or plugin behavior.
 
 ---
 
@@ -574,7 +603,7 @@ Ground-facing review artifacts are generated under:
 generated/ground/generic/
 ```
 
-Contract introspection reports are generated under:
+Core-owned structured reports are generated under:
 
 ```text
 generated/reports/
@@ -631,6 +660,7 @@ runtime contract manifest
 ground contract manifest
 ground dictionaries
 model summary report
+entity index report
 ```
 
 Reports and manifests must remain stable enough for tests and CI, but they are still development-preview artifacts before v1.0.
@@ -711,6 +741,8 @@ ground JSON export tests
 ground CSV export tests
 ground Markdown export tests
 model summary export tests
+entity index export tests
+entity index CLI tests
 CLI smoke tests
 ```
 
@@ -732,6 +764,8 @@ Release validation additionally includes:
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
 orbitfabric gen runtime examples/demo-3u/mission/
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
@@ -747,11 +781,11 @@ Future extensions should be added as generators, plugins or adapters.
 Possible future layers:
 
 ```text
-Entity Index Surface
 Custom Ground Exporters
 Custom Lint Rule Plugins
 Custom Mission Model Extensions
 Runtime Adapter SDK
+Relationship Manifest Surface
 Yamcs Export Generator
 OpenC3 Export Generator
 XTCE Export Generator
@@ -786,9 +820,9 @@ proprietary example contamination
 
 ---
 
-## 21. v0.8.1 Acceptance Architecture
+## 21. v0.8.2 Acceptance Architecture
 
-OrbitFabric v0.8.1 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.8.2 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -800,6 +834,9 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
+
+orbitfabric export entity-index examples/demo-3u/mission/ \
+  --json generated/reports/entity_index.json
 
 orbitfabric gen docs examples/demo-3u/mission/
 
@@ -827,6 +864,7 @@ And produces:
 ```text
 valid lint output
 model_summary.json
+entity_index.json
 Markdown mission documentation
 scenario execution logs
 scenario JSON reports
@@ -840,19 +878,19 @@ CSV ground dictionaries
 human-reviewable ground Markdown artifacts
 ```
 
-No flight runtime, live ground segment, orbital propagation, RF simulation, storage/downlink runtime, live uplink, decoder runtime, telemetry archive, operator console, autonomy runtime, entity index, relationship graph or plugin API is required for v0.8.1.
+No flight runtime, live ground segment, orbital propagation, RF simulation, storage/downlink runtime, live uplink, decoder runtime, telemetry archive, operator console, autonomy runtime, relationship graph or plugin API is required for v0.8.2.
 
 ---
 
-## 22. Next Architectural Step - v0.8.2
+## 22. Next Architectural Step - v0.9
 
 The next architectural step is:
 
 ```text
-v0.8.2 - Entity Index Surface
+v0.9 - Plugin and Extensibility Layer
 ```
 
-The purpose is to introduce a Core-owned read-only entity index surface without introducing relationship graphs, plugin APIs or Studio-specific APIs.
+The purpose is to introduce controlled extension points after Core-owned domain and entity surfaces exist.
 
 ---
 
@@ -874,7 +912,9 @@ The v0.7 runtime-facing binding layer exposes that contract to implementation co
 
 The v0.8.0 ground-facing artifact layer exposes that contract to ground integration work without generating ground behavior.
 
-The v0.8.1 contract introspection surface exposes a Core-owned model summary for downstream tools without introducing entity indexing, relationship graphs or plugins.
+The v0.8.1 contract introspection surface exposes a Core-owned model summary for downstream tools without introducing relationship graphs or plugins.
+
+The v0.8.2 entity index surface exposes Core-owned entity records for downstream tools without introducing relationship graphs or plugins.
 
 Future plugins must consume the contract.
 
