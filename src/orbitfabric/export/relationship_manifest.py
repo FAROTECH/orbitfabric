@@ -9,6 +9,7 @@ from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import MissionModel, Packet, PayloadContract
 
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
+REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
 
 
@@ -108,6 +109,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         for payload in sorted(model.payloads, key=lambda item: item.id)
         for record in _payload_telemetry_relationship_records(payload)
     )
+    records.extend(
+        record
+        for payload in sorted(model.payloads, key=lambda item: item.id)
+        for record in _payload_command_relationship_records(payload)
+    )
     return sorted(records, key=lambda item: item["relationship_id"])
 
 
@@ -161,6 +167,32 @@ def _payload_telemetry_relationship_records(
     ]
 
 
+def _payload_command_relationship_records(
+    payload: PayloadContract,
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": (
+                f"payloads:{payload.id}->{REL_PAYLOAD_ACCEPTS_COMMAND}:"
+                f"commands:{command_id}"
+            ),
+            "relationship_type": REL_PAYLOAD_ACCEPTS_COMMAND,
+            "from": {
+                "domain": "payloads",
+                "id": payload.id,
+            },
+            "to": {
+                "domain": "commands",
+                "id": command_id,
+            },
+            "derived_from": {
+                "model_field": "payloads[].commands.accepted",
+            },
+        }
+        for command_id in sorted(payload.commands.accepted)
+    ]
+
+
 def _relationship_type_counts(relationships: list[dict[str, Any]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for relationship in relationships:
@@ -178,6 +210,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "telemetry",
             "derived_from": {
                 "model_field": "packets[].telemetry",
+            },
+        },
+        REL_PAYLOAD_ACCEPTS_COMMAND: {
+            "relationship_type": REL_PAYLOAD_ACCEPTS_COMMAND,
+            "display_name": "Payload accepts command",
+            "from_domain": "payloads",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "payloads[].commands.accepted",
             },
         },
         REL_PAYLOAD_PRODUCES_TELEMETRY: {
