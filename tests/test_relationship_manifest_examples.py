@@ -8,7 +8,7 @@ from orbitfabric.model.loader import MissionModelLoader
 SPACELAB_MINISLICE = Path("examples/spacelab-inspired-communications-minislice/mission")
 
 
-def test_relationship_manifest_emits_data_product_subsystem_records_for_spacelab_minislice() -> None:
+def test_relationship_manifest_emits_data_product_subsystem_records() -> None:
     model = MissionModelLoader().load(SPACELAB_MINISLICE)
 
     manifest = relationship_manifest_to_dict(model, SPACELAB_MINISLICE)
