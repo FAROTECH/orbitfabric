@@ -22,6 +22,7 @@ REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
 REL_EVENT_SOURCED_FROM_SUBSYSTEM = "event_sourced_from_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
+REL_FAULT_SOURCED_FROM_SUBSYSTEM = "fault_sourced_from_subsystem"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
 REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
@@ -143,6 +144,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         record
         for fault in sorted(model.faults, key=lambda item: item.id)
         for record in _fault_event_relationship_records(fault)
+    )
+    records.extend(
+        record
+        for fault in sorted(model.faults, key=lambda item: item.id)
+        for record in _fault_subsystem_relationship_records(fault, model.subsystem_ids)
     )
     records.extend(
         record
@@ -311,6 +317,35 @@ def _fault_event_relationship_records(fault: Fault) -> list[dict[str, Any]]:
             },
         }
         for event_id in sorted(fault.emits)
+    ]
+
+
+def _fault_subsystem_relationship_records(
+    fault: Fault,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if fault.source not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"faults:{fault.id}->{REL_FAULT_SOURCED_FROM_SUBSYSTEM}:"
+                f"subsystems:{fault.source}"
+            ),
+            "relationship_type": REL_FAULT_SOURCED_FROM_SUBSYSTEM,
+            "from": {
+                "domain": "faults",
+                "id": fault.id,
+            },
+            "to": {
+                "domain": "subsystems",
+                "id": fault.source,
+            },
+            "derived_from": {
+                "model_field": "faults[].source",
+            },
+        }
     ]
 
 
@@ -527,6 +562,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "events",
             "derived_from": {
                 "model_field": "faults[].emits",
+            },
+        },
+        REL_FAULT_SOURCED_FROM_SUBSYSTEM: {
+            "relationship_type": REL_FAULT_SOURCED_FROM_SUBSYSTEM,
+            "display_name": "Fault sourced from subsystem",
+            "from_domain": "faults",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "faults[].source",
             },
         },
         REL_PACKET_INCLUDES_TELEMETRY: {
