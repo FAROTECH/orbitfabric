@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Annotated
 
@@ -453,7 +454,7 @@ def export_relationship_manifest(
         ),
     ] = Path("generated/reports/relationship_manifest.json"),
 ) -> None:
-    """Export a candidate Core-owned relationship manifest skeleton."""
+    """Export a candidate Core-owned relationship manifest."""
     typer.echo(f"OrbitFabric Relationship Manifest Export {__version__}")
 
     try:
@@ -463,11 +464,14 @@ def export_relationship_manifest(
         raise typer.Exit(code=1) from exc
 
     written_file = write_relationship_manifest(model, mission_dir, json_output)
+    relationship_count = json.loads(written_file.read_text(encoding="utf-8"))["counts"][
+        "total_relationships"
+    ]
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
     typer.echo("Status: candidate")
-    typer.echo("Relationships emitted: 0")
+    typer.echo(f"Relationships emitted: {relationship_count}")
     typer.echo(f"JSON report written to: {written_file}")
     typer.echo("\nResult: PASSED")
 
