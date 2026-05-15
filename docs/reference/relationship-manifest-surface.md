@@ -18,9 +18,10 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface emits four deliberately narrow relationship families:
+At the current baseline, this surface emits five deliberately narrow relationship families:
 
 ```text
+command_emits_event
 packet_includes_telemetry
 payload_accepts_command
 payload_generates_event
@@ -30,6 +31,7 @@ payload_produces_telemetry
 These relationships are derived only from explicit loaded Mission Model fields:
 
 ```text
+commands[].emits
 packets[].telemetry
 payloads[].commands.accepted
 payloads[].events.generated
@@ -68,7 +70,7 @@ What contract entities are defined in this mission?
 
 `relationship_manifest.json` is currently a candidate relationship surface.
 
-It emits packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-event generation records and payload-to-telemetry production records.
+It emits command-to-event emission records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-event generation records and payload-to-telemetry production records.
 
 `entity_index.json` contains nodes, not edges.
 
@@ -136,8 +138,9 @@ The current candidate manifest contains:
   "kind": "orbitfabric.relationship_manifest",
   "status": "candidate",
   "counts": {
-    "total_relationships": 10,
+    "total_relationships": 14,
     "relationship_types": {
+      "command_emits_event": 4,
       "packet_includes_telemetry": 5,
       "payload_accepts_command": 2,
       "payload_generates_event": 2,
@@ -145,6 +148,16 @@ The current candidate manifest contains:
     }
   },
   "relationship_types": [
+    {
+      "relationship_type": "command_emits_event",
+      "display_name": "Command emits event",
+      "from_domain": "commands",
+      "to_domain": "events",
+      "derived_from": {
+        "model_field": "commands[].emits"
+      },
+      "relationship_count": 4
+    },
     {
       "relationship_type": "packet_includes_telemetry",
       "display_name": "Packet includes telemetry",
@@ -227,6 +240,47 @@ They do not make the manifest a graph, dependency graph, Studio API or plugin AP
 ---
 
 ## Admitted relationship types
+
+### command_emits_event
+
+This relationship states that a command emits an event.
+
+It is derived from:
+
+```text
+commands[].emits
+```
+
+Relationship endpoints are:
+
+```text
+from: commands.<id>
+to: events.<id>
+```
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "commands:payload.start_acquisition->command_emits_event:events:payload.acquisition_started",
+  "relationship_type": "command_emits_event",
+  "from": {
+    "domain": "commands",
+    "id": "payload.start_acquisition"
+  },
+  "to": {
+    "domain": "events",
+    "id": "payload.acquisition_started"
+  },
+  "derived_from": {
+    "model_field": "commands[].emits"
+  }
+}
+```
+
+This is a direct command contract reference.
+
+It is not derived from command ID prefixes, event ID prefixes, command targets or expected effects.
 
 ### packet_includes_telemetry
 
@@ -401,6 +455,7 @@ Every relationship record must be derived from an explicit field already present
 Currently admitted derivation sources:
 
 ```text
+commands[].emits
 packets[].telemetry
 payloads[].commands.accepted
 payloads[].events.generated
@@ -412,7 +467,6 @@ Candidate future derivation sources may include explicit fields such as:
 ```text
 telemetry.source
 command.target
-command.emits
 command.expected_effects
 event.source
 fault.source
@@ -568,7 +622,6 @@ Candidate families include:
 
 ```text
 command targets subsystem or payload
-command emits event
 fault emits event
 payload may raise fault
 data product produced by payload or subsystem
@@ -628,6 +681,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently emits `packet_includes_telemetry`, `payload_accepts_command`, `payload_generates_event` and `payload_produces_telemetry` relationships.
+It currently emits `command_emits_event`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_generates_event` and `payload_produces_telemetry` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
