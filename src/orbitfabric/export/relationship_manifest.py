@@ -8,6 +8,7 @@ from orbitfabric import __version__
 from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import (
     Command,
+    CommandabilityRule,
     DataProductContract,
     DownlinkFlowContract,
     Event,
@@ -18,6 +19,7 @@ from orbitfabric.model.mission import (
     TelemetryItem,
 )
 
+REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND = "commandability_rule_constrains_command"
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
@@ -133,6 +135,14 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     )
     records.extend(
         record
+        for rule in sorted(model.commandability.rules, key=lambda item: item.id)
+        for record in _commandability_rule_command_relationship_records(
+            rule,
+            model.command_ids,
+        )
+    )
+    records.extend(
+        record
         for data_product in sorted(model.data_products, key=lambda item: item.id)
         for record in _data_product_payload_relationship_records(
             data_product,
@@ -212,6 +222,36 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         )
     )
     return sorted(records, key=lambda item: item["relationship_id"])
+
+
+def _commandability_rule_command_relationship_records(
+    rule: CommandabilityRule,
+    command_ids: set[str],
+) -> list[dict[str, Any]]:
+    if rule.command not in command_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"commandability_rules:{rule.id}->"
+                f"{REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND}:"
+                f"commands:{rule.command}"
+            ),
+            "relationship_type": REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND,
+            "from": {
+                "domain": "commandability_rules",
+                "id": rule.id,
+            },
+            "to": {
+                "domain": "commands",
+                "id": rule.command,
+            },
+            "derived_from": {
+                "model_field": "commandability.rules[].command",
+            },
+        }
+    ]
 
 
 def _command_event_relationship_records(command: Command) -> list[dict[str, Any]]:
@@ -636,6 +676,15 @@ def _relationship_type_counts(relationships: list[dict[str, Any]]) -> dict[str, 
 
 def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
     specs = {
+        REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND: {
+            "relationship_type": REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND,
+            "display_name": "Commandability rule constrains command",
+            "from_domain": "commandability_rules",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "commandability.rules[].command",
+            },
+        },
         REL_COMMAND_EMITS_EVENT: {
             "relationship_type": REL_COMMAND_EMITS_EVENT,
             "display_name": "Command emits event",
