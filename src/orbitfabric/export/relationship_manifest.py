@@ -21,6 +21,7 @@ from orbitfabric.model.mission import (
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
+REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM = "data_product_produced_by_subsystem"
 REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT = "downlink_flow_includes_data_product"
 REL_EVENT_SOURCED_FROM_SUBSYSTEM = "event_sourced_from_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
@@ -135,6 +136,14 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         for record in _data_product_payload_relationship_records(
             data_product,
             model.payload_ids,
+        )
+    )
+    records.extend(
+        record
+        for data_product in sorted(model.data_products, key=lambda item: item.id)
+        for record in _data_product_subsystem_relationship_records(
+            data_product,
+            model.subsystem_ids,
         )
     )
     records.extend(
@@ -274,6 +283,38 @@ def _data_product_payload_relationship_records(
             },
             "to": {
                 "domain": "payloads",
+                "id": data_product.producer,
+            },
+            "derived_from": {
+                "model_field": "data_products[].producer",
+            },
+        }
+    ]
+
+
+def _data_product_subsystem_relationship_records(
+    data_product: DataProductContract,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if data_product.producer_type != "subsystem":
+        return []
+    if data_product.producer not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"data_products:{data_product.id}->"
+                f"{REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM}:"
+                f"subsystems:{data_product.producer}"
+            ),
+            "relationship_type": REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM,
+            "from": {
+                "domain": "data_products",
+                "id": data_product.id,
+            },
+            "to": {
+                "domain": "subsystems",
                 "id": data_product.producer,
             },
             "derived_from": {
@@ -584,6 +625,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "display_name": "Data product produced by payload",
             "from_domain": "data_products",
             "to_domain": "payloads",
+            "derived_from": {
+                "model_field": "data_products[].producer",
+            },
+        },
+        REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM: {
+            "relationship_type": REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM,
+            "display_name": "Data product produced by subsystem",
+            "from_domain": "data_products",
+            "to_domain": "subsystems",
             "derived_from": {
                 "model_field": "data_products[].producer",
             },
