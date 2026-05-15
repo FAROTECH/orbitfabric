@@ -18,16 +18,18 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface emits one deliberately narrow relationship family:
+At the current baseline, this surface emits two deliberately narrow relationship families:
 
 ```text
 packet_includes_telemetry
+payload_produces_telemetry
 ```
 
-This relationship is derived only from the explicit loaded Mission Model field:
+These relationships are derived only from explicit loaded Mission Model fields:
 
 ```text
 packets[].telemetry
+payloads[].telemetry.produced
 ```
 
 No other relationship type is admitted yet.
@@ -62,7 +64,7 @@ What contract entities are defined in this mission?
 
 `relationship_manifest.json` is currently a candidate relationship surface.
 
-It emits only packet-to-telemetry inclusion records.
+It emits packet-to-telemetry inclusion records and payload-to-telemetry production records.
 
 `entity_index.json` contains nodes, not edges.
 
@@ -130,9 +132,10 @@ The current candidate manifest contains:
   "kind": "orbitfabric.relationship_manifest",
   "status": "candidate",
   "counts": {
-    "total_relationships": 5,
+    "total_relationships": 6,
     "relationship_types": {
-      "packet_includes_telemetry": 5
+      "packet_includes_telemetry": 5,
+      "payload_produces_telemetry": 1
     }
   },
   "relationship_types": [
@@ -145,6 +148,16 @@ The current candidate manifest contains:
         "model_field": "packets[].telemetry"
       },
       "relationship_count": 5
+    },
+    {
+      "relationship_type": "payload_produces_telemetry",
+      "display_name": "Payload produces telemetry",
+      "from_domain": "payloads",
+      "to_domain": "telemetry",
+      "derived_from": {
+        "model_field": "payloads[].telemetry.produced"
+      },
+      "relationship_count": 1
     }
   ],
   "relationships": []
@@ -230,16 +243,58 @@ This is a direct model reference.
 
 It is not derived from naming conventions.
 
+### payload_produces_telemetry
+
+This relationship states that a payload produces a telemetry item.
+
+It is derived from:
+
+```text
+payloads[].telemetry.produced
+```
+
+Relationship endpoints are:
+
+```text
+from: payloads.<id>
+to: telemetry.<id>
+```
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "payloads:demo_iod_payload->payload_produces_telemetry:telemetry:payload.acquisition.active",
+  "relationship_type": "payload_produces_telemetry",
+  "from": {
+    "domain": "payloads",
+    "id": "demo_iod_payload"
+  },
+  "to": {
+    "domain": "telemetry",
+    "id": "payload.acquisition.active"
+  },
+  "derived_from": {
+    "model_field": "payloads[].telemetry.produced"
+  }
+}
+```
+
+This is a direct payload contract reference.
+
+It is not derived from telemetry ID prefixes or payload naming conventions.
+
 ---
 
 ## Deterministic derivation rule
 
 Every relationship record must be derived from an explicit field already present in the loaded Mission Model.
 
-Currently admitted derivation source:
+Currently admitted derivation sources:
 
 ```text
 packets[].telemetry
+payloads[].telemetry.produced
 ```
 
 Candidate future derivation sources may include explicit fields such as:
@@ -254,7 +309,6 @@ fault.source
 fault.emits
 fault.recovery.auto_commands
 payload.subsystem
-payload.telemetry.produced
 payload.commands.accepted
 payload.events.generated
 payload.faults.possible
@@ -408,7 +462,6 @@ Candidate families include:
 command targets subsystem or payload
 command emits event
 fault emits event
-payload produces telemetry
 payload accepts command
 payload generates event
 payload may raise fault
@@ -469,6 +522,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently emits only `packet_includes_telemetry` relationships.
+It currently emits `packet_includes_telemetry` and `payload_produces_telemetry` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
