@@ -18,11 +18,19 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface exists only as a candidate skeleton.
+At the current baseline, this surface emits one deliberately narrow relationship family:
 
-It can be exported by the CLI, but it intentionally emits no relationship records yet.
+```text
+packet_includes_telemetry
+```
 
-Relationship types must be admitted one by one in later PRs, only when they can be derived deterministically from explicit loaded Mission Model fields.
+This relationship is derived only from the explicit loaded Mission Model field:
+
+```text
+packets[].telemetry
+```
+
+No other relationship type is admitted yet.
 
 ---
 
@@ -52,19 +60,19 @@ It answers:
 What contract entities are defined in this mission?
 ```
 
-`relationship_manifest.json` is currently a candidate relationship surface skeleton.
+`relationship_manifest.json` is currently a candidate relationship surface.
 
-It answers no relationship question yet because no relationship types have been admitted.
+It emits only packet-to-telemetry inclusion records.
 
 `entity_index.json` contains nodes, not edges.
 
-The current candidate relationship manifest contains an empty edge set.
+The relationship manifest contains Core-owned edge records derived from explicit Mission Model references.
 
 ---
 
 ## CLI export
 
-The candidate skeleton can be exported with:
+The candidate manifest can be exported with:
 
 ```bash
 orbitfabric export relationship-manifest examples/demo-3u/mission
@@ -83,9 +91,7 @@ orbitfabric export relationship-manifest examples/demo-3u/mission \
   --json generated/reports/relationship_manifest.json
 ```
 
-The command exports a candidate skeleton only.
-
-It does not infer relationships.
+The command does not infer relationships.
 
 It does not generate a graph.
 
@@ -95,7 +101,7 @@ It does not expose plugin behavior.
 
 ## Surface classification
 
-The Relationship Manifest Surface candidate skeleton is:
+The Relationship Manifest Surface candidate is:
 
 ```text
 Core-derived
@@ -114,9 +120,9 @@ The relationship manifest is a derived inspection artifact.
 
 ---
 
-## Current skeleton shape
+## Current shape
 
-The current candidate skeleton contains:
+The current candidate manifest contains:
 
 ```json
 {
@@ -124,30 +130,36 @@ The current candidate skeleton contains:
   "kind": "orbitfabric.relationship_manifest",
   "status": "candidate",
   "counts": {
-    "total_relationships": 0,
-    "relationship_types": {}
+    "total_relationships": 5,
+    "relationship_types": {
+      "packet_includes_telemetry": 5
+    }
   },
-  "relationship_types": [],
+  "relationship_types": [
+    {
+      "relationship_type": "packet_includes_telemetry",
+      "display_name": "Packet includes telemetry",
+      "from_domain": "packets",
+      "to_domain": "telemetry",
+      "derived_from": {
+        "model_field": "packets[].telemetry"
+      },
+      "relationship_count": 5
+    }
+  ],
   "relationships": []
 }
 ```
 
-This is an intentionally empty relationship surface.
+The example count above reflects the demo mission.
 
-The empty relationship set means:
-
-```text
-relationship export envelope exists
-relationship semantics are not admitted yet
-no relationship records are emitted yet
-no graph is implied
-```
+The `relationships` list is populated deterministically from the loaded Mission Model.
 
 ---
 
 ## Boundary flags
 
-The candidate skeleton declares boundary flags equivalent to:
+The candidate manifest declares boundary flags equivalent to:
 
 ```json
 {
@@ -171,53 +183,66 @@ The candidate skeleton declares boundary flags equivalent to:
 
 These flags are part of the boundary definition.
 
-They do not mean that relationship semantics are complete.
+They do not make the manifest a graph, dependency graph, Studio API or plugin API.
 
 ---
 
-## Relationship records
+## Admitted relationship types
 
-A future relationship record must connect two indexed entities.
+### packet_includes_telemetry
 
-The conceptual shape is:
+This relationship states that a packet includes a telemetry item.
+
+It is derived from:
+
+```text
+packets[].telemetry
+```
+
+Relationship endpoints are:
+
+```text
+from: packets.<id>
+to: telemetry.<id>
+```
+
+Conceptual record shape:
 
 ```json
 {
-  "relationship_id": "command:payload.capture_image->target:payload.camera",
-  "relationship_type": "targets",
+  "relationship_id": "packets:hk_fast->packet_includes_telemetry:telemetry:obc.mode",
+  "relationship_type": "packet_includes_telemetry",
   "from": {
-    "domain": "commands",
-    "id": "payload.capture_image"
+    "domain": "packets",
+    "id": "hk_fast"
   },
   "to": {
-    "domain": "payloads",
-    "id": "payload.camera"
+    "domain": "telemetry",
+    "id": "obc.mode"
   },
   "derived_from": {
-    "model_field": "commands[].target"
+    "model_field": "packets[].telemetry"
   }
 }
 ```
 
-This example is illustrative only.
+This is a direct model reference.
 
-It is not a committed schema.
-
-The current candidate skeleton emits:
-
-```json
-[]
-```
-
-for `relationships`.
+It is not derived from naming conventions.
 
 ---
 
 ## Deterministic derivation rule
 
-Every future relationship record must be derived from an explicit field already present in the loaded Mission Model.
+Every relationship record must be derived from an explicit field already present in the loaded Mission Model.
 
-Allowed derivation sources may include explicit fields such as:
+Currently admitted derivation source:
+
+```text
+packets[].telemetry
+```
+
+Candidate future derivation sources may include explicit fields such as:
 
 ```text
 telemetry.source
@@ -228,7 +253,6 @@ event.source
 fault.source
 fault.emits
 fault.recovery.auto_commands
-packet.telemetry
 payload.subsystem
 payload.telemetry.produced
 payload.commands.accepted
@@ -259,9 +283,9 @@ recovery_intent.expected_events
 recovery_intent.expected_effects
 ```
 
-This list is illustrative.
+Candidate fields are illustrative only.
 
-A future implementation must admit relationship types one by one.
+Each new relationship type must be admitted one by one.
 
 Each admitted relationship type must be documented and tested.
 
@@ -269,7 +293,7 @@ Each admitted relationship type must be documented and tested.
 
 ## Forbidden derivation sources
 
-A future relationship manifest must not derive relationship records from:
+A relationship manifest must not derive relationship records from:
 
 ```text
 naming conventions
@@ -319,13 +343,13 @@ The semantic meaning of every rendered edge must still come from Core.
 
 ## Relationship manifest and entity index
 
-The relationship manifest must depend on the Entity Index Surface.
+The relationship manifest depends on the Entity Index Surface.
 
 A relationship record must refer to entities already indexed by `entity_index.json`.
 
 It must not create independent synthetic nodes.
 
-The current skeleton records its dependency on the entity index through:
+The current manifest records its dependency on the entity index through:
 
 ```json
 {
@@ -341,8 +365,6 @@ not be emitted
 be emitted only under an explicitly documented unresolved endpoint policy
 or remain unsupported
 ```
-
-The first relationship implementation should prefer not emitting unsupported or unresolved relationships.
 
 ---
 
@@ -360,7 +382,7 @@ A future plugin-contributed relationship-like artifact must be marked as plugin 
 
 ## Relationship manifest and Studio
 
-OrbitFabric Studio must not infer relationships before Core exposes them.
+OrbitFabric Studio must not infer relationships privately.
 
 The intended downstream chain is:
 
@@ -370,15 +392,15 @@ entity_index.json -> entity navigation
 relationship_manifest.json -> relationship navigation
 ```
 
-At the current baseline, Studio may inspect the candidate skeleton but must still treat relationship navigation as unavailable because the relationship set is empty and no relationship type has been admitted.
+Studio may consume admitted Core relationship records.
 
-Studio must not use the existence of the candidate skeleton as permission to infer graph edges privately.
+Studio must not invent missing relationship types or graph edges.
 
 ---
 
-## Candidate minimal relationship families
+## Candidate future relationship families
 
-A future first implementation may consider a small subset of explicit relationship families.
+A future implementation may consider additional explicit relationship families.
 
 Candidate families include:
 
@@ -386,7 +408,6 @@ Candidate families include:
 command targets subsystem or payload
 command emits event
 fault emits event
-packet includes telemetry item
 payload produces telemetry
 payload accepts command
 payload generates event
@@ -406,10 +427,9 @@ No relationship family is accepted until documented in an implementation PR.
 
 ## Non-goals
 
-The current candidate skeleton does not introduce:
+The current candidate manifest does not introduce:
 
 ```text
-relationship records
 relationship inference
 relationship graph
 relationship dependency analysis
@@ -428,7 +448,7 @@ ground behavior
 
 ## Acceptance criteria for future relationship records
 
-A future implementation PR that admits actual relationship records must satisfy all of the following:
+A future implementation PR that admits additional relationship records must satisfy all of the following:
 
 ```text
 admit a concrete relationship type
@@ -449,6 +469,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-The current implementation exposes only the deterministic candidate envelope.
+It currently emits only `packet_includes_telemetry` relationships.
 
-It may begin to carry relationship records in v0.9 only if Core can derive them deterministically from explicit Mission Model semantics.
+Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
