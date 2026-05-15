@@ -6,9 +6,10 @@ from typing import Any
 
 from orbitfabric import __version__
 from orbitfabric.export.entity_index import entity_index_to_dict
-from orbitfabric.model.mission import Command, MissionModel, Packet, PayloadContract
+from orbitfabric.model.mission import Command, Fault, MissionModel, Packet, PayloadContract
 
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
+REL_FAULT_EMITS_EVENT = "fault_emits_event"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
@@ -108,6 +109,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     ]
     records.extend(
         record
+        for fault in sorted(model.faults, key=lambda item: item.id)
+        for record in _fault_event_relationship_records(fault)
+    )
+    records.extend(
+        record
         for packet in sorted(model.packets, key=lambda item: item.id)
         for record in _packet_telemetry_relationship_records(packet)
     )
@@ -149,6 +155,27 @@ def _command_event_relationship_records(command: Command) -> list[dict[str, Any]
             },
         }
         for event_id in sorted(command.emits)
+    ]
+
+
+def _fault_event_relationship_records(fault: Fault) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": f"faults:{fault.id}->{REL_FAULT_EMITS_EVENT}:events:{event_id}",
+            "relationship_type": REL_FAULT_EMITS_EVENT,
+            "from": {
+                "domain": "faults",
+                "id": fault.id,
+            },
+            "to": {
+                "domain": "events",
+                "id": event_id,
+            },
+            "derived_from": {
+                "model_field": "faults[].emits",
+            },
+        }
+        for event_id in sorted(fault.emits)
     ]
 
 
@@ -271,6 +298,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "events",
             "derived_from": {
                 "model_field": "commands[].emits",
+            },
+        },
+        REL_FAULT_EMITS_EVENT: {
+            "relationship_type": REL_FAULT_EMITS_EVENT,
+            "display_name": "Fault emits event",
+            "from_domain": "faults",
+            "to_domain": "events",
+            "derived_from": {
+                "model_field": "faults[].emits",
             },
         },
         REL_PACKET_INCLUDES_TELEMETRY: {
