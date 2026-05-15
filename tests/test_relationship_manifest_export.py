@@ -55,15 +55,15 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 38,
+        "total_relationships": 40,
         "relationship_types": {
             "command_emits_event": 4,
             "command_targets_subsystem": 4,
             "data_product_produced_by_payload": 1,
             "downlink_flow_includes_data_product": 1,
             "event_sourced_from_subsystem": 8,
-            "fault_emits_event": 2,
-            "fault_sourced_from_subsystem": 2,
+            "fault_emits_event": 3,
+            "fault_sourced_from_subsystem": 3,
             "packet_includes_telemetry": 5,
             "payload_accepts_command": 2,
             "payload_belongs_to_subsystem": 1,
@@ -131,7 +131,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "derived_from": {
                 "model_field": "faults[].emits",
             },
-            "relationship_count": 2,
+            "relationship_count": 3,
         },
         {
             "relationship_type": "fault_sourced_from_subsystem",
@@ -141,7 +141,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "derived_from": {
                 "model_field": "faults[].source",
             },
-            "relationship_count": 2,
+            "relationship_count": 3,
         },
         {
             "relationship_type": "packet_includes_telemetry",
@@ -206,7 +206,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 38
+    assert len(relationships) == 40
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
@@ -233,6 +233,8 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "faults:eps.battery_critical_fault->fault_sourced_from_subsystem:subsystems:eps",
         "faults:eps.battery_low_fault->fault_emits_event:events:eps.battery_low",
         "faults:eps.battery_low_fault->fault_sourced_from_subsystem:subsystems:eps",
+        "faults:payload.command_timeout_fault->fault_emits_event:events:payload.command_timeout",
+        "faults:payload.command_timeout_fault->fault_sourced_from_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",

@@ -120,7 +120,7 @@ def test_load_demo_mission() -> None:
     assert len(model.telemetry) >= 5
     assert len(model.commands) >= 4
     assert len(model.events) >= 8
-    assert len(model.faults) == 2
+    assert len(model.faults) == 3
     assert len(model.packets) >= 3
     assert len(model.contacts.contact_profiles) == 1
     assert len(model.contacts.link_profiles) == 1
@@ -163,7 +163,7 @@ def test_load_demo_payload_contract() -> None:
         "payload.acquisition_started",
         "payload.acquisition_stopped",
     ]
-    assert payload.faults.possible == []
+    assert payload.faults.possible == ["payload.command_timeout_fault"]
 
 
 def test_optional_payloads_file_can_be_absent(tmp_path: Path) -> None:

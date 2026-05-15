@@ -30,3 +30,19 @@ faults:
       mode_transition: SAFE
       auto_commands:
         - payload.stop_acquisition
+
+  - id: payload.command_timeout_fault
+    source: payload
+    severity: warning
+    description: Synthetic payload command timeout fault used to exercise explicit payload fault references.
+    condition:
+      telemetry: payload.acquisition.active
+      operator: ==
+      value: true
+      debounce_samples: 4
+    emits:
+      - payload.command_timeout
+    recovery:
+      mode_transition: DEGRADED
+      auto_commands:
+        - payload.stop_acquisition

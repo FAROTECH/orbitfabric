@@ -21,5 +21,6 @@ payloads:
         - payload.acquisition_started
         - payload.acquisition_stopped
     faults:
-      possible: []
+      possible:
+        - payload.command_timeout_fault
     description: Synthetic IOD payload contract used to demonstrate payload-specific mission data grouping.
