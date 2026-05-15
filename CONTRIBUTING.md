@@ -10,13 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current development baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
-
-The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
+The current public baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
 In v0.9.0, Relationship Manifest Surface means the first Core-owned read-only relationship surface derived from explicit loaded Mission Model fields and indexed Mission Model entities.
 
-The current development focus is to finish the v0.9.0 release alignment without adding plugin execution, plugin discovery or plugin loaders.
+The current development focus is to preserve the v0.9.0 boundary while preparing future extensibility work without adding plugin execution, plugin discovery or plugin loaders prematurely.
 
 The current baseline proves this Mission Data Chain:
 
@@ -135,10 +133,10 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current version until the final v0.9.0 release preparation PR:
+Expected current version:
 
 ```text
-orbitfabric 0.8.2
+orbitfabric 0.9.0
 ```
 
 ---

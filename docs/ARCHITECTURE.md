@@ -1,6 +1,6 @@
 # OrbitFabric - Architecture
 
-Version: 0.9.0 development baseline  
+Version: 0.9.0  
 Status: Development preview  
 Scope: Mission Data Contract architecture through Relationship Manifest Surface
 
@@ -39,9 +39,7 @@ Its architectural role is:
 
 > define, validate, simulate, document, introspect, index, relate and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings, ground-facing integration and downstream inspection tools.
 
-The current architectural development baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
-
-The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
+The current architectural baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
 v0.8.1 introduced the first Core-owned read-only model summary surface derived from the loaded Mission Model.
 
@@ -207,7 +205,7 @@ OrbitFabric
 
 ---
 
-## 4. Current Capability Boundary - v0.9.0 Development Baseline
+## 4. Current Capability Boundary - v0.9.0
 
 OrbitFabric currently includes:
 
@@ -921,7 +919,7 @@ proprietary example contamination
 
 ---
 
-## 22. v0.9.0 Development Acceptance Architecture
+## 22. v0.9.0 Acceptance Architecture
 
 OrbitFabric v0.9.0 is architecturally acceptable when this flow works end-to-end:
 

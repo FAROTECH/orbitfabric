@@ -105,10 +105,10 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected version until the final v0.9.0 release preparation PR:
+Expected version:
 
 ```text
-orbitfabric 0.8.2
+orbitfabric 0.9.0
 ```
 
 ---

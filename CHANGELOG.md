@@ -8,9 +8,14 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
+No changes yet.
+
+---
+
+## [v0.9.0] - Relationship Manifest Surface and Extensibility Boundary
+
 ### Added
 
-- Added the v0.9.0 development baseline for `Relationship Manifest Surface and Extensibility Boundary`.
 - Added `relationship_manifest_to_dict(model, mission_dir)`.
 - Added `write_relationship_manifest(model, mission_dir, output_file)`.
 - Added deterministic `relationship_manifest.json` generation.
@@ -25,19 +30,20 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 - Added relationship manifest export tests.
 - Added relationship manifest CLI tests.
 - Added Relationship Manifest Surface reference documentation.
+- Added v0.9.0 release notes.
 
 ### Changed
 
+- Updated the package and CLI version to `0.9.0`.
 - Extended Core-owned structured surfaces from domain-level and entity-level reports to relationship-level reports.
-- Extended the public documentation baseline from `v0.8.2 - Entity Index Surface` to the v0.9.0 relationship manifest development baseline.
+- Extended the public documentation baseline from `v0.8.2 - Entity Index Surface` to `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 - Aligned README, site homepage, roadmap, architecture, project charter, quickstart, development guide, contributing guide and demo walkthrough with the relationship manifest surface.
 - Clarified the structured surface chain: `model_summary.json -> entity_index.json -> relationship_manifest.json`.
-- Clarified that the package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
 - Reinforced that downstream tools should consume Core-owned structured surfaces instead of reconstructing Mission Model relationships from YAML, generated files, textual CLI output or UI state.
 
 ### Boundaries
 
-The v0.9.0 relationship manifest development slice intentionally does not introduce:
+The v0.9.0 relationship manifest slice intentionally does not introduce:
 
 - new Mission Model semantics;
 - relationship inference;

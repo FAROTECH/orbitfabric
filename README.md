@@ -42,11 +42,9 @@ downstream inspection tools
 
 ## Current Status
 
-OrbitFabric is currently preparing `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
+OrbitFabric is currently at `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
-The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
-
-The v0.9.0 development baseline introduces the first Core-owned read-only relationship manifest surface:
+v0.9.0 introduces the first Core-owned read-only relationship manifest surface:
 
 ```text
 relationship_manifest.json
@@ -84,7 +82,7 @@ The current repository includes:
 - the `v0.8.0 - Ground Integration Artifacts` vertical slice;
 - the `v0.8.1 - Contract Introspection Surface` vertical slice;
 - the `v0.8.2 - Entity Index Surface` vertical slice;
-- the v0.9.0 relationship manifest development slice.
+- the `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary` vertical slice.
 
 The current vertical slice is functional:
 
@@ -331,10 +329,10 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected until the v0.9.0 release preparation PR:
+Expected:
 
 ```text
-orbitfabric 0.8.2
+orbitfabric 0.9.0
 ```
 
 ---
@@ -547,7 +545,7 @@ Useful entry points:
 - `docs/reference/contract-introspection-surface.md`
 - `docs/reference/entity-index-surface.md`
 - `docs/reference/relationship-manifest-surface.md`
-- `docs/releases/v0.8.2.md`
+- `docs/releases/v0.9.0.md`
 - `docs/adr/`
 
 Build the documentation site locally:
