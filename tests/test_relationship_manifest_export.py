@@ -28,6 +28,7 @@ EXPECTED_RELATIONSHIP_TYPE_COUNTS = {
     "payload_generates_event": 2,
     "payload_may_raise_fault": 1,
     "payload_produces_telemetry": 1,
+    "recovery_intent_reacts_to_fault": 2,
     "telemetry_sourced_from_subsystem": 5,
 }
 
@@ -122,6 +123,12 @@ EXPECTED_RELATIONSHIP_TYPE_SPECS = {
         "to_domain": "telemetry",
         "model_field": "payloads[].telemetry.produced",
     },
+    "recovery_intent_reacts_to_fault": {
+        "display_name": "Recovery intent reacts to fault",
+        "from_domain": "recovery_intents",
+        "to_domain": "faults",
+        "model_field": "commandability.recovery_intents[].fault",
+    },
     "telemetry_sourced_from_subsystem": {
         "display_name": "Telemetry sourced from subsystem",
         "from_domain": "telemetry",
@@ -173,7 +180,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 44,
+        "total_relationships": 46,
         "relationship_types": EXPECTED_RELATIONSHIP_TYPE_COUNTS,
     }
     assert manifest["relationship_types"] == [
@@ -191,7 +198,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 44
+    assert len(relationships) == 46
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
@@ -227,6 +234,8 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
         "payloads:demo_iod_payload->payload_may_raise_fault:faults:payload.command_timeout_fault",
+        "recovery_intents:payload_battery_critical_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_critical_fault",
+        "recovery_intents:payload_battery_low_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_low_fault",
         "telemetry:eps.battery.current->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:eps.battery.voltage->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:obc.mode->telemetry_sourced_from_subsystem:subsystems:obc",
@@ -249,6 +258,7 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
         "faults": {item.id for item in model.faults},
         "packets": {item.id for item in model.packets},
         "payloads": {item.id for item in model.payloads},
+        "recovery_intents": {item.id for item in model.commandability.recovery_intents},
         "subsystems": {item.id for item in model.subsystems},
         "telemetry": {item.id for item in model.telemetry},
     }
