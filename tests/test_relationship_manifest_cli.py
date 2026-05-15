@@ -30,7 +30,7 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
     assert "Mission: demo-3u" in result.output
     assert "Model version: 0.1.0" in result.output
     assert "Status: candidate" in result.output
-    assert "Relationships emitted: 44" in result.output
+    assert "Relationships emitted: 46" in result.output
     assert f"JSON report written to: {output_file}" in result.output
     assert "Result: PASSED" in result.output
     assert output_file.exists()
@@ -40,7 +40,7 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
     assert manifest["manifest_version"] == "0.1-candidate"
     assert manifest["status"] == "candidate"
     assert manifest["mission"]["id"] == "demo-3u"
-    assert manifest["counts"]["total_relationships"] == 44
+    assert manifest["counts"]["total_relationships"] == 46
     assert manifest["counts"]["relationship_types"] == {
         "autonomous_action_dispatches_command": 2,
         "command_emits_event": 4,
@@ -57,10 +57,11 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
         "payload_generates_event": 2,
         "payload_may_raise_fault": 1,
         "payload_produces_telemetry": 1,
+        "recovery_intent_reacts_to_fault": 2,
         "telemetry_sourced_from_subsystem": 5,
     }
-    assert len(manifest["relationship_types"]) == 16
-    assert len(manifest["relationships"]) == 44
+    assert len(manifest["relationship_types"]) == 17
+    assert len(manifest["relationships"]) == 46
     assert manifest["boundaries"]["contains_relationship_manifest"] is True
     assert manifest["boundaries"]["contains_relationship_graph"] is False
     assert manifest["boundaries"]["contains_plugin_api"] is False

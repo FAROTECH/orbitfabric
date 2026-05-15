@@ -17,6 +17,7 @@ from orbitfabric.model.mission import (
     MissionModel,
     Packet,
     PayloadContract,
+    RecoveryIntent,
     TelemetryItem,
 )
 
@@ -36,6 +37,8 @@ REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
 REL_PAYLOAD_MAY_RAISE_FAULT = "payload_may_raise_fault"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
+REL_RECOVERY_INTENT_REACTS_TO_EVENT = "recovery_intent_reacts_to_event"
+REL_RECOVERY_INTENT_REACTS_TO_FAULT = "recovery_intent_reacts_to_fault"
 REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM = "telemetry_sourced_from_subsystem"
 
 
@@ -222,6 +225,22 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         record
         for payload in sorted(model.payloads, key=lambda item: item.id)
         for record in _payload_fault_relationship_records(payload, model.fault_ids)
+    )
+    records.extend(
+        record
+        for intent in sorted(model.commandability.recovery_intents, key=lambda item: item.id)
+        for record in _recovery_intent_event_relationship_records(
+            intent,
+            model.event_ids,
+        )
+    )
+    records.extend(
+        record
+        for intent in sorted(model.commandability.recovery_intents, key=lambda item: item.id)
+        for record in _recovery_intent_fault_relationship_records(
+            intent,
+            model.fault_ids,
+        )
     )
     records.extend(
         record
@@ -678,6 +697,68 @@ def _payload_fault_relationship_records(
     ]
 
 
+def _recovery_intent_event_relationship_records(
+    intent: RecoveryIntent,
+    event_ids: set[str],
+) -> list[dict[str, Any]]:
+    if intent.event is None:
+        return []
+    if intent.event not in event_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"recovery_intents:{intent.id}->"
+                f"{REL_RECOVERY_INTENT_REACTS_TO_EVENT}:events:{intent.event}"
+            ),
+            "relationship_type": REL_RECOVERY_INTENT_REACTS_TO_EVENT,
+            "from": {
+                "domain": "recovery_intents",
+                "id": intent.id,
+            },
+            "to": {
+                "domain": "events",
+                "id": intent.event,
+            },
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].event",
+            },
+        }
+    ]
+
+
+def _recovery_intent_fault_relationship_records(
+    intent: RecoveryIntent,
+    fault_ids: set[str],
+) -> list[dict[str, Any]]:
+    if intent.fault is None:
+        return []
+    if intent.fault not in fault_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"recovery_intents:{intent.id}->"
+                f"{REL_RECOVERY_INTENT_REACTS_TO_FAULT}:faults:{intent.fault}"
+            ),
+            "relationship_type": REL_RECOVERY_INTENT_REACTS_TO_FAULT,
+            "from": {
+                "domain": "recovery_intents",
+                "id": intent.id,
+            },
+            "to": {
+                "domain": "faults",
+                "id": intent.fault,
+            },
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].fault",
+            },
+        }
+    ]
+
+
 def _telemetry_subsystem_relationship_records(
     telemetry: TelemetryItem,
     subsystem_ids: set[str],
@@ -859,6 +940,24 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "telemetry",
             "derived_from": {
                 "model_field": "payloads[].telemetry.produced",
+            },
+        },
+        REL_RECOVERY_INTENT_REACTS_TO_EVENT: {
+            "relationship_type": REL_RECOVERY_INTENT_REACTS_TO_EVENT,
+            "display_name": "Recovery intent reacts to event",
+            "from_domain": "recovery_intents",
+            "to_domain": "events",
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].event",
+            },
+        },
+        REL_RECOVERY_INTENT_REACTS_TO_FAULT: {
+            "relationship_type": REL_RECOVERY_INTENT_REACTS_TO_FAULT,
+            "display_name": "Recovery intent reacts to fault",
+            "from_domain": "recovery_intents",
+            "to_domain": "faults",
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].fault",
             },
         },
         REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM: {
