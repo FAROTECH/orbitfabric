@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces and relationship manifest surfaces.
 
 ---
 
@@ -104,7 +104,7 @@ onboard_autonomy
         -> recovery intents toward DEGRADED and SAFE
 ```
 
-These are contract assumptions only. They do not implement live uplink, operator authentication, real onboard storage, real downlink queues, real contact scheduling, RF behavior or ground operations.
+These are contract assumptions only. They do not implement live uplink, operator authentication, real onboard storage, real downlink queues, real contact scheduling, RF behavior, ground operations or recovery execution behavior.
 
 ---
 
@@ -186,6 +186,14 @@ It is not real payload file generation, onboard storage, downlink queue executio
 
 ## 7. Export Core-owned structured surfaces
 
+The current Core-owned structured surface chain is:
+
+```text
+model_summary.json      -> What contract domains are present?
+entity_index.json       -> What contract entities are defined?
+relationship_manifest.json -> How are indexed contract entities related?
+```
+
 v0.8.1 adds the first Core-owned Contract Introspection Surface for the same `demo-3u` Mission Model.
 
 Run:
@@ -199,12 +207,6 @@ Generated file:
 
 ```text
 generated/reports/model_summary.json
-```
-
-The report answers:
-
-```text
-What contract domains are present in this mission?
 ```
 
 v0.8.2 adds the first Core-owned Entity Index Surface for the same `demo-3u` Mission Model.
@@ -222,13 +224,28 @@ Generated file:
 generated/reports/entity_index.json
 ```
 
-The report answers:
+v0.9.0 adds the first Core-owned Relationship Manifest Surface for the same `demo-3u` Mission Model.
 
-```text
-What contract entities are defined in this mission?
+Run:
+
+```bash
+orbitfabric export relationship-manifest examples/demo-3u/mission/ \
+  --json generated/reports/relationship_manifest.json
 ```
 
-Neither report exposes relationship graphs, plugin APIs or Studio-specific APIs.
+Generated file:
+
+```text
+generated/reports/relationship_manifest.json
+```
+
+For `demo-3u`, the relationship manifest currently emits 46 relationship records across 17 emitted relationship families.
+
+The candidate surface admits 19 deliberately narrow relationship families documented in `docs/reference/relationship-manifest-surface.md`.
+
+These reports are read-only Core-owned structured surfaces.
+
+They do not expose relationship graph behavior, dependency graph behavior, plugin APIs, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 ---
 
@@ -461,6 +478,7 @@ command accepted
   -> ground-facing artifacts generated from the same model
   -> model summary exported from the same model
   -> entity index exported from the same model
+  -> relationship manifest exported from the same model
 ```
 
 ---
