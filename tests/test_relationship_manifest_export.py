@@ -55,9 +55,10 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 6,
+        "total_relationships": 8,
         "relationship_types": {
             "packet_includes_telemetry": 5,
+            "payload_accepts_command": 2,
             "payload_produces_telemetry": 1,
         },
     }
@@ -71,6 +72,16 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
                 "model_field": "packets[].telemetry",
             },
             "relationship_count": 5,
+        },
+        {
+            "relationship_type": "payload_accepts_command",
+            "display_name": "Payload accepts command",
+            "from_domain": "payloads",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "payloads[].commands.accepted",
+            },
+            "relationship_count": 2,
         },
         {
             "relationship_type": "payload_produces_telemetry",
@@ -171,6 +182,42 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         },
         {
             "relationship_id": (
+                "payloads:demo_iod_payload->payload_accepts_command:"
+                "commands:payload.start_acquisition"
+            ),
+            "relationship_type": "payload_accepts_command",
+            "from": {
+                "domain": "payloads",
+                "id": "demo_iod_payload",
+            },
+            "to": {
+                "domain": "commands",
+                "id": "payload.start_acquisition",
+            },
+            "derived_from": {
+                "model_field": "payloads[].commands.accepted",
+            },
+        },
+        {
+            "relationship_id": (
+                "payloads:demo_iod_payload->payload_accepts_command:"
+                "commands:payload.stop_acquisition"
+            ),
+            "relationship_type": "payload_accepts_command",
+            "from": {
+                "domain": "payloads",
+                "id": "demo_iod_payload",
+            },
+            "to": {
+                "domain": "commands",
+                "id": "payload.stop_acquisition",
+            },
+            "derived_from": {
+                "model_field": "payloads[].commands.accepted",
+            },
+        },
+        {
+            "relationship_id": (
                 "payloads:demo_iod_payload->payload_produces_telemetry:"
                 "telemetry:payload.acquisition.active"
             ),
@@ -197,20 +244,30 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
     packet_ids = {packet.id for packet in model.packets}
     payload_ids = {payload.id for payload in model.payloads}
     telemetry_ids = {telemetry.id for telemetry in model.telemetry}
+    command_ids = {command.id for command in model.commands}
 
     for relationship in manifest["relationships"]:
-        assert relationship["to"]["domain"] == "telemetry"
-        assert relationship["to"]["id"] in telemetry_ids
-
         if relationship["relationship_type"] == "packet_includes_telemetry":
             assert relationship["from"]["domain"] == "packets"
             assert relationship["from"]["id"] in packet_ids
+            assert relationship["to"]["domain"] == "telemetry"
+            assert relationship["to"]["id"] in telemetry_ids
             assert relationship["derived_from"] == {
                 "model_field": "packets[].telemetry",
+            }
+        elif relationship["relationship_type"] == "payload_accepts_command":
+            assert relationship["from"]["domain"] == "payloads"
+            assert relationship["from"]["id"] in payload_ids
+            assert relationship["to"]["domain"] == "commands"
+            assert relationship["to"]["id"] in command_ids
+            assert relationship["derived_from"] == {
+                "model_field": "payloads[].commands.accepted",
             }
         elif relationship["relationship_type"] == "payload_produces_telemetry":
             assert relationship["from"]["domain"] == "payloads"
             assert relationship["from"]["id"] in payload_ids
+            assert relationship["to"]["domain"] == "telemetry"
+            assert relationship["to"]["id"] in telemetry_ids
             assert relationship["derived_from"] == {
                 "model_field": "payloads[].telemetry.produced",
             }
