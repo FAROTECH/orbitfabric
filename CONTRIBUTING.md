@@ -10,11 +10,13 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.8.2 - Entity Index Surface`.
+The current development baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
-In v0.8.2, Entity Index Surface means the first Core-owned read-only entity index surface derived from the loaded Mission Model.
+The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
 
-The next development focus is `v0.9 - Plugin and Extensibility Layer`.
+In v0.9.0, Relationship Manifest Surface means the first Core-owned read-only relationship surface derived from explicit loaded Mission Model fields and indexed Mission Model entities.
+
+The current development focus is to finish the v0.9.0 release alignment without adding plugin execution, plugin discovery or plugin loaders.
 
 The current baseline proves this Mission Data Chain:
 
@@ -31,6 +33,7 @@ Payload Contract
   -> Ground-Facing Integration Artifacts
   -> Contract Introspection Surface
   -> Entity Index Surface
+  -> Relationship Manifest Surface
 ```
 
 Do not add large integrations before the contract model is coherent.
@@ -59,8 +62,12 @@ Out of scope for the current preview:
 - Basilisk integration;
 - cFS/F Prime bridge;
 - web UI;
-- plugin API;
 - relationship graph export;
+- dependency graph export;
+- plugin API;
+- plugin execution;
+- plugin discovery;
+- plugin loader;
 - real spacecraft data.
 
 Runtime-facing contract bindings must remain generated, deterministic and disposable.
@@ -70,6 +77,8 @@ Ground-facing integration artifacts must remain generated, deterministic, tool-n
 Contract introspection reports must remain Core-owned, deterministic, read-only and disposable.
 
 Entity index reports must remain Core-owned, deterministic, read-only and disposable.
+
+Relationship manifest reports must remain Core-owned, deterministic, read-only, explicitly bounded and disposable.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -126,7 +135,7 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current version:
+Expected current version until the final v0.9.0 release preparation PR:
 
 ```text
 orbitfabric 0.8.2
@@ -156,6 +165,9 @@ orbitfabric export model-summary examples/demo-3u/mission/ \
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
 
+orbitfabric export relationship-manifest examples/demo-3u/mission/ \
+  --json generated/reports/relationship_manifest.json
+
 orbitfabric gen docs examples/demo-3u/mission/
 
 orbitfabric gen data-flow examples/demo-3u/mission/ \
@@ -180,18 +192,19 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
 Expected result:
 
 ```text
-ruff check .          -> All checks passed
-pytest                -> passing
-mkdocs                -> passing
-lint                  -> Result: PASSED
-export model-summary  -> Result: PASSED
-export entity-index   -> Result: PASSED
-gen docs              -> Result: PASSED
-gen data-flow         -> Result: PASSED
-gen runtime           -> Result: PASSED
-cmake build           -> passing
-gen ground            -> Result: PASSED
-sim                   -> Result: PASSED
+ruff check .                 -> All checks passed
+pytest                       -> passing
+mkdocs                       -> passing
+lint                         -> Result: PASSED
+export model-summary         -> Result: PASSED
+export entity-index          -> Result: PASSED
+export relationship-manifest -> Result: PASSED
+gen docs                     -> Result: PASSED
+gen data-flow                -> Result: PASSED
+gen runtime                  -> Result: PASSED
+cmake build                  -> passing
+gen ground                   -> Result: PASSED
+sim                          -> Result: PASSED
 ```
 
 ---
@@ -260,6 +273,8 @@ exporter -> raw YAML files
 
 Do not hardcode behavior for `demo-3u` inside the framework core.
 
+Relationship manifest records must remain derived from explicit loaded Mission Model fields and must reference indexed entities rather than synthetic downstream nodes.
+
 ---
 
 ## Commit Style
@@ -271,7 +286,7 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate ground dictionaries
-Align public documentation with v0.8.2
+Align public documentation with relationship manifest surface
 Fix scenario command validation
 ```
 
