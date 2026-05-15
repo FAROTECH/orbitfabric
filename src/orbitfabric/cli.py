@@ -7,6 +7,7 @@ import typer
 
 from orbitfabric import __version__
 from orbitfabric.export import write_entity_index, write_model_summary
+from orbitfabric.export.relationship_manifest import write_relationship_manifest
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
 from orbitfabric.gen.ground import (
@@ -428,6 +429,45 @@ def export_entity_index(
 
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@export_app.command("relationship-manifest")
+def export_relationship_manifest(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to export the relationship manifest skeleton.",
+        ),
+    ],
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the candidate relationship manifest to this JSON file.",
+        ),
+    ] = Path("generated/reports/relationship_manifest.json"),
+) -> None:
+    """Export a candidate Core-owned relationship manifest skeleton."""
+    typer.echo(f"OrbitFabric Relationship Manifest Export {__version__}")
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    written_file = write_relationship_manifest(model, mission_dir, json_output)
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo("Status: candidate")
+    typer.echo("Relationships emitted: 0")
     typer.echo(f"JSON report written to: {written_file}")
     typer.echo("\nResult: PASSED")
 
