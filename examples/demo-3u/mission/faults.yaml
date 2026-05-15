@@ -39,7 +39,7 @@ faults:
       telemetry: payload.acquisition.active
       operator: ==
       value: true
-      debounce_samples: 1
+      debounce_samples: 4
     emits:
       - payload.command_timeout
     recovery:
