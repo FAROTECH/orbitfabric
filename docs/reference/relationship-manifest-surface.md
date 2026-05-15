@@ -18,7 +18,7 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface emits eight deliberately narrow relationship families:
+At the current baseline, this surface emits nine deliberately narrow relationship families:
 
 ```text
 command_emits_event
@@ -27,6 +27,7 @@ data_product_produced_by_payload
 fault_emits_event
 packet_includes_telemetry
 payload_accepts_command
+payload_belongs_to_subsystem
 payload_generates_event
 payload_produces_telemetry
 ```
@@ -40,6 +41,7 @@ data_products[].producer
 faults[].emits
 packets[].telemetry
 payloads[].commands.accepted
+payloads[].subsystem
 payloads[].events.generated
 payloads[].telemetry.produced
 ```
@@ -76,7 +78,7 @@ What contract entities are defined in this mission?
 
 `relationship_manifest.json` is currently a candidate relationship surface.
 
-It emits command-to-event emission records, command-to-subsystem target records, data-product-to-payload producer records, fault-to-event emission records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-event generation records and payload-to-telemetry production records.
+It emits command-to-event emission records, command-to-subsystem target records, data-product-to-payload producer records, fault-to-event emission records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-subsystem membership records, payload-to-event generation records and payload-to-telemetry production records.
 
 `entity_index.json` contains nodes, not edges.
 
@@ -144,7 +146,7 @@ The current candidate manifest contains:
   "kind": "orbitfabric.relationship_manifest",
   "status": "candidate",
   "counts": {
-    "total_relationships": 21,
+    "total_relationships": 22,
     "relationship_types": {
       "command_emits_event": 4,
       "command_targets_subsystem": 4,
@@ -152,6 +154,7 @@ The current candidate manifest contains:
       "fault_emits_event": 2,
       "packet_includes_telemetry": 5,
       "payload_accepts_command": 2,
+      "payload_belongs_to_subsystem": 1,
       "payload_generates_event": 2,
       "payload_produces_telemetry": 1
     }
@@ -216,6 +219,16 @@ The current candidate manifest contains:
         "model_field": "payloads[].commands.accepted"
       },
       "relationship_count": 2
+    },
+    {
+      "relationship_type": "payload_belongs_to_subsystem",
+      "display_name": "Payload belongs to subsystem",
+      "from_domain": "payloads",
+      "to_domain": "subsystems",
+      "derived_from": {
+        "model_field": "payloads[].subsystem"
+      },
+      "relationship_count": 1
     },
     {
       "relationship_type": "payload_generates_event",
@@ -530,6 +543,49 @@ This is a direct payload contract reference.
 
 It is not derived from command ID prefixes, payload naming conventions or command targets.
 
+### payload_belongs_to_subsystem
+
+This relationship states that a payload belongs to an indexed subsystem.
+
+It is derived from:
+
+```text
+payloads[].subsystem
+```
+
+Relationship endpoints are:
+
+```text
+from: payloads.<id>
+to: subsystems.<id>
+```
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
+  "relationship_type": "payload_belongs_to_subsystem",
+  "from": {
+    "domain": "payloads",
+    "id": "demo_iod_payload"
+  },
+  "to": {
+    "domain": "subsystems",
+    "id": "payload"
+  },
+  "derived_from": {
+    "model_field": "payloads[].subsystem"
+  }
+}
+```
+
+This is a direct payload contract reference.
+
+It is emitted only when `payloads[].subsystem` resolves to an indexed subsystem.
+
+It is not derived from payload ID prefixes, subsystem naming conventions or command targets.
+
 ### payload_generates_event
 
 This relationship states that a payload generates an event.
@@ -627,6 +683,7 @@ data_products[].producer
 faults[].emits
 packets[].telemetry
 payloads[].commands.accepted
+payloads[].subsystem
 payloads[].events.generated
 payloads[].telemetry.produced
 ```
@@ -639,7 +696,6 @@ command.expected_effects
 event.source
 fault.source
 fault.recovery.auto_commands
-payload.subsystem
 payload.faults.possible
 data_product.payload
 contact_window.contact_profile
@@ -845,6 +901,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently emits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `fault_emits_event`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_generates_event` and `payload_produces_telemetry` relationships.
+It currently emits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `fault_emits_event`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event` and `payload_produces_telemetry` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.

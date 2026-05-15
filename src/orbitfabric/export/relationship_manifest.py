@@ -21,6 +21,7 @@ REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
+REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
 
@@ -138,6 +139,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         record
         for packet in sorted(model.packets, key=lambda item: item.id)
         for record in _packet_telemetry_relationship_records(packet)
+    )
+    records.extend(
+        record
+        for payload in sorted(model.payloads, key=lambda item: item.id)
+        for record in _payload_subsystem_relationship_records(payload, model.subsystem_ids)
     )
     records.extend(
         record
@@ -286,6 +292,35 @@ def _packet_telemetry_relationship_records(packet: Packet) -> list[dict[str, Any
     ]
 
 
+def _payload_subsystem_relationship_records(
+    payload: PayloadContract,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if payload.subsystem not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"payloads:{payload.id}->{REL_PAYLOAD_BELONGS_TO_SUBSYSTEM}:"
+                f"subsystems:{payload.subsystem}"
+            ),
+            "relationship_type": REL_PAYLOAD_BELONGS_TO_SUBSYSTEM,
+            "from": {
+                "domain": "payloads",
+                "id": payload.id,
+            },
+            "to": {
+                "domain": "subsystems",
+                "id": payload.subsystem,
+            },
+            "derived_from": {
+                "model_field": "payloads[].subsystem",
+            },
+        }
+    ]
+
+
 def _payload_telemetry_relationship_records(
     payload: PayloadContract,
 ) -> list[dict[str, Any]]:
@@ -426,6 +461,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "commands",
             "derived_from": {
                 "model_field": "payloads[].commands.accepted",
+            },
+        },
+        REL_PAYLOAD_BELONGS_TO_SUBSYSTEM: {
+            "relationship_type": REL_PAYLOAD_BELONGS_TO_SUBSYSTEM,
+            "display_name": "Payload belongs to subsystem",
+            "from_domain": "payloads",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "payloads[].subsystem",
             },
         },
         REL_PAYLOAD_GENERATES_EVENT: {
