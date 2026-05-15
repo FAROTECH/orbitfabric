@@ -18,12 +18,13 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface emits twelve deliberately narrow relationship families:
+At the current baseline, this surface emits thirteen deliberately narrow relationship families:
 
 ```text
 command_emits_event
 command_targets_subsystem
 data_product_produced_by_payload
+downlink_flow_includes_data_product
 event_sourced_from_subsystem
 fault_emits_event
 fault_sourced_from_subsystem
@@ -41,6 +42,7 @@ These relationships are derived only from explicit loaded Mission Model fields:
 commands[].emits
 commands[].target
 data_products[].producer
+downlink_flows[].eligible_data_products
 events[].source
 faults[].emits
 faults[].source
@@ -84,7 +86,7 @@ What contract entities are defined in this mission?
 
 `relationship_manifest.json` is currently a candidate relationship surface.
 
-It emits command-to-event emission records, command-to-subsystem target records, data-product-to-payload producer records, event-to-subsystem source records, fault-to-event emission records, fault-to-subsystem source records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-subsystem membership records, payload-to-event generation records, payload-to-telemetry production records and telemetry-to-subsystem source records.
+It emits command-to-event emission records, command-to-subsystem target records, data-product-to-payload producer records, downlink-flow-to-data-product eligibility records, event-to-subsystem source records, fault-to-event emission records, fault-to-subsystem source records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-subsystem membership records, payload-to-event generation records, payload-to-telemetry production records and telemetry-to-subsystem source records.
 
 `entity_index.json` contains nodes, not edges.
 
@@ -152,11 +154,12 @@ The current candidate manifest contains:
   "kind": "orbitfabric.relationship_manifest",
   "status": "candidate",
   "counts": {
-    "total_relationships": 37,
+    "total_relationships": 38,
     "relationship_types": {
       "command_emits_event": 4,
       "command_targets_subsystem": 4,
       "data_product_produced_by_payload": 1,
+      "downlink_flow_includes_data_product": 1,
       "event_sourced_from_subsystem": 8,
       "fault_emits_event": 2,
       "fault_sourced_from_subsystem": 2,
@@ -196,6 +199,16 @@ The current candidate manifest contains:
       "to_domain": "payloads",
       "derived_from": {
         "model_field": "data_products[].producer"
+      },
+      "relationship_count": 1
+    },
+    {
+      "relationship_type": "downlink_flow_includes_data_product",
+      "display_name": "Downlink flow includes data product",
+      "from_domain": "downlink_flows",
+      "to_domain": "data_products",
+      "derived_from": {
+        "model_field": "downlink_flows[].eligible_data_products"
       },
       "relationship_count": 1
     },
@@ -458,6 +471,49 @@ This is a direct data product contract reference.
 It is emitted only when `data_products[].producer_type` is `payload` and `data_products[].producer` resolves to an indexed payload.
 
 It is not derived from data product ID prefixes, payload naming conventions, storage policy or downlink policy.
+
+### downlink_flow_includes_data_product
+
+This relationship states that a downlink flow includes an indexed data product as an eligible product.
+
+It is derived from:
+
+```text
+downlink_flows[].eligible_data_products
+```
+
+Relationship endpoints are:
+
+```text
+from: downlink_flows.<id>
+to: data_products.<id>
+```
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "downlink_flows:science_next_available_contact->downlink_flow_includes_data_product:data_products:payload.radiation_histogram",
+  "relationship_type": "downlink_flow_includes_data_product",
+  "from": {
+    "domain": "downlink_flows",
+    "id": "science_next_available_contact"
+  },
+  "to": {
+    "domain": "data_products",
+    "id": "payload.radiation_histogram"
+  },
+  "derived_from": {
+    "model_field": "downlink_flows[].eligible_data_products"
+  }
+}
+```
+
+This is a direct downlink flow contract reference.
+
+It is emitted only when a `downlink_flows[].eligible_data_products` entry resolves to an indexed data product.
+
+It is not derived from data product ID prefixes, downlink flow naming conventions, storage policy, downlink policy, contact profiles, link profiles or contact windows.
 
 ### event_sourced_from_subsystem
 
@@ -848,6 +904,7 @@ Currently admitted derivation sources:
 commands[].emits
 commands[].target
 data_products[].producer
+downlink_flows[].eligible_data_products
 events[].source
 faults[].emits
 faults[].source
@@ -870,7 +927,6 @@ contact_window.contact_profile
 contact_window.link_profile
 downlink_flow.contact_profile
 downlink_flow.link_profile
-downlink_flow.eligible_data_products
 commandability_rule.command
 commandability_rule.sources
 commandability_rule.expected_events
@@ -1013,7 +1069,6 @@ Candidate families include:
 ```text
 payload may raise fault
 data product produced by subsystem
-downlink flow includes data product
 commandability rule constrains command
 autonomous action dispatches command
 recovery intent reacts to fault or event
@@ -1069,6 +1124,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently emits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
+It currently emits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
