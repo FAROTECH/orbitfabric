@@ -55,9 +55,10 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 14,
+        "total_relationships": 16,
         "relationship_types": {
             "command_emits_event": 4,
+            "fault_emits_event": 2,
             "packet_includes_telemetry": 5,
             "payload_accepts_command": 2,
             "payload_generates_event": 2,
@@ -74,6 +75,16 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
                 "model_field": "commands[].emits",
             },
             "relationship_count": 4,
+        },
+        {
+            "relationship_type": "fault_emits_event",
+            "display_name": "Fault emits event",
+            "from_domain": "faults",
+            "to_domain": "events",
+            "derived_from": {
+                "model_field": "faults[].emits",
+            },
+            "relationship_count": 2,
         },
         {
             "relationship_type": "packet_includes_telemetry",
@@ -118,7 +129,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 14
+    assert len(relationships) == 16
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
@@ -127,6 +138,8 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "commands:payload.start_acquisition->command_emits_event:events:payload.acquisition_started",
         "commands:payload.stop_acquisition->command_emits_event:events:payload.acquisition_stopped",
         "commands:radio.downlink_housekeeping->command_emits_event:events:radio.housekeeping_downlink_requested",
+        "faults:eps.battery_critical_fault->fault_emits_event:events:eps.battery_critical",
+        "faults:eps.battery_low_fault->fault_emits_event:events:eps.battery_low",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
     }
@@ -141,6 +154,7 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
     telemetry_ids = {telemetry.id for telemetry in model.telemetry}
     command_ids = {command.id for command in model.commands}
     event_ids = {event.id for event in model.events}
+    fault_ids = {fault.id for fault in model.faults}
 
     for relationship in manifest["relationships"]:
         if relationship["relationship_type"] == "command_emits_event":
@@ -150,6 +164,14 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
             assert relationship["to"]["id"] in event_ids
             assert relationship["derived_from"] == {
                 "model_field": "commands[].emits",
+            }
+        elif relationship["relationship_type"] == "fault_emits_event":
+            assert relationship["from"]["domain"] == "faults"
+            assert relationship["from"]["id"] in fault_ids
+            assert relationship["to"]["domain"] == "events"
+            assert relationship["to"]["id"] in event_ids
+            assert relationship["derived_from"] == {
+                "model_field": "faults[].emits",
             }
         elif relationship["relationship_type"] == "packet_includes_telemetry":
             assert relationship["from"]["domain"] == "packets"
