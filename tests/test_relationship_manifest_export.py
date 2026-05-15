@@ -55,7 +55,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 40,
+        "total_relationships": 41,
         "relationship_types": {
             "command_emits_event": 4,
             "command_targets_subsystem": 4,
@@ -68,6 +68,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "payload_accepts_command": 2,
             "payload_belongs_to_subsystem": 1,
             "payload_generates_event": 2,
+            "payload_may_raise_fault": 1,
             "payload_produces_telemetry": 1,
             "telemetry_sourced_from_subsystem": 5,
         },
@@ -184,6 +185,16 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "relationship_count": 2,
         },
         {
+            "relationship_type": "payload_may_raise_fault",
+            "display_name": "Payload may raise fault",
+            "from_domain": "payloads",
+            "to_domain": "faults",
+            "derived_from": {
+                "model_field": "payloads[].faults.possible",
+            },
+            "relationship_count": 1,
+        },
+        {
             "relationship_type": "payload_produces_telemetry",
             "display_name": "Payload produces telemetry",
             "from_domain": "payloads",
@@ -206,7 +217,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 40
+    assert len(relationships) == 41
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
@@ -238,6 +249,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
+        "payloads:demo_iod_payload->payload_may_raise_fault:faults:payload.command_timeout_fault",
         "telemetry:eps.battery.current->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:eps.battery.voltage->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:obc.mode->telemetry_sourced_from_subsystem:subsystems:obc",
@@ -348,6 +360,14 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
             assert relationship["to"]["id"] in event_ids
             assert relationship["derived_from"] == {
                 "model_field": "payloads[].events.generated",
+            }
+        elif relationship["relationship_type"] == "payload_may_raise_fault":
+            assert relationship["from"]["domain"] == "payloads"
+            assert relationship["from"]["id"] in payload_ids
+            assert relationship["to"]["domain"] == "faults"
+            assert relationship["to"]["id"] in fault_ids
+            assert relationship["derived_from"] == {
+                "model_field": "payloads[].faults.possible",
             }
         elif relationship["relationship_type"] == "payload_produces_telemetry":
             assert relationship["from"]["domain"] == "payloads"
