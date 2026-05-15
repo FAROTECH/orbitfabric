@@ -9,6 +9,7 @@ from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import (
     Command,
     DataProductContract,
+    DownlinkFlowContract,
     Event,
     Fault,
     MissionModel,
@@ -20,6 +21,7 @@ from orbitfabric.model.mission import (
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
+REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT = "downlink_flow_includes_data_product"
 REL_EVENT_SOURCED_FROM_SUBSYSTEM = "event_sourced_from_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
 REL_FAULT_SOURCED_FROM_SUBSYSTEM = "fault_sourced_from_subsystem"
@@ -133,6 +135,17 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         for record in _data_product_payload_relationship_records(
             data_product,
             model.payload_ids,
+        )
+    )
+    records.extend(
+        record
+        for downlink_flow in sorted(
+            model.contacts.downlink_flows,
+            key=lambda item: item.id,
+        )
+        for record in _downlink_flow_data_product_relationship_records(
+            downlink_flow,
+            model.data_product_ids,
         )
     )
     records.extend(
@@ -267,6 +280,35 @@ def _data_product_payload_relationship_records(
                 "model_field": "data_products[].producer",
             },
         }
+    ]
+
+
+def _downlink_flow_data_product_relationship_records(
+    downlink_flow: DownlinkFlowContract,
+    data_product_ids: set[str],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": (
+                f"downlink_flows:{downlink_flow.id}->"
+                f"{REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT}:"
+                f"data_products:{data_product_id}"
+            ),
+            "relationship_type": REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT,
+            "from": {
+                "domain": "downlink_flows",
+                "id": downlink_flow.id,
+            },
+            "to": {
+                "domain": "data_products",
+                "id": data_product_id,
+            },
+            "derived_from": {
+                "model_field": "downlink_flows[].eligible_data_products",
+            },
+        }
+        for data_product_id in sorted(downlink_flow.eligible_data_products)
+        if data_product_id in data_product_ids
     ]
 
 
@@ -544,6 +586,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "payloads",
             "derived_from": {
                 "model_field": "data_products[].producer",
+            },
+        },
+        REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT: {
+            "relationship_type": REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT,
+            "display_name": "Downlink flow includes data product",
+            "from_domain": "downlink_flows",
+            "to_domain": "data_products",
+            "derived_from": {
+                "model_field": "downlink_flows[].eligible_data_products",
             },
         },
         REL_EVENT_SOURCED_FROM_SUBSYSTEM: {
