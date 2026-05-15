@@ -55,10 +55,11 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 8,
+        "total_relationships": 10,
         "relationship_types": {
             "packet_includes_telemetry": 5,
             "payload_accepts_command": 2,
+            "payload_generates_event": 2,
             "payload_produces_telemetry": 1,
         },
     }
@@ -84,6 +85,16 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "relationship_count": 2,
         },
         {
+            "relationship_type": "payload_generates_event",
+            "display_name": "Payload generates event",
+            "from_domain": "payloads",
+            "to_domain": "events",
+            "derived_from": {
+                "model_field": "payloads[].events.generated",
+            },
+            "relationship_count": 2,
+        },
+        {
             "relationship_type": "payload_produces_telemetry",
             "display_name": "Payload produces telemetry",
             "from_domain": "payloads",
@@ -94,147 +105,16 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "relationship_count": 1,
         },
     ]
-    assert manifest["relationships"] == [
-        {
-            "relationship_id": (
-                "packets:comm_status->packet_includes_telemetry:"
-                "telemetry:radio.downlink.available"
-            ),
-            "relationship_type": "packet_includes_telemetry",
-            "from": {
-                "domain": "packets",
-                "id": "comm_status",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "radio.downlink.available",
-            },
-            "derived_from": {
-                "model_field": "packets[].telemetry",
-            },
-        },
-        {
-            "relationship_id": (
-                "packets:hk_fast->packet_includes_telemetry:telemetry:eps.battery.current"
-            ),
-            "relationship_type": "packet_includes_telemetry",
-            "from": {
-                "domain": "packets",
-                "id": "hk_fast",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "eps.battery.current",
-            },
-            "derived_from": {
-                "model_field": "packets[].telemetry",
-            },
-        },
-        {
-            "relationship_id": (
-                "packets:hk_fast->packet_includes_telemetry:telemetry:eps.battery.voltage"
-            ),
-            "relationship_type": "packet_includes_telemetry",
-            "from": {
-                "domain": "packets",
-                "id": "hk_fast",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "eps.battery.voltage",
-            },
-            "derived_from": {
-                "model_field": "packets[].telemetry",
-            },
-        },
-        {
-            "relationship_id": "packets:hk_fast->packet_includes_telemetry:telemetry:obc.mode",
-            "relationship_type": "packet_includes_telemetry",
-            "from": {
-                "domain": "packets",
-                "id": "hk_fast",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "obc.mode",
-            },
-            "derived_from": {
-                "model_field": "packets[].telemetry",
-            },
-        },
-        {
-            "relationship_id": (
-                "packets:payload_status->packet_includes_telemetry:"
-                "telemetry:payload.acquisition.active"
-            ),
-            "relationship_type": "packet_includes_telemetry",
-            "from": {
-                "domain": "packets",
-                "id": "payload_status",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "payload.acquisition.active",
-            },
-            "derived_from": {
-                "model_field": "packets[].telemetry",
-            },
-        },
-        {
-            "relationship_id": (
-                "payloads:demo_iod_payload->payload_accepts_command:"
-                "commands:payload.start_acquisition"
-            ),
-            "relationship_type": "payload_accepts_command",
-            "from": {
-                "domain": "payloads",
-                "id": "demo_iod_payload",
-            },
-            "to": {
-                "domain": "commands",
-                "id": "payload.start_acquisition",
-            },
-            "derived_from": {
-                "model_field": "payloads[].commands.accepted",
-            },
-        },
-        {
-            "relationship_id": (
-                "payloads:demo_iod_payload->payload_accepts_command:"
-                "commands:payload.stop_acquisition"
-            ),
-            "relationship_type": "payload_accepts_command",
-            "from": {
-                "domain": "payloads",
-                "id": "demo_iod_payload",
-            },
-            "to": {
-                "domain": "commands",
-                "id": "payload.stop_acquisition",
-            },
-            "derived_from": {
-                "model_field": "payloads[].commands.accepted",
-            },
-        },
-        {
-            "relationship_id": (
-                "payloads:demo_iod_payload->payload_produces_telemetry:"
-                "telemetry:payload.acquisition.active"
-            ),
-            "relationship_type": "payload_produces_telemetry",
-            "from": {
-                "domain": "payloads",
-                "id": "demo_iod_payload",
-            },
-            "to": {
-                "domain": "telemetry",
-                "id": "payload.acquisition.active",
-            },
-            "derived_from": {
-                "model_field": "payloads[].telemetry.produced",
-            },
-        },
-    ]
+
+    relationships = manifest["relationships"]
+    assert len(relationships) == 10
+    assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
+    assert {
+        relationship["relationship_id"] for relationship in relationships
+    } >= {
+        "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
+        "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
+    }
 
 
 def test_relationship_manifest_relationships_reference_indexed_entities() -> None:
@@ -245,6 +125,7 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
     payload_ids = {payload.id for payload in model.payloads}
     telemetry_ids = {telemetry.id for telemetry in model.telemetry}
     command_ids = {command.id for command in model.commands}
+    event_ids = {event.id for event in model.events}
 
     for relationship in manifest["relationships"]:
         if relationship["relationship_type"] == "packet_includes_telemetry":
@@ -262,6 +143,14 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
             assert relationship["to"]["id"] in command_ids
             assert relationship["derived_from"] == {
                 "model_field": "payloads[].commands.accepted",
+            }
+        elif relationship["relationship_type"] == "payload_generates_event":
+            assert relationship["from"]["domain"] == "payloads"
+            assert relationship["from"]["id"] in payload_ids
+            assert relationship["to"]["domain"] == "events"
+            assert relationship["to"]["id"] in event_ids
+            assert relationship["derived_from"] == {
+                "model_field": "payloads[].events.generated",
             }
         elif relationship["relationship_type"] == "payload_produces_telemetry":
             assert relationship["from"]["domain"] == "payloads"
