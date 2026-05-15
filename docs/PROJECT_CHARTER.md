@@ -1,6 +1,6 @@
 # OrbitFabric - Project Charter
 
-Version: 0.9.0 development baseline
+Version: 0.9.0
 Status: Draft
 Scope: Mission Data Contract foundation, Mission Data Chain and generated contract-facing artifacts
 
@@ -243,9 +243,9 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 ---
 
-## 7. Current Development Baseline
+## 7. Current Baseline
 
-The current v0.9.0 development baseline includes:
+The current v0.9.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
