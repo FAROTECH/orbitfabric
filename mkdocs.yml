@@ -44,6 +44,7 @@ nav:
       - v0.8.0 Ground Integration Artifacts: releases/v0.8.0.md
       - v0.8.1 Contract Introspection Surface: releases/v0.8.1.md
       - v0.8.2 Entity Index Surface: releases/v0.8.2.md
+      - v0.9.0 Relationship Manifest Surface and Extensibility Boundary: releases/v0.9.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 
