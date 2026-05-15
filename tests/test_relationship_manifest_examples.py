@@ -8,6 +8,34 @@ from orbitfabric.model.loader import MissionModelLoader
 SPACELAB_MINISLICE = Path("examples/spacelab-inspired-communications-minislice/mission")
 
 
+def test_relationship_manifest_emits_data_product_subsystem_records() -> None:
+    model = MissionModelLoader().load(SPACELAB_MINISLICE)
+
+    manifest = relationship_manifest_to_dict(model, SPACELAB_MINISLICE)
+    relationships = manifest["relationships"]
+    data_product_relationships = [
+        relationship
+        for relationship in relationships
+        if relationship["relationship_type"] == "data_product_produced_by_subsystem"
+    ]
+
+    assert len(data_product_relationships) == 7
+    assert {
+        relationship["relationship_id"] for relationship in data_product_relationships
+    } == {
+        "data_products:critical_housekeeping_packet->data_product_produced_by_subsystem:subsystems:obdh",
+        "data_products:decoder_reception_log->data_product_produced_by_subsystem:subsystems:decoder_context",
+        "data_products:downlink_summary_report->data_product_produced_by_subsystem:subsystems:obdh",
+        "data_products:periodic_beacon_packet->data_product_produced_by_subsystem:subsystems:beacon_context",
+        "data_products:requested_data_frame_batch->data_product_produced_by_subsystem:subsystems:data_storage",
+        "data_products:requested_telemetry_frame_batch->data_product_produced_by_subsystem:subsystems:obdh",
+        "data_products:scenario_evidence_log->data_product_produced_by_subsystem:subsystems:obdh",
+    }
+    assert manifest["counts"]["relationship_types"][
+        "data_product_produced_by_subsystem"
+    ] == 7
+
+
 def test_relationship_manifest_emits_downlink_flow_records_for_spacelab_minislice() -> None:
     model = MissionModelLoader().load(SPACELAB_MINISLICE)
 
