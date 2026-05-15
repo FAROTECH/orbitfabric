@@ -13,6 +13,7 @@ from orbitfabric.model.mission import (
     MissionModel,
     Packet,
     PayloadContract,
+    TelemetryItem,
 )
 
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
@@ -24,6 +25,7 @@ REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
 REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
+REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM = "telemetry_sourced_from_subsystem"
 
 
 def relationship_manifest_to_dict(
@@ -159,6 +161,14 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         record
         for payload in sorted(model.payloads, key=lambda item: item.id)
         for record in _payload_event_relationship_records(payload)
+    )
+    records.extend(
+        record
+        for telemetry in sorted(model.telemetry, key=lambda item: item.id)
+        for record in _telemetry_subsystem_relationship_records(
+            telemetry,
+            model.subsystem_ids,
+        )
     )
     return sorted(records, key=lambda item: item["relationship_id"])
 
@@ -399,6 +409,35 @@ def _payload_event_relationship_records(
     ]
 
 
+def _telemetry_subsystem_relationship_records(
+    telemetry: TelemetryItem,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if telemetry.source not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"telemetry:{telemetry.id}->{REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM}:"
+                f"subsystems:{telemetry.source}"
+            ),
+            "relationship_type": REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM,
+            "from": {
+                "domain": "telemetry",
+                "id": telemetry.id,
+            },
+            "to": {
+                "domain": "subsystems",
+                "id": telemetry.source,
+            },
+            "derived_from": {
+                "model_field": "telemetry[].source",
+            },
+        }
+    ]
+
+
 def _relationship_type_counts(relationships: list[dict[str, Any]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for relationship in relationships:
@@ -488,6 +527,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "telemetry",
             "derived_from": {
                 "model_field": "payloads[].telemetry.produced",
+            },
+        },
+        REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM: {
+            "relationship_type": REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM,
+            "display_name": "Telemetry sourced from subsystem",
+            "from_domain": "telemetry",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "telemetry[].source",
             },
         },
     }

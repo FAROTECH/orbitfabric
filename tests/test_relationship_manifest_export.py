@@ -55,7 +55,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 22,
+        "total_relationships": 27,
         "relationship_types": {
             "command_emits_event": 4,
             "command_targets_subsystem": 4,
@@ -66,6 +66,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             "payload_belongs_to_subsystem": 1,
             "payload_generates_event": 2,
             "payload_produces_telemetry": 1,
+            "telemetry_sourced_from_subsystem": 5,
         },
     }
     assert manifest["relationship_types"] == [
@@ -159,10 +160,20 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
             },
             "relationship_count": 1,
         },
+        {
+            "relationship_type": "telemetry_sourced_from_subsystem",
+            "display_name": "Telemetry sourced from subsystem",
+            "from_domain": "telemetry",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "telemetry[].source",
+            },
+            "relationship_count": 5,
+        },
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 22
+    assert len(relationships) == 27
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
@@ -181,6 +192,11 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
+        "telemetry:eps.battery.current->telemetry_sourced_from_subsystem:subsystems:eps",
+        "telemetry:eps.battery.voltage->telemetry_sourced_from_subsystem:subsystems:eps",
+        "telemetry:obc.mode->telemetry_sourced_from_subsystem:subsystems:obc",
+        "telemetry:payload.acquisition.active->telemetry_sourced_from_subsystem:subsystems:payload",
+        "telemetry:radio.downlink.available->telemetry_sourced_from_subsystem:subsystems:radio",
     }
 
 
@@ -269,6 +285,14 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
             assert relationship["to"]["id"] in telemetry_ids
             assert relationship["derived_from"] == {
                 "model_field": "payloads[].telemetry.produced",
+            }
+        elif relationship["relationship_type"] == "telemetry_sourced_from_subsystem":
+            assert relationship["from"]["domain"] == "telemetry"
+            assert relationship["from"]["id"] in telemetry_ids
+            assert relationship["to"]["domain"] == "subsystems"
+            assert relationship["to"]["id"] in subsystem_ids
+            assert relationship["derived_from"] == {
+                "model_field": "telemetry[].source",
             }
         else:
             raise AssertionError("unexpected relationship type")
