@@ -7,6 +7,7 @@ from typing import Any
 from orbitfabric import __version__
 from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import (
+    AutonomousActionContract,
     Command,
     CommandabilityRule,
     DataProductContract,
@@ -19,6 +20,7 @@ from orbitfabric.model.mission import (
     TelemetryItem,
 )
 
+REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND = "autonomous_action_dispatches_command"
 REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND = "commandability_rule_constrains_command"
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
@@ -125,9 +127,17 @@ def write_relationship_manifest(
 def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     records = [
         record
+        for action in sorted(model.commandability.autonomous_actions, key=lambda item: item.id)
+        for record in _autonomous_action_command_relationship_records(
+            action,
+            model.command_ids,
+        )
+    ]
+    records.extend(
+        record
         for command in sorted(model.commands, key=lambda item: item.id)
         for record in _command_event_relationship_records(command)
-    ]
+    )
     records.extend(
         record
         for command in sorted(model.commands, key=lambda item: item.id)
@@ -222,6 +232,37 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         )
     )
     return sorted(records, key=lambda item: item["relationship_id"])
+
+
+def _autonomous_action_command_relationship_records(
+    action: AutonomousActionContract,
+    command_ids: set[str],
+) -> list[dict[str, Any]]:
+    command_id = action.dispatches.command
+    if command_id not in command_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"autonomous_actions:{action.id}->"
+                f"{REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND}:"
+                f"commands:{command_id}"
+            ),
+            "relationship_type": REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND,
+            "from": {
+                "domain": "autonomous_actions",
+                "id": action.id,
+            },
+            "to": {
+                "domain": "commands",
+                "id": command_id,
+            },
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].dispatches.command",
+            },
+        }
+    ]
 
 
 def _commandability_rule_command_relationship_records(
@@ -676,6 +717,15 @@ def _relationship_type_counts(relationships: list[dict[str, Any]]) -> dict[str, 
 
 def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
     specs = {
+        REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND: {
+            "relationship_type": REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND,
+            "display_name": "Autonomous action dispatches command",
+            "from_domain": "autonomous_actions",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].dispatches.command",
+            },
+        },
         REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND: {
             "relationship_type": REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND,
             "display_name": "Commandability rule constrains command",
