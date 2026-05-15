@@ -30,6 +30,7 @@ REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
 REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
+REL_PAYLOAD_MAY_RAISE_FAULT = "payload_may_raise_fault"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
 REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM = "telemetry_sourced_from_subsystem"
 
@@ -196,6 +197,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         record
         for payload in sorted(model.payloads, key=lambda item: item.id)
         for record in _payload_event_relationship_records(payload)
+    )
+    records.extend(
+        record
+        for payload in sorted(model.payloads, key=lambda item: item.id)
+        for record in _payload_fault_relationship_records(payload, model.fault_ids)
     )
     records.extend(
         record
@@ -563,6 +569,34 @@ def _payload_event_relationship_records(
     ]
 
 
+def _payload_fault_relationship_records(
+    payload: PayloadContract,
+    fault_ids: set[str],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": (
+                f"payloads:{payload.id}->{REL_PAYLOAD_MAY_RAISE_FAULT}:"
+                f"faults:{fault_id}"
+            ),
+            "relationship_type": REL_PAYLOAD_MAY_RAISE_FAULT,
+            "from": {
+                "domain": "payloads",
+                "id": payload.id,
+            },
+            "to": {
+                "domain": "faults",
+                "id": fault_id,
+            },
+            "derived_from": {
+                "model_field": "payloads[].faults.possible",
+            },
+        }
+        for fault_id in sorted(payload.faults.possible)
+        if fault_id in fault_ids
+    ]
+
+
 def _telemetry_subsystem_relationship_records(
     telemetry: TelemetryItem,
     subsystem_ids: set[str],
@@ -708,6 +742,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "events",
             "derived_from": {
                 "model_field": "payloads[].events.generated",
+            },
+        },
+        REL_PAYLOAD_MAY_RAISE_FAULT: {
+            "relationship_type": REL_PAYLOAD_MAY_RAISE_FAULT,
+            "display_name": "Payload may raise fault",
+            "from_domain": "payloads",
+            "to_domain": "faults",
+            "derived_from": {
+                "model_field": "payloads[].faults.possible",
             },
         },
         REL_PAYLOAD_PRODUCES_TELEMETRY: {
