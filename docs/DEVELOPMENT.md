@@ -47,7 +47,7 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current version:
+Expected current package version until the final v0.9.0 release preparation PR:
 
 ```text
 orbitfabric 0.8.2
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.8.2 Vertical Slice
+## Verify the Current v0.9.0 Development Slice
 
 Run mission lint:
 
@@ -96,6 +96,13 @@ Export the Core-owned entity index report:
 ```bash
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
+```
+
+Export the Core-owned relationship manifest report:
+
+```bash
+orbitfabric export relationship-manifest examples/demo-3u/mission/ \
+  --json generated/reports/relationship_manifest.json
 ```
 
 Generate documentation:
@@ -149,15 +156,16 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
 Expected results:
 
 ```text
-lint                  -> Result: PASSED
-export model-summary  -> Result: PASSED
-export entity-index   -> Result: PASSED
-gen docs              -> Result: PASSED
-gen data-flow         -> Result: PASSED
-gen runtime           -> Result: PASSED
-cmake build           -> passing
-gen ground            -> Result: PASSED
-sim                   -> Result: PASSED
+lint                         -> Result: PASSED
+export model-summary         -> Result: PASSED
+export entity-index          -> Result: PASSED
+export relationship-manifest -> Result: PASSED
+gen docs                     -> Result: PASSED
+gen data-flow                -> Result: PASSED
+gen runtime                  -> Result: PASSED
+cmake build                  -> passing
+gen ground                   -> Result: PASSED
+sim                          -> Result: PASSED
 ```
 
 The generated Core-owned structured reports should include:
@@ -165,6 +173,7 @@ The generated Core-owned structured reports should include:
 ```text
 generated/reports/model_summary.json
 generated/reports/entity_index.json
+generated/reports/relationship_manifest.json
 ```
 
 The generated mission documentation should include:
@@ -254,6 +263,8 @@ Generated contract introspection reports are disposable.
 
 Generated entity index reports are disposable.
 
+Generated relationship manifest reports are disposable.
+
 User implementation code and downstream integration code must live outside `generated/`.
 
 ---
@@ -285,7 +296,7 @@ For new behavior, follow this order:
 2. add or update lint rules
 3. add tests
 4. update generated docs or reports if needed
-5. update runtime-facing, ground-facing or introspection exporters if needed
+5. update runtime-facing, ground-facing, introspection, entity-index or relationship exporters if needed
 6. update user-facing documentation
 ```
 
@@ -295,7 +306,7 @@ Do not add generated artifacts that bypass validation.
 
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
-Do not add plugin mechanisms before Core-owned introspection and entity surfaces exist.
+Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
 
 Do not put user code inside generated runtime bindings.
 
@@ -304,6 +315,8 @@ Do not present generated ground artifacts as live ground behavior.
 Do not present contract introspection reports as relationship graphs or Studio-specific APIs.
 
 Do not present entity index reports as relationship graphs, dependency graphs, plugin APIs or Studio-specific APIs.
+
+Do not present relationship manifest reports as graph engines, dependency graphs, runtime routing tables, ground routing tables, plugin APIs or Studio-specific APIs.
 
 ---
 
