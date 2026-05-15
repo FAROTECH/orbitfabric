@@ -153,23 +153,23 @@ It does not expose plugin behavior.
 
 ## Demo mission shape
 
-For `examples/demo-3u/mission`, the current manifest contains 38 relationship records.
+For `examples/demo-3u/mission`, the current manifest contains 40 relationship records.
 
 The demo mission currently emits thirteen relationship families because its only data product is produced by a payload, not by a subsystem.
 
-The demo count remains:
+The demo count is:
 
 ```json
 {
-  "total_relationships": 38,
+  "total_relationships": 40,
   "relationship_types": {
     "command_emits_event": 4,
     "command_targets_subsystem": 4,
     "data_product_produced_by_payload": 1,
     "downlink_flow_includes_data_product": 1,
     "event_sourced_from_subsystem": 8,
-    "fault_emits_event": 2,
-    "fault_sourced_from_subsystem": 2,
+    "fault_emits_event": 3,
+    "fault_sourced_from_subsystem": 3,
     "packet_includes_telemetry": 5,
     "payload_accepts_command": 2,
     "payload_belongs_to_subsystem": 1,
@@ -181,6 +181,8 @@ The demo count remains:
 ```
 
 The admitted `data_product_produced_by_subsystem` family is exercised by richer examples such as `examples/spacelab-inspired-communications-minislice/mission`, where seven data products are produced by indexed subsystems.
+
+The demo mission now also contains an explicit payload fault reference in `payloads[].faults.possible`. That field is intentionally present to support a future `payload_may_raise_fault` relationship family, but that relationship family is not admitted yet.
 
 ---
 
