@@ -8,7 +8,7 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces once.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces and relationship manifest surfaces once.
 Validate them, document them, simulate them and generate deterministic integration and inspection artifacts from the same source of truth.
 
 </div>
@@ -42,13 +42,31 @@ downstream inspection tools
 
 ## Current Status
 
-OrbitFabric is currently at `v0.8.2 - Entity Index Surface`.
+OrbitFabric is currently preparing `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
-In v0.8.2, **Entity Index Surface** means the first Core-owned read-only machine-readable surface for inspecting the loaded Mission Model at contract-entity level.
+The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
 
-It introduces `entity_index.json` and the `orbitfabric export entity-index` command.
+The v0.9.0 development baseline introduces the first Core-owned read-only relationship manifest surface:
 
-It builds on v0.8.1, which introduced `model_summary.json` and the `orbitfabric export model-summary` command.
+```text
+relationship_manifest.json
+```
+
+It builds on:
+
+```text
+v0.8.1 -> model_summary.json
+v0.8.2 -> entity_index.json
+v0.9.0 -> relationship_manifest.json
+```
+
+The current Core-owned structured surface chain is:
+
+```text
+model_summary.json      -> What contract domains are present?
+entity_index.json       -> What contract entities are defined?
+relationship_manifest.json -> How are indexed contract entities related?
+```
 
 OrbitFabric does not generate a ground segment, mission control system, telemetry archive, command uplink service, operator console, decoder runtime, database, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
@@ -65,7 +83,8 @@ The current repository includes:
 - the `v0.7.0 - Generated Runtime Skeletons` vertical slice;
 - the `v0.8.0 - Ground Integration Artifacts` vertical slice;
 - the `v0.8.1 - Contract Introspection Surface` vertical slice;
-- the `v0.8.2 - Entity Index Surface` vertical slice.
+- the `v0.8.2 - Entity Index Surface` vertical slice;
+- the v0.9.0 relationship manifest development slice.
 
 The current vertical slice is functional:
 
@@ -90,7 +109,13 @@ The current vertical slice is functional:
 - Core-owned `model_summary.json` contract introspection report;
 - `orbitfabric export entity-index` generation;
 - Core-owned `entity_index.json` entity index report;
+- `orbitfabric export relationship-manifest` generation;
+- Core-owned `relationship_manifest.json` candidate relationship report;
 - synthetic demo mission: `demo-3u`.
+
+The relationship manifest currently exposes a candidate read-only surface with 19 explicitly admitted relationship families and 46 relationship records for `examples/demo-3u/mission`.
+
+It is not a graph engine, dependency graph, plugin API, Studio API, runtime behavior layer or ground behavior layer.
 
 The repository also includes a growing set of example mission slices:
 
@@ -126,6 +151,9 @@ orbitfabric export model-summary examples/demo-3u/mission/ --json generated/repo
 
 orbitfabric export entity-index examples/demo-3u/mission/ --json generated/reports/entity_index.json
 -> passing
+
+orbitfabric export relationship-manifest examples/demo-3u/mission/ --json generated/reports/relationship_manifest.json
+-> passing
 ```
 
 ---
@@ -152,7 +180,8 @@ It models:
 - generated runtime-facing contract bindings;
 - generated ground-facing integration artifacts;
 - Core-owned contract introspection surfaces;
-- Core-owned entity index surfaces.
+- Core-owned entity index surfaces;
+- Core-owned relationship manifest surfaces.
 
 The data-flow evidence chain connects:
 
@@ -170,9 +199,10 @@ command expected effect
         -> ground-facing artifacts
         -> model summary surface
         -> entity index surface
+        -> relationship manifest surface
 ```
 
-The v0.8.2 introspection and indexing chain is:
+The structured surface chain is:
 
 ```text
 Mission Model
@@ -180,10 +210,11 @@ Mission Model
         -> validated MissionModel
         -> model_summary.json
         -> entity_index.json
+        -> relationship_manifest.json
         -> downstream tools consume Core-owned structured surfaces
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts, Contract Introspection Surfaces and Entity Index Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces and Relationship Manifest Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
 
 ---
 
@@ -217,6 +248,8 @@ OrbitFabric is not:
 - an onboard scheduler;
 - a HAL or RTOS abstraction;
 - a relationship graph;
+- a dependency graph;
+- a plugin execution layer;
 - a plugin API;
 - a Studio-specific backend API.
 
@@ -228,7 +261,9 @@ Contract Introspection Surface in v0.8.1 is a Core-derived read-only model summa
 
 Entity Index Surface in v0.8.2 is a Core-derived read-only entity index.
 
-None of them is flight software, ground software or a visual modeling tool.
+Relationship Manifest Surface in v0.9.0 is a Core-derived read-only candidate relationship manifest.
+
+None of them is flight software, ground software, plugin execution or a visual modeling tool.
 
 ---
 
@@ -273,6 +308,7 @@ Payload Contract
         -> Ground-Facing Integration Artifacts
         -> Contract Introspection Surface
         -> Entity Index Surface
+        -> Relationship Manifest Surface
 ```
 
 ---
@@ -295,7 +331,7 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected:
+Expected until the v0.9.0 release preparation PR:
 
 ```text
 orbitfabric 0.8.2
@@ -334,11 +370,19 @@ orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
 ```
 
+Generate the relationship-level manifest report:
+
+```bash
+orbitfabric export relationship-manifest examples/demo-3u/mission/ \
+  --json generated/reports/relationship_manifest.json
+```
+
 Generated files:
 
 ```text
 generated/reports/model_summary.json
 generated/reports/entity_index.json
+generated/reports/relationship_manifest.json
 ```
 
 `model_summary.json` answers:
@@ -353,7 +397,13 @@ What contract domains are present in this mission?
 What contract entities are defined in this mission?
 ```
 
-Neither surface is a relationship graph, plugin API or Studio-specific API.
+`relationship_manifest.json` answers:
+
+```text
+How are indexed mission contract entities related?
+```
+
+These surfaces are read-only Core-owned reports. They are not graph engines, plugin APIs or Studio-specific APIs.
 
 ---
 
@@ -455,7 +505,8 @@ generated/
 ├── docs/
 ├── reports/
 │   ├── model_summary.json
-│   └── entity_index.json
+│   ├── entity_index.json
+│   └── relationship_manifest.json
 ├── logs/
 ├── runtime/
 │   └── cpp17/
@@ -495,6 +546,7 @@ Useful entry points:
 - `docs/reference/ground-integration-artifacts.md`
 - `docs/reference/contract-introspection-surface.md`
 - `docs/reference/entity-index-surface.md`
+- `docs/reference/relationship-manifest-surface.md`
 - `docs/releases/v0.8.2.md`
 - `docs/adr/`
 
@@ -517,72 +569,3 @@ mkdocs serve
 OrbitFabric is developed as a clean-room open-source project.
 
 Do not add proprietary mission data, private architectures, private protocols, real operational logs, non-public payload details, real bus maps, real pinouts, employer/customer-owned code or NDA-protected material.
-
-All examples must be synthetic or based on public information.
-
-See:
-
-```text
-docs/CLEAN_ROOM_POLICY.md
-```
-
----
-
-## Contributing
-
-Contributions should stay aligned with the Mission Data Contract architecture.
-
-Before contributing, read:
-
-```text
-CONTRIBUTING.md
-```
-
-Required local checks:
-
-```bash
-ruff check .
-pytest
-mkdocs build --strict
-```
-
-Also verify the demo vertical slice:
-
-```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
-
-orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json generated/reports/model_summary.json
-
-orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json generated/reports/entity_index.json
-
-orbitfabric gen docs examples/demo-3u/mission/
-
-orbitfabric gen data-flow examples/demo-3u/mission/ \
-  --output-file generated/docs/data_flow.md
-
-orbitfabric gen runtime examples/demo-3u/mission/
-
-cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
-cmake --build generated/runtime/cpp17/build
-
-orbitfabric gen ground examples/demo-3u/mission/
-
-orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
-  --json generated/reports/payload_data_flow_evidence_report.json \
-  --log generated/logs/payload_data_flow_evidence.log
-```
-
----
-
-## License
-
-OrbitFabric is licensed under the Apache License 2.0.
-
-See:
-
-```text
-LICENSE
-```
