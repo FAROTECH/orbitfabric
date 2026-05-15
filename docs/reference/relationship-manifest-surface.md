@@ -66,11 +66,12 @@ The relationship manifest contains Core-owned edge records derived from explicit
 
 ## Admitted relationship families
 
-At the current baseline, the surface admits fifteen deliberately narrow relationship families:
+At the current baseline, the surface admits sixteen deliberately narrow relationship families:
 
 ```text
 command_emits_event
 command_targets_subsystem
+commandability_rule_constrains_command
 data_product_produced_by_payload
 data_product_produced_by_subsystem
 downlink_flow_includes_data_product
@@ -101,6 +102,7 @@ Currently admitted derivation sources are:
 ```text
 commands[].emits
 commands[].target
+commandability.rules[].command
 data_products[].producer
 downlink_flows[].eligible_data_products
 events[].source
@@ -155,18 +157,19 @@ It does not expose plugin behavior.
 
 ## Demo mission shape
 
-For `examples/demo-3u/mission`, the current manifest contains 41 relationship records.
+For `examples/demo-3u/mission`, the current manifest contains 42 relationship records.
 
-The demo mission currently emits fourteen relationship families because its only data product is produced by a payload, not by a subsystem.
+The demo mission currently emits fifteen relationship families because its only data product is produced by a payload, not by a subsystem.
 
 The demo count is:
 
 ```json
 {
-  "total_relationships": 41,
+  "total_relationships": 42,
   "relationship_types": {
     "command_emits_event": 4,
     "command_targets_subsystem": 4,
+    "commandability_rule_constrains_command": 1,
     "data_product_produced_by_payload": 1,
     "downlink_flow_includes_data_product": 1,
     "event_sourced_from_subsystem": 8,
@@ -186,6 +189,8 @@ The demo count is:
 The admitted `data_product_produced_by_subsystem` family is exercised by richer examples such as `examples/spacelab-inspired-communications-minislice/mission`, where seven data products are produced by indexed subsystems.
 
 The admitted `payload_may_raise_fault` family is exercised by the demo mission through `payloads[].faults.possible` for `demo_iod_payload`.
+
+The admitted `commandability_rule_constrains_command` family is exercised by the demo mission through `commandability.rules[].command` for `payload_start_ground_rule`.
 
 ---
 
@@ -292,6 +297,51 @@ to: subsystems.<id>
 It is emitted only when `commands[].target` resolves to an indexed subsystem.
 
 It is not derived from command ID prefixes, subsystem naming conventions or payload contract references.
+
+### commandability_rule_constrains_command
+
+This relationship states that a commandability rule constrains an indexed command.
+
+It is derived from:
+
+```text
+commandability.rules[].command
+```
+
+Endpoints:
+
+```text
+from: commandability_rules.<id>
+to: commands.<id>
+```
+
+It is emitted only when `commandability.rules[].command` resolves to an indexed command.
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "commandability_rules:payload_start_ground_rule->commandability_rule_constrains_command:commands:payload.start_acquisition",
+  "relationship_type": "commandability_rule_constrains_command",
+  "from": {
+    "domain": "commandability_rules",
+    "id": "payload_start_ground_rule"
+  },
+  "to": {
+    "domain": "commands",
+    "id": "payload.start_acquisition"
+  },
+  "derived_from": {
+    "model_field": "commandability.rules[].command"
+  }
+}
+```
+
+This is a direct commandability contract reference.
+
+It is not derived from command ID prefixes, rule ID prefixes, allowed modes, expected events, expected effects, source IDs or command targets.
+
+It does not implement runtime commandability evaluation, command authorization, security policy evaluation, dispatch behavior, scheduler behavior, ground behavior, Studio API behavior or plugin API behavior.
 
 ### data_product_produced_by_payload
 
@@ -701,7 +751,6 @@ A future implementation may consider additional explicit relationship families.
 Candidate families include:
 
 ```text
-commandability rule constrains command
 autonomous action dispatches command
 recovery intent reacts to fault or event
 ```
@@ -710,7 +759,7 @@ These are candidates only.
 
 No relationship family is accepted until documented in an implementation PR.
 
-`data_product_produced_by_subsystem` and `payload_may_raise_fault` are no longer listed as future candidates because they are now admitted relationship families.
+`data_product_produced_by_subsystem`, `payload_may_raise_fault` and `commandability_rule_constrains_command` are no longer listed as future candidates because they are now admitted relationship families.
 
 ---
 
@@ -733,7 +782,7 @@ runtime behavior
 ground behavior
 ```
 
-It also does not introduce storage relationships, downlink policy relationships, subsystem behavior, packet-generation behavior, runtime routing behavior, ground routing behavior, fault monitoring behavior or recovery execution behavior.
+It also does not introduce storage relationships, downlink policy relationships, subsystem behavior, packet-generation behavior, runtime routing behavior, ground routing behavior, fault monitoring behavior, commandability evaluation behavior, authorization behavior, security policy behavior or recovery execution behavior.
 
 ---
 
@@ -760,6 +809,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently admits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `data_product_produced_by_subsystem`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_may_raise_fault`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
+It currently admits `command_emits_event`, `command_targets_subsystem`, `commandability_rule_constrains_command`, `data_product_produced_by_payload`, `data_product_produced_by_subsystem`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_may_raise_fault`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
