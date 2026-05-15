@@ -9,6 +9,7 @@ from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import (
     Command,
     DataProductContract,
+    Event,
     Fault,
     MissionModel,
     Packet,
@@ -19,6 +20,7 @@ from orbitfabric.model.mission import (
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_DATA_PRODUCT_PRODUCED_BY_PAYLOAD = "data_product_produced_by_payload"
+REL_EVENT_SOURCED_FROM_SUBSYSTEM = "event_sourced_from_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
@@ -131,6 +133,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
             data_product,
             model.payload_ids,
         )
+    )
+    records.extend(
+        record
+        for event in sorted(model.events, key=lambda item: item.id)
+        for record in _event_subsystem_relationship_records(event, model.subsystem_ids)
     )
     records.extend(
         record
@@ -252,6 +259,35 @@ def _data_product_payload_relationship_records(
             },
             "derived_from": {
                 "model_field": "data_products[].producer",
+            },
+        }
+    ]
+
+
+def _event_subsystem_relationship_records(
+    event: Event,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if event.source not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"events:{event.id}->{REL_EVENT_SOURCED_FROM_SUBSYSTEM}:"
+                f"subsystems:{event.source}"
+            ),
+            "relationship_type": REL_EVENT_SOURCED_FROM_SUBSYSTEM,
+            "from": {
+                "domain": "events",
+                "id": event.id,
+            },
+            "to": {
+                "domain": "subsystems",
+                "id": event.source,
+            },
+            "derived_from": {
+                "model_field": "events[].source",
             },
         }
     ]
@@ -473,6 +509,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "payloads",
             "derived_from": {
                 "model_field": "data_products[].producer",
+            },
+        },
+        REL_EVENT_SOURCED_FROM_SUBSYSTEM: {
+            "relationship_type": REL_EVENT_SOURCED_FROM_SUBSYSTEM,
+            "display_name": "Event sourced from subsystem",
+            "from_domain": "events",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "events[].source",
             },
         },
         REL_FAULT_EMITS_EVENT: {
