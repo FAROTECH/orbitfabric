@@ -8,15 +8,13 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 
 ## Current development preview
 
-OrbitFabric is currently preparing:
+OrbitFabric is currently at:
 
 ```text
 v0.9.0 - Relationship Manifest Surface and Extensibility Boundary
 ```
 
-The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
-
-The current v0.9.0 development baseline adds the first **Core-owned read-only relationship manifest surface** derived from explicit loaded Mission Model fields.
+v0.9.0 adds the first **Core-owned read-only relationship manifest surface** derived from explicit loaded Mission Model fields.
 
 It builds on:
 
