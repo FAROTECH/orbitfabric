@@ -10,6 +10,7 @@ from orbitfabric.model.mission import MissionModel, Packet, PayloadContract
 
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
+REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
 
 
@@ -114,6 +115,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
         for payload in sorted(model.payloads, key=lambda item: item.id)
         for record in _payload_command_relationship_records(payload)
     )
+    records.extend(
+        record
+        for payload in sorted(model.payloads, key=lambda item: item.id)
+        for record in _payload_event_relationship_records(payload)
+    )
     return sorted(records, key=lambda item: item["relationship_id"])
 
 
@@ -193,6 +199,32 @@ def _payload_command_relationship_records(
     ]
 
 
+def _payload_event_relationship_records(
+    payload: PayloadContract,
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": (
+                f"payloads:{payload.id}->{REL_PAYLOAD_GENERATES_EVENT}:"
+                f"events:{event_id}"
+            ),
+            "relationship_type": REL_PAYLOAD_GENERATES_EVENT,
+            "from": {
+                "domain": "payloads",
+                "id": payload.id,
+            },
+            "to": {
+                "domain": "events",
+                "id": event_id,
+            },
+            "derived_from": {
+                "model_field": "payloads[].events.generated",
+            },
+        }
+        for event_id in sorted(payload.events.generated)
+    ]
+
+
 def _relationship_type_counts(relationships: list[dict[str, Any]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for relationship in relationships:
@@ -219,6 +251,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "commands",
             "derived_from": {
                 "model_field": "payloads[].commands.accepted",
+            },
+        },
+        REL_PAYLOAD_GENERATES_EVENT: {
+            "relationship_type": REL_PAYLOAD_GENERATES_EVENT,
+            "display_name": "Payload generates event",
+            "from_domain": "payloads",
+            "to_domain": "events",
+            "derived_from": {
+                "model_field": "payloads[].events.generated",
             },
         },
         REL_PAYLOAD_PRODUCES_TELEMETRY: {
