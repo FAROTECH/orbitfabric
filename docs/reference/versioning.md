@@ -10,7 +10,8 @@ OrbitFabric currently distinguishes between:
 - the generated runtime contract manifest context;
 - the generated ground contract manifest context;
 - the generated contract introspection report context;
-- the generated entity index report context.
+- the generated entity index report context;
+- the generated relationship manifest report context.
 
 These versions are related, but they are not the same thing.
 
@@ -36,7 +37,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.8.2
+orbitfabric 0.9.0
 ```
 
 This version answers the question:
@@ -89,7 +90,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -221,6 +222,38 @@ It is not a relationship manifest, dependency graph, plugin API or Studio-specif
 
 ---
 
+## Relationship manifest report context
+
+v0.9.0 introduced the first Core-owned Relationship Manifest Surface.
+
+The generated relationship manifest report is written to:
+
+```text
+generated/reports/relationship_manifest.json
+```
+
+It records relationship-level contract records derived from explicit loaded Mission Model fields.
+
+It includes:
+
+```text
+manifest_version
+kind = orbitfabric.relationship_manifest
+OrbitFabric tool version
+mission identity
+source mission directory
+boundary flags
+relationship type records
+relationship type counts
+relationship records
+```
+
+The relationship manifest report is generated from the current OrbitFabric tool and the declared Mission Model.
+
+It is not a relationship graph, dependency graph, plugin API, Studio-specific API, runtime routing table or ground routing table.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -228,7 +261,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.8.2
+OrbitFabric tool/package version: 0.9.0
 Mission Model version:           0.1.0
 ```
 
@@ -236,13 +269,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces and Entity Index Surfaces;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces and Relationship Manifest Surfaces;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.8.2 rule
+## Current v0.9.0 rule
 
 For the current development preview:
 
@@ -261,6 +294,8 @@ For the current development preview:
 | Model summary `kind` | Contract introspection report kind, currently `orbitfabric.model_summary`. |
 | Entity index `index_version` | Entity index report format version, currently `0.1`. |
 | Entity index `kind` | Entity index report kind, currently `orbitfabric.entity_index`. |
+| Relationship manifest `manifest_version` | Relationship manifest report format version, currently `0.1-candidate`. |
+| Relationship manifest `kind` | Relationship manifest report kind, currently `orbitfabric.relationship_manifest`. |
 
 ---
 
@@ -275,7 +310,8 @@ Do not assume that:
 - generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees;
 - generated ground-facing artifacts imply ground runtime behavior or tool-specific compatibility;
 - model summary reports imply entity-level indexing, relationship graphs or plugin APIs;
-- entity index reports imply relationship graphs, dependency graphs or plugin APIs.
+- entity index reports imply relationship graphs, dependency graphs or plugin APIs;
+- relationship manifest reports imply graph engines, runtime behavior, ground behavior, plugin APIs or Studio-specific APIs.
 
 ---
 
@@ -289,9 +325,10 @@ Possible future additions include:
 - a dedicated RuntimeContract schema version;
 - a dedicated GroundContract schema version;
 - a dedicated Entity Index schema version;
+- a dedicated Relationship Manifest schema version;
 - schema migration helpers;
 - compatibility checks between tool version and Mission Model version;
 - JSON Schema export for Mission Model validation;
 - compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.8.2 development preview.
+These are not part of the current v0.9.0 development preview.
