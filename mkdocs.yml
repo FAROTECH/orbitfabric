@@ -33,6 +33,7 @@ nav:
       - Ground Integration Artifacts: reference/ground-integration-artifacts.md
       - Contract Introspection Surface: reference/contract-introspection-surface.md
       - Entity Index Surface: reference/entity-index-surface.md
+      - Relationship Manifest Surface: reference/relationship-manifest-surface.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
