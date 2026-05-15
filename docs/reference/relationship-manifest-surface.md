@@ -66,7 +66,7 @@ The relationship manifest contains Core-owned edge records derived from explicit
 
 ## Admitted relationship families
 
-At the current baseline, the surface admits seventeen deliberately narrow relationship families:
+At the current baseline, the surface admits nineteen deliberately narrow relationship families:
 
 ```text
 autonomous_action_dispatches_command
@@ -85,6 +85,8 @@ payload_belongs_to_subsystem
 payload_generates_event
 payload_may_raise_fault
 payload_produces_telemetry
+recovery_intent_reacts_to_event
+recovery_intent_reacts_to_fault
 telemetry_sourced_from_subsystem
 ```
 
@@ -104,6 +106,8 @@ Currently admitted derivation sources are:
 commands[].emits
 commands[].target
 commandability.autonomous_actions[].dispatches.command
+commandability.recovery_intents[].event
+commandability.recovery_intents[].fault
 commandability.rules[].command
 data_products[].producer
 downlink_flows[].eligible_data_products
@@ -159,15 +163,15 @@ It does not expose plugin behavior.
 
 ## Demo mission shape
 
-For `examples/demo-3u/mission`, the current manifest contains 44 relationship records.
+For `examples/demo-3u/mission`, the current manifest contains 46 relationship records.
 
-The demo mission currently emits sixteen relationship families because its only data product is produced by a payload, not by a subsystem.
+The demo mission currently emits seventeen relationship families because its only data product is produced by a payload, not by a subsystem, and its recovery intents are fault-based rather than event-based.
 
 The demo count is:
 
 ```json
 {
-  "total_relationships": 44,
+  "total_relationships": 46,
   "relationship_types": {
     "autonomous_action_dispatches_command": 2,
     "command_emits_event": 4,
@@ -184,6 +188,7 @@ The demo count is:
     "payload_generates_event": 2,
     "payload_may_raise_fault": 1,
     "payload_produces_telemetry": 1,
+    "recovery_intent_reacts_to_fault": 2,
     "telemetry_sourced_from_subsystem": 5
   }
 }
@@ -196,6 +201,10 @@ The admitted `payload_may_raise_fault` family is exercised by the demo mission t
 The admitted `commandability_rule_constrains_command` family is exercised by the demo mission through `commandability.rules[].command` for `payload_start_ground_rule`.
 
 The admitted `autonomous_action_dispatches_command` family is exercised by the demo mission through `commandability.autonomous_actions[].dispatches.command` for `stop_payload_on_battery_low` and `stop_payload_on_battery_critical`.
+
+The admitted `recovery_intent_reacts_to_fault` family is exercised by the demo mission through `commandability.recovery_intents[].fault` for `payload_battery_low_recovery` and `payload_battery_critical_recovery`.
+
+The admitted `recovery_intent_reacts_to_event` family is not emitted by the demo mission because the demo recovery intents are fault-based.
 
 ---
 
@@ -691,6 +700,76 @@ This is a direct payload contract reference.
 
 It is not derived from telemetry ID prefixes or payload naming conventions.
 
+### recovery_intent_reacts_to_event
+
+This relationship states that a recovery intent reacts to an indexed event.
+
+It is derived from:
+
+```text
+commandability.recovery_intents[].event
+```
+
+Endpoints:
+
+```text
+from: recovery_intents.<id>
+to: events.<id>
+```
+
+It is emitted only when `commandability.recovery_intents[].event` resolves to an indexed event.
+
+This is a direct recovery intent contract reference.
+
+It is not derived from recovery intent ID prefixes, event ID prefixes, expected events, expected effects, target modes, command lists or autonomous actions.
+
+It does not execute recovery behavior, dispatch commands, transition modes, evaluate recovery policies, evaluate security policy behavior, schedule runtime behavior, expose ground behavior, expose Studio API behavior or expose plugin API behavior.
+
+### recovery_intent_reacts_to_fault
+
+This relationship states that a recovery intent reacts to an indexed fault.
+
+It is derived from:
+
+```text
+commandability.recovery_intents[].fault
+```
+
+Endpoints:
+
+```text
+from: recovery_intents.<id>
+to: faults.<id>
+```
+
+It is emitted only when `commandability.recovery_intents[].fault` resolves to an indexed fault.
+
+Conceptual record shape:
+
+```json
+{
+  "relationship_id": "recovery_intents:payload_battery_low_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_low_fault",
+  "relationship_type": "recovery_intent_reacts_to_fault",
+  "from": {
+    "domain": "recovery_intents",
+    "id": "payload_battery_low_recovery"
+  },
+  "to": {
+    "domain": "faults",
+    "id": "eps.battery_low_fault"
+  },
+  "derived_from": {
+    "model_field": "commandability.recovery_intents[].fault"
+  }
+}
+```
+
+This is a direct recovery intent contract reference.
+
+It is not derived from recovery intent ID prefixes, fault ID prefixes, expected events, expected effects, target modes, command lists or autonomous actions.
+
+It does not execute recovery behavior, dispatch commands, transition modes, evaluate recovery policies, evaluate security policy behavior, schedule runtime behavior, expose ground behavior, expose Studio API behavior or expose plugin API behavior.
+
 ### telemetry_sourced_from_subsystem
 
 This relationship states that a telemetry item is sourced from an indexed subsystem.
@@ -796,19 +875,13 @@ Studio must not invent missing relationship types or graph edges.
 
 ## Candidate future relationship families
 
-A future implementation may consider additional explicit relationship families.
+No additional relationship families are currently listed as near-term candidates for this candidate surface.
 
-Candidate families include:
-
-```text
-recovery intent reacts to fault or event
-```
-
-These are candidates only.
+Additional families may be considered only when they can be derived from explicit loaded Mission Model fields without weakening the current boundary.
 
 No relationship family is accepted until documented in an implementation PR.
 
-`data_product_produced_by_subsystem`, `payload_may_raise_fault`, `commandability_rule_constrains_command` and `autonomous_action_dispatches_command` are no longer listed as future candidates because they are now admitted relationship families.
+`data_product_produced_by_subsystem`, `payload_may_raise_fault`, `commandability_rule_constrains_command`, `autonomous_action_dispatches_command`, `recovery_intent_reacts_to_fault` and `recovery_intent_reacts_to_event` are no longer listed as future candidates because they are now admitted relationship families.
 
 ---
 
@@ -831,7 +904,7 @@ runtime behavior
 ground behavior
 ```
 
-It also does not introduce storage relationships, downlink policy relationships, subsystem behavior, packet-generation behavior, runtime routing behavior, ground routing behavior, fault monitoring behavior, autonomous action execution behavior, trigger evaluation behavior, dispatch behavior, commandability evaluation behavior, authorization behavior, security policy behavior or recovery execution behavior.
+It also does not introduce storage relationships, downlink policy relationships, subsystem behavior, packet-generation behavior, runtime routing behavior, ground routing behavior, fault monitoring behavior, autonomous action execution behavior, trigger evaluation behavior, dispatch behavior, commandability evaluation behavior, authorization behavior, security policy behavior, recovery policy evaluation behavior, mode transition behavior or recovery execution behavior.
 
 ---
 
@@ -858,6 +931,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently admits `autonomous_action_dispatches_command`, `command_emits_event`, `command_targets_subsystem`, `commandability_rule_constrains_command`, `data_product_produced_by_payload`, `data_product_produced_by_subsystem`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_may_raise_fault`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
+It currently admits `autonomous_action_dispatches_command`, `command_emits_event`, `command_targets_subsystem`, `commandability_rule_constrains_command`, `data_product_produced_by_payload`, `data_product_produced_by_subsystem`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_may_raise_fault`, `payload_produces_telemetry`, `recovery_intent_reacts_to_event`, `recovery_intent_reacts_to_fault` and `telemetry_sourced_from_subsystem` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
