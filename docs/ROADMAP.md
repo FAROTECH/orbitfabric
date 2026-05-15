@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.9.0 development baseline  
+Version: v0.9.0  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -65,11 +65,11 @@ v0.7.0  Generated Runtime Skeletons                           completed
 v0.8.0  Ground Integration Artifacts                          completed
 v0.8.1  Contract Introspection Surface                        completed
 v0.8.2  Entity Index Surface                                  completed
-v0.9.0  Relationship Manifest Surface and Extensibility Boundary in progress
+v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
 v1.0    Stable Mission Data Contract                          future
 ```
 
-The immediate target after v0.8.2 is now `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
+The current completed milestone is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
 This is the first v0.9 slice. It keeps the original `Plugin and Extensibility Layer` roadmap direction, but starts with the Core-owned relationship surface required before downstream tools or future plugins can safely reason about relationships.
 
@@ -234,7 +234,7 @@ v0.8.2 intentionally did not introduce new Mission Model semantics, relationship
 
 ---
 
-## 9. Active Slice - v0.9.0 Relationship Manifest Surface and Extensibility Boundary
+## 9. Completed Slice - v0.9.0 Relationship Manifest Surface and Extensibility Boundary
 
 v0.9.0 introduces the first Core-owned read-only relationship manifest surface.
 
@@ -254,7 +254,7 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
-v0.9.0 currently includes:
+v0.9.0 includes:
 
 ```text
 relationship_manifest_to_dict(model, mission_dir)
@@ -270,6 +270,7 @@ explicit derivation policy
 explicit boundary flags
 Relationship Manifest Surface reference documentation
 ADR-0014 v0.9 plugin and relationship surface boundaries
+v0.9.0 release notes
 ```
 
 Command:
@@ -305,7 +306,7 @@ telemetry_sourced_from_subsystem
 
 For `examples/demo-3u/mission`, the current manifest emits 46 relationship records across 17 relationship families.
 
-v0.9.0 relationship manifest work intentionally does not introduce:
+v0.9.0 intentionally does not introduce:
 
 ```text
 relationship inference
@@ -327,9 +328,9 @@ The relationship manifest is a candidate Core-owned surface. It is deterministic
 
 ---
 
-## 10. Deferred v0.9 Plugin and Extensibility Work
+## 10. Deferred Plugin and Extensibility Work
 
-The wider v0.9 roadmap direction remains controlled plugin and extensibility support.
+The wider roadmap direction remains controlled plugin and extensibility support.
 
 Candidate future features include:
 
@@ -470,20 +471,20 @@ When deciding what to implement next, use these rules.
 
 ## 14. Immediate Work Plan
 
-The immediate work package is:
+The immediate work package after v0.9.0 is:
 
 ```text
-v0.9.0 - Relationship Manifest Surface and Extensibility Boundary
+post-v0.9.0 plugin and extensibility boundary planning
 ```
 
-Required completion sequence:
+Required next-step discipline:
 
 ```text
 1. keep relationship_manifest.json candidate and explicitly bounded
-2. align README, roadmap, architecture and project documentation
-3. add v0.9.0 release notes
-4. prepare the v0.9.0 release without adding plugin execution
-5. defer plugin loader, discovery and execution to later reviewed work
+2. avoid plugin execution until trust and metadata boundaries are defined
+3. avoid plugin loader, discovery and execution without reviewed design
+4. keep downstream tools consuming Core-owned structured surfaces
+5. prevent downstream tools from becoming a second source of truth
 ```
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
@@ -508,7 +509,7 @@ The v0.8.1 roadmap step completed the first Core-owned contract introspection su
 
 The v0.8.2 roadmap step completed the first Core-owned entity index surface for downstream tools.
 
-The v0.9.0 roadmap step introduces the first Core-owned relationship manifest surface and preserves the plugin/extensibility boundary before plugin execution.
+The v0.9.0 roadmap step completed the first Core-owned relationship manifest surface and preserved the plugin/extensibility boundary before plugin execution.
 
 Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection, entity indexing and relationship semantics are clear should OrbitFabric grow into plugin execution.
 
