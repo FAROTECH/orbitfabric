@@ -47,10 +47,10 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current package version until the final v0.9.0 release preparation PR:
+Expected current package version:
 
 ```text
-orbitfabric 0.8.2
+orbitfabric 0.9.0
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.9.0 Development Slice
+## Verify the Current v0.9.0 Slice
 
 Run mission lint:
 
