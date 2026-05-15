@@ -18,49 +18,15 @@ It is intended to answer:
 How are indexed mission contract entities related?
 ```
 
-At the current baseline, this surface emits thirteen deliberately narrow relationship families:
+The Mission Model remains the source of truth.
 
-```text
-command_emits_event
-command_targets_subsystem
-data_product_produced_by_payload
-downlink_flow_includes_data_product
-event_sourced_from_subsystem
-fault_emits_event
-fault_sourced_from_subsystem
-packet_includes_telemetry
-payload_accepts_command
-payload_belongs_to_subsystem
-payload_generates_event
-payload_produces_telemetry
-telemetry_sourced_from_subsystem
-```
-
-These relationships are derived only from explicit loaded Mission Model fields:
-
-```text
-commands[].emits
-commands[].target
-data_products[].producer
-downlink_flows[].eligible_data_products
-events[].source
-faults[].emits
-faults[].source
-packets[].telemetry
-payloads[].commands.accepted
-payloads[].subsystem
-payloads[].events.generated
-payloads[].telemetry.produced
-telemetry[].source
-```
-
-No other relationship type is admitted yet.
+The relationship manifest is a derived, read-only inspection artifact.
 
 ---
 
 ## Current status
 
-OrbitFabric Core exposes:
+OrbitFabric Core currently exposes these machine-readable inspection surfaces:
 
 ```text
 model_summary.json
@@ -84,13 +50,75 @@ It answers:
 What contract entities are defined in this mission?
 ```
 
-`relationship_manifest.json` is currently a candidate relationship surface.
+`relationship_manifest.json` is relationship-level.
 
-It emits command-to-event emission records, command-to-subsystem target records, data-product-to-payload producer records, downlink-flow-to-data-product eligibility records, event-to-subsystem source records, fault-to-event emission records, fault-to-subsystem source records, packet-to-telemetry inclusion records, payload-to-command acceptance records, payload-to-subsystem membership records, payload-to-event generation records, payload-to-telemetry production records and telemetry-to-subsystem source records.
+It answers:
+
+```text
+How are indexed mission contract entities related?
+```
 
 `entity_index.json` contains nodes, not edges.
 
 The relationship manifest contains Core-owned edge records derived from explicit Mission Model references.
+
+---
+
+## Admitted relationship families
+
+At the current baseline, the surface admits fourteen deliberately narrow relationship families:
+
+```text
+command_emits_event
+command_targets_subsystem
+data_product_produced_by_payload
+data_product_produced_by_subsystem
+downlink_flow_includes_data_product
+event_sourced_from_subsystem
+fault_emits_event
+fault_sourced_from_subsystem
+packet_includes_telemetry
+payload_accepts_command
+payload_belongs_to_subsystem
+payload_generates_event
+payload_produces_telemetry
+telemetry_sourced_from_subsystem
+```
+
+These relationship families are admitted only because they can be derived from explicit loaded Mission Model fields.
+
+No relationship family is admitted from naming conventions, ID prefixes, generated documentation, CLI text, downstream UI state or private downstream assumptions.
+
+---
+
+## Currently admitted derivation sources
+
+Every relationship record must be derived from an explicit field already present in the loaded Mission Model.
+
+Currently admitted derivation sources are:
+
+```text
+commands[].emits
+commands[].target
+data_products[].producer
+downlink_flows[].eligible_data_products
+events[].source
+faults[].emits
+faults[].source
+packets[].telemetry
+payloads[].commands.accepted
+payloads[].subsystem
+payloads[].events.generated
+payloads[].telemetry.produced
+telemetry[].source
+```
+
+`data_products[].producer` currently admits two distinct relationship families, depending on the explicit `producer_type` value:
+
+```text
+producer_type == payload    -> data_product_produced_by_payload
+producer_type == subsystem -> data_product_produced_by_subsystem
+```
 
 ---
 
@@ -123,193 +151,36 @@ It does not expose plugin behavior.
 
 ---
 
-## Surface classification
+## Demo mission shape
 
-The Relationship Manifest Surface candidate is:
+For `examples/demo-3u/mission`, the current manifest contains 38 relationship records.
 
-```text
-Core-derived
-read-only
-machine-readable
-deterministic
-versioned as 0.1-candidate
-explicitly bounded
-safe for downstream inspection
-not the source of truth
-```
+The demo mission currently emits thirteen relationship families because its only data product is produced by a payload, not by a subsystem.
 
-The Mission Model remains the source of truth.
-
-The relationship manifest is a derived inspection artifact.
-
----
-
-## Current shape
-
-The current candidate manifest contains:
+The demo count remains:
 
 ```json
 {
-  "manifest_version": "0.1-candidate",
-  "kind": "orbitfabric.relationship_manifest",
-  "status": "candidate",
-  "counts": {
-    "total_relationships": 38,
-    "relationship_types": {
-      "command_emits_event": 4,
-      "command_targets_subsystem": 4,
-      "data_product_produced_by_payload": 1,
-      "downlink_flow_includes_data_product": 1,
-      "event_sourced_from_subsystem": 8,
-      "fault_emits_event": 2,
-      "fault_sourced_from_subsystem": 2,
-      "packet_includes_telemetry": 5,
-      "payload_accepts_command": 2,
-      "payload_belongs_to_subsystem": 1,
-      "payload_generates_event": 2,
-      "payload_produces_telemetry": 1,
-      "telemetry_sourced_from_subsystem": 5
-    }
-  },
-  "relationship_types": [
-    {
-      "relationship_type": "command_emits_event",
-      "display_name": "Command emits event",
-      "from_domain": "commands",
-      "to_domain": "events",
-      "derived_from": {
-        "model_field": "commands[].emits"
-      },
-      "relationship_count": 4
-    },
-    {
-      "relationship_type": "command_targets_subsystem",
-      "display_name": "Command targets subsystem",
-      "from_domain": "commands",
-      "to_domain": "subsystems",
-      "derived_from": {
-        "model_field": "commands[].target"
-      },
-      "relationship_count": 4
-    },
-    {
-      "relationship_type": "data_product_produced_by_payload",
-      "display_name": "Data product produced by payload",
-      "from_domain": "data_products",
-      "to_domain": "payloads",
-      "derived_from": {
-        "model_field": "data_products[].producer"
-      },
-      "relationship_count": 1
-    },
-    {
-      "relationship_type": "downlink_flow_includes_data_product",
-      "display_name": "Downlink flow includes data product",
-      "from_domain": "downlink_flows",
-      "to_domain": "data_products",
-      "derived_from": {
-        "model_field": "downlink_flows[].eligible_data_products"
-      },
-      "relationship_count": 1
-    },
-    {
-      "relationship_type": "event_sourced_from_subsystem",
-      "display_name": "Event sourced from subsystem",
-      "from_domain": "events",
-      "to_domain": "subsystems",
-      "derived_from": {
-        "model_field": "events[].source"
-      },
-      "relationship_count": 8
-    },
-    {
-      "relationship_type": "fault_emits_event",
-      "display_name": "Fault emits event",
-      "from_domain": "faults",
-      "to_domain": "events",
-      "derived_from": {
-        "model_field": "faults[].emits"
-      },
-      "relationship_count": 2
-    },
-    {
-      "relationship_type": "fault_sourced_from_subsystem",
-      "display_name": "Fault sourced from subsystem",
-      "from_domain": "faults",
-      "to_domain": "subsystems",
-      "derived_from": {
-        "model_field": "faults[].source"
-      },
-      "relationship_count": 2
-    },
-    {
-      "relationship_type": "packet_includes_telemetry",
-      "display_name": "Packet includes telemetry",
-      "from_domain": "packets",
-      "to_domain": "telemetry",
-      "derived_from": {
-        "model_field": "packets[].telemetry"
-      },
-      "relationship_count": 5
-    },
-    {
-      "relationship_type": "payload_accepts_command",
-      "display_name": "Payload accepts command",
-      "from_domain": "payloads",
-      "to_domain": "commands",
-      "derived_from": {
-        "model_field": "payloads[].commands.accepted"
-      },
-      "relationship_count": 2
-    },
-    {
-      "relationship_type": "payload_belongs_to_subsystem",
-      "display_name": "Payload belongs to subsystem",
-      "from_domain": "payloads",
-      "to_domain": "subsystems",
-      "derived_from": {
-        "model_field": "payloads[].subsystem"
-      },
-      "relationship_count": 1
-    },
-    {
-      "relationship_type": "payload_generates_event",
-      "display_name": "Payload generates event",
-      "from_domain": "payloads",
-      "to_domain": "events",
-      "derived_from": {
-        "model_field": "payloads[].events.generated"
-      },
-      "relationship_count": 2
-    },
-    {
-      "relationship_type": "payload_produces_telemetry",
-      "display_name": "Payload produces telemetry",
-      "from_domain": "payloads",
-      "to_domain": "telemetry",
-      "derived_from": {
-        "model_field": "payloads[].telemetry.produced"
-      },
-      "relationship_count": 1
-    },
-    {
-      "relationship_type": "telemetry_sourced_from_subsystem",
-      "display_name": "Telemetry sourced from subsystem",
-      "from_domain": "telemetry",
-      "to_domain": "subsystems",
-      "derived_from": {
-        "model_field": "telemetry[].source"
-      },
-      "relationship_count": 5
-    }
-  ],
-  "relationships": []
+  "total_relationships": 38,
+  "relationship_types": {
+    "command_emits_event": 4,
+    "command_targets_subsystem": 4,
+    "data_product_produced_by_payload": 1,
+    "downlink_flow_includes_data_product": 1,
+    "event_sourced_from_subsystem": 8,
+    "fault_emits_event": 2,
+    "fault_sourced_from_subsystem": 2,
+    "packet_includes_telemetry": 5,
+    "payload_accepts_command": 2,
+    "payload_belongs_to_subsystem": 1,
+    "payload_generates_event": 2,
+    "payload_produces_telemetry": 1,
+    "telemetry_sourced_from_subsystem": 5
+  }
 }
 ```
 
-The example count above reflects the demo mission.
-
-The `relationships` list is populated deterministically from the loaded Mission Model.
+The admitted `data_product_produced_by_subsystem` family is exercised by richer examples such as `examples/spacelab-inspired-communications-minislice/mission`, where seven data products are produced by indexed subsystems.
 
 ---
 
@@ -343,6 +214,36 @@ They do not make the manifest a graph, dependency graph, Studio API or plugin AP
 
 ---
 
+## Relationship record shape
+
+Each relationship record has this conceptual shape:
+
+```json
+{
+  "relationship_id": "<from-domain>:<from-id>-><relationship-type>:<to-domain>:<to-id>",
+  "relationship_type": "<relationship-type>",
+  "from": {
+    "domain": "<from-domain>",
+    "id": "<from-id>"
+  },
+  "to": {
+    "domain": "<to-domain>",
+    "id": "<to-id>"
+  },
+  "derived_from": {
+    "model_field": "<explicit-loaded-model-field>"
+  }
+}
+```
+
+Relationship records must refer to entities already represented by the Entity Index Surface.
+
+They must not create independent synthetic nodes.
+
+If Core cannot resolve an endpoint to an indexed entity, the relationship type must either not be emitted, be emitted only under an explicitly documented unresolved endpoint policy, or remain unsupported.
+
+---
+
 ## Admitted relationship types
 
 ### command_emits_event
@@ -355,31 +256,11 @@ It is derived from:
 commands[].emits
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: commands.<id>
 to: events.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "commands:payload.start_acquisition->command_emits_event:events:payload.acquisition_started",
-  "relationship_type": "command_emits_event",
-  "from": {
-    "domain": "commands",
-    "id": "payload.start_acquisition"
-  },
-  "to": {
-    "domain": "events",
-    "id": "payload.acquisition_started"
-  },
-  "derived_from": {
-    "model_field": "commands[].emits"
-  }
-}
 ```
 
 This is a direct command contract reference.
@@ -396,34 +277,12 @@ It is derived from:
 commands[].target
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: commands.<id>
 to: subsystems.<id>
 ```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "commands:eps.get_status->command_targets_subsystem:subsystems:eps",
-  "relationship_type": "command_targets_subsystem",
-  "from": {
-    "domain": "commands",
-    "id": "eps.get_status"
-  },
-  "to": {
-    "domain": "subsystems",
-    "id": "eps"
-  },
-  "derived_from": {
-    "model_field": "commands[].target"
-  }
-}
-```
-
-This is a direct command contract reference.
 
 It is emitted only when `commands[].target` resolves to an indexed subsystem.
 
@@ -439,26 +298,49 @@ It is derived from:
 data_products[].producer
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: data_products.<id>
 to: payloads.<id>
 ```
 
+It is emitted only when `data_products[].producer_type` is `payload` and `data_products[].producer` resolves to an indexed payload.
+
+It is not derived from data product ID prefixes, payload naming conventions, storage policy or downlink policy.
+
+### data_product_produced_by_subsystem
+
+This relationship states that a data product is produced by an indexed subsystem.
+
+It is derived from:
+
+```text
+data_products[].producer
+```
+
+Endpoints:
+
+```text
+from: data_products.<id>
+to: subsystems.<id>
+```
+
+It is emitted only when `data_products[].producer_type` is `subsystem` and `data_products[].producer` resolves to an indexed subsystem.
+
 Conceptual record shape:
 
 ```json
 {
-  "relationship_id": "data_products:payload.radiation_histogram->data_product_produced_by_payload:payloads:demo_iod_payload",
-  "relationship_type": "data_product_produced_by_payload",
+  "relationship_id": "data_products:critical_housekeeping_packet->data_product_produced_by_subsystem:subsystems:obdh",
+  "relationship_type": "data_product_produced_by_subsystem",
   "from": {
     "domain": "data_products",
-    "id": "payload.radiation_histogram"
+    "id": "critical_housekeeping_packet"
   },
   "to": {
-    "domain": "payloads",
-    "id": "demo_iod_payload"
+    "domain": "subsystems",
+    "id": "obdh"
   },
   "derived_from": {
     "model_field": "data_products[].producer"
@@ -468,9 +350,7 @@ Conceptual record shape:
 
 This is a direct data product contract reference.
 
-It is emitted only when `data_products[].producer_type` is `payload` and `data_products[].producer` resolves to an indexed payload.
-
-It is not derived from data product ID prefixes, payload naming conventions, storage policy or downlink policy.
+It is not derived from data product ID prefixes, subsystem naming conventions, storage policy, downlink policy, packet membership or telemetry sources.
 
 ### downlink_flow_includes_data_product
 
@@ -482,34 +362,12 @@ It is derived from:
 downlink_flows[].eligible_data_products
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: downlink_flows.<id>
 to: data_products.<id>
 ```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "downlink_flows:science_next_available_contact->downlink_flow_includes_data_product:data_products:payload.radiation_histogram",
-  "relationship_type": "downlink_flow_includes_data_product",
-  "from": {
-    "domain": "downlink_flows",
-    "id": "science_next_available_contact"
-  },
-  "to": {
-    "domain": "data_products",
-    "id": "payload.radiation_histogram"
-  },
-  "derived_from": {
-    "model_field": "downlink_flows[].eligible_data_products"
-  }
-}
-```
-
-This is a direct downlink flow contract reference.
 
 It is emitted only when a `downlink_flows[].eligible_data_products` entry resolves to an indexed data product.
 
@@ -525,34 +383,12 @@ It is derived from:
 events[].source
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: events.<id>
 to: subsystems.<id>
 ```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "events:eps.battery_low->event_sourced_from_subsystem:subsystems:eps",
-  "relationship_type": "event_sourced_from_subsystem",
-  "from": {
-    "domain": "events",
-    "id": "eps.battery_low"
-  },
-  "to": {
-    "domain": "subsystems",
-    "id": "eps"
-  },
-  "derived_from": {
-    "model_field": "events[].source"
-  }
-}
-```
-
-This is a direct event contract reference.
 
 It is emitted only when `events[].source` resolves to an indexed subsystem.
 
@@ -568,31 +404,11 @@ It is derived from:
 faults[].emits
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: faults.<id>
 to: events.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "faults:eps.battery_low_fault->fault_emits_event:events:eps.battery_low",
-  "relationship_type": "fault_emits_event",
-  "from": {
-    "domain": "faults",
-    "id": "eps.battery_low_fault"
-  },
-  "to": {
-    "domain": "events",
-    "id": "eps.battery_low"
-  },
-  "derived_from": {
-    "model_field": "faults[].emits"
-  }
-}
 ```
 
 This is a direct fault contract reference.
@@ -609,34 +425,12 @@ It is derived from:
 faults[].source
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: faults.<id>
 to: subsystems.<id>
 ```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "faults:eps.battery_low_fault->fault_sourced_from_subsystem:subsystems:eps",
-  "relationship_type": "fault_sourced_from_subsystem",
-  "from": {
-    "domain": "faults",
-    "id": "eps.battery_low_fault"
-  },
-  "to": {
-    "domain": "subsystems",
-    "id": "eps"
-  },
-  "derived_from": {
-    "model_field": "faults[].source"
-  }
-}
-```
-
-This is a direct fault contract reference.
 
 It is emitted only when `faults[].source` resolves to an indexed subsystem.
 
@@ -652,31 +446,11 @@ It is derived from:
 packets[].telemetry
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: packets.<id>
 to: telemetry.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "packets:hk_fast->packet_includes_telemetry:telemetry:obc.mode",
-  "relationship_type": "packet_includes_telemetry",
-  "from": {
-    "domain": "packets",
-    "id": "hk_fast"
-  },
-  "to": {
-    "domain": "telemetry",
-    "id": "obc.mode"
-  },
-  "derived_from": {
-    "model_field": "packets[].telemetry"
-  }
-}
 ```
 
 This is a direct model reference.
@@ -693,31 +467,11 @@ It is derived from:
 payloads[].commands.accepted
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: payloads.<id>
 to: commands.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "payloads:demo_iod_payload->payload_accepts_command:commands:payload.start_acquisition",
-  "relationship_type": "payload_accepts_command",
-  "from": {
-    "domain": "payloads",
-    "id": "demo_iod_payload"
-  },
-  "to": {
-    "domain": "commands",
-    "id": "payload.start_acquisition"
-  },
-  "derived_from": {
-    "model_field": "payloads[].commands.accepted"
-  }
-}
 ```
 
 This is a direct payload contract reference.
@@ -734,34 +488,12 @@ It is derived from:
 payloads[].subsystem
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: payloads.<id>
 to: subsystems.<id>
 ```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
-  "relationship_type": "payload_belongs_to_subsystem",
-  "from": {
-    "domain": "payloads",
-    "id": "demo_iod_payload"
-  },
-  "to": {
-    "domain": "subsystems",
-    "id": "payload"
-  },
-  "derived_from": {
-    "model_field": "payloads[].subsystem"
-  }
-}
-```
-
-This is a direct payload contract reference.
 
 It is emitted only when `payloads[].subsystem` resolves to an indexed subsystem.
 
@@ -777,31 +509,11 @@ It is derived from:
 payloads[].events.generated
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: payloads.<id>
 to: events.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
-  "relationship_type": "payload_generates_event",
-  "from": {
-    "domain": "payloads",
-    "id": "demo_iod_payload"
-  },
-  "to": {
-    "domain": "events",
-    "id": "payload.acquisition_started"
-  },
-  "derived_from": {
-    "model_field": "payloads[].events.generated"
-  }
-}
 ```
 
 This is a direct payload contract reference.
@@ -818,31 +530,11 @@ It is derived from:
 payloads[].telemetry.produced
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: payloads.<id>
 to: telemetry.<id>
-```
-
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "payloads:demo_iod_payload->payload_produces_telemetry:telemetry:payload.acquisition.active",
-  "relationship_type": "payload_produces_telemetry",
-  "from": {
-    "domain": "payloads",
-    "id": "demo_iod_payload"
-  },
-  "to": {
-    "domain": "telemetry",
-    "id": "payload.acquisition.active"
-  },
-  "derived_from": {
-    "model_field": "payloads[].telemetry.produced"
-  }
-}
 ```
 
 This is a direct payload contract reference.
@@ -859,97 +551,16 @@ It is derived from:
 telemetry[].source
 ```
 
-Relationship endpoints are:
+Endpoints:
 
 ```text
 from: telemetry.<id>
 to: subsystems.<id>
 ```
 
-Conceptual record shape:
-
-```json
-{
-  "relationship_id": "telemetry:eps.battery.voltage->telemetry_sourced_from_subsystem:subsystems:eps",
-  "relationship_type": "telemetry_sourced_from_subsystem",
-  "from": {
-    "domain": "telemetry",
-    "id": "eps.battery.voltage"
-  },
-  "to": {
-    "domain": "subsystems",
-    "id": "eps"
-  },
-  "derived_from": {
-    "model_field": "telemetry[].source"
-  }
-}
-```
-
-This is a direct telemetry contract reference.
-
 It is emitted only when `telemetry[].source` resolves to an indexed subsystem.
 
 It is not derived from telemetry ID prefixes, subsystem naming conventions, packets or payload telemetry declarations.
-
----
-
-## Deterministic derivation rule
-
-Every relationship record must be derived from an explicit field already present in the loaded Mission Model.
-
-Currently admitted derivation sources:
-
-```text
-commands[].emits
-commands[].target
-data_products[].producer
-downlink_flows[].eligible_data_products
-events[].source
-faults[].emits
-faults[].source
-packets[].telemetry
-payloads[].commands.accepted
-payloads[].subsystem
-payloads[].events.generated
-payloads[].telemetry.produced
-telemetry[].source
-```
-
-Candidate future derivation sources may include explicit fields such as:
-
-```text
-command.expected_effects
-fault.recovery.auto_commands
-payload.faults.possible
-data_product.payload
-contact_window.contact_profile
-contact_window.link_profile
-downlink_flow.contact_profile
-downlink_flow.link_profile
-commandability_rule.command
-commandability_rule.sources
-commandability_rule.expected_events
-commandability_rule.expected_effects
-autonomous_action.trigger.event
-autonomous_action.trigger.fault
-autonomous_action.trigger.telemetry
-autonomous_action.trigger.mode
-autonomous_action.dispatches.command
-autonomous_action.dispatches.source
-recovery_intent.fault
-recovery_intent.event
-recovery_intent.target_mode
-recovery_intent.commands
-recovery_intent.expected_events
-recovery_intent.expected_effects
-```
-
-Candidate fields are illustrative only.
-
-Each new relationship type must be admitted one by one.
-
-Each admitted relationship type must be documented and tested.
 
 ---
 
@@ -1003,33 +614,6 @@ The semantic meaning of every rendered edge must still come from Core.
 
 ---
 
-## Relationship manifest and entity index
-
-The relationship manifest depends on the Entity Index Surface.
-
-A relationship record must refer to entities already indexed by `entity_index.json`.
-
-It must not create independent synthetic nodes.
-
-The current manifest records its dependency on the entity index through:
-
-```json
-{
-  "entity_index_kind": "orbitfabric.entity_index",
-  "entity_index_version": "0.1"
-}
-```
-
-If Core cannot resolve one endpoint to an indexed entity, the relationship type must either:
-
-```text
-not be emitted
-be emitted only under an explicitly documented unresolved endpoint policy
-or remain unsupported
-```
-
----
-
 ## Relationship manifest and plugins
 
 A relationship manifest is not a plugin API.
@@ -1068,7 +652,6 @@ Candidate families include:
 
 ```text
 payload may raise fault
-data product produced by subsystem
 commandability rule constrains command
 autonomous action dispatches command
 recovery intent reacts to fault or event
@@ -1077,6 +660,8 @@ recovery intent reacts to fault or event
 These are candidates only.
 
 No relationship family is accepted until documented in an implementation PR.
+
+`data_product_produced_by_subsystem` is no longer listed as a future candidate because it is now an admitted relationship family.
 
 ---
 
@@ -1098,6 +683,8 @@ Studio API
 runtime behavior
 ground behavior
 ```
+
+It also does not introduce storage relationships, downlink policy relationships, subsystem behavior, packet-generation behavior, runtime routing behavior or ground routing behavior.
 
 ---
 
@@ -1124,6 +711,6 @@ keep Studio-specific behavior out of Core
 
 The Relationship Manifest Surface is a candidate Core-owned read-only inspection surface.
 
-It currently emits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
+It currently admits `command_emits_event`, `command_targets_subsystem`, `data_product_produced_by_payload`, `data_product_produced_by_subsystem`, `downlink_flow_includes_data_product`, `event_sourced_from_subsystem`, `fault_emits_event`, `fault_sourced_from_subsystem`, `packet_includes_telemetry`, `payload_accepts_command`, `payload_belongs_to_subsystem`, `payload_generates_event`, `payload_produces_telemetry` and `telemetry_sourced_from_subsystem` relationships.
 
 Additional relationship families may be added only if Core can derive them deterministically from explicit Mission Model semantics.
