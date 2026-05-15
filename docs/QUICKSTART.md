@@ -28,6 +28,7 @@ Mission Model YAML
   -> human-reviewable ground Markdown artifacts
   -> model_summary.json contract introspection report
   -> entity_index.json entity index report
+  -> relationship_manifest.json candidate relationship report
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -39,7 +40,7 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection and entity index surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
+Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
 ---
 
@@ -104,7 +105,7 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected version for the current development preview:
+Expected version until the final v0.9.0 release preparation PR:
 
 ```text
 orbitfabric 0.8.2
@@ -190,11 +191,19 @@ orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
 ```
 
+Generate the relationship-level manifest:
+
+```bash
+orbitfabric export relationship-manifest examples/demo-3u/mission/ \
+  --json generated/reports/relationship_manifest.json
+```
+
 Generated output:
 
 ```text
 generated/reports/model_summary.json
 generated/reports/entity_index.json
+generated/reports/relationship_manifest.json
 ```
 
 `model_summary.json` answers:
@@ -209,7 +218,15 @@ What contract domains are present in this mission?
 What contract entities are defined in this mission?
 ```
 
-Neither surface exposes relationship graphs, plugin APIs or Studio-specific APIs.
+`relationship_manifest.json` answers:
+
+```text
+How are indexed mission contract entities related?
+```
+
+These surfaces are Core-owned, read-only and derived from the loaded Mission Model.
+
+They do not expose plugin execution, graph engines, Studio-specific APIs, runtime behavior or ground behavior.
 
 ---
 
@@ -341,7 +358,9 @@ The current demo proves that OrbitFabric can:
 - run semantic lint rules;
 - generate Markdown documentation;
 - inspect a Mission Model summary;
+- export a model summary from the loaded Mission Model;
 - export an entity index from the loaded Mission Model;
+- export a relationship manifest from the loaded Mission Model;
 - validate scenarios without executing them;
 - execute deterministic operational sequences;
 - record contract-level data-flow evidence;
@@ -380,8 +399,10 @@ The current demo does not prove:
 - command dispatch runtime behavior;
 - telemetry polling runtime behavior;
 - HAL or RTOS integration;
-- relationship graph export;
+- relationship graph behavior;
+- dependency graph behavior;
 - plugin API behavior;
+- plugin execution behavior;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current development preview scope.
