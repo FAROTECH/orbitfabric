@@ -2,21 +2,29 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces and entity index surfaces in a single Mission Data Contract.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces and relationship manifest surfaces in a single Mission Data Contract.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
 ## Current development preview
 
-OrbitFabric is currently at:
+OrbitFabric is currently preparing:
 
 ```text
-v0.8.2 - Entity Index Surface
+v0.9.0 - Relationship Manifest Surface and Extensibility Boundary
 ```
 
-In v0.8.2, Entity Index Surface means the first **Core-owned read-only entity index surface** derived from the loaded Mission Model.
+The package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
 
-It builds on v0.8.1, which introduced the domain-level `model_summary.json` surface.
+The current v0.9.0 development baseline adds the first **Core-owned read-only relationship manifest surface** derived from explicit loaded Mission Model fields.
+
+It builds on:
+
+```text
+v0.8.1 -> model_summary.json
+v0.8.2 -> entity_index.json
+v0.9.0 -> relationship_manifest.json
+```
 
 The current public preview includes:
 
@@ -50,6 +58,8 @@ The current public preview includes:
 - generated `model_summary.json` contract introspection report;
 - `orbitfabric export entity-index`;
 - generated `entity_index.json` entity index report;
+- `orbitfabric export relationship-manifest`;
+- generated `relationship_manifest.json` candidate relationship report;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -70,6 +80,15 @@ Mission Model
   -> generated ground-facing integration artifacts
   -> Core-owned contract introspection surfaces
   -> Core-owned entity index surfaces
+  -> Core-owned relationship manifest surfaces
+```
+
+The current Core-owned structured surface chain is:
+
+```text
+model_summary.json      -> domain navigation
+entity_index.json       -> entity navigation
+relationship_manifest.json -> relationship navigation
 ```
 
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
@@ -80,4 +99,4 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection and entity index surfaces are not plugin APIs, relationship graphs or Studio-specific APIs.
+Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
