@@ -9,6 +9,7 @@ from orbitfabric.export.entity_index import entity_index_to_dict
 from orbitfabric.model.mission import Command, Fault, MissionModel, Packet, PayloadContract
 
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
+REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
@@ -109,6 +110,11 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     ]
     records.extend(
         record
+        for command in sorted(model.commands, key=lambda item: item.id)
+        for record in _command_subsystem_relationship_records(command, model.subsystem_ids)
+    )
+    records.extend(
+        record
         for fault in sorted(model.faults, key=lambda item: item.id)
         for record in _fault_event_relationship_records(fault)
     )
@@ -155,6 +161,35 @@ def _command_event_relationship_records(command: Command) -> list[dict[str, Any]
             },
         }
         for event_id in sorted(command.emits)
+    ]
+
+
+def _command_subsystem_relationship_records(
+    command: Command,
+    subsystem_ids: set[str],
+) -> list[dict[str, Any]]:
+    if command.target not in subsystem_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"commands:{command.id}->{REL_COMMAND_TARGETS_SUBSYSTEM}:"
+                f"subsystems:{command.target}"
+            ),
+            "relationship_type": REL_COMMAND_TARGETS_SUBSYSTEM,
+            "from": {
+                "domain": "commands",
+                "id": command.id,
+            },
+            "to": {
+                "domain": "subsystems",
+                "id": command.target,
+            },
+            "derived_from": {
+                "model_field": "commands[].target",
+            },
+        }
     ]
 
 
@@ -298,6 +333,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "events",
             "derived_from": {
                 "model_field": "commands[].emits",
+            },
+        },
+        REL_COMMAND_TARGETS_SUBSYSTEM: {
+            "relationship_type": REL_COMMAND_TARGETS_SUBSYSTEM,
+            "display_name": "Command targets subsystem",
+            "from_domain": "commands",
+            "to_domain": "subsystems",
+            "derived_from": {
+                "model_field": "commands[].target",
             },
         },
         REL_FAULT_EMITS_EVENT: {
