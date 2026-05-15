@@ -8,9 +8,54 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
-### Next
+### Added
 
-- Prepare `v0.9 - Plugin and Extensibility Layer` as the next controlled extension milestone after Core-owned introspection and entity index surfaces.
+- Added the v0.9.0 development baseline for `Relationship Manifest Surface and Extensibility Boundary`.
+- Added `relationship_manifest_to_dict(model, mission_dir)`.
+- Added `write_relationship_manifest(model, mission_dir, output_file)`.
+- Added deterministic `relationship_manifest.json` generation.
+- Added the `orbitfabric export relationship-manifest` command.
+- Added `manifest_version 0.1-candidate` for the relationship manifest surface.
+- Added `kind orbitfabric.relationship_manifest` for the relationship manifest report.
+- Added Core-owned relationship records derived from explicit loaded Mission Model fields.
+- Added relationship type records and relationship type counts.
+- Added explicit relationship derivation policy.
+- Added explicit boundary flags for the relationship manifest report.
+- Added 19 admitted relationship families to the candidate relationship manifest surface.
+- Added relationship manifest export tests.
+- Added relationship manifest CLI tests.
+- Added Relationship Manifest Surface reference documentation.
+
+### Changed
+
+- Extended Core-owned structured surfaces from domain-level and entity-level reports to relationship-level reports.
+- Extended the public documentation baseline from `v0.8.2 - Entity Index Surface` to the v0.9.0 relationship manifest development baseline.
+- Aligned README, site homepage, roadmap, architecture, project charter, quickstart, development guide, contributing guide and demo walkthrough with the relationship manifest surface.
+- Clarified the structured surface chain: `model_summary.json -> entity_index.json -> relationship_manifest.json`.
+- Clarified that the package and CLI version remain `0.8.2` until the final v0.9.0 release preparation PR.
+- Reinforced that downstream tools should consume Core-owned structured surfaces instead of reconstructing Mission Model relationships from YAML, generated files, textual CLI output or UI state.
+
+### Boundaries
+
+The v0.9.0 relationship manifest development slice intentionally does not introduce:
+
+- new Mission Model semantics;
+- relationship inference;
+- relationship graph;
+- dependency graph;
+- source line or column tracking;
+- YAML AST export;
+- plugin API;
+- plugin discovery;
+- plugin loader;
+- plugin execution;
+- custom lint plugin support;
+- custom generator plugin support;
+- Studio-specific API;
+- runtime behavior;
+- ground behavior.
+
+Relationship Manifest Surface in v0.9.0 is a Core-owned read-only candidate relationship report only.
 
 ---
 
