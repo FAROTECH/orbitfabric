@@ -49,15 +49,16 @@ def test_relationship_manifest_contains_identity_and_boundaries() -> None:
     }
 
 
-def test_relationship_manifest_emits_packet_telemetry_relationship_records() -> None:
+def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     model = MissionModelLoader().load(DEMO_MISSION)
 
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 5,
+        "total_relationships": 6,
         "relationship_types": {
             "packet_includes_telemetry": 5,
+            "payload_produces_telemetry": 1,
         },
     }
     assert manifest["relationship_types"] == [
@@ -70,7 +71,17 @@ def test_relationship_manifest_emits_packet_telemetry_relationship_records() -> 
                 "model_field": "packets[].telemetry",
             },
             "relationship_count": 5,
-        }
+        },
+        {
+            "relationship_type": "payload_produces_telemetry",
+            "display_name": "Payload produces telemetry",
+            "from_domain": "payloads",
+            "to_domain": "telemetry",
+            "derived_from": {
+                "model_field": "payloads[].telemetry.produced",
+            },
+            "relationship_count": 1,
+        },
     ]
     assert manifest["relationships"] == [
         {
@@ -158,6 +169,24 @@ def test_relationship_manifest_emits_packet_telemetry_relationship_records() -> 
                 "model_field": "packets[].telemetry",
             },
         },
+        {
+            "relationship_id": (
+                "payloads:demo_iod_payload->payload_produces_telemetry:"
+                "telemetry:payload.acquisition.active"
+            ),
+            "relationship_type": "payload_produces_telemetry",
+            "from": {
+                "domain": "payloads",
+                "id": "demo_iod_payload",
+            },
+            "to": {
+                "domain": "telemetry",
+                "id": "payload.acquisition.active",
+            },
+            "derived_from": {
+                "model_field": "payloads[].telemetry.produced",
+            },
+        },
     ]
 
 
@@ -166,17 +195,27 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
 
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
     packet_ids = {packet.id for packet in model.packets}
+    payload_ids = {payload.id for payload in model.payloads}
     telemetry_ids = {telemetry.id for telemetry in model.telemetry}
 
     for relationship in manifest["relationships"]:
-        assert relationship["relationship_type"] == "packet_includes_telemetry"
-        assert relationship["from"]["domain"] == "packets"
-        assert relationship["from"]["id"] in packet_ids
         assert relationship["to"]["domain"] == "telemetry"
         assert relationship["to"]["id"] in telemetry_ids
-        assert relationship["derived_from"] == {
-            "model_field": "packets[].telemetry",
-        }
+
+        if relationship["relationship_type"] == "packet_includes_telemetry":
+            assert relationship["from"]["domain"] == "packets"
+            assert relationship["from"]["id"] in packet_ids
+            assert relationship["derived_from"] == {
+                "model_field": "packets[].telemetry",
+            }
+        elif relationship["relationship_type"] == "payload_produces_telemetry":
+            assert relationship["from"]["domain"] == "payloads"
+            assert relationship["from"]["id"] in payload_ids
+            assert relationship["derived_from"] == {
+                "model_field": "payloads[].telemetry.produced",
+            }
+        else:
+            raise AssertionError("unexpected relationship type")
 
 
 def test_relationship_manifest_declares_derivation_policy() -> None:
