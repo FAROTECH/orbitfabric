@@ -142,7 +142,65 @@ It does not define field names, JSON structure, validation rules, a file path, p
 
 ---
 
-## 6. Semantic override ban
+## 6. Non-normative future metadata guidance
+
+Future extension metadata, if introduced by a later milestone, should remain descriptive, inspectable and non-authoritative with respect to Core semantics.
+
+This section is intentionally non-normative.
+
+It is guidance for future design work, not a schema commitment.
+
+A future metadata declaration may need to answer these engineering questions:
+
+```text
+Who produced this extension-owned artifact?
+Which OrbitFabric Core version or surface version was it designed around?
+Which Core-owned surfaces were consumed as input?
+What kind of artifact was produced?
+Who owns the meaning of the produced artifact?
+Is the result descriptive, diagnostic or generated?
+Is the result safe for downstream inspection?
+Does the result claim any authority over Core semantics?
+```
+
+The expected answer to the last question must be:
+
+```text
+No.
+```
+
+Future metadata should classify intent rather than enable execution.
+
+Useful descriptive dimensions may include:
+
+```text
+identity
+compatibility
+input surfaces
+output ownership
+artifact intent
+diagnostic scope
+downstream inspection safety
+non-authority over Core semantics
+```
+
+These dimensions are not field names.
+
+They are not a JSON shape.
+
+They are not a metadata manifest format.
+
+They are not a validation contract.
+
+They are not a plugin API.
+
+They are only design constraints for future reviewed work.
+
+A future PR that turns any of these dimensions into a concrete file format, schema, CLI command, loader or execution behavior must be treated as a separate architectural step.
+
+---
+
+## 7. Semantic override ban
 
 A future extension must not silently override Core semantics.
 
@@ -166,7 +224,7 @@ It must not replace the Core result.
 
 ---
 
-## 7. Allowed descriptive extension categories
+## 8. Allowed descriptive extension categories
 
 After the v0.11.0 boundary is documented and reviewed, future milestones may consider descriptive extension categories such as:
 
@@ -187,7 +245,7 @@ They do not imply a plugin runtime.
 
 ---
 
-## 8. Disallowed v0.11.0 capabilities
+## 9. Disallowed v0.11.0 capabilities
 
 v0.11.0 must not introduce:
 
@@ -219,7 +277,7 @@ These items require separate architectural decisions and implementation PRs afte
 
 ---
 
-## 9. Downstream consumer rule
+## 10. Downstream consumer rule
 
 Downstream tools, including OrbitFabric Studio, must consume Core-owned structured surfaces.
 
@@ -243,7 +301,7 @@ Studio-specific requirements must not become Core API requirements.
 
 ---
 
-## 10. Relationship to generated surface stability
+## 11. Relationship to generated surface stability
 
 This document complements the Generated Surfaces Stability reference.
 
@@ -264,7 +322,7 @@ An extension must not promote its own output to Core-owned status.
 
 ---
 
-## 11. Relationship to ADR-0015
+## 12. Relationship to ADR-0015
 
 ADR-0015 records the architectural decision for v0.11.0.
 
@@ -278,7 +336,7 @@ If the two diverge, the project must resolve the discrepancy explicitly before v
 
 ---
 
-## 12. Compatibility-sensitive changes
+## 13. Compatibility-sensitive changes
 
 The following changes are compatibility-sensitive before v1.0.0:
 
@@ -287,6 +345,7 @@ The following changes are compatibility-sensitive before v1.0.0:
 - weakening the semantic override ban;
 - allowing extension outputs to masquerade as Core outputs;
 - removing provenance expectations;
+- converting non-normative metadata guidance into a concrete schema without a separate architectural review;
 - adding execution semantics to the v0.11.0 boundary;
 - adding Studio-specific API expectations to the Core boundary;
 - treating extension diagnostics as Core diagnostics;
@@ -298,7 +357,7 @@ It means the change must be explicit, reviewed and documented.
 
 ---
 
-## 13. v1.0 direction
+## 14. v1.0 direction
 
 Before v1.0.0, OrbitFabric should decide which extensibility-related expectations remain development preview and which become part of the stable Mission Data Contract boundary.
 
