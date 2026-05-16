@@ -27,6 +27,7 @@ nav:
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Lint Rule Code Stability: reference/lint-rule-code-stability.md
+      - JSON Report Compatibility: reference/json-report-compatibility.md
       - JSON Reports v0.1: reference/json-reports-v0.1.md
       - Lint Rules v0.1: reference/lint-rules-v0.1.md
       - Payload Contract Model: reference/payload-contract-model.md
