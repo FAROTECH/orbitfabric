@@ -27,6 +27,7 @@ nav:
       - Release Compatibility Policy: reference/release-compatibility-policy.md
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
+      - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
       - Lint Rule Code Stability: reference/lint-rule-code-stability.md
       - JSON Report Compatibility: reference/json-report-compatibility.md
       - Scenario Evidence Stability: reference/scenario-evidence-stability.md
