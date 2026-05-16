@@ -5,7 +5,7 @@ This page documents the JSON reports currently produced by OrbitFabric.
 Current documented baseline:
 
 ```text
-v0.9.0 - Relationship Manifest Surface and Extensibility Boundary
+v0.10.0 - Stability and Compatibility Contract
 ```
 
 OrbitFabric JSON reports are generated artifacts intended for:
@@ -28,7 +28,7 @@ The source of truth remains the Mission Model YAML and scenario YAML.
 
 The JSON report structures documented here are development-preview contracts.
 
-They are stable enough for current v0.9.x workflows, but they are not a v1.0 compatibility promise.
+They are stable enough for current v0.10.x workflows, but they are not a v1.0 compatibility promise.
 
 Future versions may introduce:
 
@@ -49,7 +49,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.9.0"
+  "version": "0.10.0"
 }
 ```
 
@@ -78,6 +78,7 @@ See also:
 
 ```text
 Reference -> Versioning Model
+Reference -> JSON Report Compatibility
 ```
 
 ---
@@ -406,6 +407,29 @@ Reference -> Relationship Manifest Surface
 
 ---
 
+## Stability and compatibility references
+
+v0.10.0 added compatibility classification references for current public and preview surfaces.
+
+These include:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
+```
+
+These references classify compatibility expectations for existing surfaces.
+
+They do not add report fields, report schemas, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior, plugin execution or a stable v1.0 compatibility guarantee.
+
+---
+
 ## Ground artifacts and JSON dictionaries
 
 v0.8.0 also generates JSON ground dictionaries through:
@@ -437,7 +461,7 @@ Compact example:
 ```json
 {
   "tool": "orbitfabric-sim",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "mission": "demo-3u",
   "scenario": "payload_data_flow_evidence",
   "result": "passed",
