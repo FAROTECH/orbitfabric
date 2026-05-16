@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.10.0 - Stability and Compatibility Contract`.
+The current public baseline is `v0.10.1 - Documentation and Published Site Consistency`.
 
-In v0.10.0, Stability and Compatibility Contract means the first classification baseline for public, preview, candidate, generated and internal OrbitFabric surfaces before v1.0.0.
+In v0.10.1, Documentation and Published Site Consistency means the public documentation and release baseline have been aligned after the v0.10.0 stability and compatibility classification baseline.
 
-The current development focus is to preserve the v0.10.0 compatibility boundary while preparing documentation consistency work and future extensibility work without adding plugin execution, plugin discovery or plugin loaders prematurely.
+The current development focus is to prepare `v0.11.0 - Extensibility Boundary Contract, no execution` without adding plugin execution, plugin discovery or plugin loaders prematurely.
 
 The current baseline proves this Mission Data Chain:
 
@@ -142,7 +142,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.10.0
+orbitfabric 0.10.1
 ```
 
 ---
