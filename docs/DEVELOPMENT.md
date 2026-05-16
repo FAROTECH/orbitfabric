@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.10.0
+orbitfabric 0.10.1
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.10.0 Slice
+## Verify the Current v0.10.1 Slice
 
 Run mission lint:
 
@@ -105,7 +105,7 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Review the v0.10.0 compatibility classification references:
+Review the v0.10.0 compatibility classification references, which remain the current compatibility foundation before v1.0.0:
 
 ```text
 Stability and Compatibility Contract
