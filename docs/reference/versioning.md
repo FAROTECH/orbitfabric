@@ -37,7 +37,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.10.0
+orbitfabric 0.10.1
 ```
 
 This version answers the question:
@@ -90,7 +90,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -279,6 +279,14 @@ They do not introduce new version fields, schema migration tooling, JSON Schema 
 
 ---
 
+## Documentation consistency context
+
+v0.10.1 closes the documentation and published-site consistency pass after v0.10.0.
+
+It updates the OrbitFabric tool/package version and release documentation, but it does not introduce new Mission Model semantics, generated surface formats, JSON report fields, CLI behavior beyond version reporting, plugin execution, runtime behavior or ground behavior.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -286,7 +294,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.10.0
+OrbitFabric tool/package version: 0.10.1
 Mission Model version:           0.1.0
 ```
 
@@ -294,13 +302,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces and Stability/Compatibility Classification references;
+- the tool has gained capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces and Stability/Compatibility Classification references;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.10.0 rule
+## Current v0.10.1 rule
 
 For the current development preview:
 
@@ -357,4 +365,4 @@ Possible future additions include:
 - JSON Schema export for Mission Model validation;
 - compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.10.0 development preview.
+These are not part of the current v0.10.1 development preview.

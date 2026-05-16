@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.10.0 to v1.0 stability path  
+Version: v0.10.1 to v1.0 stability path  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -71,23 +71,23 @@ v0.8.1  Contract Introspection Surface                        completed
 v0.8.2  Entity Index Surface                                  completed
 v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
 v0.10.0 Stability and Compatibility Contract                  completed
-v0.10.1 Documentation and Published Site Consistency          next
-v0.11.0 Extensibility Boundary Contract, no execution         future
+v0.10.1 Documentation and Published Site Consistency          completed
+v0.11.0 Extensibility Boundary Contract, no execution         next
 v0.12.0 v1.0 Release Candidate Hardening                      future
 v1.0.0  Stable Mission Data Contract                          future
 ```
 
-The current completed milestone is `v0.10.0 - Stability and Compatibility Contract`.
+The current completed milestone is `v0.10.1 - Documentation and Published Site Consistency`.
 
-The immediate target after v0.10.0 is `v0.10.1 - Documentation and Published Site Consistency`.
+The immediate target after v0.10.1 is `v0.11.0 - Extensibility Boundary Contract, no execution`.
 
-This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified the compatibility expectations around those public and preview surfaces before v1.0.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified the compatibility expectations around those public and preview surfaces before v1.0. v0.10.1 verified and preserved documentation and published-site consistency before the extensibility boundary work.
 
-The next step is not plugin execution. The next step is to verify and preserve consistency between repository documentation and the published documentation site.
+The next step is not plugin execution. The next step is to define the extensibility boundary without plugin execution.
 
-v0.10.1 does not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics.
+v0.11.0 must not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics unless explicitly scoped and reviewed.
 
-Future extensibility can build on Core-owned structured surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
+Future extensibility must build on Core-owned structured surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
 
 ---
 
@@ -400,17 +400,47 @@ stable v1.0 compatibility guarantee
 
 ---
 
-## 11. Next Milestone - v0.10.1 Documentation and Published Site Consistency
+## 11. Completed Slice - v0.10.1 Documentation and Published Site Consistency
 
-v0.10.1 should verify and preserve consistency between repository documentation and the published documentation site.
+v0.10.1 verified and preserved consistency between repository documentation and the published documentation site.
 
-It should ensure that the public documentation remains aligned with the released baseline and the roadmap toward v1.0.
+It ensured that the public documentation remains aligned with the released baseline and the roadmap toward v1.0.
 
-This milestone is documentation consistency work only. It should not introduce model, CLI, export, generator, runtime, ground or plugin behavior.
+It also clarified README wording around Relationship Manifest family counts:
+
+```text
+19 admitted relationship families at the candidate surface level
+46 emitted relationship records for examples/demo-3u/mission
+17 emitted relationship families for examples/demo-3u/mission
+```
+
+v0.10.1 intentionally does not introduce:
+
+```text
+new Mission Model semantics
+new YAML fields
+new model domains
+new CLI behavior beyond version reporting
+new JSON report fields
+new generated surfaces
+new lint diagnostics
+new scenario behavior
+schema migration tooling
+JSON Schema publication
+plugin execution
+plugin discovery
+plugin loader
+relationship graph
+dependency graph
+runtime behavior
+ground behavior
+Studio-specific API
+stable v1.0 compatibility guarantee
+```
 
 ---
 
-## 12. Future Milestone - v0.11.0 Extensibility Boundary Contract, no execution
+## 12. Next Milestone - v0.11.0 Extensibility Boundary Contract, no execution
 
 v0.11.0 should define the extensibility boundary without executing plugins.
 
@@ -536,23 +566,23 @@ When deciding what to implement next, use these rules.
 
 ## 17. Immediate Work Plan
 
-The immediate work package after v0.10.0 is:
+The immediate work package after v0.10.1 is:
 
 ```text
-v0.10.1 - Documentation and Published Site Consistency
+v0.11.0 - Extensibility Boundary Contract, no execution
 ```
 
 Required next-step discipline:
 
 ```text
-1. verify repository documentation against the published documentation site
-2. preserve consistency between public docs and release baseline
-3. avoid model, CLI, export, generator, runtime, ground or plugin behavior changes
-4. keep compatibility documentation aligned with the v1.0 path
+1. define the extensibility boundary without executing plugins
+2. preserve Core-owned structured surfaces as the only downstream semantic source
+3. avoid runtime, ground, Studio-specific or plugin execution behavior
+4. keep the Mission Model as the source of truth
 5. keep downstream tools consuming Core-owned structured surfaces
 ```
 
-Do not start plugin execution, plugin discovery or plugin loader work in v0.10.1.
+Do not start plugin execution, plugin discovery or plugin loader work in v0.11.0.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -580,7 +610,7 @@ The v0.9.0 roadmap step completed the first Core-owned relationship manifest sur
 
 The v0.10.0 roadmap step completed the first stability and compatibility classification baseline before v1.0.
 
-The v0.10.1 roadmap step should verify and preserve consistency between repository documentation and the published documentation site.
+The v0.10.1 roadmap step completed the documentation and published-site consistency pass.
 
 The v0.11.0 roadmap step should define the extensibility boundary without plugin execution.
 

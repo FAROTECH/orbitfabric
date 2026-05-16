@@ -111,7 +111,7 @@ orbitfabric --help
 Expected version:
 
 ```text
-orbitfabric 0.10.0
+orbitfabric 0.10.1
 ```
 
 ---

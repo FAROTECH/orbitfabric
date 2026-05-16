@@ -42,9 +42,11 @@ downstream inspection tools
 
 ## Current Status
 
-OrbitFabric is currently at `v0.10.0 - Stability and Compatibility Contract`.
+OrbitFabric is currently at `v0.10.1 - Documentation and Published Site Consistency`.
 
-v0.10.0 introduces the first stability and compatibility classification baseline before v1.0.0.
+v0.10.1 closes the documentation and published-site consistency pass after v0.10.0.
+
+It introduces no new Mission Model semantics, CLI behavior, generated surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin execution or Studio-specific APIs.
 
 It builds on:
 
@@ -53,6 +55,7 @@ v0.8.1  -> model_summary.json
 v0.8.2  -> entity_index.json
 v0.9.0  -> relationship_manifest.json
 v0.10.0 -> stability and compatibility classification
+v0.10.1 -> documentation and published-site consistency
 ```
 
 The current Core-owned structured surface chain is:
@@ -92,7 +95,8 @@ The current repository includes:
 - the `v0.8.1 - Contract Introspection Surface` vertical slice;
 - the `v0.8.2 - Entity Index Surface` vertical slice;
 - the `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary` vertical slice;
-- the `v0.10.0 - Stability and Compatibility Contract` vertical slice.
+- the `v0.10.0 - Stability and Compatibility Contract` vertical slice;
+- the `v0.10.1 - Documentation and Published Site Consistency` vertical slice.
 
 The current vertical slice is functional:
 
@@ -281,6 +285,8 @@ Relationship Manifest Surface in v0.9.0 is a Core-derived read-only candidate re
 
 Stability and Compatibility Contract in v0.10.0 is a classification baseline for public, preview, candidate, generated and internal surfaces before v1.0.0.
 
+Documentation and Published Site Consistency in v0.10.1 is a documentation consistency and release-alignment pass.
+
 None of them is flight software, ground software, plugin execution or a visual modeling tool.
 
 ---
@@ -353,7 +359,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.10.0
+orbitfabric 0.10.1
 ```
 
 ---
@@ -598,6 +604,7 @@ Useful entry points:
 - `docs/reference/scenario-evidence-stability.md`
 - `docs/reference/release-compatibility-policy.md`
 - `docs/releases/v0.10.0.md`
+- `docs/releases/v0.10.1.md`
 - `docs/adr/`
 
 Build the documentation site locally:
@@ -618,4 +625,4 @@ mkdocs serve
 
 OrbitFabric is developed as a clean-room open-source project.
 
-Do not add proprietary mission data, private architectures, private protocols, real operational logs, non-public payload details, real bus maps, real pinouts, employer/customer-owned code or NDA-protected material.
+Do not add private, confidential, proprietary, restricted or non-public mission material to this repository.

@@ -54,6 +54,7 @@ nav:
       - v0.8.2 Entity Index Surface: releases/v0.8.2.md
       - v0.9.0 Relationship Manifest Surface and Extensibility Boundary: releases/v0.9.0.md
       - v0.10.0 Stability and Compatibility Contract: releases/v0.10.0.md
+      - v0.10.1 Documentation and Published Site Consistency: releases/v0.10.1.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 

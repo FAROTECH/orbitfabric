@@ -11,10 +11,12 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.10.0 - Stability and Compatibility Contract
+v0.10.1 - Documentation and Published Site Consistency
 ```
 
-v0.10.0 adds the first **stability and compatibility classification baseline** for the path toward v1.0.0.
+v0.10.1 closes the documentation and published-site consistency pass after the first **stability and compatibility classification baseline** introduced in v0.10.0.
+
+It introduces no Mission Model semantics, CLI behavior, generated surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin execution or Studio-specific APIs.
 
 It builds on:
 
@@ -23,6 +25,7 @@ v0.8.1  -> model_summary.json
 v0.8.2  -> entity_index.json
 v0.9.0  -> relationship_manifest.json
 v0.10.0 -> stability and compatibility classification
+v0.10.1 -> documentation and published-site consistency
 ```
 
 The current public preview includes:
