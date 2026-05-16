@@ -2,7 +2,7 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces and relationship manifest surfaces in a single Mission Data Contract.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces and compatibility classification references in a single Mission Data Contract workflow.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
@@ -11,17 +11,18 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.9.0 - Relationship Manifest Surface and Extensibility Boundary
+v0.10.0 - Stability and Compatibility Contract
 ```
 
-v0.9.0 adds the first **Core-owned read-only relationship manifest surface** derived from explicit loaded Mission Model fields.
+v0.10.0 adds the first **stability and compatibility classification baseline** for the path toward v1.0.0.
 
 It builds on:
 
 ```text
-v0.8.1 -> model_summary.json
-v0.8.2 -> entity_index.json
-v0.9.0 -> relationship_manifest.json
+v0.8.1  -> model_summary.json
+v0.8.2  -> entity_index.json
+v0.9.0  -> relationship_manifest.json
+v0.10.0 -> stability and compatibility classification
 ```
 
 The current public preview includes:
@@ -58,6 +59,8 @@ The current public preview includes:
 - generated `entity_index.json` entity index report;
 - `orbitfabric export relationship-manifest`;
 - generated `relationship_manifest.json` candidate relationship report;
+- stability and compatibility classification references;
+- release compatibility policy;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -79,14 +82,15 @@ Mission Model
   -> Core-owned contract introspection surfaces
   -> Core-owned entity index surfaces
   -> Core-owned relationship manifest surfaces
+  -> stability and compatibility classification
 ```
 
 The current Core-owned structured surface chain is:
 
 ```text
-model_summary.json      -> domain navigation
-entity_index.json       -> entity navigation
-relationship_manifest.json -> relationship navigation
+model_summary.json          -> domain navigation
+entity_index.json           -> entity navigation
+relationship_manifest.json  -> relationship navigation
 ```
 
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
@@ -98,3 +102,5 @@ Generated runtime-facing contract bindings are not flight software.
 Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
+
+Compatibility classification references are not schema migration tooling, plugin execution, runtime behavior or a v1.0 stability guarantee.
