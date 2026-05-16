@@ -21,6 +21,7 @@ nav:
       - Demo Walkthrough: DEMO_WALKTHROUGH.md
   - Reference:
       - Mission Model v0.1: reference/mission-model-v0.1.md
+      - Mission Model Stability Contract: reference/mission-model-stability-contract.md
       - Versioning Model: reference/versioning.md
       - Stability and Compatibility Contract: reference/stability-compatibility-contract.md
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
