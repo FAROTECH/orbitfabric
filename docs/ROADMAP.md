@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.9.0 to v1.0 stability path  
+Version: v0.10.0 to v1.0 stability path  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -70,22 +70,22 @@ v0.8.0  Ground Integration Artifacts                          completed
 v0.8.1  Contract Introspection Surface                        completed
 v0.8.2  Entity Index Surface                                  completed
 v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
-v0.10.0 Stability and Compatibility Contract                  next
-v0.10.1 Documentation and Published Site Consistency          future
+v0.10.0 Stability and Compatibility Contract                  completed
+v0.10.1 Documentation and Published Site Consistency          next
 v0.11.0 Extensibility Boundary Contract, no execution         future
 v0.12.0 v1.0 Release Candidate Hardening                      future
 v1.0.0  Stable Mission Data Contract                          future
 ```
 
-The current completed milestone is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
+The current completed milestone is `v0.10.0 - Stability and Compatibility Contract`.
 
-The immediate target after v0.9.0 is `v0.10.0 - Stability and Compatibility Contract`.
+The immediate target after v0.10.0 is `v0.10.1 - Documentation and Published Site Consistency`.
 
-This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified the compatibility expectations around those public and preview surfaces before v1.0.
 
-The next step is not plugin execution. The next step is to classify what is stable, what is preview, what is public, what is internal and how compatibility should evolve toward v1.0.
+The next step is not plugin execution. The next step is to verify and preserve consistency between repository documentation and the published documentation site.
 
-v0.10.0 does not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics.
+v0.10.1 does not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics.
 
 Future extensibility can build on Core-owned structured surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
 
@@ -342,13 +342,13 @@ The relationship manifest is a candidate Core-owned surface. It is deterministic
 
 ---
 
-## 10. Next Milestone - v0.10.0 Stability and Compatibility Contract
+## 10. Completed Slice - v0.10.0 Stability and Compatibility Contract
 
-v0.10.0 is a stability and compatibility classification milestone.
+v0.10.0 introduced the first stability and compatibility classification baseline before v1.0.
 
-It should define how OrbitFabric treats public and preview surfaces before v1.0.
+It defines how OrbitFabric treats public, preview, candidate, generated and internal surfaces.
 
-The intended classification scope is:
+The classification scope includes:
 
 ```text
 Mission Model stability expectations
@@ -356,13 +356,37 @@ Core-owned generated surfaces
 CLI command stability
 JSON report compatibility expectations
 lint rule code evolution
+scenario evidence stability
 release compatibility policy
+```
+
+v0.10.0 introduced these reference documents:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
+v0.10.0 release notes
 ```
 
 v0.10.0 intentionally does not introduce:
 
 ```text
 new Mission Model semantics
+new YAML fields
+new model domains
+new CLI behavior
+new JSON report fields
+new generated surfaces
+new lint diagnostics
+new scenario behavior
+schema migration tooling
+JSON Schema publication
 plugin execution
 plugin discovery
 plugin loader
@@ -371,12 +395,12 @@ dependency graph
 runtime behavior
 ground behavior
 Studio-specific API
-new generated surface implementation
+stable v1.0 compatibility guarantee
 ```
 
 ---
 
-## 11. Future Milestone - v0.10.1 Documentation and Published Site Consistency
+## 11. Next Milestone - v0.10.1 Documentation and Published Site Consistency
 
 v0.10.1 should verify and preserve consistency between repository documentation and the published documentation site.
 
@@ -512,23 +536,23 @@ When deciding what to implement next, use these rules.
 
 ## 17. Immediate Work Plan
 
-The immediate work package after v0.9.0 is:
+The immediate work package after v0.10.0 is:
 
 ```text
-v0.10.0 - Stability and Compatibility Contract
+v0.10.1 - Documentation and Published Site Consistency
 ```
 
 Required next-step discipline:
 
 ```text
-1. classify public, preview and internal surfaces
-2. classify CLI, JSON report and lint rule compatibility expectations
-3. keep relationship_manifest.json candidate and explicitly bounded
-4. keep downstream tools consuming Core-owned structured surfaces
-5. prevent downstream tools from becoming a second source of truth
+1. verify repository documentation against the published documentation site
+2. preserve consistency between public docs and release baseline
+3. avoid model, CLI, export, generator, runtime, ground or plugin behavior changes
+4. keep compatibility documentation aligned with the v1.0 path
+5. keep downstream tools consuming Core-owned structured surfaces
 ```
 
-Do not start plugin execution, plugin discovery or plugin loader work in v0.10.0.
+Do not start plugin execution, plugin discovery or plugin loader work in v0.10.1.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -554,7 +578,7 @@ The v0.8.2 roadmap step completed the first Core-owned entity index surface for 
 
 The v0.9.0 roadmap step completed the first Core-owned relationship manifest surface and preserved the plugin/extensibility boundary before plugin execution.
 
-The v0.10.0 roadmap step should classify stability and compatibility expectations before v1.0.
+The v0.10.0 roadmap step completed the first stability and compatibility classification baseline before v1.0.
 
 The v0.10.1 roadmap step should verify and preserve consistency between repository documentation and the published documentation site.
 
