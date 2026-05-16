@@ -37,7 +37,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.9.0
+orbitfabric 0.10.0
 ```
 
 This version answers the question:
@@ -90,7 +90,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -254,6 +254,31 @@ It is not a relationship graph, dependency graph, plugin API, Studio-specific AP
 
 ---
 
+## Stability and compatibility classification context
+
+v0.10.0 introduced the first stability and compatibility classification baseline before v1.0.0.
+
+This baseline classifies public, preview, candidate, generated and internal surfaces.
+
+It is documented through references such as:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
+```
+
+These references classify compatibility expectations.
+
+They do not introduce new version fields, schema migration tooling, JSON Schema publication, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -261,7 +286,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.9.0
+OrbitFabric tool/package version: 0.10.0
 Mission Model version:           0.1.0
 ```
 
@@ -269,13 +294,13 @@ This is valid.
 
 It means:
 
-- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces and Relationship Manifest Surfaces;
+- the tool has gained new capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces and Stability/Compatibility Classification references;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.9.0 rule
+## Current v0.10.0 rule
 
 For the current development preview:
 
@@ -311,7 +336,8 @@ Do not assume that:
 - generated ground-facing artifacts imply ground runtime behavior or tool-specific compatibility;
 - model summary reports imply entity-level indexing, relationship graphs or plugin APIs;
 - entity index reports imply relationship graphs, dependency graphs or plugin APIs;
-- relationship manifest reports imply graph engines, runtime behavior, ground behavior, plugin APIs or Studio-specific APIs.
+- relationship manifest reports imply graph engines, runtime behavior, ground behavior, plugin APIs or Studio-specific APIs;
+- stability and compatibility references imply schema migration tooling, JSON Schema publication, plugin execution or a stable v1.0 compatibility guarantee.
 
 ---
 
@@ -331,4 +357,4 @@ Possible future additions include:
 - JSON Schema export for Mission Model validation;
 - compatibility checks for generated artifact profiles.
 
-These are not part of the current v0.9.0 development preview.
+These are not part of the current v0.10.0 development preview.
