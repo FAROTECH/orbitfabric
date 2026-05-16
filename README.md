@@ -122,7 +122,9 @@ The current vertical slice is functional:
 - stability and compatibility classification references;
 - synthetic demo mission: `demo-3u`.
 
-The relationship manifest currently exposes a candidate read-only surface with 19 explicitly admitted relationship families and 46 relationship records for `examples/demo-3u/mission`.
+The relationship manifest candidate surface admits 19 deliberately narrow relationship families.
+
+For `examples/demo-3u/mission`, the current manifest emits 46 relationship records across 17 emitted relationship families.
 
 It is not a graph engine, dependency graph, plugin API, Studio API, runtime behavior layer or ground behavior layer.
 
