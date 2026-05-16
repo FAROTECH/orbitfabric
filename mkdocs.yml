@@ -24,6 +24,7 @@ nav:
       - Mission Model Stability Contract: reference/mission-model-stability-contract.md
       - Versioning Model: reference/versioning.md
       - Stability and Compatibility Contract: reference/stability-compatibility-contract.md
+      - Release Compatibility Policy: reference/release-compatibility-policy.md
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Lint Rule Code Stability: reference/lint-rule-code-stability.md
