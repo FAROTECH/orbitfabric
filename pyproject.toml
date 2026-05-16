@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "orbitfabric"
-version = "0.10.0"
+version = "0.10.1"
 description = "A model-first Mission Data Fabric for small spacecraft."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -23,7 +23,7 @@ keywords = [
   "model-first"
 ]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: Apache Software License",
@@ -34,16 +34,19 @@ classifiers = [
   "Topic :: Software Development :: Code Generators"
 ]
 dependencies = [
-  "pydantic>=2.7",
   "typer>=0.12",
+  "rich>=13.7",
+  "pydantic>=2.7",
   "PyYAML>=6.0"
 ]
 
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
-  "ruff>=0.5",
-  "mkdocs-material>=9.5"
+  "ruff>=0.6",
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+  "pymdown-extensions>=10.0"
 ]
 
 [project.scripts]
@@ -52,14 +55,9 @@ orbitfabric = "orbitfabric.cli:app"
 [tool.hatch.build.targets.wheel]
 packages = ["src/orbitfabric"]
 
+[tool.ruff]
+line-length = 100
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
-ignore = []
