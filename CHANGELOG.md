@@ -12,6 +12,57 @@ No changes yet.
 
 ---
 
+## [v0.10.0] - Stability and Compatibility Contract
+
+### Added
+
+- Added the Stability and Compatibility Contract reference.
+- Added the Mission Model Stability Contract reference.
+- Added the CLI Contract v1 Preview reference.
+- Added the Generated Surfaces Stability reference.
+- Added the Lint Rule Code Stability reference.
+- Added the JSON Report Compatibility reference.
+- Added the Scenario Evidence Stability reference.
+- Added the Release Compatibility Policy reference.
+- Added v0.10.0 release notes.
+
+### Changed
+
+- Updated the package and CLI version to `0.10.0`.
+- Marked `v0.10.0 - Stability and Compatibility Contract` as completed in the roadmap.
+- Marked `v0.10.1 - Documentation and Published Site Consistency` as the next milestone.
+- Classified Mission Model, CLI, JSON report, lint diagnostic, generated surface, scenario evidence and release compatibility expectations before v1.0.0.
+- Clarified which surfaces are public preview, candidate contract, internal implementation detail or disposable generated artifacts.
+- Clarified that compatibility-sensitive changes must be explicit, reviewed and documented before v1.0.0.
+
+### Boundaries
+
+The v0.10.0 stability and compatibility slice intentionally does not introduce:
+
+- new Mission Model semantics;
+- new YAML fields;
+- new model domains;
+- new CLI behavior;
+- new JSON report fields;
+- new generated surfaces;
+- new lint diagnostics;
+- new scenario behavior;
+- schema migration tooling;
+- JSON Schema publication;
+- plugin execution;
+- plugin discovery;
+- plugin loader;
+- relationship graph;
+- dependency graph;
+- runtime behavior;
+- ground behavior;
+- Studio-specific API;
+- stable v1.0 compatibility guarantee.
+
+v0.10.0 is a classification and release-alignment milestone only.
+
+---
+
 ## [v0.9.0] - Relationship Manifest Surface and Extensibility Boundary
 
 ### Added
