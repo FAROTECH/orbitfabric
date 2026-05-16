@@ -12,6 +12,50 @@ No changes yet.
 
 ---
 
+## [v0.10.1] - Documentation and Published Site Consistency
+
+### Added
+
+- Added v0.10.1 release notes.
+- Added the v0.10.1 release notes page to the MkDocs navigation.
+
+### Changed
+
+- Updated the package and CLI version to `0.10.1`.
+- Marked `v0.10.1 - Documentation and Published Site Consistency` as completed in the roadmap.
+- Marked `v0.11.0 - Extensibility Boundary Contract, no execution` as the next milestone.
+- Clarified README wording around Relationship Manifest family counts.
+- Aligned the public documentation homepage with the v0.10.1 release baseline.
+- Preserved the v0.10.0 stability and compatibility classification baseline as the current compatibility foundation before v1.0.0.
+
+### Boundaries
+
+The v0.10.1 documentation consistency slice intentionally does not introduce:
+
+- new Mission Model semantics;
+- new YAML fields;
+- new model domains;
+- new CLI behavior beyond version reporting;
+- new JSON report fields;
+- new generated surfaces;
+- new lint diagnostics;
+- new scenario behavior;
+- schema migration tooling;
+- JSON Schema publication;
+- plugin execution;
+- plugin discovery;
+- plugin loader;
+- relationship graph;
+- dependency graph;
+- runtime behavior;
+- ground behavior;
+- Studio-specific API;
+- stable v1.0 compatibility guarantee.
+
+v0.10.1 is a documentation consistency and release-alignment milestone only.
+
+---
+
 ## [v0.10.0] - Stability and Compatibility Contract
 
 ### Added
