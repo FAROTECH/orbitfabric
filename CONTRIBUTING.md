@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
+The current public baseline is `v0.10.0 - Stability and Compatibility Contract`.
 
-In v0.9.0, Relationship Manifest Surface means the first Core-owned read-only relationship surface derived from explicit loaded Mission Model fields and indexed Mission Model entities.
+In v0.10.0, Stability and Compatibility Contract means the first classification baseline for public, preview, candidate, generated and internal OrbitFabric surfaces before v1.0.0.
 
-The current development focus is to preserve the v0.9.0 boundary while preparing future extensibility work without adding plugin execution, plugin discovery or plugin loaders prematurely.
+The current development focus is to preserve the v0.10.0 compatibility boundary while preparing documentation consistency work and future extensibility work without adding plugin execution, plugin discovery or plugin loaders prematurely.
 
 The current baseline proves this Mission Data Chain:
 
@@ -32,9 +32,10 @@ Payload Contract
   -> Contract Introspection Surface
   -> Entity Index Surface
   -> Relationship Manifest Surface
+  -> Stability and Compatibility Classification
 ```
 
-Do not add large integrations before the contract model is coherent.
+Do not add large integrations before the contract model, Core-owned structured surfaces and compatibility boundaries are coherent.
 
 Out of scope for the current preview:
 
@@ -62,6 +63,9 @@ Out of scope for the current preview:
 - web UI;
 - relationship graph export;
 - dependency graph export;
+- schema migration tooling;
+- JSON Schema publication;
+- stable v1.0 compatibility guarantee;
 - plugin API;
 - plugin execution;
 - plugin discovery;
@@ -77,6 +81,8 @@ Contract introspection reports must remain Core-owned, deterministic, read-only 
 Entity index reports must remain Core-owned, deterministic, read-only and disposable.
 
 Relationship manifest reports must remain Core-owned, deterministic, read-only, explicitly bounded and disposable.
+
+Compatibility classification references must remain documentation contracts, not implementation behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -136,7 +142,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.9.0
+orbitfabric 0.10.0
 ```
 
 ---
@@ -272,6 +278,8 @@ exporter -> raw YAML files
 Do not hardcode behavior for `demo-3u` inside the framework core.
 
 Relationship manifest records must remain derived from explicit loaded Mission Model fields and must reference indexed entities rather than synthetic downstream nodes.
+
+Compatibility classification references must not become a second source of Mission Data Contract semantics.
 
 ---
 
