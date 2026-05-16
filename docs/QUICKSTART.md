@@ -29,6 +29,7 @@ Mission Model YAML
   -> model_summary.json contract introspection report
   -> entity_index.json entity index report
   -> relationship_manifest.json candidate relationship report
+  -> stability and compatibility classification references
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -41,6 +42,8 @@ Generated runtime-facing contract bindings are not flight software.
 Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
+
+Compatibility classification references are not runtime behavior, ground behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
 
 ---
 
@@ -108,7 +111,7 @@ orbitfabric --help
 Expected version:
 
 ```text
-orbitfabric 0.9.0
+orbitfabric 0.10.0
 ```
 
 ---
@@ -230,7 +233,30 @@ They do not expose plugin execution, graph engines, Studio-specific APIs, runtim
 
 ---
 
-## 11. Generate mission documentation
+## 11. Review compatibility classification references
+
+v0.10.0 adds compatibility classification references for the path toward v1.0.0.
+
+Key references include:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
+```
+
+These references classify existing public and preview surfaces.
+
+They do not introduce new Mission Model semantics, CLI behavior, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
+
+---
+
+## 12. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -249,7 +275,7 @@ Do not edit generated files manually.
 
 ---
 
-## 12. Generate runtime-facing contract bindings
+## 13. Generate runtime-facing contract bindings
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -263,7 +289,7 @@ They do not implement onboard behavior.
 
 ---
 
-## 13. Validate the generated C++17 host-build smoke target
+## 14. Validate the generated C++17 host-build smoke target
 
 After generating runtime bindings, run:
 
@@ -284,7 +310,7 @@ It does not validate flight behavior.
 
 ---
 
-## 14. Generate ground integration artifacts
+## 15. Generate ground integration artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
@@ -298,7 +324,7 @@ They do not implement a live ground segment, decoder, telemetry archive, databas
 
 ---
 
-## 15. Run the battery-low demo scenario
+## 16. Run the battery-low demo scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -320,7 +346,7 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
 
 ---
 
-## 16. Run the data-flow evidence scenario
+## 17. Run the data-flow evidence scenario
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
@@ -348,7 +374,7 @@ command -> data product -> storage intent -> downlink intent -> downlink flow ->
 
 ---
 
-## 17. What this proves
+## 18. What this proves
 
 The current demo proves that OrbitFabric can:
 
@@ -361,6 +387,7 @@ The current demo proves that OrbitFabric can:
 - export a model summary from the loaded Mission Model;
 - export an entity index from the loaded Mission Model;
 - export a relationship manifest from the loaded Mission Model;
+- classify public, preview, candidate, generated and internal compatibility surfaces;
 - validate scenarios without executing them;
 - execute deterministic operational sequences;
 - record contract-level data-flow evidence;
@@ -375,7 +402,7 @@ The current demo proves that OrbitFabric can:
 
 ---
 
-## 18. What this does not prove
+## 19. What this does not prove
 
 The current demo does not prove:
 
@@ -403,6 +430,7 @@ The current demo does not prove:
 - dependency graph behavior;
 - plugin API behavior;
 - plugin execution behavior;
+- v1.0 compatibility guarantee;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current development preview scope.

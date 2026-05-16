@@ -8,8 +8,8 @@
 
 **Model-first Mission Data Fabric for small spacecraft**
 
-Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces and relationship manifest surfaces once.
-Validate them, document them, simulate them and generate deterministic integration and inspection artifacts from the same source of truth.
+Define telemetry, commands, events, faults, modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces and compatibility classification references once.
+Validate them, document them, simulate them and generate deterministic integration, inspection and compatibility artifacts from the same source of truth.
 
 </div>
 
@@ -42,28 +42,37 @@ downstream inspection tools
 
 ## Current Status
 
-OrbitFabric is currently at `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
+OrbitFabric is currently at `v0.10.0 - Stability and Compatibility Contract`.
 
-v0.9.0 introduces the first Core-owned read-only relationship manifest surface:
-
-```text
-relationship_manifest.json
-```
+v0.10.0 introduces the first stability and compatibility classification baseline before v1.0.0.
 
 It builds on:
 
 ```text
-v0.8.1 -> model_summary.json
-v0.8.2 -> entity_index.json
-v0.9.0 -> relationship_manifest.json
+v0.8.1  -> model_summary.json
+v0.8.2  -> entity_index.json
+v0.9.0  -> relationship_manifest.json
+v0.10.0 -> stability and compatibility classification
 ```
 
 The current Core-owned structured surface chain is:
 
 ```text
-model_summary.json      -> What contract domains are present?
-entity_index.json       -> What contract entities are defined?
-relationship_manifest.json -> How are indexed contract entities related?
+model_summary.json          -> What contract domains are present?
+entity_index.json           -> What contract entities are defined?
+relationship_manifest.json  -> How are indexed contract entities related?
+```
+
+v0.10.0 adds compatibility classification references for:
+
+```text
+Mission Model stability expectations
+CLI command stability
+JSON report compatibility expectations
+lint rule code evolution
+generated and exported surface stability
+scenario evidence stability
+release compatibility policy
 ```
 
 OrbitFabric does not generate a ground segment, mission control system, telemetry archive, command uplink service, operator console, decoder runtime, database, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
@@ -82,7 +91,8 @@ The current repository includes:
 - the `v0.8.0 - Ground Integration Artifacts` vertical slice;
 - the `v0.8.1 - Contract Introspection Surface` vertical slice;
 - the `v0.8.2 - Entity Index Surface` vertical slice;
-- the `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary` vertical slice.
+- the `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary` vertical slice;
+- the `v0.10.0 - Stability and Compatibility Contract` vertical slice.
 
 The current vertical slice is functional:
 
@@ -109,6 +119,7 @@ The current vertical slice is functional:
 - Core-owned `entity_index.json` entity index report;
 - `orbitfabric export relationship-manifest` generation;
 - Core-owned `relationship_manifest.json` candidate relationship report;
+- stability and compatibility classification references;
 - synthetic demo mission: `demo-3u`.
 
 The relationship manifest currently exposes a candidate read-only surface with 19 explicitly admitted relationship families and 46 relationship records for `examples/demo-3u/mission`.
@@ -179,7 +190,8 @@ It models:
 - generated ground-facing integration artifacts;
 - Core-owned contract introspection surfaces;
 - Core-owned entity index surfaces;
-- Core-owned relationship manifest surfaces.
+- Core-owned relationship manifest surfaces;
+- stability and compatibility classifications before v1.0.0.
 
 The data-flow evidence chain connects:
 
@@ -198,6 +210,7 @@ command expected effect
         -> model summary surface
         -> entity index surface
         -> relationship manifest surface
+        -> compatibility classification
 ```
 
 The structured surface chain is:
@@ -212,7 +225,7 @@ Mission Model
         -> downstream tools consume Core-owned structured surfaces
 ```
 
-Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces and Relationship Manifest Surfaces are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
+Payload, Data Product, Contact/Downlink, Commandability/Autonomy, Data-Flow Evidence, Runtime Contract Binding, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces and Stability/Compatibility References are part of the Mission Data Contract architecture. They do not describe payload firmware, payload drivers, hardware buses, onboard services, physical payload simulation, real storage execution, real contact scheduling, real downlink runtime behavior, live uplink services, operator authentication, command queues, onboard schedulers, autonomy runtime, real FDIR behavior or live ground operations.
 
 ---
 
@@ -249,7 +262,10 @@ OrbitFabric is not:
 - a dependency graph;
 - a plugin execution layer;
 - a plugin API;
-- a Studio-specific backend API.
+- a Studio-specific backend API;
+- schema migration tooling;
+- a JSON Schema publication layer;
+- a v1.0 compatibility guarantee.
 
 Generated Runtime Skeletons in v0.7.0 are runtime-facing contract bindings.
 
@@ -260,6 +276,8 @@ Contract Introspection Surface in v0.8.1 is a Core-derived read-only model summa
 Entity Index Surface in v0.8.2 is a Core-derived read-only entity index.
 
 Relationship Manifest Surface in v0.9.0 is a Core-derived read-only candidate relationship manifest.
+
+Stability and Compatibility Contract in v0.10.0 is a classification baseline for public, preview, candidate, generated and internal surfaces before v1.0.0.
 
 None of them is flight software, ground software, plugin execution or a visual modeling tool.
 
@@ -307,6 +325,7 @@ Payload Contract
         -> Contract Introspection Surface
         -> Entity Index Surface
         -> Relationship Manifest Surface
+        -> Stability and Compatibility Classification
 ```
 
 ---
@@ -332,7 +351,7 @@ orbitfabric --help
 Expected:
 
 ```text
-orbitfabric 0.9.0
+orbitfabric 0.10.0
 ```
 
 ---
@@ -402,6 +421,29 @@ How are indexed mission contract entities related?
 ```
 
 These surfaces are read-only Core-owned reports. They are not graph engines, plugin APIs or Studio-specific APIs.
+
+---
+
+## Review Stability and Compatibility References
+
+v0.10.0 adds the first compatibility classification baseline before v1.0.0.
+
+Key references:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
+```
+
+These references classify existing surfaces.
+
+They do not add Mission Model semantics, CLI behavior, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, schema migration tooling, JSON Schema publication, runtime behavior, ground behavior, plugin execution or a stable v1.0 guarantee.
 
 ---
 
@@ -545,7 +587,15 @@ Useful entry points:
 - `docs/reference/contract-introspection-surface.md`
 - `docs/reference/entity-index-surface.md`
 - `docs/reference/relationship-manifest-surface.md`
-- `docs/releases/v0.9.0.md`
+- `docs/reference/stability-compatibility-contract.md`
+- `docs/reference/mission-model-stability-contract.md`
+- `docs/reference/cli-contract-v1.md`
+- `docs/reference/generated-surfaces-stability.md`
+- `docs/reference/lint-rule-code-stability.md`
+- `docs/reference/json-report-compatibility.md`
+- `docs/reference/scenario-evidence-stability.md`
+- `docs/reference/release-compatibility-policy.md`
+- `docs/releases/v0.10.0.md`
 - `docs/adr/`
 
 Build the documentation site locally:
