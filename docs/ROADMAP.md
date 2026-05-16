@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.9.0  
+Version: v0.9.0 to v1.0 stability path  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -38,7 +38,11 @@ Mission Model
         -> contract introspection surfaces
         -> entity index surfaces
         -> relationship manifest surfaces
-        -> plugins and controlled extensibility
+        -> stability and compatibility contract
+        -> documentation and published site consistency
+        -> extensibility boundary contract
+        -> release candidate hardening
+        -> stable Mission Data Contract
 ```
 
 Every milestone must reinforce the core identity:
@@ -66,14 +70,24 @@ v0.8.0  Ground Integration Artifacts                          completed
 v0.8.1  Contract Introspection Surface                        completed
 v0.8.2  Entity Index Surface                                  completed
 v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
-v1.0    Stable Mission Data Contract                          future
+v0.10.0 Stability and Compatibility Contract                  next
+v0.10.1 Documentation and Published Site Consistency          future
+v0.11.0 Extensibility Boundary Contract, no execution         future
+v0.12.0 v1.0 Release Candidate Hardening                      future
+v1.0.0  Stable Mission Data Contract                          future
 ```
 
 The current completed milestone is `v0.9.0 - Relationship Manifest Surface and Extensibility Boundary`.
 
-This is the first v0.9 slice. It keeps the original `Plugin and Extensibility Layer` roadmap direction, but starts with the Core-owned relationship surface required before downstream tools or future plugins can safely reason about relationships.
+The immediate target after v0.9.0 is `v0.10.0 - Stability and Compatibility Contract`.
 
-This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduces the first Core-owned relationship-level surface. Future plugin extensibility can build on these surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files or human-oriented CLI output.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface.
+
+The next step is not plugin execution. The next step is to classify what is stable, what is preview, what is public, what is internal and how compatibility should evolve toward v1.0.
+
+v0.10.0 does not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics.
+
+Future extensibility can build on Core-owned structured surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
 
 ---
 
@@ -328,46 +342,73 @@ The relationship manifest is a candidate Core-owned surface. It is deterministic
 
 ---
 
-## 10. Deferred Plugin and Extensibility Work
+## 10. Next Milestone - v0.10.0 Stability and Compatibility Contract
 
-The wider roadmap direction remains controlled plugin and extensibility support.
+v0.10.0 is a stability and compatibility classification milestone.
 
-Candidate future features include:
+It should define how OrbitFabric treats public and preview surfaces before v1.0.
+
+The intended classification scope is:
 
 ```text
-extension boundary documentation
-public versus internal surface classification
-plugin metadata manifest
-plugin capability manifest
-plugin-generated report manifest
-custom lint rule plugins
-custom generator plugins
-custom data product validators
-custom ground exporters
-custom scenario step plugins
-mission model extension mechanism
-adapter SDK
-plugin discovery
-plugin metadata
-example plugin
-contribution guide
-rule documentation generator
-semantic versioning policy
+Mission Model stability expectations
+Core-owned generated surfaces
+CLI command stability
+JSON report compatibility expectations
+lint rule code evolution
+release compatibility policy
 ```
 
-These are not part of the current relationship manifest slice.
+v0.10.0 intentionally does not introduce:
 
-Plugins must extend OrbitFabric without silently redefining Core semantics.
-
-Plugins must not bypass Mission Model loading, validation, linting or Core-owned structured surfaces.
-
-Plugin execution requires explicit trust and security design before arbitrary or untrusted plugin code is supported.
+```text
+new Mission Model semantics
+plugin execution
+plugin discovery
+plugin loader
+relationship graph
+dependency graph
+runtime behavior
+ground behavior
+Studio-specific API
+new generated surface implementation
+```
 
 ---
 
-## 11. Future Milestone - v1.0 Stable Mission Data Contract
+## 11. Future Milestone - v0.10.1 Documentation and Published Site Consistency
 
-v1.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
+v0.10.1 should verify and preserve consistency between repository documentation and the published documentation site.
+
+It should ensure that the public documentation remains aligned with the released baseline and the roadmap toward v1.0.
+
+This milestone is documentation consistency work only. It should not introduce model, CLI, export, generator, runtime, ground or plugin behavior.
+
+---
+
+## 12. Future Milestone - v0.11.0 Extensibility Boundary Contract, no execution
+
+v0.11.0 should define the extensibility boundary without executing plugins.
+
+It may document what future extension metadata would be allowed to describe, but it must not introduce plugin discovery, plugin loading, plugin execution or arbitrary third-party code execution.
+
+Plugins must never become a second source of Mission Data Contract semantics.
+
+---
+
+## 13. Future Milestone - v0.12.0 v1.0 Release Candidate Hardening
+
+v0.12.0 should harden the release candidate path toward v1.0.0.
+
+The focus should be consistency, documentation, validation coverage, release hygiene and removal of ambiguity before declaring a stable Mission Data Contract.
+
+It should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling or plugin execution.
+
+---
+
+## 14. Future Milestone - v1.0.0 Stable Mission Data Contract
+
+v1.0.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
 
 Possible requirements:
 
@@ -397,11 +438,11 @@ CI-tested release artifacts
 clear contribution process
 ```
 
-v1.0 should mean stable Mission Data Contract framework, not a complete space software ecosystem.
+v1.0.0 should mean stable Mission Data Contract framework, not a complete space software ecosystem.
 
 ---
 
-## 12. Backlog Parking Lot
+## 15. Backlog Parking Lot
 
 These ideas are valid but must not distract from the active milestone.
 
@@ -446,7 +487,7 @@ custom generator plugin support
 
 ---
 
-## 13. Priority Rules
+## 16. Priority Rules
 
 When deciding what to implement next, use these rules.
 
@@ -469,23 +510,25 @@ When deciding what to implement next, use these rules.
 
 ---
 
-## 14. Immediate Work Plan
+## 17. Immediate Work Plan
 
 The immediate work package after v0.9.0 is:
 
 ```text
-post-v0.9.0 plugin and extensibility boundary planning
+v0.10.0 - Stability and Compatibility Contract
 ```
 
 Required next-step discipline:
 
 ```text
-1. keep relationship_manifest.json candidate and explicitly bounded
-2. avoid plugin execution until trust and metadata boundaries are defined
-3. avoid plugin loader, discovery and execution without reviewed design
+1. classify public, preview and internal surfaces
+2. classify CLI, JSON report and lint rule compatibility expectations
+3. keep relationship_manifest.json candidate and explicitly bounded
 4. keep downstream tools consuming Core-owned structured surfaces
 5. prevent downstream tools from becoming a second source of truth
 ```
+
+Do not start plugin execution, plugin discovery or plugin loader work in v0.10.0.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -493,7 +536,7 @@ Do not let downstream tools become a second source of truth.
 
 ---
 
-## 15. Final Roadmap Statement
+## 18. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
 
@@ -511,7 +554,13 @@ The v0.8.2 roadmap step completed the first Core-owned entity index surface for 
 
 The v0.9.0 roadmap step completed the first Core-owned relationship manifest surface and preserved the plugin/extensibility boundary before plugin execution.
 
-Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection, entity indexing and relationship semantics are clear should OrbitFabric grow into plugin execution.
+The v0.10.0 roadmap step should classify stability and compatibility expectations before v1.0.
+
+The v0.10.1 roadmap step should verify and preserve consistency between repository documentation and the published documentation site.
+
+The v0.11.0 roadmap step should define the extensibility boundary without plugin execution.
+
+Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection, entity indexing, relationship semantics and compatibility boundaries are clear should OrbitFabric consider plugin execution.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
