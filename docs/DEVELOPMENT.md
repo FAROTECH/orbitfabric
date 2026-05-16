@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.9.0
+orbitfabric 0.10.0
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.9.0 Slice
+## Verify the Current v0.10.0 Slice
 
 Run mission lint:
 
@@ -103,6 +103,19 @@ Export the Core-owned relationship manifest report:
 ```bash
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
+```
+
+Review the v0.10.0 compatibility classification references:
+
+```text
+Stability and Compatibility Contract
+Mission Model Stability Contract
+CLI Contract v1 Preview
+Generated Surfaces Stability
+Lint Rule Code Stability
+JSON Report Compatibility
+Scenario Evidence Stability
+Release Compatibility Policy
 ```
 
 Generate documentation:
@@ -317,6 +330,8 @@ Do not present contract introspection reports as relationship graphs or Studio-s
 Do not present entity index reports as relationship graphs, dependency graphs, plugin APIs or Studio-specific APIs.
 
 Do not present relationship manifest reports as graph engines, dependency graphs, runtime routing tables, ground routing tables, plugin APIs or Studio-specific APIs.
+
+Do not present compatibility classification references as implementation changes, schema migration tooling, runtime behavior, ground behavior, plugin execution or a stable v1.0 guarantee.
 
 ---
 
