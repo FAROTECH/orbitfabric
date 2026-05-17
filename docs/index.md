@@ -2,7 +2,7 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces and compatibility classification references in a single Mission Data Contract workflow.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references and extensibility boundary contracts in a single Mission Data Contract workflow.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
@@ -11,12 +11,12 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.10.1 - Documentation and Published Site Consistency
+v0.11.0 - Extensibility Boundary Contract, no execution
 ```
 
-v0.10.1 closes the documentation and published-site consistency pass after the first **stability and compatibility classification baseline** introduced in v0.10.0.
+v0.11.0 defines the extensibility boundary without introducing plugin execution.
 
-It introduces no Mission Model semantics, CLI behavior, generated surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin execution or Studio-specific APIs.
+It introduces no Mission Model semantics, CLI behavior beyond version reporting, generated Core surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution, metadata schema, metadata parser, metadata loader, metadata validator or Studio-specific APIs.
 
 It builds on:
 
@@ -26,6 +26,7 @@ v0.8.2  -> entity_index.json
 v0.9.0  -> relationship_manifest.json
 v0.10.0 -> stability and compatibility classification
 v0.10.1 -> documentation and published-site consistency
+v0.11.0 -> extensibility boundary contract, no execution
 ```
 
 The current public preview includes:
@@ -63,6 +64,8 @@ The current public preview includes:
 - `orbitfabric export relationship-manifest`;
 - generated `relationship_manifest.json` candidate relationship report;
 - stability and compatibility classification references;
+- Extensibility Boundary Contract reference documentation;
+- ADR-0015 for the extensibility boundary;
 - release compatibility policy;
 - a clean-room synthetic `demo-3u` mission.
 
@@ -86,6 +89,7 @@ Mission Model
   -> Core-owned entity index surfaces
   -> Core-owned relationship manifest surfaces
   -> stability and compatibility classification
+  -> extensibility boundary contract
 ```
 
 The current Core-owned structured surface chain is:
@@ -96,9 +100,20 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
+The extensibility boundary rule is:
+
+```text
+Mission Model remains the source of truth.
+Core owns Mission Data Contract semantics.
+Extensions consume Core-owned structured surfaces.
+Extension-owned outputs remain distinguishable from Core-owned outputs.
+Extensions must not override Core semantics.
+Execution is out of scope.
+```
+
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
 
-It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing bindings, ground-facing integration artifacts and downstream inspection tools.
+It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing bindings, ground-facing integration artifacts, downstream inspection tools and future extension-owned outputs.
 
 Generated runtime-facing contract bindings are not flight software.
 
@@ -106,4 +121,4 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility classification references are not schema migration tooling, plugin execution, runtime behavior or a v1.0 stability guarantee.
+Compatibility classification references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a v1.0 stability guarantee.
