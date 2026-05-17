@@ -10,11 +10,11 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.10.1 - Documentation and Published Site Consistency`.
+The current public baseline is `v0.11.0 - Extensibility Boundary Contract, no execution`.
 
-In v0.10.1, Documentation and Published Site Consistency means the public documentation and release baseline have been aligned after the v0.10.0 stability and compatibility classification baseline.
+In v0.11.0, Extensibility Boundary Contract means the project has documented how future extension-owned outputs may relate to Core-owned Mission Data Contract semantics without introducing plugin discovery, plugin loading, plugin execution or a plugin runtime.
 
-The current development focus is to prepare `v0.11.0 - Extensibility Boundary Contract, no execution` without adding plugin execution, plugin discovery or plugin loaders prematurely.
+The current development focus is to prepare `v0.12.0 - v1.0 Release Candidate Hardening` without broadening OrbitFabric into flight software, ground software, visual modeling, plugin discovery, plugin loading or plugin execution.
 
 The current baseline proves this Mission Data Chain:
 
@@ -33,9 +33,10 @@ Payload Contract
   -> Entity Index Surface
   -> Relationship Manifest Surface
   -> Stability and Compatibility Classification
+  -> Extensibility Boundary Contract
 ```
 
-Do not add large integrations before the contract model, Core-owned structured surfaces and compatibility boundaries are coherent.
+Do not add large integrations before the contract model, Core-owned structured surfaces, compatibility boundaries and extensibility boundary are coherent.
 
 Out of scope for the current preview:
 
@@ -67,9 +68,13 @@ Out of scope for the current preview:
 - JSON Schema publication;
 - stable v1.0 compatibility guarantee;
 - plugin API;
-- plugin execution;
 - plugin discovery;
-- plugin loader;
+- plugin loading;
+- plugin execution;
+- metadata schema;
+- metadata parser;
+- metadata loader;
+- metadata validator;
 - real spacecraft data.
 
 Runtime-facing contract bindings must remain generated, deterministic and disposable.
@@ -84,9 +89,11 @@ Relationship manifest reports must remain Core-owned, deterministic, read-only, 
 
 Compatibility classification references must remain documentation contracts, not implementation behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
 
+The Extensibility Boundary Contract must remain a boundary contract, not metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime.
+
 User implementation code and downstream integration code must live outside `generated/`.
 
-Future plugin and extensibility work must not allow plugins to silently redefine core Mission Data Contract semantics or bypass validation.
+Future plugin and extensibility work must not allow plugins to silently redefine Core Mission Data Contract semantics or bypass validation.
 
 ---
 
@@ -142,7 +149,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.10.1
+orbitfabric 0.11.0
 ```
 
 ---
@@ -228,8 +235,8 @@ Rules:
 
 - keep modules small;
 - keep the Mission Model as the source of truth;
-- do not parse YAML independently in generators, simulators or exporters;
-- consume validated model objects;
+- do not parse YAML independently in generators, simulators, exporters or downstream tools;
+- consume validated model objects and Core-owned structured surfaces;
 - prefer explicit diagnostics;
 - write tests for new lint rules, generators, exporters and simulator behavior;
 - do not introduce heavy dependencies without a clear reason.
@@ -273,6 +280,8 @@ RuntimeContract builder -> raw YAML files
 GroundContract builder -> raw YAML files
 profile-specific generator -> raw YAML files
 exporter -> raw YAML files
+extension output -> Core-owned semantics
+plugin output -> Core-owned relationship manifest
 ```
 
 Do not hardcode behavior for `demo-3u` inside the framework core.
@@ -280,6 +289,8 @@ Do not hardcode behavior for `demo-3u` inside the framework core.
 Relationship manifest records must remain derived from explicit loaded Mission Model fields and must reference indexed entities rather than synthetic downstream nodes.
 
 Compatibility classification references must not become a second source of Mission Data Contract semantics.
+
+The Extensibility Boundary Contract must not become a plugin execution surface without a separate architectural review.
 
 ---
 

@@ -1,8 +1,8 @@
 # OrbitFabric - Architecture
 
-Version: 0.10.0  
+Version: 0.11.0  
 Status: Development preview  
-Scope: Mission Data Contract architecture through Stability and Compatibility Contract
+Scope: Mission Data Contract architecture through Extensibility Boundary Contract, no execution
 
 ---
 
@@ -16,7 +16,7 @@ Its architecture is centered on one primary artifact:
 
 The Mission Data Contract is expressed as a structured Mission Model.
 
-It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, stability and compatibility classifications, documentation and scenario evidence from one source of truth.
+It defines mission data, operational behavior, payload contracts, data products, storage intent, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, stability and compatibility classifications, extensibility boundary rules, documentation and scenario evidence from one source of truth.
 
 OrbitFabric is not designed as:
 
@@ -32,14 +32,16 @@ CCSDS/PUS/CFDP implementation
 hardware abstraction layer
 visual modeling tool
 Studio-specific backend API
+plugin discovery mechanism
+plugin loading mechanism
 plugin execution platform
 ```
 
 Its architectural role is:
 
-> define, validate, simulate, document, introspect, index, relate, classify and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings, ground-facing integration and downstream inspection tools.
+> define, validate, simulate, document, introspect, index, relate, classify, bound extensibility and generate contract-facing artifacts between mission design, onboard software, tests, documentation, simulation, runtime-facing bindings, ground-facing integration, downstream inspection tools and future extension-owned outputs.
 
-The current architectural baseline is `v0.10.0 - Stability and Compatibility Contract`.
+The current architectural baseline is `v0.11.0 - Extensibility Boundary Contract, no execution`.
 
 v0.8.1 introduced the first Core-owned read-only model summary surface derived from the loaded Mission Model.
 
@@ -47,7 +49,9 @@ v0.8.2 introduced the first Core-owned read-only entity index surface derived fr
 
 v0.9.0 introduced the first Core-owned read-only relationship manifest surface derived from explicit loaded Mission Model fields.
 
-v0.10.0 introduces the first stability and compatibility classification baseline for public, preview, candidate, generated and internal surfaces before v1.0.0.
+v0.10.0 introduced the first stability and compatibility classification baseline for public, preview, candidate, generated and internal surfaces before v1.0.0.
+
+v0.11.0 introduces the first extensibility boundary contract before any plugin execution exists.
 
 ---
 
@@ -57,9 +61,9 @@ v0.10.0 introduces the first stability and compatibility classification baseline
 
 The Mission Model is the source of truth.
 
-Runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, relationship manifest reports, simulation behavior, generated documentation and compatibility classifications must derive from or describe the Mission Model and its Core-owned surfaces.
+Runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, relationship manifest reports, simulation behavior, generated documentation, compatibility classifications and extensibility boundary rules must derive from or describe the Mission Model and its Core-owned surfaces.
 
-No important mission behavior should live only in Python code, documentation, generated files, simulator internals, plugin outputs or downstream tools.
+No important mission behavior should live only in Python code, documentation, generated files, simulator internals, plugin outputs, extension-owned outputs or downstream tools.
 
 ### 2.2 Contract Before Runtime
 
@@ -77,7 +81,9 @@ v0.8.2 introduced a Core-owned entity index report, not relationship graphs or p
 
 v0.9.0 introduced a Core-owned relationship manifest report, not graph execution, plugin execution or Studio-specific behavior.
 
-v0.10.0 introduces compatibility classification references, not schema migration tooling, plugin execution, runtime behavior, ground behavior or a stable v1.0 guarantee.
+v0.10.0 introduced compatibility classification references, not schema migration tooling, plugin execution, runtime behavior, ground behavior or a stable v1.0 guarantee.
+
+v0.11.0 introduces an extensibility boundary contract, not metadata schema, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 ### 2.3 Chain Before Generated Artifacts
 
@@ -99,9 +105,10 @@ Payload behavior
         -> Entity Index Surface
         -> Relationship Manifest Surface
         -> Stability and Compatibility Classification
+        -> Extensibility Boundary Contract
 ```
 
-### 2.4 Generated Bindings, Exports, Reports and Classifications Are Not Behavior
+### 2.4 Generated Bindings, Exports, Reports, Classifications and Boundaries Are Not Behavior
 
 Generated Runtime Skeletons are contract bindings.
 
@@ -115,9 +122,11 @@ Generated Relationship Manifest reports are Core-owned read-only relationship re
 
 Stability and compatibility references classify public, preview, candidate, generated and internal surfaces.
 
-They may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces, manifests, dictionaries, review documents, domain-level model summaries, entity-level records, relationship records and compatibility expectations.
+The Extensibility Boundary Contract defines how future extension-owned outputs may relate to Core-owned semantics without becoming a second source of truth.
 
-They must not implement command dispatch, queues, scheduling, hardware access, telemetry polling, fault handling runtime, storage runtime, downlink runtime, decoder runtime, database behavior, operator workflows, live ground operations, relationship graph behavior or plugin execution.
+These surfaces and references may expose identifiers, descriptors, typed command argument structures, static registries, abstract interfaces, manifests, dictionaries, review documents, domain-level model summaries, entity-level records, relationship records, compatibility expectations and extensibility boundary expectations.
+
+They must not implement command dispatch, queues, scheduling, hardware access, telemetry polling, fault handling runtime, storage runtime, downlink runtime, decoder runtime, database behavior, operator workflows, live ground operations, relationship graph behavior, plugin discovery, plugin loading or plugin execution.
 
 ### 2.5 Lint as Engineering Judgment
 
@@ -125,7 +134,7 @@ They must not implement command dispatch, queues, scheduling, hardware access, t
 
 It must detect mission consistency issues, not merely invalid YAML.
 
-A concept that can become operationally ambiguous should have a lint rule before downstream runtime-facing, ground-facing, introspection, entity-index or relationship artifacts depend on it.
+A concept that can become operationally ambiguous should have a lint rule before downstream runtime-facing, ground-facing, introspection, entity-index, relationship or extension-owned artifacts depend on it.
 
 ### 2.6 Docs from Model
 
@@ -161,6 +170,8 @@ v0.9.0 extends it with `relationship_manifest.json`.
 
 v0.10.0 classifies these and other public surfaces as compatibility-sensitive before v1.0.0.
 
+v0.11.0 extends the same rule to future extension-owned outputs: extensions consume Core-owned surfaces and must not redefine Core semantics.
+
 ---
 
 ## 3. High-Level System View
@@ -188,6 +199,7 @@ OrbitFabric
 │   ├── entity index inputs
 │   ├── relationship manifest inputs
 │   ├── stability and compatibility classifications
+│   ├── extensibility boundary rules
 │   └── scenarios
 │
 ├── Toolchain
@@ -211,12 +223,12 @@ OrbitFabric
 ├── Export Layer
 ├── Generation Layer
 ├── Compatibility Classification Layer
-└── Future Extension Layer
+└── Extensibility Boundary Layer
 ```
 
 ---
 
-## 4. Current Capability Boundary - v0.10.0
+## 4. Current Capability Boundary - v0.11.0
 
 OrbitFabric currently includes:
 
@@ -253,6 +265,8 @@ entity_index.json entity index report
 orbitfabric export relationship-manifest command
 relationship_manifest.json candidate relationship report
 stability and compatibility classification references
+Extensibility Boundary Contract reference
+ADR-0015 extensibility boundary decision
 release compatibility policy
 synthetic demo mission
 ```
@@ -286,6 +300,10 @@ relationship graph
 dependency graph
 schema migration tooling
 JSON Schema publication
+metadata schema
+metadata parser
+metadata loader
+metadata validator
 plugin API
 plugin discovery
 plugin loader
@@ -326,7 +344,7 @@ Typed Mission Model
 
 The model is loaded once and consumed by multiple downstream layers.
 
-No generator, simulator, exporter, plugin or downstream tool should independently reinterpret raw YAML.
+No generator, simulator, exporter, plugin, extension-owned output or downstream tool should independently reinterpret raw YAML.
 
 ---
 
@@ -375,11 +393,14 @@ Relationship Manifest Surface
       │
       ▼
 Stability and Compatibility Classification
+      │
+      ▼
+Extensibility Boundary Contract
 ```
 
 This is the architectural reason OrbitFabric did not jump directly from payload contracts to plugins.
 
-Plugins and downstream tools are useful only after the mission data chain, Core-owned structured surfaces and compatibility boundaries are explicit enough to consume safely.
+Plugins, extension-owned outputs and downstream tools are useful only after the mission data chain, Core-owned structured surfaces, compatibility boundaries and extensibility boundaries are explicit enough to consume safely.
 
 ---
 
@@ -425,6 +446,8 @@ orbitfabric
 ```
 
 Future commands may include tool-specific exporters and plugin-related commands only after their semantics, trust model and boundaries are implemented and tested explicitly.
+
+v0.11.0 does not add extension commands.
 
 ---
 
@@ -494,6 +517,8 @@ relationship_manifest.json
 
 v0.10.0 classifies these Core-owned structured surfaces as compatibility-sensitive candidate or preview surfaces before v1.0.0.
 
+v0.11.0 defines how future extension-owned outputs may consume these surfaces without redefining them.
+
 The required dependency direction is:
 
 ```text
@@ -504,6 +529,7 @@ Mission Model
         -> model_summary.json
         -> entity_index.json
         -> relationship_manifest.json
+        -> downstream tools and future extensions consume Core-owned structured surfaces
 ```
 
 The disallowed direction is:
@@ -517,6 +543,7 @@ export layer
         -> human-oriented CLI output
         -> downstream UI state
         -> plugin assumptions
+        -> extension-owned assumptions
 ```
 
 The model summary report contains domain-level information only.
@@ -525,7 +552,7 @@ The entity index report contains entity-level records only.
 
 The relationship manifest report contains admitted Core-owned relationship records only.
 
-None of these surfaces contains source locations, YAML AST data, plugin definitions, Studio-specific formatting, runtime behavior or ground behavior.
+None of these surfaces contains source locations, YAML AST data, plugin definitions, extension definitions, Studio-specific formatting, runtime behavior or ground behavior.
 
 ---
 
@@ -554,6 +581,7 @@ human-oriented CLI output
 Studio UI state
 React component state
 private downstream assumptions
+extension-owned assumptions
 ```
 
 For `examples/demo-3u/mission`, the current manifest emits 46 relationship records across 17 emitted relationship families.
@@ -573,13 +601,14 @@ a ground routing table
 a scheduler input
 a command dispatcher input
 a plugin API
+an extension API
 ```
 
 A downstream tool may render a graph from relationship records, but the engineering meaning of every edge must still come from Core.
 
 ---
 
-## 12. Stability and Compatibility Architecture
+## 12. Stability, Compatibility and Extensibility Architecture
 
 v0.10.0 classifies OrbitFabric's public and preview surfaces before v1.0.0.
 
@@ -595,11 +624,22 @@ scenario evidence stability
 release compatibility policy
 ```
 
+v0.11.0 adds the Extensibility Boundary Contract, which states:
+
+```text
+Mission Model remains the source of truth.
+Core owns Mission Data Contract semantics.
+Extensions consume Core-owned structured surfaces.
+Extension-owned outputs remain distinguishable from Core-owned outputs.
+Extensions must not override Core semantics.
+Execution is out of scope.
+```
+
 These references are documentation contracts.
 
-They define how existing surfaces should evolve, but they do not add new Mission Model semantics, YAML fields, report fields, generated surfaces, CLI behavior, lint diagnostics or scenario behavior.
+They define how existing surfaces should evolve and how future extension-owned outputs may relate to Core-owned semantics, but they do not add new Mission Model semantics, YAML fields, report fields, generated surfaces, CLI behavior beyond version reporting, lint diagnostics or scenario behavior.
 
-They also do not introduce schema migration tooling, JSON Schema publication, runtime behavior, ground behavior, plugin execution, graph behavior, Studio-specific APIs or a stable v1.0 compatibility guarantee.
+They also do not introduce schema migration tooling, JSON Schema publication, metadata schema, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior, graph behavior, Studio-specific APIs or a stable v1.0 compatibility guarantee.
 
 ---
 
@@ -785,6 +825,8 @@ Reports and manifests must remain stable enough for tests and CI, but they are s
 
 v0.10.0 classifies JSON report compatibility expectations without changing report structure or introducing JSON Schema publication.
 
+v0.11.0 does not introduce new JSON report fields or extension metadata schemas.
+
 ---
 
 ## 19. Layer Dependency Rules
@@ -831,6 +873,7 @@ relationship exporter -> raw YAML files
 relationship exporter -> generated Markdown
 relationship exporter -> downstream UI state
 plugin output -> Core-owned relationship manifest
+extension output -> Core-owned semantics
 ```
 
 The Model Layer must remain the lowest stable layer.
@@ -903,7 +946,7 @@ orbitfabric gen ground examples/demo-3u/mission/
 
 ## 21. Future Extension Architecture
 
-Future extensions should be added as generators, plugins or adapters.
+Future extensions should be added as generators, plugins or adapters only after their semantics, trust model and boundary rules are reviewed explicitly.
 
 Possible future layers:
 
@@ -923,6 +966,8 @@ cFS/F Prime Integration Bridges
 These must remain downstream of the Mission Model and Core-owned structured surfaces.
 
 They must not redefine the mission contract.
+
+v0.11.0 defines the boundary but does not introduce discovery, loading or execution.
 
 Plugin execution requires explicit trust and boundary design before arbitrary plugin code is supported.
 
@@ -946,14 +991,15 @@ downlink runtime creep
 plugin-before-core-surface creep
 relationship-graph-before-relationship-semantics creep
 compatibility-claim-before-classification creep
+execution-before-boundary creep
 proprietary example contamination
 ```
 
 ---
 
-## 23. v0.10.0 Acceptance Architecture
+## 23. v0.11.0 Acceptance Architecture
 
-OrbitFabric v0.10.0 is architecturally acceptable when this flow works end-to-end:
+OrbitFabric v0.11.0 is architecturally acceptable when this flow works end-to-end:
 
 ```bash
 ruff check .
@@ -1012,20 +1058,22 @@ JSON ground dictionaries
 CSV ground dictionaries
 human-reviewable ground Markdown artifacts
 stability and compatibility classification references
+Extensibility Boundary Contract reference
+ADR-0015
 release compatibility policy
 ```
 
-No flight runtime, live ground segment, orbital propagation, RF simulation, storage/downlink runtime, live uplink, decoder runtime, telemetry archive, operator console, autonomy runtime, relationship graph, plugin API, schema migration tooling, JSON Schema publication or stable v1.0 guarantee is required for v0.10.0.
+No flight runtime, live ground segment, orbital propagation, RF simulation, storage/downlink runtime, live uplink, decoder runtime, telemetry archive, operator console, autonomy runtime, relationship graph, metadata schema, plugin discovery, plugin loading, plugin execution, schema migration tooling, JSON Schema publication or stable v1.0 guarantee is required for v0.11.0.
 
 ---
 
-## 24. Next Architectural Step After v0.10.0
+## 24. Next Architectural Step After v0.11.0
 
-The next architectural step after v0.10.0 is v0.10.1 Documentation and Published Site Consistency.
+The next architectural step after v0.11.0 is v0.12.0 Release Candidate Hardening.
 
-That work should verify and preserve consistency between repository documentation and the published documentation site.
+That work should focus on consistency, release hygiene, validation coverage, compatibility review, golden-output confidence and removal of ambiguity before declaring a stable Mission Data Contract.
 
-It should not introduce model, CLI, export, generator, runtime, ground or plugin behavior.
+It should not introduce model, runtime, ground, graph, Studio-specific, plugin discovery, plugin loading or plugin execution behavior.
 
 ---
 
@@ -1054,6 +1102,8 @@ The v0.8.2 entity index surface exposes Core-owned entity records for downstream
 The v0.9.0 relationship manifest surface exposes Core-owned relationship records for downstream tools without introducing graph behavior, plugin execution or Studio-specific APIs.
 
 The v0.10.0 stability and compatibility contract classifies public, preview, candidate, generated and internal surfaces before v1.0.0 without introducing implementation behavior or a stable v1.0 guarantee.
+
+The v0.11.0 extensibility boundary contract defines how future extension-owned outputs may relate to Core-owned semantics without introducing plugin discovery, plugin loading or plugin execution.
 
 Future plugins must consume the contract.
 

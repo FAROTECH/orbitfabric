@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.10.1
+orbitfabric 0.11.0
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.10.1 Slice
+## Verify the Current v0.11.0 Slice
 
 Run mission lint:
 
@@ -105,13 +105,14 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Review the v0.10.0 compatibility classification references, which remain the current compatibility foundation before v1.0.0:
+Review the compatibility and extensibility references, which remain the current documentation foundation before v1.0.0:
 
 ```text
 Stability and Compatibility Contract
 Mission Model Stability Contract
 CLI Contract v1 Preview
 Generated Surfaces Stability
+Extensibility Boundary Contract
 Lint Rule Code Stability
 JSON Report Compatibility
 Scenario Evidence Stability
@@ -320,6 +321,8 @@ Do not add generated artifacts that bypass validation.
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
 Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
+
+Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
 
 Do not put user code inside generated runtime bindings.
 

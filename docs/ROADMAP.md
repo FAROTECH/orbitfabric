@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.10.1 to v1.0 stability path  
+Version: v0.11.0 to v1.0 stability path  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -19,7 +19,8 @@ The project must not try to become, at the same time:
 - a formal verification tool;
 - a hardware abstraction layer;
 - a CubeSat tutorial;
-- a payload runtime framework.
+- a payload runtime framework;
+- a plugin execution platform.
 
 The correct growth path is:
 
@@ -49,61 +50,47 @@ Every milestone must reinforce the core identity:
 
 > OrbitFabric is a Mission Data Contract framework.
 
-The current architectural objective is to keep the Mission Data Chain explicit, inspectable and consumable by generated artifacts and downstream tools without turning OrbitFabric into flight software, a ground segment, a visual modeling tool or a plugin execution platform.
+The current architectural objective is to keep the Mission Data Chain explicit, inspectable, compatibility-classified and safely extensible without turning OrbitFabric into flight software, a ground segment, a visual modeling tool or a plugin execution platform.
 
 ---
 
 ## 2. Roadmap Overview
 
 ```text
-v0.1    Mission Contract MVP                                  completed
-v0.2    Model Hardening                                       completed line
-v0.2.1  Payload Contract Model                                completed
-v0.2.2  Payload Contract Release Alignment                    completed
-v0.2.3  Mission Data Chain Roadmap Alignment                  completed
-v0.3.0  Data Product and Storage Contracts                    completed
-v0.4.0  Contact Windows and Downlink Flow Contracts           completed
-v0.5.0  Commandability and Autonomy Contracts                 completed
-v0.6.0  End-to-End Mission Data Flow Evidence                 completed
-v0.7.0  Generated Runtime Skeletons                           completed
-v0.8.0  Ground Integration Artifacts                          completed
-v0.8.1  Contract Introspection Surface                        completed
-v0.8.2  Entity Index Surface                                  completed
+v0.1    Mission Contract MVP                                     completed
+v0.2    Model Hardening                                          completed line
+v0.2.1  Payload Contract Model                                   completed
+v0.2.2  Payload Contract Release Alignment                       completed
+v0.2.3  Mission Data Chain Roadmap Alignment                     completed
+v0.3.0  Data Product and Storage Contracts                       completed
+v0.4.0  Contact Windows and Downlink Flow Contracts              completed
+v0.5.0  Commandability and Autonomy Contracts                    completed
+v0.6.0  End-to-End Mission Data Flow Evidence                    completed
+v0.7.0  Generated Runtime Skeletons                              completed
+v0.8.0  Ground Integration Artifacts                             completed
+v0.8.1  Contract Introspection Surface                           completed
+v0.8.2  Entity Index Surface                                     completed
 v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
-v0.10.0 Stability and Compatibility Contract                  completed
-v0.10.1 Documentation and Published Site Consistency          completed
-v0.11.0 Extensibility Boundary Contract, no execution         next
-v0.12.0 v1.0 Release Candidate Hardening                      future
-v1.0.0  Stable Mission Data Contract                          future
+v0.10.0 Stability and Compatibility Contract                     completed
+v0.10.1 Documentation and Published Site Consistency             completed
+v0.11.0 Extensibility Boundary Contract, no execution            completed
+v0.12.0 v1.0 Release Candidate Hardening                         next
+v1.0.0  Stable Mission Data Contract                             future
 ```
 
-The current completed milestone is `v0.10.1 - Documentation and Published Site Consistency`.
+The current completed milestone is `v0.11.0 - Extensibility Boundary Contract, no execution`.
 
-The immediate target after v0.10.1 is `v0.11.0 - Extensibility Boundary Contract, no execution`.
+The immediate target after v0.11.0 is `v0.12.0 - v1.0 Release Candidate Hardening`.
 
-This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified the compatibility expectations around those public and preview surfaces before v1.0. v0.10.1 verified and preserved documentation and published-site consistency before the extensibility boundary work.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified compatibility expectations around public and preview surfaces before v1.0. v0.10.1 verified documentation and published-site consistency. v0.11.0 defined the extensibility boundary without plugin execution.
 
-The next step is not plugin execution. The next step is to define the extensibility boundary without plugin execution.
+The next step is not plugin execution. The next step is release candidate hardening toward a stable Mission Data Contract.
 
-v0.11.0 must not introduce plugin execution, plugin discovery, plugin loaders, relationship graphs, dependency graphs, runtime behavior, ground behavior, Studio-specific APIs or new Mission Model semantics unless explicitly scoped and reviewed.
-
-Future extensibility must build on Core-owned structured surfaces without forcing plugins or downstream tools to reconstruct Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
+v0.12.0 should focus on consistency, release hygiene, validation coverage, golden-output confidence, compatibility review and ambiguity removal before v1.0.0.
 
 ---
 
-## 3. Completed Baseline - v0.1 Mission Contract MVP
-
-v0.1 proved that a user can:
-
-1. define a mission once;
-2. lint it semantically;
-3. generate documentation;
-4. execute an operational scenario;
-5. receive readable logs and JSON reports.
-
----
-
-## 4. Completed Model and Mission Data Chain Slices
+## 3. Completed Model and Mission Data Chain Slices
 
 OrbitFabric has completed the following model and Mission Data Chain slices:
 
@@ -134,49 +121,29 @@ They intentionally did not implement payload firmware, physical payload simulati
 
 ---
 
-## 5. Completed Slice - v0.7.0 Generated Runtime Skeletons
+## 4. Completed Slice - v0.7.0 Generated Runtime Skeletons
 
-v0.7.0 introduced the first generated runtime-facing contract binding layer derived from the Mission Data Contract.
+v0.7.0 introduced generated runtime-facing contract bindings.
 
-The public milestone name was:
+They expose identifiers, typed command argument structures, static metadata registries, abstract adapter interfaces and host-build smoke validation.
 
-```text
-Generated Runtime Skeletons
-```
-
-The precise architectural meaning is:
-
-```text
-runtime-facing contract bindings
-```
-
-v0.7.0 intentionally did not implement flight-ready runtime, command dispatch runtime, command queues, telemetry polling runtime, event routing runtime, fault manager runtime, scheduler, HAL, drivers, RTOS abstraction, binary serialization, CCSDS/PUS/CFDP behavior, storage runtime, downlink runtime, user-code merge or protected regions.
+They intentionally do not implement flight-ready runtime, command dispatch runtime, command queues, telemetry polling runtime, event routing runtime, fault manager runtime, scheduler, HAL, drivers, RTOS abstraction, binary serialization, CCSDS/PUS/CFDP behavior, storage runtime, downlink runtime, user-code merge or protected regions.
 
 ---
 
-## 6. Completed Slice - v0.8.0 Ground Integration Artifacts
+## 5. Completed Slice - v0.8.0 Ground Integration Artifacts
 
-v0.8.0 introduced the first generated ground-facing artifact package derived from the Mission Data Contract.
+v0.8.0 introduced generated ground-facing Mission Data Contract exports.
 
-The public milestone name is:
+They expose deterministic JSON, CSV and Markdown artifacts for engineering review and downstream ground integration work.
 
-```text
-Ground Integration Artifacts
-```
-
-The precise architectural meaning is:
-
-```text
-ground-facing Mission Data Contract exports
-```
-
-v0.8.0 intentionally did not implement a live ground segment, mission control system, telemetry archive, telemetry database, command uplink service, Yamcs integration, OpenC3 integration, XTCE compliance, CCSDS/PUS/CFDP implementation, binary packet decoder, binary telecommand encoder, RF behavior, pass scheduling or station automation.
+They intentionally do not implement a live ground segment, mission control system, telemetry archive, telemetry database, command uplink service, Yamcs integration, OpenC3 integration, XTCE compliance, CCSDS/PUS/CFDP implementation, binary packet decoder, binary telecommand encoder, RF behavior, pass scheduling or station automation.
 
 ---
 
-## 7. Completed Slice - v0.8.1 Contract Introspection Surface
+## 6. Completed Slice - v0.8.1 Contract Introspection Surface
 
-v0.8.1 introduced the first Core-owned read-only contract introspection surface.
+v0.8.1 introduced `model_summary.json`, the first Core-owned read-only contract introspection surface.
 
 It answers:
 
@@ -184,32 +151,13 @@ It answers:
 What contract domains are present in this mission?
 ```
 
-v0.8.1 introduced:
-
-```text
-orbitfabric.export package
-model_summary_to_dict(model, mission_dir)
-write_model_summary(model, mission_dir, output_file)
-orbitfabric export model-summary command
-model_summary.json report
-summary_version 0.1
-kind orbitfabric.model_summary
-contract domain records
-domain-level counts
-source file metadata
-required/present status
-explicit boundary flags
-Contract Introspection Surface reference documentation
-v0.8.1 release notes
-```
-
-v0.8.1 intentionally did not introduce entity records, relationship manifests, relationship graphs, source locations, YAML AST export, plugin API, Studio-specific API, runtime behavior, ground behavior or new Mission Model semantics.
+It intentionally did not introduce entity records, relationship manifests, relationship graphs, source locations, YAML AST export, plugin API, Studio-specific API, runtime behavior, ground behavior or new Mission Model semantics.
 
 ---
 
-## 8. Completed Slice - v0.8.2 Entity Index Surface
+## 7. Completed Slice - v0.8.2 Entity Index Surface
 
-v0.8.2 introduced the first Core-owned read-only entity index surface.
+v0.8.2 introduced `entity_index.json`, the first Core-owned read-only entity index surface.
 
 It answers:
 
@@ -217,40 +165,13 @@ It answers:
 What contract entities are defined in this mission?
 ```
 
-v0.8.2 introduced:
-
-```text
-entity_index_to_dict(model, mission_dir)
-write_entity_index(model, mission_dir, output_file)
-orbitfabric export entity-index command
-entity_index.json report
-index_version 0.1
-kind orbitfabric.entity_index
-entity-level records
-per-domain entity counts
-per-domain model counts
-source file metadata
-required/present domain status
-indexed/not-indexed domain status
-explicit boundary flags
-Entity Index Surface reference documentation
-v0.8.2 release notes
-```
-
-Command:
-
-```bash
-orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json generated/reports/entity_index.json
-```
-
-v0.8.2 intentionally did not introduce new Mission Model semantics, relationship manifest implementation, relationship graph, dependency graph, source line or column tracking, YAML AST export, plugin API, plugin discovery, Studio-specific API, runtime behavior or ground behavior.
+It intentionally did not introduce new Mission Model semantics, relationship manifest export, relationship graph, dependency graph, source line or column tracking, YAML AST export, plugin API, plugin discovery, Studio-specific API, runtime behavior or ground behavior.
 
 ---
 
-## 9. Completed Slice - v0.9.0 Relationship Manifest Surface and Extensibility Boundary
+## 8. Completed Slice - v0.9.0 Relationship Manifest Surface and Extensibility Boundary
 
-v0.9.0 introduces the first Core-owned read-only relationship manifest surface.
+v0.9.0 introduced `relationship_manifest.json`, the first Core-owned read-only relationship manifest surface.
 
 It answers:
 
@@ -258,95 +179,17 @@ It answers:
 How are indexed mission contract entities related?
 ```
 
-The relationship manifest builds directly on `entity_index.json`.
+The current candidate surface admits nineteen deliberately narrow relationship families.
 
-The intended downstream chain is now:
+For `examples/demo-3u/mission`, the current manifest emits 46 relationship records across 17 emitted relationship families.
 
-```text
-model_summary.json          -> domain navigation
-entity_index.json           -> entity navigation
-relationship_manifest.json  -> relationship navigation
-```
-
-v0.9.0 includes:
-
-```text
-relationship_manifest_to_dict(model, mission_dir)
-write_relationship_manifest(model, mission_dir, output_file)
-orbitfabric export relationship-manifest command
-relationship_manifest.json report
-manifest_version 0.1-candidate
-kind orbitfabric.relationship_manifest
-relationship records
-relationship type records
-relationship type counts
-explicit derivation policy
-explicit boundary flags
-Relationship Manifest Surface reference documentation
-ADR-0014 v0.9 plugin and relationship surface boundaries
-v0.9.0 release notes
-```
-
-Command:
-
-```bash
-orbitfabric export relationship-manifest examples/demo-3u/mission/ \
-  --json generated/reports/relationship_manifest.json
-```
-
-The current candidate surface admits nineteen deliberately narrow relationship families:
-
-```text
-autonomous_action_dispatches_command
-command_emits_event
-command_targets_subsystem
-commandability_rule_constrains_command
-data_product_produced_by_payload
-data_product_produced_by_subsystem
-downlink_flow_includes_data_product
-event_sourced_from_subsystem
-fault_emits_event
-fault_sourced_from_subsystem
-packet_includes_telemetry
-payload_accepts_command
-payload_belongs_to_subsystem
-payload_generates_event
-payload_may_raise_fault
-payload_produces_telemetry
-recovery_intent_reacts_to_event
-recovery_intent_reacts_to_fault
-telemetry_sourced_from_subsystem
-```
-
-For `examples/demo-3u/mission`, the current manifest emits 46 relationship records across 17 relationship families.
-
-v0.9.0 intentionally does not introduce:
-
-```text
-relationship inference
-relationship graph
-dependency graph
-source line or column tracking
-YAML AST export
-plugin execution
-plugin discovery
-plugin loader
-custom lint plugin support
-custom generator plugin support
-Studio-specific API
-runtime behavior
-ground behavior
-```
-
-The relationship manifest is a candidate Core-owned surface. It is deterministic, read-only and derived from explicit loaded Mission Model fields. It is not a graph engine, visualization format, plugin API, Studio API, runtime routing table, ground routing table, scheduler input or command dispatcher input.
+v0.9.0 intentionally did not introduce relationship inference, relationship graph, dependency graph, source line or column tracking, YAML AST export, plugin execution, plugin discovery, plugin loader, custom lint plugin support, custom generator plugin support, Studio-specific API, runtime behavior or ground behavior.
 
 ---
 
-## 10. Completed Slice - v0.10.0 Stability and Compatibility Contract
+## 9. Completed Slice - v0.10.0 Stability and Compatibility Contract
 
 v0.10.0 introduced the first stability and compatibility classification baseline before v1.0.
-
-It defines how OrbitFabric treats public, preview, candidate, generated and internal surfaces.
 
 The classification scope includes:
 
@@ -360,109 +203,76 @@ scenario evidence stability
 release compatibility policy
 ```
 
-v0.10.0 introduced these reference documents:
-
-```text
-Stability and Compatibility Contract
-Mission Model Stability Contract
-CLI Contract v1 Preview
-Generated Surfaces Stability
-Lint Rule Code Stability
-JSON Report Compatibility
-Scenario Evidence Stability
-Release Compatibility Policy
-v0.10.0 release notes
-```
-
-v0.10.0 intentionally does not introduce:
-
-```text
-new Mission Model semantics
-new YAML fields
-new model domains
-new CLI behavior
-new JSON report fields
-new generated surfaces
-new lint diagnostics
-new scenario behavior
-schema migration tooling
-JSON Schema publication
-plugin execution
-plugin discovery
-plugin loader
-relationship graph
-dependency graph
-runtime behavior
-ground behavior
-Studio-specific API
-stable v1.0 compatibility guarantee
-```
+v0.10.0 intentionally did not introduce new Mission Model semantics, new YAML fields, new CLI behavior, new JSON report fields, new generated surfaces, new lint diagnostics, new scenario behavior, schema migration tooling, JSON Schema publication, plugin execution, plugin discovery, plugin loader, relationship graph, dependency graph, runtime behavior, ground behavior, Studio-specific API or a stable v1.0 compatibility guarantee.
 
 ---
 
-## 11. Completed Slice - v0.10.1 Documentation and Published Site Consistency
+## 10. Completed Slice - v0.10.1 Documentation and Published Site Consistency
 
 v0.10.1 verified and preserved consistency between repository documentation and the published documentation site.
 
-It ensured that the public documentation remains aligned with the released baseline and the roadmap toward v1.0.
+It clarified README wording around Relationship Manifest family counts and preserved the v0.10.0 compatibility baseline as the current compatibility foundation before v1.0.0.
 
-It also clarified README wording around Relationship Manifest family counts:
-
-```text
-19 admitted relationship families at the candidate surface level
-46 emitted relationship records for examples/demo-3u/mission
-17 emitted relationship families for examples/demo-3u/mission
-```
-
-v0.10.1 intentionally does not introduce:
-
-```text
-new Mission Model semantics
-new YAML fields
-new model domains
-new CLI behavior beyond version reporting
-new JSON report fields
-new generated surfaces
-new lint diagnostics
-new scenario behavior
-schema migration tooling
-JSON Schema publication
-plugin execution
-plugin discovery
-plugin loader
-relationship graph
-dependency graph
-runtime behavior
-ground behavior
-Studio-specific API
-stable v1.0 compatibility guarantee
-```
+v0.10.1 intentionally did not introduce new Mission Model semantics, new YAML fields, new CLI behavior beyond version reporting, new JSON report fields, new generated surfaces, new lint diagnostics, new scenario behavior, schema migration tooling, JSON Schema publication, plugin execution, plugin discovery, plugin loader, relationship graph, dependency graph, runtime behavior, ground behavior, Studio-specific API or a stable v1.0 compatibility guarantee.
 
 ---
 
-## 12. Next Milestone - v0.11.0 Extensibility Boundary Contract, no execution
+## 11. Completed Slice - v0.11.0 Extensibility Boundary Contract, no execution
 
-v0.11.0 should define the extensibility boundary without executing plugins.
+v0.11.0 defines the extensibility boundary without executing plugins.
 
-It may document what future extension metadata would be allowed to describe, but it must not introduce plugin discovery, plugin loading, plugin execution or arbitrary third-party code execution.
+It introduces:
 
-Plugins must never become a second source of Mission Data Contract semantics.
+```text
+ADR-0015 - Extensibility Boundary Contract, No Execution
+Extensibility Boundary Contract reference documentation
+non-normative guidance for future descriptive extension metadata
+explicit Core ownership rules
+explicit extension ownership rules
+provenance expectations for future extension-owned artifacts
+semantic override ban
+explicit downstream consumer rules
+compatibility-sensitive extensibility boundary expectations before v1.0.0
+```
+
+The stable rule is:
+
+```text
+Mission Model remains the source of truth.
+Core owns Mission Data Contract semantics.
+Extensions consume Core-owned structured surfaces.
+Extension-owned outputs remain distinguishable from Core-owned outputs.
+Extensions must not override Core semantics.
+Execution is out of scope.
+```
+
+v0.11.0 intentionally does not introduce new Mission Model semantics, new YAML fields, new CLI behavior beyond version reporting, new JSON report fields, new generated Core surfaces, new lint diagnostics, new scenario behavior, metadata schema, metadata parser, metadata loader, metadata validator, plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, relationship graph, dependency graph, runtime behavior, ground behavior, Studio-specific API, schema migration tooling, JSON Schema publication or a stable v1.0 compatibility guarantee.
 
 ---
 
-## 13. Future Milestone - v0.12.0 v1.0 Release Candidate Hardening
+## 12. Next Milestone - v0.12.0 v1.0 Release Candidate Hardening
 
 v0.12.0 should harden the release candidate path toward v1.0.0.
 
-The focus should be consistency, documentation, validation coverage, release hygiene and removal of ambiguity before declaring a stable Mission Data Contract.
+The focus should be:
 
-It should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling or plugin execution.
+```text
+consistency
+release hygiene
+validation coverage
+golden-output confidence
+compatibility review
+removal of ambiguity
+v1.0 candidate surface selection
+```
+
+It should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling, plugin discovery, plugin loading or plugin execution.
 
 ---
 
-## 14. Future Milestone - v1.0.0 Stable Mission Data Contract
+## 13. Future Milestone - v1.0.0 Stable Mission Data Contract
 
-v1.0.0 should be the first version where the Mission Data Contract is stable enough for external users to build around.
+v1.0.0 should be the first version where the Mission Data Contract is stable enough for external users and downstream consumers to build around.
 
 Possible requirements:
 
@@ -478,6 +288,7 @@ stable GroundContract semantics
 stable contract introspection surface
 stable entity index surface
 stable relationship manifest surface
+stable extensibility boundary semantics
 stable runtime-facing contract binding surface
 stable ground-facing artifact package
 stable CLI commands
@@ -496,7 +307,7 @@ v1.0.0 should mean stable Mission Data Contract framework, not a complete space 
 
 ---
 
-## 15. Backlog Parking Lot
+## 14. Backlog Parking Lot
 
 These ideas are valid but must not distract from the active milestone.
 
@@ -537,11 +348,14 @@ plugin metadata manifest
 plugin capability manifest
 custom lint plugin support
 custom generator plugin support
+plugin discovery
+plugin loading
+plugin execution
 ```
 
 ---
 
-## 16. Priority Rules
+## 15. Priority Rules
 
 When deciding what to implement next, use these rules.
 
@@ -561,28 +375,30 @@ When deciding what to implement next, use these rules.
 14. Core Surfaces Before Plugins.
 15. Downstream Tools Consume, Not Infer.
 16. Relationship Semantics Before Relationship Visualization.
+17. Boundary Before Execution.
 
 ---
 
-## 17. Immediate Work Plan
+## 16. Immediate Work Plan
 
-The immediate work package after v0.10.1 is:
+The immediate work package after v0.11.0 is:
 
 ```text
-v0.11.0 - Extensibility Boundary Contract, no execution
+v0.12.0 - v1.0 Release Candidate Hardening
 ```
 
 Required next-step discipline:
 
 ```text
-1. define the extensibility boundary without executing plugins
-2. preserve Core-owned structured surfaces as the only downstream semantic source
-3. avoid runtime, ground, Studio-specific or plugin execution behavior
-4. keep the Mission Model as the source of truth
-5. keep downstream tools consuming Core-owned structured surfaces
+1. identify v1.0 candidate stable surfaces
+2. harden public documentation consistency
+3. review compatibility-sensitive surfaces
+4. strengthen regression confidence around generated and exported outputs
+5. remove ambiguous wording before stable Mission Data Contract declaration
+6. keep plugin execution out of scope
 ```
 
-Do not start plugin execution, plugin discovery or plugin loader work in v0.11.0.
+Do not start plugin execution, plugin discovery or plugin loader work in v0.12.0.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -590,7 +406,7 @@ Do not let downstream tools become a second source of truth.
 
 ---
 
-## 18. Final Roadmap Statement
+## 17. Final Roadmap Statement
 
 OrbitFabric must first become excellent at one thing:
 
@@ -612,9 +428,9 @@ The v0.10.0 roadmap step completed the first stability and compatibility classif
 
 The v0.10.1 roadmap step completed the documentation and published-site consistency pass.
 
-The v0.11.0 roadmap step should define the extensibility boundary without plugin execution.
+The v0.11.0 roadmap step completed the extensibility boundary contract without plugin execution.
 
-Only after the mission data chain, commandability, autonomy, end-to-end evidence, runtime-facing binding layer, ground-facing artifact layer, contract introspection, entity indexing, relationship semantics and compatibility boundaries are clear should OrbitFabric consider plugin execution.
+The v0.12.0 roadmap step must harden the path to v1.0.0 without broadening the Core.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
