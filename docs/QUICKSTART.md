@@ -30,6 +30,7 @@ Mission Model YAML
   -> entity_index.json entity index report
   -> relationship_manifest.json candidate relationship report
   -> stability and compatibility classification references
+  -> Extensibility Boundary Contract reference
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -43,7 +44,7 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility classification references are not runtime behavior, ground behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
+Compatibility classification references and the Extensibility Boundary Contract are not runtime behavior, ground behavior, schema migration tooling, plugin discovery, plugin loading, plugin execution or a v1.0 stability guarantee.
 
 ---
 
@@ -111,7 +112,7 @@ orbitfabric --help
 Expected version:
 
 ```text
-orbitfabric 0.10.1
+orbitfabric 0.11.0
 ```
 
 ---
@@ -233,9 +234,11 @@ They do not expose plugin execution, graph engines, Studio-specific APIs, runtim
 
 ---
 
-## 11. Review compatibility classification references
+## 11. Review stability, compatibility and extensibility references
 
 v0.10.0 adds compatibility classification references for the path toward v1.0.0.
+
+v0.11.0 adds the Extensibility Boundary Contract before any plugin execution exists.
 
 Key references include:
 
@@ -244,15 +247,16 @@ Stability and Compatibility Contract
 Mission Model Stability Contract
 CLI Contract v1 Preview
 Generated Surfaces Stability
+Extensibility Boundary Contract
 Lint Rule Code Stability
 JSON Report Compatibility
 Scenario Evidence Stability
 Release Compatibility Policy
 ```
 
-These references classify existing public and preview surfaces.
+These references classify existing public and preview surfaces and define how future extension-owned outputs must remain distinguishable from Core-owned outputs.
 
-They do not introduce new Mission Model semantics, CLI behavior, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
+They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
 
 ---
 
@@ -388,6 +392,7 @@ The current demo proves that OrbitFabric can:
 - export an entity index from the loaded Mission Model;
 - export a relationship manifest from the loaded Mission Model;
 - classify public, preview, candidate, generated and internal compatibility surfaces;
+- document the extensibility boundary before plugin execution;
 - validate scenarios without executing them;
 - execute deterministic operational sequences;
 - record contract-level data-flow evidence;
@@ -429,7 +434,10 @@ The current demo does not prove:
 - relationship graph behavior;
 - dependency graph behavior;
 - plugin API behavior;
+- plugin discovery behavior;
+- plugin loading behavior;
 - plugin execution behavior;
+- metadata schema behavior;
 - v1.0 compatibility guarantee;
 - qualification for operational spacecraft use.
 
