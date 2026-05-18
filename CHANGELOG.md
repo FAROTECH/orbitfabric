@@ -12,6 +12,89 @@ No changes yet.
 
 ---
 
+## [v0.12.0] - v1.0 Release Candidate Hardening
+
+### Added
+
+- Added the v1.0 Candidate Surface Inventory reference.
+- Added the Golden Output and Regression Confidence Policy reference.
+- Added the v1.0 Compatibility and Migration Notes reference.
+- Added all three v0.12.0 hardening references to the MkDocs Reference navigation.
+- Added v0.12.0 release notes.
+- Added the v0.12.0 release notes page to the MkDocs Releases navigation.
+- Added explicit documentation that v0.12.0 hardening references are review and governance surfaces, not new Mission Data Contract semantics.
+- Added explicit documentation that candidate, preview and generated surfaces do not become stable v1.0 automatically.
+- Added explicit disposition for security assumptions and command criticality contracts: valid future exploration, not a v1.0.0 blocker, deferred beyond v1.0.0 unless separately scoped.
+
+### Changed
+
+- Updated the package and CLI version to `0.12.0`.
+- Marked `v0.12.0 - v1.0 Release Candidate Hardening` as completed in the roadmap.
+- Marked `v1.0.0 - Stable Mission Data Contract` as the next milestone.
+- Aligned README with the v0.12.0 release baseline.
+- Aligned the public documentation homepage with the v0.12.0 release baseline.
+- Aligned Quickstart, Development Guide, Contributing Guide and Versioning Model with the v0.12.0 release baseline.
+- Aligned Architecture and Project Charter headers with the v0.12.0 release candidate hardening baseline.
+- Clarified the release candidate hardening path before v1.0.0.
+- Clarified that current CI artifacts are not committed golden-output baselines.
+- Clarified that golden-output baselines require separate future PRs and explicit scope.
+- Clarified compatibility and migration note discipline before v1.0.0.
+- Clarified that security assumptions and command criticality contracts remain outside v0.12.0 and v1.0.0 implementation scope.
+
+### Compatibility impact
+
+v0.12.0 has no Mission Data Contract semantic impact.
+
+It does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics, scenario expectations, JSON report fields or generated surfaces.
+
+The only CLI-visible behavior change is the reported package version:
+
+```text
+orbitfabric 0.12.0
+```
+
+No migration is required from v0.11.0 to v0.12.0.
+
+### Boundaries
+
+The v0.12.0 release candidate hardening slice intentionally does not introduce:
+
+- new Mission Model semantics;
+- new YAML fields;
+- new model domains;
+- new CLI behavior beyond version reporting;
+- new JSON report fields;
+- new generated Core surfaces;
+- new lint diagnostics;
+- new scenario behavior;
+- new golden files;
+- new snapshot tests;
+- new CI jobs;
+- schema migration tooling;
+- migration commands;
+- compatibility scanners;
+- JSON Schema publication;
+- Mission Model security domain;
+- security YAML fields;
+- security enforcement semantics;
+- plugin discovery;
+- plugin loading;
+- plugin execution;
+- metadata schema;
+- metadata parser;
+- metadata loader;
+- metadata validator;
+- relationship graph;
+- dependency graph;
+- runtime behavior;
+- ground behavior;
+- Studio-specific API;
+- stable v1.0 compatibility guarantee.
+
+v0.12.0 is a release candidate hardening and release-alignment milestone only.
+
+---
+
 ## [v0.11.0] - Extensibility Boundary Contract, no execution
 
 ### Added
