@@ -29,6 +29,26 @@ v0.10.1 -> documentation and published-site consistency
 v0.11.0 -> extensibility boundary contract, no execution
 ```
 
+The active hardening path after v0.11.0 is:
+
+```text
+v0.12.0 - v1.0 Release Candidate Hardening
+```
+
+Current v0.12.0 hardening references are documentation and review surfaces only:
+
+```text
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
+```
+
+They do not make v0.12.0 released.
+
+They do not make any surface stable v1.0.
+
+They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+
 The current public preview includes:
 
 - Mission Model YAML loading;
@@ -67,6 +87,9 @@ The current public preview includes:
 - Extensibility Boundary Contract reference documentation;
 - ADR-0015 for the extensibility boundary;
 - release compatibility policy;
+- v1.0 candidate surface inventory;
+- golden output and regression confidence policy;
+- v1.0 compatibility and migration notes;
 - a clean-room synthetic `demo-3u` mission.
 
 ## Core Idea
@@ -90,6 +113,7 @@ Mission Model
   -> Core-owned relationship manifest surfaces
   -> stability and compatibility classification
   -> extensibility boundary contract
+  -> v1.0 release candidate hardening references
 ```
 
 The current Core-owned structured surface chain is:
@@ -111,6 +135,16 @@ Extensions must not override Core semantics.
 Execution is out of scope.
 ```
 
+The v0.12.0 hardening rule is:
+
+```text
+Review candidate v1.0 surfaces.
+Define confidence policy before adding golden baselines.
+Document compatibility and migration decisions before stabilization.
+Remove ambiguity before declaring a stable Mission Data Contract.
+Do not broaden OrbitFabric.
+```
+
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
 
 It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing bindings, ground-facing integration artifacts, downstream inspection tools and future extension-owned outputs.
@@ -121,4 +155,4 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility classification references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a v1.0 stability guarantee.
+Compatibility classification references, v0.12.0 hardening references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a v1.0 stability guarantee.
