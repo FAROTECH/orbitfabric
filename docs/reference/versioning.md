@@ -12,7 +12,8 @@ OrbitFabric currently distinguishes between:
 - the generated contract introspection report context;
 - the generated entity index report context;
 - the generated relationship manifest report context;
-- the extensibility boundary documentation context.
+- the extensibility boundary documentation context;
+- the v1.0 release candidate hardening documentation context.
 
 These versions and contexts are related, but they are not the same thing.
 
@@ -38,7 +39,7 @@ orbitfabric --version
 Current example:
 
 ```text
-orbitfabric 0.11.0
+orbitfabric 0.12.0
 ```
 
 This version answers the question:
@@ -91,7 +92,7 @@ Current lint report example:
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
@@ -306,6 +307,32 @@ This boundary does not introduce a metadata schema, JSON shape, metadata manifes
 
 ---
 
+## v1.0 release candidate hardening context
+
+v0.12.0 introduces release candidate hardening references before `v1.0.0 - Stable Mission Data Contract`.
+
+This hardening context is documented through:
+
+```text
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
+```
+
+These references record expectations such as:
+
+```text
+candidate v1.0 surfaces must be inventoried explicitly
+golden-output baselines require separate scoped decisions
+compatibility and migration notes must be explicit before stabilization
+candidate, preview and generated surfaces do not become stable automatically
+security assumptions and command criticality contracts are deferred beyond v1.0.0
+```
+
+This hardening context does not introduce golden files, snapshot tests, schema migration tooling, JSON Schema publication, Mission Model security domain, security YAML fields, security enforcement semantics, plugin discovery, plugin loading, plugin execution or a stable v1.0 compatibility guarantee.
+
+---
+
 ## Why the versions differ
 
 During development previews, OrbitFabric may evolve faster than the Mission Model contract.
@@ -313,7 +340,7 @@ During development previews, OrbitFabric may evolve faster than the Mission Mode
 For example:
 
 ```text
-OrbitFabric tool/package version: 0.11.0
+OrbitFabric tool/package version: 0.12.0
 Mission Model version:           0.1.0
 ```
 
@@ -321,13 +348,13 @@ This is valid.
 
 It means:
 
-- the tool has gained capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces, Stability/Compatibility Classification references and the Extensibility Boundary Contract;
+- the tool has gained capabilities such as Payload Contracts, Data Product Contracts, Contact/Downlink Contracts, Commandability/Autonomy Contracts, Data Flow Evidence, Runtime Contract Bindings, Ground Integration Artifacts, Contract Introspection Surfaces, Entity Index Surfaces, Relationship Manifest Surfaces, Stability/Compatibility Classification references, the Extensibility Boundary Contract and v1.0 release candidate hardening references;
 - the demo mission still declares the v0.1 Mission Model contract;
 - generated artifacts record the relevant tool and model context.
 
 ---
 
-## Current v0.11.0 rule
+## Current v0.12.0 rule
 
 For the current development preview:
 
@@ -349,6 +376,7 @@ For the current development preview:
 | Relationship manifest `manifest_version` | Relationship manifest report format version, currently `0.1-candidate`. |
 | Relationship manifest `kind` | Relationship manifest report kind, currently `orbitfabric.relationship_manifest`. |
 | Extensibility Boundary Contract | Documentation boundary for future extension-owned outputs, not an execution version. |
+| v0.12.0 hardening references | Documentation and review context for v1.0 candidate surfaces, golden-output decisions and compatibility notes, not execution or schema version. |
 
 ---
 
@@ -366,7 +394,8 @@ Do not assume that:
 - entity index reports imply relationship graphs, dependency graphs or plugin APIs;
 - relationship manifest reports imply graph engines, runtime behavior, ground behavior, plugin APIs or Studio-specific APIs;
 - stability and compatibility references imply schema migration tooling, JSON Schema publication, plugin execution or a stable v1.0 compatibility guarantee;
-- Extensibility Boundary Contract implies metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime.
+- Extensibility Boundary Contract implies metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime;
+- v0.12.0 hardening references imply golden baselines, migration tooling, JSON Schema publication, security enforcement semantics or stable v1.0 compatibility.
 
 ---
 
@@ -387,4 +416,4 @@ Possible future additions include:
 - compatibility checks for generated artifact profiles;
 - a separately reviewed metadata format for future extension-owned outputs.
 
-These are not part of the current v0.11.0 development preview.
+These are not part of the current v0.12.0 development preview.
