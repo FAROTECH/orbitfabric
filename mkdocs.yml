@@ -25,6 +25,7 @@ nav:
       - Versioning Model: reference/versioning.md
       - Stability and Compatibility Contract: reference/stability-compatibility-contract.md
       - Release Compatibility Policy: reference/release-compatibility-policy.md
+      - v1.0 Candidate Surface Inventory: reference/v1-candidate-surface-inventory.md
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
