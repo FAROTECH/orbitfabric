@@ -88,6 +88,22 @@ The next step is not plugin execution. The next step is release candidate harden
 
 v0.12.0 should focus on consistency, release hygiene, validation coverage, golden-output confidence, compatibility review and ambiguity removal before v1.0.0.
 
+The current v0.12.0 hardening references are:
+
+```text
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
+```
+
+These references are review and governance surfaces.
+
+They do not release v0.12.0 by themselves.
+
+They do not make any surface stable v1.0.
+
+They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+
 ---
 
 ## 3. Completed Model and Mission Data Chain Slices
@@ -266,7 +282,25 @@ removal of ambiguity
 v1.0 candidate surface selection
 ```
 
-It should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling, plugin discovery, plugin loading or plugin execution.
+The current hardening references are:
+
+```text
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
+```
+
+Their role is to make the v1.0 path explicit before final release alignment.
+
+They do not themselves decide the final v1.0 stable surface.
+
+They do not add golden baselines, migration tooling, JSON Schema publication, generated Core surfaces or new Mission Model semantics.
+
+v0.12.0 should answer or explicitly defer central stabilization questions before the project moves to v1.0.0.
+
+v0.12.0 should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling, plugin discovery, plugin loading or plugin execution.
+
+Security assumptions and command criticality contracts remain valid future explorations, but they are deferred beyond v1.0.0 unless separately scoped in a post-v1.0 milestone.
 
 ---
 
@@ -302,6 +336,10 @@ published documentation site
 CI-tested release artifacts
 clear contribution process
 ```
+
+The final v1.0.0 stable surface must be selected explicitly.
+
+A surface listed as a candidate, preview or generated artifact before v1.0.0 does not become stable automatically.
 
 v1.0.0 should mean stable Mission Data Contract framework, not a complete space software ecosystem.
 
@@ -376,6 +414,7 @@ When deciding what to implement next, use these rules.
 15. Downstream Tools Consume, Not Infer.
 16. Relationship Semantics Before Relationship Visualization.
 17. Boundary Before Execution.
+18. Hardening Before Stability.
 
 ---
 
@@ -391,14 +430,17 @@ Required next-step discipline:
 
 ```text
 1. identify v1.0 candidate stable surfaces
-2. harden public documentation consistency
-3. review compatibility-sensitive surfaces
-4. strengthen regression confidence around generated and exported outputs
-5. remove ambiguous wording before stable Mission Data Contract declaration
-6. keep plugin execution out of scope
+2. define golden-output and regression confidence policy
+3. define compatibility and migration note discipline
+4. harden public documentation consistency
+5. review compatibility-sensitive surfaces
+6. remove ambiguous wording before stable Mission Data Contract declaration
+7. keep plugin execution out of scope
 ```
 
 Do not start plugin execution, plugin discovery or plugin loader work in v0.12.0.
+
+Do not introduce a Mission Model security domain, security YAML fields or security enforcement semantics in v0.12.0.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
