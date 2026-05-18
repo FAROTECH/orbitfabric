@@ -1,6 +1,6 @@
 # OrbitFabric - Roadmap
 
-Version: v0.11.0 to v1.0 stability path  
+Version: v0.12.0 to v1.0 stability path  
 Status: Development preview  
 Scope: v0.3 to v1.0 planning
 
@@ -74,35 +74,19 @@ v0.9.0  Relationship Manifest Surface and Extensibility Boundary completed
 v0.10.0 Stability and Compatibility Contract                     completed
 v0.10.1 Documentation and Published Site Consistency             completed
 v0.11.0 Extensibility Boundary Contract, no execution            completed
-v0.12.0 v1.0 Release Candidate Hardening                         next
-v1.0.0  Stable Mission Data Contract                             future
+v0.12.0 v1.0 Release Candidate Hardening                         completed
+v1.0.0  Stable Mission Data Contract                             next
 ```
 
-The current completed milestone is `v0.11.0 - Extensibility Boundary Contract, no execution`.
+The current completed milestone is `v0.12.0 - v1.0 Release Candidate Hardening`.
 
-The immediate target after v0.11.0 is `v0.12.0 - v1.0 Release Candidate Hardening`.
+The immediate target after v0.12.0 is `v1.0.0 - Stable Mission Data Contract`.
 
-This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified compatibility expectations around public and preview surfaces before v1.0. v0.10.1 verified documentation and published-site consistency. v0.11.0 defined the extensibility boundary without plugin execution.
+This sequence is intentional. v0.8.1 exposed the first Core-owned domain-level introspection surface. v0.8.2 exposed the first Core-owned entity-level index surface. v0.9.0 introduced the first Core-owned relationship-level surface. v0.10.0 classified compatibility expectations around public and preview surfaces before v1.0. v0.10.1 verified documentation and published-site consistency. v0.11.0 defined the extensibility boundary without plugin execution. v0.12.0 hardened the release candidate path toward a stable Mission Data Contract.
 
-The next step is not plugin execution. The next step is release candidate hardening toward a stable Mission Data Contract.
+The next step is not plugin execution. The next step is the stable Mission Data Contract release.
 
-v0.12.0 should focus on consistency, release hygiene, validation coverage, golden-output confidence, compatibility review and ambiguity removal before v1.0.0.
-
-The current v0.12.0 hardening references are:
-
-```text
-v1.0 Candidate Surface Inventory
-Golden Output and Regression Confidence Policy
-v1.0 Compatibility and Migration Notes
-```
-
-These references are review and governance surfaces.
-
-They do not release v0.12.0 by themselves.
-
-They do not make any surface stable v1.0.
-
-They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+v1.0.0 should finalize the narrow stable surface selected from the existing Mission Data Contract core.
 
 ---
 
@@ -266,23 +250,11 @@ v0.11.0 intentionally does not introduce new Mission Model semantics, new YAML f
 
 ---
 
-## 12. Next Milestone - v0.12.0 v1.0 Release Candidate Hardening
+## 12. Completed Slice - v0.12.0 v1.0 Release Candidate Hardening
 
-v0.12.0 should harden the release candidate path toward v1.0.0.
+v0.12.0 hardens the release candidate path toward v1.0.0.
 
-The focus should be:
-
-```text
-consistency
-release hygiene
-validation coverage
-golden-output confidence
-compatibility review
-removal of ambiguity
-v1.0 candidate surface selection
-```
-
-The current hardening references are:
+It introduces these hardening references:
 
 ```text
 v1.0 Candidate Surface Inventory
@@ -290,21 +262,21 @@ Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
 ```
 
-Their role is to make the v1.0 path explicit before final release alignment.
+Their role is to make the v1.0 path explicit before the final stable release.
 
 They do not themselves decide the final v1.0 stable surface.
 
 They do not add golden baselines, migration tooling, JSON Schema publication, generated Core surfaces or new Mission Model semantics.
 
-v0.12.0 should answer or explicitly defer central stabilization questions before the project moves to v1.0.0.
-
-v0.12.0 should not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling, plugin discovery, plugin loading or plugin execution.
+v0.12.0 answers or explicitly defers central stabilization questions before the project moves to v1.0.0.
 
 Security assumptions and command criticality contracts remain valid future explorations, but they are deferred beyond v1.0.0 unless separately scoped in a post-v1.0 milestone.
 
+v0.12.0 intentionally does not broaden OrbitFabric into flight software, ground software, simulation runtime, visual modeling, plugin discovery, plugin loading or plugin execution.
+
 ---
 
-## 13. Future Milestone - v1.0.0 Stable Mission Data Contract
+## 13. Next Milestone - v1.0.0 Stable Mission Data Contract
 
 v1.0.0 should be the first version where the Mission Data Contract is stable enough for external users and downstream consumers to build around.
 
@@ -420,27 +392,27 @@ When deciding what to implement next, use these rules.
 
 ## 16. Immediate Work Plan
 
-The immediate work package after v0.11.0 is:
+The immediate work package after v0.12.0 is:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
+v1.0.0 - Stable Mission Data Contract
 ```
 
 Required next-step discipline:
 
 ```text
-1. identify v1.0 candidate stable surfaces
-2. define golden-output and regression confidence policy
-3. define compatibility and migration note discipline
-4. harden public documentation consistency
-5. review compatibility-sensitive surfaces
-6. remove ambiguous wording before stable Mission Data Contract declaration
+1. select the final narrow v1.0 stable surface
+2. confirm which candidate surfaces become stable
+3. explicitly defer or mark preview surfaces that do not become stable
+4. confirm golden-output and regression expectations for stable surfaces
+5. confirm compatibility and migration notes
+6. align release documentation without broadening scope
 7. keep plugin execution out of scope
 ```
 
-Do not start plugin execution, plugin discovery or plugin loader work in v0.12.0.
+Do not start plugin execution, plugin discovery or plugin loader work in v1.0.0.
 
-Do not introduce a Mission Model security domain, security YAML fields or security enforcement semantics in v0.12.0.
+Do not introduce a Mission Model security domain, security YAML fields or security enforcement semantics in v1.0.0.
 
 Do not let plugins reconstruct contract semantics from raw YAML, generated files or human-oriented CLI output.
 
@@ -472,7 +444,7 @@ The v0.10.1 roadmap step completed the documentation and published-site consiste
 
 The v0.11.0 roadmap step completed the extensibility boundary contract without plugin execution.
 
-The v0.12.0 roadmap step must harden the path to v1.0.0 without broadening the Core.
+The v0.12.0 roadmap step completed the release candidate hardening path to v1.0.0 without broadening the Core.
 
 The narrowness of the roadmap is intentional.
 That narrowness is a strength, not a limitation.
