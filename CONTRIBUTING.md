@@ -16,6 +16,22 @@ In v0.11.0, Extensibility Boundary Contract means the project has documented how
 
 The current development focus is to prepare `v0.12.0 - v1.0 Release Candidate Hardening` without broadening OrbitFabric into flight software, ground software, visual modeling, plugin discovery, plugin loading or plugin execution.
 
+The active v0.12.0 hardening references are:
+
+```text
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
+```
+
+These references support review and release candidate hardening.
+
+They do not release v0.12.0 by themselves.
+
+They do not make any surface stable v1.0.
+
+They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+
 The current baseline proves this Mission Data Chain:
 
 ```text
@@ -34,9 +50,10 @@ Payload Contract
   -> Relationship Manifest Surface
   -> Stability and Compatibility Classification
   -> Extensibility Boundary Contract
+  -> v1.0 Release Candidate Hardening References
 ```
 
-Do not add large integrations before the contract model, Core-owned structured surfaces, compatibility boundaries and extensibility boundary are coherent.
+Do not add large integrations before the contract model, Core-owned structured surfaces, compatibility boundaries, extensibility boundary and release candidate hardening references are coherent.
 
 Out of scope for the current preview:
 
@@ -67,6 +84,9 @@ Out of scope for the current preview:
 - schema migration tooling;
 - JSON Schema publication;
 - stable v1.0 compatibility guarantee;
+- Mission Model security domain before v1.0.0;
+- security YAML fields before v1.0.0;
+- security enforcement semantics;
 - plugin API;
 - plugin discovery;
 - plugin loading;
@@ -90,6 +110,8 @@ Relationship manifest reports must remain Core-owned, deterministic, read-only, 
 Compatibility classification references must remain documentation contracts, not implementation behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
 
 The Extensibility Boundary Contract must remain a boundary contract, not metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime.
+
+v0.12.0 hardening references must remain review and governance documentation, not new runtime behavior, new generated surfaces or a stable v1.0 claim.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -291,6 +313,8 @@ Relationship manifest records must remain derived from explicit loaded Mission M
 Compatibility classification references must not become a second source of Mission Data Contract semantics.
 
 The Extensibility Boundary Contract must not become a plugin execution surface without a separate architectural review.
+
+v0.12.0 hardening references must not become a new source of Mission Data Contract semantics.
 
 ---
 
