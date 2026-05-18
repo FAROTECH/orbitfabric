@@ -10,11 +10,13 @@ The project is currently in pre-1.0 development. Contributions should stay focus
 
 ## Current Project Focus
 
-The current public baseline is `v0.11.0 - Extensibility Boundary Contract, no execution`.
+The current public baseline is `v0.12.0 - v1.0 Release Candidate Hardening`.
 
-In v0.11.0, Extensibility Boundary Contract means the project has documented how future extension-owned outputs may relate to Core-owned Mission Data Contract semantics without introducing plugin discovery, plugin loading, plugin execution or a plugin runtime.
+v0.12.0 hardens the release candidate path toward `v1.0.0 - Stable Mission Data Contract` without broadening OrbitFabric into flight software, ground software, visual modeling, plugin discovery, plugin loading or plugin execution.
 
-The current development focus is to prepare `v0.12.0 - v1.0 Release Candidate Hardening` without broadening OrbitFabric into flight software, ground software, visual modeling, plugin discovery, plugin loading or plugin execution.
+v0.11.0 remains the completed extensibility boundary baseline. It documented how future extension-owned outputs may relate to Core-owned Mission Data Contract semantics without introducing plugin discovery, plugin loading, plugin execution or a plugin runtime.
+
+The current development focus is to prepare `v1.0.0 - Stable Mission Data Contract` from the v0.12.0 hardening baseline.
 
 The active v0.12.0 hardening references are:
 
@@ -26,9 +28,9 @@ v1.0 Compatibility and Migration Notes
 
 These references support review and release candidate hardening.
 
-They do not release v0.12.0 by themselves.
+They are part of the v0.12.0 documentation baseline.
 
-They do not make any surface stable v1.0.
+They do not make any surface stable v1.0 by themselves.
 
 They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -171,7 +173,7 @@ orbitfabric --help
 Expected current version:
 
 ```text
-orbitfabric 0.11.0
+orbitfabric 0.12.0
 ```
 
 ---

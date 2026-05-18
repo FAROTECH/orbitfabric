@@ -50,7 +50,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.11.0
+orbitfabric 0.12.0
 ```
 
 ---
@@ -75,7 +75,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.11.0 Slice
+## Verify the Current v0.12.0 Slice
 
 Run mission lint:
 
@@ -105,7 +105,7 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Review the compatibility and extensibility references, which remain the current documentation foundation before v1.0.0:
+Review the compatibility, extensibility and v1.0 hardening references, which remain the current documentation foundation before v1.0.0:
 
 ```text
 Stability and Compatibility Contract
@@ -113,6 +113,9 @@ Mission Model Stability Contract
 CLI Contract v1 Preview
 Generated Surfaces Stability
 Extensibility Boundary Contract
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
 Lint Rule Code Stability
 JSON Report Compatibility
 Scenario Evidence Stability
@@ -279,6 +282,10 @@ Generated entity index reports are disposable.
 
 Generated relationship manifest reports are disposable.
 
+Current v0.12.0 hardening references are documentation and review surfaces.
+
+They are not generated artifacts, not new Mission Model semantics and not stable v1.0 guarantees.
+
 User implementation code and downstream integration code must live outside `generated/`.
 
 ---
@@ -324,6 +331,10 @@ Do not add plugin execution mechanisms before Core-owned structured surfaces and
 
 Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
 
+Do not introduce golden baselines without an explicit golden-output scope and acceptance criteria.
+
+Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains during v0.12.0 release candidate hardening.
+
 Do not put user code inside generated runtime bindings.
 
 Do not present generated ground artifacts as live ground behavior.
@@ -334,7 +345,7 @@ Do not present entity index reports as relationship graphs, dependency graphs, p
 
 Do not present relationship manifest reports as graph engines, dependency graphs, runtime routing tables, ground routing tables, plugin APIs or Studio-specific APIs.
 
-Do not present compatibility classification references as implementation changes, schema migration tooling, runtime behavior, ground behavior, plugin execution or a stable v1.0 guarantee.
+Do not present compatibility classification references or v0.12.0 hardening references as implementation changes, schema migration tooling, runtime behavior, ground behavior, plugin execution or a stable v1.0 guarantee.
 
 ---
 

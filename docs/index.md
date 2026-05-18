@@ -2,7 +2,7 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references and extensibility boundary contracts in a single Mission Data Contract workflow.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references, extensibility boundary contracts and v1.0 release candidate hardening references in a single Mission Data Contract workflow.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
@@ -11,12 +11,14 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.11.0 - Extensibility Boundary Contract, no execution
+v0.12.0 - v1.0 Release Candidate Hardening
 ```
 
-v0.11.0 defines the extensibility boundary without introducing plugin execution.
+v0.12.0 hardens the path toward `v1.0.0 - Stable Mission Data Contract`.
 
-It introduces no Mission Model semantics, CLI behavior beyond version reporting, generated Core surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution, metadata schema, metadata parser, metadata loader, metadata validator or Studio-specific APIs.
+It introduces release candidate hardening references, not new Mission Model behavior.
+
+It introduces no Mission Model semantics, CLI behavior beyond version reporting, generated Core surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, security enforcement semantics, plugin discovery, plugin loading, plugin execution, metadata schema, metadata parser, metadata loader, metadata validator or Studio-specific APIs.
 
 It builds on:
 
@@ -27,27 +29,8 @@ v0.9.0  -> relationship_manifest.json
 v0.10.0 -> stability and compatibility classification
 v0.10.1 -> documentation and published-site consistency
 v0.11.0 -> extensibility boundary contract, no execution
+v0.12.0 -> v1.0 release candidate hardening references
 ```
-
-The active hardening path after v0.11.0 is:
-
-```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-Current v0.12.0 hardening references are documentation and review surfaces only:
-
-```text
-v1.0 Candidate Surface Inventory
-Golden Output and Regression Confidence Policy
-v1.0 Compatibility and Migration Notes
-```
-
-They do not make v0.12.0 released.
-
-They do not make any surface stable v1.0.
-
-They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 The current public preview includes:
 

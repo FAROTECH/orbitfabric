@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 0.11.0
+Version: 0.12.0
 Status: Draft
-Scope: Mission Data Contract foundation, Mission Data Chain, generated contract-facing artifacts, stability classification and extensibility boundary contract
+Scope: Mission Data Contract foundation, Mission Data Chain, generated contract-facing artifacts, stability classification, extensibility boundary contract and v1.0 release candidate hardening references
 
 ---
 
@@ -10,7 +10,7 @@ Scope: Mission Data Contract foundation, Mission Data Chain, generated contract-
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classifications and extensibility boundary rules once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration and inspection artifacts for onboard, ground, downstream tooling and future extension-owned outputs.
+Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classifications, extensibility boundary rules and v1.0 release candidate hardening references once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration and inspection artifacts for onboard, ground, downstream tooling and future extension-owned outputs.
 
 OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool, a payload runtime framework, a plugin execution platform, a plugin loader, a plugin discovery mechanism or a visual modeling backend.
 
@@ -51,7 +51,8 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - Core-owned entity index surfaces;
 - Core-owned relationship manifest surfaces;
 - stability and compatibility classifications;
-- extensibility boundary rules.
+- extensibility boundary rules;
+- v1.0 release candidate hardening references.
 
 The Mission Data Contract is the single source of truth for all derived artifacts.
 
@@ -82,7 +83,7 @@ This creates drift.
 
 A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A packet may exceed its expected size without being detected early. A mode may forbid an operation in principle, while the command router still accepts it in practice. A payload may produce data products that have no storage policy, retention rule or downlink path. A ground dictionary may describe data that the onboard design does not actually preserve or prioritize. A generated software boundary may diverge from the mission model it was supposed to represent. A downstream tool may infer contract semantics differently from the Core. A future extension may accidentally become a second semantic source if the ownership boundary is not explicit.
 
-OrbitFabric addresses this by making the mission data model explicit, validated, executable, documented, reusable, introspectable, indexable, relatable, compatibility-classified and extensibility-bounded through Core-owned structured surfaces and references.
+OrbitFabric addresses this by making the mission data model explicit, validated, executable, documented, reusable, introspectable, indexable, relatable, compatibility-classified, extensibility-bounded and hardened toward v1.0 through Core-owned structured surfaces and references.
 
 ---
 
@@ -135,7 +136,7 @@ The correct long-term role is:
 
 OrbitFabric starts from the Mission Model, not from the onboard runtime, the ground system, a plugin, an extension-owned output or a visual tool.
 
-The runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, relationship manifest reports, simulator, documentation, compatibility classifications and extensibility boundary rules must derive from or describe the model, not the other way around.
+The runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, relationship manifest reports, simulator, documentation, compatibility classifications, extensibility boundary rules and v1.0 hardening references must derive from or describe the model, not the other way around.
 
 ### 6.2 Contract Before Code
 
@@ -165,6 +166,7 @@ payload behavior
         -> relationship manifest surface
         -> stability and compatibility classification
         -> extensibility boundary contract
+        -> v1.0 release candidate hardening references
 ```
 
 Only after these concepts are sufficiently clear should OrbitFabric derive plugin, tool-specific or external integration layers from them.
@@ -229,6 +231,8 @@ v0.10.0 classifies public, preview, candidate, generated and internal surfaces b
 
 v0.11.0 defines the extensibility boundary before any plugin execution exists.
 
+v0.12.0 hardens the release candidate path before the final v1.0 stable-surface decision.
+
 Future plugin extensibility must build on these surfaces without silently redefining Core semantics.
 
 ### 6.9 Clean-Room Development
@@ -247,6 +251,8 @@ Plugin execution requires explicit trust, metadata and boundary design before ar
 
 v0.11.0 does not introduce plugin discovery, plugin loading or plugin execution.
 
+v0.12.0 does not introduce plugin discovery, plugin loading or plugin execution.
+
 ### 6.11 Practical Before Perfect
 
 OrbitFabric must favor useful, testable, well-documented behavior over broad but shallow standard compliance.
@@ -257,7 +263,7 @@ CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations ar
 
 ## 7. Current Baseline
 
-The current v0.11.0 baseline includes:
+The current v0.12.0 baseline includes:
 
 - Mission Model YAML files;
 - model loading;
@@ -285,6 +291,9 @@ The current v0.11.0 baseline includes:
 - stability and compatibility classification references;
 - Extensibility Boundary Contract reference;
 - ADR-0015 extensibility boundary decision;
+- v1.0 Candidate Surface Inventory;
+- Golden Output and Regression Confidence Policy;
+- v1.0 Compatibility and Migration Notes;
 - release compatibility policy;
 - readable logs;
 - JSON reports;
@@ -305,7 +314,7 @@ orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
-There are no extension commands in v0.11.0.
+There are no extension commands in v0.12.0.
 
 ---
 
@@ -323,7 +332,7 @@ They are the foundation for later tool-specific exporters and plugin extensibili
 
 ---
 
-## 9. Contract Introspection, Entity Index, Relationship Manifest, Compatibility and Extensibility Direction
+## 9. Contract Introspection, Entity Index, Relationship Manifest, Compatibility, Extensibility and Hardening Direction
 
 Core-owned structured surfaces make the loaded Mission Model visible to downstream tools without letting those tools infer Core semantics privately.
 
@@ -336,6 +345,8 @@ The v0.9.0 relationship manifest report describes mission identity, source missi
 The v0.10.0 compatibility references classify how public, preview, candidate, generated and internal surfaces should evolve before v1.0.0.
 
 The v0.11.0 extensibility boundary defines how future extension-owned outputs may relate to Core-owned semantics without becoming a second source of truth.
+
+The v0.12.0 hardening references define how v1.0 candidate surfaces, golden-output decisions and compatibility or migration notes should be reviewed before a stable Mission Data Contract release.
 
 These surfaces and references must not describe or implement:
 
@@ -353,6 +364,7 @@ These surfaces and references must not describe or implement:
 - plugin execution;
 - schema migration tooling;
 - JSON Schema publication;
+- security enforcement semantics;
 - Studio-specific API;
 - runtime behavior;
 - ground behavior;
@@ -381,6 +393,7 @@ Payload or subsystem activity
         -> relationship manifest surface
         -> stability and compatibility classification
         -> extensibility boundary contract
+        -> v1.0 release candidate hardening references
         -> future extensions
 ```
 
@@ -432,9 +445,12 @@ Early OrbitFabric versions must not include:
 - plugin discovery before trust and boundary design are stable;
 - plugin loading before trust and boundary design are stable;
 - plugin execution before trust and boundary design are stable;
-- relationship graphs before entity indexing and relationship semantics are stable.
+- relationship graphs before entity indexing and relationship semantics are stable;
+- Mission Model security domain before v1.0.0;
+- security YAML fields before v1.0.0;
+- security enforcement semantics.
 
-These items may become future integration targets, generated artifacts or external consumers only after the Mission Model, lint engine, scenario runner, mission data chain contracts, generated contract-facing artifacts, Core-owned surfaces and extensibility boundary prove valuable.
+These items may become future integration targets, generated artifacts or external consumers only after the Mission Model, lint engine, scenario runner, mission data chain contracts, generated contract-facing artifacts, Core-owned surfaces, extensibility boundary and v1.0 release candidate hardening references prove valuable.
 
 ---
 
@@ -444,7 +460,7 @@ The initial demo mission is `demo-3u`.
 
 It is a synthetic 3U CubeSat-like mission used only to demonstrate OrbitFabric concepts.
 
-It contains the full current Mission Data Chain from telemetry, commands, events, faults and modes through payload contracts, data products, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, contract introspection surface, entity index surface, relationship manifest surface, stability/compatibility classification and extensibility boundary documentation.
+It contains the full current Mission Data Chain from telemetry, commands, events, faults and modes through payload contracts, data products, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, contract introspection surface, entity index surface, relationship manifest surface, stability/compatibility classification, extensibility boundary documentation and v1.0 release candidate hardening references.
 
 The demo assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
 
@@ -466,7 +482,7 @@ The recommended technical baseline is:
 - CMake for host-build smoke validation;
 - JSON, CSV and Markdown for the first generated ground-facing artifact package;
 - JSON for Core-owned introspection, entity index and relationship manifest reports;
-- Markdown for stability, compatibility and extensibility boundary references;
+- Markdown for stability, compatibility, extensibility boundary and v1.0 hardening references;
 - GitHub Actions for CI;
 - Apache-2.0 license.
 
@@ -485,6 +501,8 @@ The generated relationship manifest report is intentionally Core-owned, read-onl
 The stability and compatibility references are intentionally classification documents, not implementation behavior or a stable v1.0 guarantee.
 
 The extensibility boundary is intentionally a documentation contract, not metadata schema, plugin discovery, plugin loading or plugin execution.
+
+The v0.12.0 hardening references are intentionally review and governance documents, not golden baselines, migration tooling, JSON Schema publication, security enforcement, generated Core surfaces or a stable v1.0 guarantee.
 
 None is a relationship graph engine, plugin execution mechanism or Studio-specific API.
 
@@ -541,8 +559,9 @@ OrbitFabric is successful in the early public preview if a user can:
 13. understand the project positioning from the README in less than one minute;
 14. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
 15. understand how payload contracts fit into the Mission Data Contract;
-16. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints, recovery expectations, runtime-facing bindings, ground-facing artifacts, Core-owned surfaces, compatibility references and extensibility boundaries fit into the roadmap before plugin execution;
-17. understand which surfaces are public preview, candidate, internal or disposable before v1.0.0.
+16. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints, recovery expectations, runtime-facing bindings, ground-facing artifacts, Core-owned surfaces, compatibility references, extensibility boundaries and v1.0 hardening references fit into the roadmap before plugin execution;
+17. understand which surfaces are public preview, candidate, internal or disposable before v1.0.0;
+18. understand that candidate, preview and generated surfaces do not become stable v1.0 automatically.
 
 A minimal but strong preview is better than a broad, fragile and unfinished feature set.
 
@@ -600,5 +619,6 @@ The project should prefer:
 - Core-owned structured surfaces over downstream semantic inference;
 - compatibility classifications over implicit stability assumptions;
 - extensibility boundary contracts over premature plugin execution;
+- v1.0 hardening references over implicit release stability assumptions;
 - clean interfaces over premature integrations;
 - mission data chain modeling before runtime-facing, ground-facing, introspection, entity indexing, relationship manifests, stability guarantees and plugin execution.
