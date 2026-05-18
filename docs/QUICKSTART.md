@@ -31,6 +31,9 @@ Mission Model YAML
   -> relationship_manifest.json candidate relationship report
   -> stability and compatibility classification references
   -> Extensibility Boundary Contract reference
+  -> v1.0 candidate surface inventory
+  -> golden output and regression confidence policy
+  -> v1.0 compatibility and migration notes
   -> JSON lint reports
   -> JSON simulation reports with data-flow evidence
   -> simulation logs
@@ -44,7 +47,7 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility classification references and the Extensibility Boundary Contract are not runtime behavior, ground behavior, schema migration tooling, plugin discovery, plugin loading, plugin execution or a v1.0 stability guarantee.
+Compatibility classification references, v0.12.0 hardening references and the Extensibility Boundary Contract are not runtime behavior, ground behavior, schema migration tooling, plugin discovery, plugin loading, plugin execution or a v1.0 stability guarantee.
 
 ---
 
@@ -112,7 +115,7 @@ orbitfabric --help
 Expected version:
 
 ```text
-orbitfabric 0.11.0
+orbitfabric 0.12.0
 ```
 
 ---
@@ -234,11 +237,13 @@ They do not expose plugin execution, graph engines, Studio-specific APIs, runtim
 
 ---
 
-## 11. Review stability, compatibility and extensibility references
+## 11. Review stability, compatibility, extensibility and v1.0 hardening references
 
 v0.10.0 adds compatibility classification references for the path toward v1.0.0.
 
 v0.11.0 adds the Extensibility Boundary Contract before any plugin execution exists.
+
+v0.12.0 adds release candidate hardening references before the stable v1.0.0 decision.
 
 Key references include:
 
@@ -248,15 +253,18 @@ Mission Model Stability Contract
 CLI Contract v1 Preview
 Generated Surfaces Stability
 Extensibility Boundary Contract
+v1.0 Candidate Surface Inventory
+Golden Output and Regression Confidence Policy
+v1.0 Compatibility and Migration Notes
 Lint Rule Code Stability
 JSON Report Compatibility
 Scenario Evidence Stability
 Release Compatibility Policy
 ```
 
-These references classify existing public and preview surfaces and define how future extension-owned outputs must remain distinguishable from Core-owned outputs.
+These references classify existing public and preview surfaces, define how future extension-owned outputs must remain distinguishable from Core-owned outputs and document the v1.0 hardening path.
 
-They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
+They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, golden files, snapshot tests, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
 
 ---
 
@@ -393,6 +401,7 @@ The current demo proves that OrbitFabric can:
 - export a relationship manifest from the loaded Mission Model;
 - classify public, preview, candidate, generated and internal compatibility surfaces;
 - document the extensibility boundary before plugin execution;
+- document the v1.0 release candidate hardening path;
 - validate scenarios without executing them;
 - execute deterministic operational sequences;
 - record contract-level data-flow evidence;
@@ -433,6 +442,7 @@ The current demo does not prove:
 - HAL or RTOS integration;
 - relationship graph behavior;
 - dependency graph behavior;
+- security enforcement behavior;
 - plugin API behavior;
 - plugin discovery behavior;
 - plugin loading behavior;
