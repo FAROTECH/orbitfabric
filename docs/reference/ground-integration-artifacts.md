@@ -1,6 +1,6 @@
 # Ground Integration Artifacts
 
-Status: Introduced in v0.8.0  
+Status: Public preview disposable generated artifact  
 Scope: Ground-facing Mission Data Contract exports
 
 ---
@@ -10,6 +10,8 @@ Scope: Ground-facing Mission Data Contract exports
 Ground Integration Artifacts are generated ground-facing outputs derived from the validated OrbitFabric Mission Model.
 
 Their purpose is to help ground software teams review, adapt and integrate the mission data contract before configuring or implementing their actual ground system.
+
+In v1.0.0, generated ground-facing artifacts remain useful and reproducible, but they are not part of a stable live ground API.
 
 They are not a ground segment.
 
@@ -27,7 +29,7 @@ They are not a Yamcs, OpenC3 or XTCE integration.
 
 ## Implemented Flow
 
-The v0.8.0 flow is:
+The flow is:
 
 ```text
 Mission Model
@@ -120,7 +122,7 @@ generic
 
 ## GroundContract
 
-GroundContract is the v0.8.0 intermediate model for ground-facing generation.
+GroundContract is the intermediate model for ground-facing generation.
 
 It is derived from the validated Mission Model.
 
@@ -283,7 +285,7 @@ It is not a binary decoder specification.
 
 The current Mission Model does not define byte offsets, bit offsets, endianness, scaling rules, calibration curves, APID, VCID, CCSDS headers, PUS service/subservice fields, framing or transport.
 
-Therefore v0.8.0 does not claim decoder generation, CCSDS compliance, PUS compliance or CFDP behavior.
+Therefore OrbitFabric does not claim decoder generation, CCSDS compliance, PUS compliance or CFDP behavior.
 
 ---
 
@@ -360,9 +362,7 @@ pass scheduling
 station automation
 ```
 
-These are not missing pieces of v0.8.0.
-
-They are intentionally outside scope.
+These are intentionally outside scope.
 
 ---
 
@@ -385,7 +385,7 @@ Neither should bypass Mission Model validation.
 
 ## Relationship with Security Assumptions
 
-v0.8.0 exports existing command `risk` metadata.
+OrbitFabric exports existing command `risk` metadata.
 
 It does not introduce security assumptions, command authorization, authentication, audit runtime, cryptography, key management or enforcement behavior.
 
