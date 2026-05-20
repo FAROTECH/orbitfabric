@@ -1,10 +1,10 @@
-# CLI Contract v1 Preview
+# CLI Contract v1
 
-Status: Development preview  
-Scope: v0.10.0 CLI compatibility classification  
-Applies to: OrbitFabric CLI before v1.0.0
+Status: Active v1.0 contract  
+Scope: CLI compatibility classification for documented workflows  
+Applies to: OrbitFabric CLI from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies the current OrbitFabric CLI surface on the path toward v1.0.0.
+This page classifies the current OrbitFabric CLI surface after v1.0.0.
 
 It is a documentation contract. It does not introduce new commands, new options, new behavior, new Mission Model semantics, new reports, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -14,7 +14,7 @@ It is a documentation contract. It does not introduce new commands, new options,
 
 The OrbitFabric CLI is a public user-facing workflow surface.
 
-Before v1.0.0, the CLI is still a development-preview interface. However, command names, command groups, required arguments and documented machine-readable outputs are compatibility-sensitive.
+From v1.0.0 onward, documented command names, command groups, required arguments, documented options and documented machine-readable outputs for selected workflows are compatibility-sensitive.
 
 This page identifies the current CLI surface and separates:
 
@@ -34,17 +34,15 @@ Current CLI classification:
 
 | CLI area | Classification | Notes |
 |---|---|---|
-| top-level command name `orbitfabric` | Public preview | User-facing entry point. |
-| top-level command groups | Public preview | `gen`, `validate`, `inspect`, `export`. |
-| top-level commands | Public preview | `lint`, `sim`. |
-| documented options | Public preview | Option names are compatibility-sensitive before v1.0.0. |
-| command required arguments | Public preview | Required positional arguments are compatibility-sensitive. |
+| top-level command name `orbitfabric` | Stable contract | User-facing entry point. |
+| top-level command groups | Stable contract | `gen`, `validate`, `inspect`, `export`. |
+| top-level commands | Stable contract | `lint`, `sim`. |
+| documented options | Stable contract | Option names are compatibility-sensitive after v1.0.0. |
+| command required arguments | Stable contract | Required positional arguments are compatibility-sensitive. |
 | CLI textual output | Human-oriented public preview | Useful for users. Not a machine contract. |
-| JSON outputs produced via `--json` | Public preview report surface | Machine-readable report families are documented separately. |
-| generated artifact paths | Public preview, generated artifact surface | Paths are compatibility-sensitive when documented. |
+| JSON outputs produced via `--json` | Stable report surface where documented | Machine-readable report families are documented separately. |
+| generated artifact paths | Public preview or stable depending on surface | Paths are compatibility-sensitive when documented. |
 | internal Python implementation | Internal implementation detail | Not a CLI contract. |
-
-No current CLI surface is classified as a stable v1.0 contract yet.
 
 ---
 
@@ -124,7 +122,7 @@ Compatibility-sensitive behavior:
 - `--json` writes a machine-readable simulation report;
 - `--log` writes a plain-text simulation timeline log.
 
-The JSON simulation report is a machine-readable public preview surface.
+The JSON simulation report is a machine-readable stable surface.
 
 The plain-text log is human-reviewable evidence and should not be treated as a machine contract.
 
@@ -149,7 +147,7 @@ orbitfabric gen ground
 
 These commands generate artifacts derived from the validated Mission Model.
 
-Generated artifacts are disposable outputs. They must not become the source of truth.
+Generated artifacts are disposable outputs unless explicitly classified otherwise. They must not become the source of truth.
 
 ---
 
@@ -389,10 +387,9 @@ generated/reports/relationship_manifest.json
 
 Compatibility-sensitive behavior:
 
-- exports the candidate Core-owned relationship manifest surface;
+- exports the stable Core-owned relationship manifest surface for admitted families;
 - answers how indexed mission contract entities are related;
-- writes a machine-readable JSON report;
-- reports candidate status.
+- writes a machine-readable JSON report.
 
 This command does not expose a relationship graph, dependency graph, plugin API, runtime routing table, ground routing table or Studio-specific API.
 
@@ -460,7 +457,7 @@ This command does not execute scenario behavior, generate evidence reports or mu
 
 ## 17. Machine-readable versus human-oriented output
 
-Only explicitly documented JSON reports and Core-owned structured surfaces should be treated as machine-readable public preview outputs.
+Only explicitly documented JSON reports and Core-owned structured surfaces should be treated as machine-readable stable or public preview outputs.
 
 Human-oriented terminal output is useful for users, demonstrations and diagnostics, but it is not a machine compatibility contract.
 
@@ -480,7 +477,7 @@ over parsing terminal text.
 
 ## 18. Compatibility-sensitive CLI changes
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - renaming a documented command;
 - removing a documented command;
@@ -504,7 +501,6 @@ It means the change must be explicit, reviewed and documented.
 The CLI contract does not introduce or promise:
 
 ```text
-stable v1.0 compatibility
 shell completion compatibility
 terminal text parsing compatibility
 plugin command discovery
@@ -521,24 +517,6 @@ Studio-specific API behavior
 
 ---
 
-## 20. v1.0 direction
+## 20. Final statement
 
-Before v1.0.0, OrbitFabric should decide which CLI commands and options become stable.
-
-Likely stable candidates include:
-
-```text
-orbitfabric lint
-orbitfabric sim
-orbitfabric gen docs
-orbitfabric gen runtime
-orbitfabric gen ground
-orbitfabric export model-summary
-orbitfabric export entity-index
-orbitfabric export relationship-manifest
-orbitfabric --version
-```
-
-The final v1.0 CLI contract should remain narrow.
-
-OrbitFabric CLI stability should protect Mission Data Contract workflows, not turn OrbitFabric into a flight software runtime, ground segment, simulator platform, visual modeling tool or plugin execution environment.
+v1.0.0 stabilizes documented CLI workflows enough for users and CI workflows to rely on command names, command groups, required arguments, documented options and machine-readable outputs, without freezing human-oriented terminal prose.

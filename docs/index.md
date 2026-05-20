@@ -2,7 +2,7 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references, extensibility boundary contracts and v1.0 candidate hardening references in a single Mission Data Contract workflow.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility references, extensibility boundary contracts and v1.0 stable Mission Data Contract governance in a single workflow.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
@@ -11,27 +11,14 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-The immediate target is:
-
-```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-The repository now contains the v1.0 candidate documentation and regression-confidence material needed before the final v1.0.0 release alignment:
+v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
 
-```text
-v1.0 Stable Surface Decision
-v1.0 Demo Evidence Chain
-v1.0 Compatibility and Migration Notes
-v1.0 golden signatures for selected Core-owned structured surfaces
-```
+The stable surface is intentionally limited.
 
-These additions clarify the proposed v1.0 posture.
-
-They do not change the package version, add Mission Model behavior, add YAML fields, add CLI behavior, add JSON report fields, add generated Core surfaces, add runtime behavior, add ground behavior, introduce schema migration tooling, publish JSON Schema, add security enforcement semantics, add plugin discovery, add plugin loading, add plugin execution or create a tool-specific integration layer.
+OrbitFabric v1.0.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
 
 ## Core idea
 
@@ -60,7 +47,7 @@ Mission Model
   -> v1.0 golden signatures for selected Core-owned structured surfaces
 ```
 
-The current Core-owned structured surface chain is:
+The stable Core-owned structured surface chain is:
 
 ```text
 model_summary.json          -> domain navigation
@@ -68,7 +55,7 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
-The current v1.0 candidate posture is:
+The stable v1.0 posture is:
 
 ```text
 Mission Model remains the source of truth.
@@ -89,7 +76,7 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility references, v1.0 candidate references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or tool-specific integrations.
+Compatibility references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or tool-specific integrations.
 
 The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
 

@@ -1,10 +1,10 @@
 # Scenario Evidence Stability
 
-Status: Development preview  
-Scope: v0.10.0 scenario and evidence compatibility classification  
-Applies to: OrbitFabric scenario inputs and scenario evidence before v1.0.0
+Status: Active v1.0 contract  
+Scope: scenario and evidence compatibility classification  
+Applies to: OrbitFabric scenario inputs and scenario evidence from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies OrbitFabric scenario and evidence compatibility expectations on the path toward v1.0.0.
+This page classifies OrbitFabric scenario and evidence compatibility expectations after v1.0.0.
 
 It is a documentation contract. It does not introduce new scenario fields, new scenario behavior, new JSON report fields, new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -14,9 +14,9 @@ It is a documentation contract. It does not introduce new scenario fields, new s
 
 OrbitFabric scenarios provide deterministic host-side evidence for Mission Data Contract behavior.
 
-Before v1.0.0, scenarios and scenario evidence are still development-preview surfaces. However, documented scenario structure, validation behavior, expectation semantics, result values and machine-readable evidence outputs are compatibility-sensitive.
+From v1.0.0 onward, documented scenario structure, validation behavior, expectation semantics, result values and machine-readable evidence outputs are part of the stable narrow Mission Data Contract surface.
 
-This document defines how scenario inputs and generated evidence should evolve before v1.0.0.
+This document defines how scenario inputs and generated evidence should evolve after v1.0.0.
 
 It covers:
 
@@ -58,18 +58,16 @@ Current scenario and evidence surfaces are classified as follows:
 
 | Surface | Classification | Notes |
 |---|---|---|
-| scenario YAML files | Public preview | Host-side scenario input surface. |
-| scenario file path argument | Public preview | Used by `orbitfabric validate scenario` and `orbitfabric sim`. |
-| scenario loader diagnostics | Public preview | Uses `OF-SCN-*` diagnostics. |
-| scenario reference validation | Public preview | Validates references before execution. |
-| scenario execution result | Public preview | Deterministic host-side evidence result. |
-| simulation JSON report | Public preview | Machine-readable scenario evidence. |
-| simulation plain-text log | Human-oriented public preview | Reviewable timeline, not a machine contract. |
-| data-flow evidence records | Public preview | Derived evidence for declared data-flow expectations. |
+| scenario YAML files | Stable contract | Host-side scenario input surface. |
+| scenario file path argument | Stable workflow surface | Used by `orbitfabric validate scenario` and `orbitfabric sim`. |
+| scenario loader diagnostics | Stable diagnostic policy | Uses `OF-SCN-*` diagnostics. |
+| scenario reference validation | Stable behavior | Validates references before execution. |
+| scenario execution result | Stable behavior | Deterministic host-side evidence result. |
+| simulation JSON report | Stable contract | Machine-readable scenario evidence. |
+| simulation plain-text log | Public preview, human-oriented | Reviewable timeline, not a machine contract. |
+| data-flow evidence records | Stable contract | Derived evidence for declared data-flow expectations. |
 | scenario runner internals | Internal implementation detail | Not a public compatibility surface. |
 | test helper structure | Internal validation asset | Not a public compatibility surface. |
-
-No scenario or evidence surface is classified as a stable v1.0 contract yet.
 
 ---
 
@@ -141,9 +139,9 @@ Changing the meaning of this chain is compatibility-sensitive.
 
 ## 7. Simulation JSON report stability
 
-Simulation JSON reports are machine-readable public preview evidence outputs.
+Simulation JSON reports are machine-readable stable evidence outputs.
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - removing a documented top-level simulation report field;
 - renaming a documented top-level simulation report field;
@@ -188,7 +186,7 @@ They should identify invalid scenario structure, invalid references or unsupport
 
 ## 10. Preferred evolution rules
 
-Before v1.0.0, scenario and evidence surfaces should evolve with these rules.
+Scenario and evidence surfaces should evolve with these rules.
 
 ### 10.1 Prefer additive changes
 
@@ -261,7 +259,6 @@ plugin loader
 relationship graph
 dependency graph
 Studio-specific API
-stable v1.0 scenario guarantee
 ```
 
 ---
@@ -284,24 +281,10 @@ Stability and Compatibility Contract
 
 `JSON Reports v0.1` remains the reference for the current simulation JSON report structure.
 
-This page defines how those scenario and evidence surfaces should be treated as compatibility-sensitive before v1.0.0.
+This page defines how those scenario and evidence surfaces should be treated as compatibility-sensitive after v1.0.0.
 
 ---
 
-## 14. v1.0 direction
+## 14. Final statement
 
-Before v1.0.0, OrbitFabric should decide which scenario inputs, expectation semantics and evidence report fields become stable.
-
-Likely v1.0 candidates include:
-
-```text
-scenario file role
-scenario validation workflow
-scenario execution workflow
-core scenario result values
-simulation JSON report family
-data-flow evidence semantics
-scenario diagnostic code meanings
-```
-
-v1.0.0 should stabilize scenario evidence enough for CI and downstream inspection tools to rely on it, without turning OrbitFabric into a runtime simulator, flight software framework, ground segment, mission control system or plugin execution platform.
+v1.0.0 stabilizes scenario evidence enough for CI and downstream inspection tools to rely on it, without turning OrbitFabric into a runtime simulator, flight software framework, ground segment, mission control system or plugin execution platform.

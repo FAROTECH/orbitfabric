@@ -1,10 +1,10 @@
 # Generated Surfaces Stability
 
-Status: Development preview  
-Scope: v0.10.0 generated surface compatibility classification  
-Applies to: OrbitFabric generated and exported surfaces before v1.0.0
+Status: Active v1.0 classification  
+Scope: generated and exported surface compatibility classification  
+Applies to: OrbitFabric generated and exported surfaces from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies OrbitFabric generated and exported surfaces on the path toward v1.0.0.
+This page classifies OrbitFabric generated and exported surfaces after v1.0.0.
 
 It is a documentation contract. It does not introduce new generated surfaces, new report fields, new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -14,11 +14,11 @@ It is a documentation contract. It does not introduce new generated surfaces, ne
 
 OrbitFabric generates and exports several surfaces derived from the validated Mission Model.
 
-This document defines how those surfaces should be treated before v1.0.0:
+This document defines how those surfaces are treated after v1.0.0:
 
-- which surfaces are Core-owned inspection surfaces;
+- which surfaces are stable Core-owned inspection surfaces;
+- which surfaces are machine-readable validation or evidence reports;
 - which surfaces are generated artifact packages;
-- which surfaces are candidate contract surfaces;
 - which surfaces are disposable generated outputs;
 - which changes are compatibility-sensitive;
 - which assumptions downstream tools must not make.
@@ -29,7 +29,7 @@ The Mission Model remains the source of truth.
 
 ## 2. Surface categories
 
-OrbitFabric currently distinguishes these generated or exported surface categories.
+OrbitFabric distinguishes these generated or exported surface categories.
 
 ### 2.1 Core-owned structured inspection surfaces
 
@@ -43,6 +43,8 @@ relationship_manifest.json
 
 They exist to prevent downstream tools from reconstructing Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
 
+These surfaces are part of the narrow v1.0 stable surface.
+
 ### 2.2 Machine-readable validation and evidence reports
 
 These are JSON reports produced by validation or scenario execution workflows:
@@ -53,6 +55,8 @@ simulation JSON report
 ```
 
 They are intended for CI, automated checks and reproducible evidence.
+
+These report families are part of the narrow v1.0 stable surface.
 
 ### 2.3 Generated runtime-facing artifacts
 
@@ -67,6 +71,8 @@ generated C++17 host-build smoke files
 They are not flight software.
 
 They are not a flight ABI guarantee.
+
+They remain public preview and disposable unless explicitly promoted later.
 
 ### 2.4 Generated ground-facing artifacts
 
@@ -83,6 +89,8 @@ They are not a ground segment runtime.
 
 They are not a mission control system.
 
+They remain public preview and disposable unless explicitly promoted later.
+
 ### 2.5 Generated Markdown documentation
 
 These are generated human-reviewable documentation artifacts:
@@ -96,32 +104,32 @@ They are useful for review and communication.
 
 They are not the source of truth.
 
+They remain public preview generated documentation.
+
 ---
 
 ## 3. Current classification
 
-The current pre-v1.0 classification is:
+The current v1.0 classification is:
 
 | Surface | Classification | Source of truth | Notes |
 |---|---|---|---|
-| `model_summary.json` | Candidate contract | Mission Model | Core-owned domain-level inspection surface. |
-| `entity_index.json` | Candidate contract | Mission Model | Core-owned entity-level inspection surface. |
-| `relationship_manifest.json` | Candidate contract | Mission Model | Core-owned relationship-level candidate surface. |
-| lint JSON report | Public preview | Mission Model and lint rules | Machine-readable validation result. |
-| simulation JSON report | Public preview | Mission Model and scenario YAML | Machine-readable scenario evidence. |
+| `model_summary.json` | Stable contract | Mission Model | Core-owned domain-level inspection surface. |
+| `entity_index.json` | Stable contract | Mission Model | Core-owned entity-level inspection surface. |
+| `relationship_manifest.json` | Stable contract for admitted families | Mission Model | Core-owned relationship-level surface. |
+| lint JSON report | Stable contract | Mission Model and lint rules | Machine-readable validation result. |
+| simulation JSON report | Stable contract | Mission Model and scenario YAML | Machine-readable scenario evidence. |
 | `runtime_contract_manifest.json` | Public preview generated artifact | Mission Model | Runtime-facing contract manifest, not flight runtime. |
 | generated C++17 runtime bindings | Public preview disposable artifact | Mission Model | Regenerable contract-facing bindings, not flight software. |
 | `ground_contract_manifest.json` | Public preview generated artifact | Mission Model | Ground-facing contract manifest, not ground runtime. |
 | generated ground dictionaries | Public preview disposable artifact | Mission Model | Integration dictionaries, not live decoder or database behavior. |
 | generated Markdown docs | Public preview disposable artifact | Mission Model | Human-reviewable docs, not machine contract. |
 
-No generated or exported surface is currently classified as a stable v1.0 contract.
-
 ---
 
 ## 4. Core-owned inspection surface chain
 
-The current Core-owned inspection chain is:
+The stable Core-owned inspection chain is:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -141,7 +149,7 @@ These surfaces are intentionally narrow.
 
 ## 5. Compatibility-sensitive surface changes
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - renaming a documented generated or exported file;
 - moving a documented default output path;
@@ -164,7 +172,7 @@ It means the change must be explicit, reviewed and documented.
 
 ## 6. Preferred evolution rules
 
-Before v1.0.0, generated and exported surfaces should evolve with these rules.
+Generated and exported surfaces should evolve with these rules.
 
 ### 6.1 Prefer additive changes
 
@@ -237,7 +245,6 @@ ground behavior
 Studio-specific API
 JSON Schema publication
 schema migration tooling
-v1.0 compatibility guarantee
 ```
 
 ---
@@ -257,24 +264,10 @@ Runtime Contract Bindings
 Ground Integration Artifacts
 ```
 
-This page only classifies their stability and compatibility expectations before v1.0.0.
+This page classifies their stability and compatibility expectations after v1.0.0.
 
 ---
 
-## 10. v1.0 direction
+## 10. Final statement
 
-Before v1.0.0, OrbitFabric should decide which generated and exported surfaces become stable contract surfaces.
-
-Likely v1.0 candidates include:
-
-```text
-model_summary.json
-entity_index.json
-relationship_manifest.json
-lint JSON report family
-simulation JSON report family
-runtime contract manifest boundary
-ground contract manifest boundary
-```
-
-v1.0.0 should stabilize the Mission Data Contract surfaces without turning generated artifacts into user-owned source files or runtime implementations.
+v1.0.0 stabilizes selected Mission Data Contract surfaces without turning generated artifacts into user-owned source files or runtime implementations.

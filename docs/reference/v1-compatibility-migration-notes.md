@@ -1,12 +1,12 @@
 # v1.0 Compatibility and Migration Notes
 
-Status: Proposed for v1.0.0  
+Status: Active v1.0 policy  
 Scope: v1.0 compatibility posture and migration-note discipline  
-Applies to: OrbitFabric Core after `v0.12.0 - v1.0 Release Candidate Hardening`
+Applies to: OrbitFabric Core `v1.0.0 - Stable Mission Data Contract`
 
-This page defines the compatibility and migration posture for the path toward `v1.0.0 - Stable Mission Data Contract`.
+This page defines the compatibility and migration posture for `v1.0.0 - Stable Mission Data Contract` and later maintenance releases.
 
-It records the current expected compatibility status after the v1.0 stable surface decision, the first golden signatures for Core-owned structured surfaces and the v1.0 demo evidence chain reference.
+It records the v1.0 compatibility status after the stable surface decision, the golden signatures for selected Core-owned structured surfaces and the v1.0 demo evidence chain reference.
 
 It is a documentation policy and release-governance reference only.
 
@@ -16,11 +16,11 @@ It does not introduce schema migration tooling, JSON Schema publication, migrati
 
 ## 1. Purpose
 
-The path toward v1.0.0 requires explicit answers to two questions:
+The v1.0.0 release requires explicit answers to two questions:
 
 ```text
-What will OrbitFabric keep compatible after v1.0.0?
-What should pre-v1.0 users know if a preview surface changes before v1.0.0?
+What does OrbitFabric keep compatible after v1.0.0?
+What should users or downstream tools do if a stable or preview surface changes later?
 ```
 
 This page records how those answers should be written and what the current v1.0 compatibility posture is.
@@ -38,7 +38,6 @@ This page complements these references:
 ```text
 Stability and Compatibility Contract
 Release Compatibility Policy
-v1.0 Candidate Surface Inventory
 v1.0 Stable Surface Decision
 v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
@@ -50,13 +49,13 @@ Generated Surfaces Stability
 Extensibility Boundary Contract
 ```
 
-The Stable Surface Decision identifies the narrow proposed v1.0 stable surface.
+The Stable Surface Decision identifies the narrow v1.0 stable surface.
 
 The Demo Evidence Chain explains the selected end-to-end proof path for the existing `demo-3u` Mission Model.
 
-The Golden Output and Regression Confidence Policy explains how selected outputs can be protected from accidental drift.
+The Golden Output and Regression Confidence Policy explains how selected outputs are protected from accidental drift.
 
-The committed v1.0 golden signatures now protect selected fields of:
+The committed v1.0 golden signatures protect selected fields of:
 
 ```text
 model_summary.json
@@ -74,13 +73,13 @@ This page explains how to document compatibility decisions and migration notes a
 
 A compatibility note explains whether a surface remains compatible, changes compatibility class or requires careful review.
 
-A compatibility note should be used when a public, candidate or stable surface changes or is being stabilized.
+A compatibility note should be used when a public, preview or stable surface changes.
 
 Examples:
 
 ```text
-This field remains public preview and is not yet a stable v1.0 contract.
-This report family is a v1.0 candidate and changes to top-level fields are compatibility-sensitive.
+This field remains public preview and is not part of the stable v1.0 contract.
+This report family is a stable v1.0 surface and changes to top-level fields are compatibility-sensitive.
 This generated artifact remains disposable and should not be treated as a stable ABI.
 ```
 
@@ -105,7 +104,7 @@ A migration note is not a migration tool.
 
 ## 4. When notes are required
 
-Before v1.0.0, compatibility or migration notes should be required for changes that affect:
+After v1.0.0, compatibility or migration notes are required for changes that affect:
 
 ```text
 Mission Model documented fields
@@ -180,10 +179,8 @@ CLI command: orbitfabric lint
 Use one of these statuses:
 
 ```text
-stable v1.0 candidate
-stable v1.0 selected surface
+stable v1.0 surface
 public preview
-candidate contract
 generated disposable artifact
 internal implementation detail
 out of v1.0 scope
@@ -199,6 +196,7 @@ corrective
 clarifying
 compatibility-sensitive
 breaking preview change
+breaking stable change
 internal-only
 ```
 
@@ -212,6 +210,7 @@ Examples:
 No Mission Data Contract impact.
 Compatibility-sensitive for downstream tools consuming JSON reports.
 Breaking preview change for tools consuming the previous field name.
+Breaking stable change for tools consuming the previous stable field name.
 Internal-only change with no public surface impact.
 ```
 
@@ -238,7 +237,7 @@ Examples:
 ```text
 Clarifies the existing boundary.
 Aligns the generated surface with the documented contract.
-Removes ambiguity before v1.0.0.
+Removes ambiguity after v1.0.0.
 Prevents downstream tools from reconstructing semantics from raw YAML.
 ```
 
@@ -252,28 +251,28 @@ Examples:
 This does not introduce runtime behavior.
 This does not introduce ground behavior.
 This does not introduce plugin discovery, loading or execution.
-This does not make the surface stable v1.0 unless explicitly stated by the v1.0 release.
+This does not make a preview surface stable unless explicitly stated by a release decision.
 ```
 
 ---
 
 ## 6. Current v1.0 compatibility posture
 
-The current expected v1.0 compatibility posture is:
+The current v1.0 compatibility posture is:
 
 ```text
-Mission Model documented contract semantics: stable v1.0 selected surface
-Core structural validation: stable v1.0 selected surface
-Core semantic lint diagnostic policy: stable v1.0 selected surface
-scenario YAML evidence inputs: stable v1.0 selected surface
-lint JSON report: stable v1.0 selected surface
-simulation JSON report: stable v1.0 selected surface
-model_summary.json: stable v1.0 selected surface, golden signature protected
-entity_index.json: stable v1.0 selected surface, golden signature protected
-relationship_manifest.json: stable v1.0 selected surface, golden signature protected for admitted families
-CLI command interface for documented workflows: stable v1.0 selected surface
-release compatibility policy: stable v1.0 selected governance surface
-extensibility boundary contract: stable v1.0 selected governance surface
+Mission Model documented contract semantics: stable v1.0 surface
+Core structural validation: stable v1.0 surface
+Core semantic lint diagnostic policy: stable v1.0 surface
+scenario YAML evidence inputs: stable v1.0 surface
+lint JSON report: stable v1.0 surface
+simulation JSON report: stable v1.0 surface
+model_summary.json: stable v1.0 surface, golden signature protected
+entity_index.json: stable v1.0 surface, golden signature protected
+relationship_manifest.json: stable v1.0 surface, golden signature protected for admitted families
+CLI command interface for documented workflows: stable v1.0 surface
+release compatibility policy: stable v1.0 governance surface
+extensibility boundary contract: stable v1.0 governance surface
 CLI textual output: public preview, human-oriented
 orbitfabric inspect mission terminal output: public preview, human-oriented
 orbitfabric validate scenario terminal output: public preview, human-oriented
@@ -301,11 +300,11 @@ Any later PR that changes one of the selected stable surfaces must include an ex
 
 ---
 
-## 7. Migration posture from v0.12.0 to the current v1.0 candidate state
+## 7. Migration posture from v0.12.0 to v1.0.0
 
-No migration is required from the v0.12.0 release candidate hardening baseline to the current v1.0 candidate documentation and regression-test state.
+No migration is required from the v0.12.0 release candidate hardening baseline to the v1.0.0 stable release baseline.
 
-The changes introduced after v0.12.0 are governance, documentation and regression-confidence changes:
+The v1.0.0 release promotes the selected candidate posture to a stable release baseline and includes:
 
 ```text
 v1.0 Stable Surface Decision
@@ -409,48 +408,47 @@ UI state
 private extension assumptions
 ```
 
-### 9.3 Prefer compatibility notes over tooling before v1.0.0
+### 9.3 Prefer compatibility notes over tooling
 
-Before v1.0.0, compatibility notes are enough.
-
-OrbitFabric should not introduce schema migration tooling unless a separate architectural decision accepts that scope.
+Compatibility notes are enough unless a separate architectural decision accepts schema migration tooling scope.
 
 ### 9.4 Prefer explicit deferral over vague stability
 
-If a surface is not ready for v1.0, say so.
+If a surface is not ready for stability, say so.
 
 A deferred surface is safer than an ambiguous stable-sounding claim.
 
 ### 9.5 Keep v1.0 narrow
 
-v1.0.0 should stabilize the Mission Data Contract core.
+v1.0.0 stabilizes the Mission Data Contract core.
 
-It should not stabilize flight runtime behavior, ground runtime behavior, plugin execution, Studio-specific APIs or graph engines.
+It does not stabilize flight runtime behavior, ground runtime behavior, plugin execution, Studio-specific APIs or graph engines.
 
 ---
 
-## 10. Standard note outcomes before v1.0.0
+## 10. Standard note outcomes after v1.0.0
 
-Before v1.0.0, review outcomes should fall into one of these categories:
+Review outcomes should fall into one of these categories:
 
 | Outcome | Meaning |
 |---|---|
-| Accepted for v1.0 stable contract | The surface is intended to become part of the stable v1.0 Mission Data Contract. |
-| Remains candidate contract | The surface is important but needs more review before being declared stable. |
+| Stable surface preserved | The change preserves the stable v1.0 Mission Data Contract surface. |
+| Stable additive change | The change adds compatible stable-surface capability. |
+| Breaking stable change | The change intentionally breaks a stable surface and requires explicit migration guidance. |
 | Remains public preview | The surface remains documented and usable but not stable. |
 | Remains generated disposable artifact | The output remains reproducible and useful but should not be patched or treated as source of truth. |
-| Deferred beyond v1.0 | The decision is intentionally postponed and should not block v1.0.0. |
-| Explicitly out of v1.0 scope | The surface or feature is outside the stable Core target. |
+| Deferred beyond current release | The decision is intentionally postponed. |
+| Explicitly out of scope | The surface or feature is outside the stable Core target. |
 | Migration note required | Existing users or downstream tools need explicit guidance. |
 | No migration required | The change is clarifying, additive or internal-only. |
 
-A v1.0 release candidate should not leave central surfaces in an ambiguous state.
+A release should not leave central surfaces in an ambiguous state.
 
 ---
 
 ## 11. Release note expectations
 
-Future release notes on the path to v1.0.0 should include a compatibility section when relevant.
+Future release notes should include a compatibility section when relevant.
 
 Recommended release note fields:
 
@@ -493,9 +491,6 @@ new JSON report fields
 new generated surfaces
 new lint diagnostics
 new scenario behavior
-new golden files
-new snapshot tests
-new CI jobs
 runtime behavior
 ground behavior
 plugin discovery
@@ -511,4 +506,4 @@ Studio-specific API
 security enforcement semantics
 ```
 
-This page only defines the current v1.0 compatibility posture and how compatibility and migration notes should be written before v1.0.0.
+This page only defines the v1.0 compatibility posture and how compatibility and migration notes should be written after v1.0.0.

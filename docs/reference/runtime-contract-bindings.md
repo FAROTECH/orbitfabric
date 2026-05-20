@@ -1,6 +1,6 @@
 # Runtime Contract Bindings
 
-Status: Introduced in v0.7.0  
+Status: Public preview disposable generated artifact  
 Scope: Generated Runtime-Facing Contract Bindings
 
 ---
@@ -12,6 +12,8 @@ Runtime Contract Bindings are generated software-facing artifacts derived from t
 They provide a deterministic boundary that implementation code can include, compile and implement against.
 
 They do not implement onboard behavior.
+
+In v1.0.0, generated runtime-facing bindings remain useful and reproducible, but they are not part of the narrow stable runtime ABI.
 
 The intended flow is:
 
@@ -33,7 +35,7 @@ Runtime Contract Bindings are contract-facing artifacts.
 They are intended to expose:
 
 ```text
-stable identifiers
+deterministic identifiers
 typed command argument structs
 static metadata registries
 abstract integration interfaces
@@ -295,13 +297,13 @@ user-code merge
 protected regions
 ```
 
-These are outside the v0.7.0 boundary.
+These are outside the runtime-facing generated artifact boundary.
 
 ---
 
 ## Architectural meaning
 
-Runtime Contract Bindings are the first software-facing output of OrbitFabric.
+Runtime Contract Bindings are a software-facing output of OrbitFabric.
 
 They make the Mission Model visible to implementation code without turning OrbitFabric into flight software.
 

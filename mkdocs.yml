@@ -25,12 +25,12 @@ nav:
       - Versioning Model: reference/versioning.md
       - Stability and Compatibility Contract: reference/stability-compatibility-contract.md
       - Release Compatibility Policy: reference/release-compatibility-policy.md
-      - v1.0 Candidate Surface Inventory: reference/v1-candidate-surface-inventory.md
+      - v1.0 Candidate Surface Inventory (Historical): reference/v1-candidate-surface-inventory.md
       - v1.0 Stable Surface Decision: reference/v1-stable-surface-decision.md
       - v1.0 Demo Evidence Chain: reference/v1-demo-evidence-chain.md
       - Golden Output and Regression Confidence Policy: reference/golden-output-regression-confidence.md
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
-      - CLI Contract v1 Preview: reference/cli-contract-v1.md
+      - CLI Contract v1: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
       - Lint Rule Code Stability: reference/lint-rule-code-stability.md
@@ -63,6 +63,7 @@ nav:
       - v0.10.1 Documentation and Published Site Consistency: releases/v0.10.1.md
       - v0.11.0 Extensibility Boundary Contract, no execution: releases/v0.11.0.md
       - v0.12.0 v1.0 Release Candidate Hardening: releases/v0.12.0.md
+      - v1.0.0 Stable Mission Data Contract: releases/v1.0.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 

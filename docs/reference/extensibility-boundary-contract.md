@@ -1,12 +1,14 @@
 # Extensibility Boundary Contract
 
-Status: Development preview  
-Scope: v0.11.0 extensibility boundary classification  
-Applies to: future extension metadata, extension-owned outputs and downstream consumers before v1.0.0
+Status: Active v1.0 governance contract  
+Scope: extensibility boundary classification, no execution  
+Applies to: future extension metadata, extension-owned outputs and downstream consumers from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page documents the OrbitFabric extensibility boundary before any plugin execution exists.
+This page documents the OrbitFabric extensibility boundary.
 
-It is a documentation contract. It does not introduce plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, new Mission Model semantics, new YAML fields, new generated Core surfaces, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior or Studio-specific APIs.
+It is a stable v1.0 governance surface.
+
+It does not introduce plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, new Mission Model semantics, new YAML fields, new generated Core surfaces, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior or Studio-specific APIs.
 
 ---
 
@@ -27,9 +29,7 @@ Extensions may add value at the edges.
 Extensions must not redefine the contract.
 ```
 
-v0.11.0 defines the boundary before execution exists.
-
-The accepted posture is:
+The accepted v1.0 posture is:
 
 ```text
 extensibility is descriptive before it is executable
@@ -39,7 +39,7 @@ extensibility is descriptive before it is executable
 
 ## 2. Current Core-owned surface chain
 
-OrbitFabric Core currently exposes these Core-owned structured surfaces:
+OrbitFabric Core exposes these Core-owned structured surfaces:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -226,7 +226,7 @@ It must not replace the Core result.
 
 ## 8. Allowed descriptive extension categories
 
-After the v0.11.0 boundary is documented and reviewed, future milestones may consider descriptive extension categories such as:
+Future milestones may consider descriptive extension categories such as:
 
 ```text
 extension metadata declarations
@@ -239,15 +239,15 @@ extension diagnostics clearly marked as extension-owned
 
 These categories are allowed only if they remain derived from or anchored to Core-owned surfaces.
 
-They do not imply execution in v0.11.0.
+They do not imply execution.
 
 They do not imply a plugin runtime.
 
 ---
 
-## 9. Disallowed v0.11.0 capabilities
+## 9. Disallowed capabilities
 
-v0.11.0 must not introduce:
+The v1.0 extensibility boundary does not introduce:
 
 ```text
 plugin discovery
@@ -324,7 +324,7 @@ An extension must not promote its own output to Core-owned status.
 
 ## 12. Relationship to ADR-0015
 
-ADR-0015 records the architectural decision for v0.11.0.
+ADR-0015 records the original architectural decision for the extensibility boundary.
 
 This reference page makes that decision easier to consume from the public documentation.
 
@@ -332,13 +332,13 @@ ADR-0015 is the decision record.
 
 This page is the reference contract.
 
-If the two diverge, the project must resolve the discrepancy explicitly before v1.0.0.
+If the two diverge, the project must resolve the discrepancy explicitly.
 
 ---
 
 ## 13. Compatibility-sensitive changes
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - changing Core ownership rules;
 - changing extension ownership rules;
@@ -346,7 +346,7 @@ The following changes are compatibility-sensitive before v1.0.0:
 - allowing extension outputs to masquerade as Core outputs;
 - removing provenance expectations;
 - converting non-normative metadata guidance into a concrete schema without a separate architectural review;
-- adding execution semantics to the v0.11.0 boundary;
+- adding execution semantics to the boundary;
 - adding Studio-specific API expectations to the Core boundary;
 - treating extension diagnostics as Core diagnostics;
 - allowing extensions to reconstruct semantics from raw YAML where Core-owned surfaces exist.
@@ -357,19 +357,17 @@ It means the change must be explicit, reviewed and documented.
 
 ---
 
-## 14. v1.0 direction
+## 14. Final statement
 
-Before v1.0.0, OrbitFabric should decide which extensibility-related expectations remain development preview and which become part of the stable Mission Data Contract boundary.
-
-Likely v1.0 candidates include:
+The v1.0 extensibility boundary stabilizes these rules:
 
 ```text
-Core remains semantic owner
-Mission Model remains source of truth
-extensions consume Core-owned surfaces
-extension-owned outputs remain distinguishable from Core-owned outputs
-semantic override remains forbidden
-execution remains outside the stable v1.0 Core boundary unless separately designed and accepted
+Core remains semantic owner.
+Mission Model remains source of truth.
+Extensions consume Core-owned surfaces.
+Extension-owned outputs remain distinguishable from Core-owned outputs.
+Semantic override remains forbidden.
+Execution remains outside the stable v1.0 Core boundary unless separately designed and accepted.
 ```
 
-v1.0.0 should stabilize the Mission Data Contract without turning OrbitFabric into a plugin execution platform.
+v1.0.0 stabilizes the Mission Data Contract without turning OrbitFabric into a plugin execution platform.
