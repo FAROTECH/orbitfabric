@@ -1,10 +1,10 @@
 # Release Compatibility Policy
 
-Status: Development preview  
-Scope: v0.10.0 release compatibility classification  
-Applies to: OrbitFabric releases before v1.0.0
+Status: Active v1.0 policy  
+Scope: release compatibility classification and maintenance discipline  
+Applies to: OrbitFabric releases from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page defines how OrbitFabric should classify compatibility impact across releases on the path toward v1.0.0.
+This page defines how OrbitFabric classifies compatibility impact across releases after v1.0.0.
 
 It is a documentation contract. It does not introduce new version numbers, new release tags, new package metadata, new CLI behavior, new Mission Model semantics, new generated surfaces, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -12,11 +12,11 @@ It is a documentation contract. It does not introduce new version numbers, new r
 
 ## 1. Purpose
 
-OrbitFabric is still before v1.0.0.
+OrbitFabric v1.0.0 establishes the first stable narrow Mission Data Contract surface.
 
-That means its public surfaces may still evolve, but compatibility-sensitive changes must be explicit, reviewed and documented.
+Compatibility-sensitive changes must be explicit, reviewed and documented.
 
-This policy defines how release changes should be classified before v1.0.0.
+This policy defines how release changes should be classified after v1.0.0.
 
 It covers:
 
@@ -26,28 +26,45 @@ It covers:
 - what counts as internal;
 - what patch releases should and should not do;
 - how release notes should describe compatibility impact;
-- what v1.0.0 should eventually stabilize.
+- how stable v1.0 surfaces evolve.
 
 ---
 
-## 2. Current release status
+## 2. Stable v1.0 release status
 
-Current OrbitFabric releases are development-preview releases.
-
-No current release before v1.0.0 should be interpreted as a full stable compatibility guarantee.
-
-However, the following surfaces are already public enough to require explicit compatibility review:
+The v1.0.0 stable surface includes:
 
 ```text
-Mission Model YAML
-scenario YAML
-CLI commands and documented options
-lint diagnostic codes
-JSON report fields
-generated manifest fields
-Core-owned structured surfaces
-generated artifact paths
-reference documentation claims
+Mission Model documented contract semantics
+Core structural validation
+Core semantic lint diagnostic policy
+scenario YAML evidence inputs
+lint JSON report
+simulation JSON report
+model_summary.json
+entity_index.json
+relationship_manifest.json for admitted families
+CLI command interface for documented workflows
+release compatibility policy
+extensibility boundary contract
+```
+
+The following remain preview, disposable or out of scope unless explicitly promoted later:
+
+```text
+CLI textual output
+generated Markdown mission documentation
+plain-text simulation logs
+generated C++17 runtime-facing bindings
+generated ground-facing dictionaries
+runtime_contract_manifest.json
+ground_contract_manifest.json
+plugin execution
+relationship graph behavior
+schema migration tooling
+JSON Schema publication
+security enforcement semantics
+Studio-specific API
 ```
 
 Compatibility review protects users and downstream tools from silent changes.
@@ -56,15 +73,16 @@ Compatibility review protects users and downstream tools from silent changes.
 
 ## 3. Release compatibility classes
 
-OrbitFabric uses the following release compatibility classes before v1.0.0.
+OrbitFabric uses the following release compatibility classes.
 
 | Class | Meaning | Example |
 |---|---|---|
 | additive | Adds documented capability without changing existing meaning. | New optional field, new optional report metadata, new documentation page. |
 | corrective | Fixes a mistake while preserving intended meaning. | Correcting documentation wording or generated path text. |
 | clarifying | Makes existing meaning more explicit. | Boundary clarification or non-goal clarification. |
-| compatibility-sensitive | Changes a documented public or preview surface. | Rename field, change result token, change diagnostic severity. |
-| breaking preview change | Intentionally changes a development-preview surface in an incompatible way. | Remove documented field before v1.0 with explicit note. |
+| compatibility-sensitive | Changes a documented stable, public preview or machine-readable surface. | Rename field, change result token, change diagnostic severity. |
+| breaking preview change | Intentionally changes a non-stable preview surface in an incompatible way. | Remove a preview field with explicit note. |
+| breaking stable change | Intentionally changes a stable v1.0 surface in an incompatible way. | Remove or rename a stable JSON field. |
 | internal-only | Changes internals without changing public behavior or documented surfaces. | Refactor private Python helper structure. |
 
 These classes are not version numbers.
@@ -77,7 +95,7 @@ They are review labels for assessing release impact.
 
 A change is compatibility-sensitive when it affects a documented user-facing or machine-readable surface.
 
-Current compatibility-sensitive surfaces include:
+Compatibility-sensitive surfaces include:
 
 ```text
 Mission Model directory layout
@@ -110,7 +128,7 @@ Changing any of these must be explicit and documented.
 
 ## 5. Additive changes
 
-Additive changes are usually acceptable before v1.0.0 when they do not silently change existing meaning.
+Additive changes are usually acceptable when they do not silently change existing meaning.
 
 Examples include:
 
@@ -149,34 +167,47 @@ A correction becomes compatibility-sensitive if it changes the documented meanin
 
 ---
 
-## 7. Breaking preview changes
+## 7. Breaking stable changes
 
-Before v1.0.0, OrbitFabric may still make breaking preview changes.
+Breaking changes to stable v1.0 surfaces are not routine maintenance.
 
-Breaking preview changes are allowed only when they are deliberate, reviewed and documented.
+They require explicit release notes, compatibility impact, migration guidance and architectural justification.
 
 Examples include:
 
 ```text
-removing a documented field
-renaming a documented field
-renaming a CLI command
-changing a result token
-changing a diagnostic severity
-changing a generated manifest profile name
-changing the meaning of a Core-owned surface
-changing whether a domain is required or optional
+removing a stable documented field
+renaming a stable documented field
+renaming a stable CLI command
+changing a stable result token
+changing a stable diagnostic severity
+changing the meaning of a stable Core-owned surface field
 ```
 
-Breaking preview changes should not be hidden inside unrelated PRs.
-
-They should have a clear PR title, release note and migration explanation when practical.
+Breaking stable changes must not be hidden inside unrelated PRs.
 
 ---
 
-## 8. Patch release rule
+## 8. Breaking preview changes
 
-Before v1.0.0, patch releases should be conservative.
+Preview surfaces may still change, but incompatible changes must be deliberate, reviewed and documented.
+
+Examples include:
+
+```text
+renaming a preview generated manifest field
+changing disposable generated artifact formatting
+changing human-oriented terminal wording
+changing preview generated dictionary formatting
+```
+
+Preview changes should not be described as stable-surface changes unless they affect a selected stable surface.
+
+---
+
+## 9. Patch release rule
+
+Patch releases should be conservative.
 
 Patch releases should normally be limited to:
 
@@ -206,9 +237,9 @@ If a patch release must include a compatibility-sensitive change, that impact mu
 
 ---
 
-## 9. Minor release rule before v1.0.0
+## 10. Minor release rule after v1.0.0
 
-Before v1.0.0, minor releases may introduce new preview capabilities.
+After v1.0.0, minor releases may introduce new preview capabilities and additive stable-surface extensions.
 
 However, every minor release should clearly state whether it changes:
 
@@ -229,11 +260,11 @@ It should not blur OrbitFabric into flight software, ground software, simulator 
 
 ---
 
-## 10. Release note expectations
+## 11. Release note expectations
 
 Release notes should identify compatibility impact clearly.
 
-For any release after v0.10.0, release notes should preferably include:
+For every release after v1.0.0, release notes should preferably include:
 
 ```text
 Summary
@@ -254,7 +285,7 @@ This reduces ambiguity for users and downstream tooling.
 
 ---
 
-## 11. PR review rule
+## 12. PR review rule
 
 PRs that affect compatibility-sensitive surfaces should say so explicitly.
 
@@ -277,11 +308,9 @@ This policy clarifies what reviewers should look for.
 
 ---
 
-## 12. Deprecation rule before v1.0.0
+## 13. Deprecation rule after v1.0.0
 
-Before v1.0.0, OrbitFabric does not need a heavy deprecation framework.
-
-However, when practical, a compatibility-sensitive replacement should be documented with:
+When practical, a compatibility-sensitive replacement should be documented with:
 
 ```text
 old surface
@@ -295,7 +324,7 @@ Diagnostic codes, result tokens and public field names should not be silently re
 
 ---
 
-## 13. Current non-goals
+## 14. Current non-goals
 
 This release compatibility policy does not introduce:
 
@@ -319,12 +348,11 @@ dependency graph
 runtime behavior
 ground behavior
 Studio-specific API
-stable v1.0 compatibility guarantee
 ```
 
 ---
 
-## 14. Relationship to existing references
+## 15. Relationship to existing references
 
 This page complements, but does not replace:
 
@@ -341,27 +369,14 @@ Scenario Evidence Stability
 
 `Versioning Model` explains what version fields mean.
 
-This page explains how release changes should be classified for compatibility review before v1.0.0.
+This page explains how release changes should be classified for compatibility review after v1.0.0.
 
 ---
 
-## 15. v1.0 direction
+## 16. Stable v1.0 direction
 
-Before v1.0.0, OrbitFabric should converge on a stable compatibility promise for the Mission Data Contract.
+OrbitFabric v1.0.0 stabilizes the Mission Data Contract core.
 
-v1.0.0 should define which of the following become stable:
+Future releases should preserve that narrowness.
 
-```text
-Mission Model schema
-scenario input semantics
-CLI core workflow commands
-lint diagnostic code meanings
-JSON report families
-Core-owned structured surfaces
-generated manifest boundaries
-release note compatibility sections
-```
-
-The stable v1.0 contract should remain narrow.
-
-It should protect Mission Data Contract workflows without turning OrbitFabric into flight software, a ground segment, a simulator runtime, a visual modeling database or a plugin execution platform.
+The stable contract protects Mission Data Contract workflows without turning OrbitFabric into flight software, a ground segment, a simulator runtime, a visual modeling database or a plugin execution platform.
