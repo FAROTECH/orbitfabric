@@ -1,10 +1,10 @@
 # Stability and Compatibility Contract
 
-Status: Development preview  
-Scope: v0.10.0 stability and compatibility classification baseline  
-Applies to: pre-v1.0 OrbitFabric Core
+Status: Active v1.0 contract  
+Scope: v1.0 stability and compatibility classification baseline  
+Applies to: OrbitFabric Core from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page defines the initial stability and compatibility classification model for OrbitFabric Core on the path toward v1.0.0.
+This page defines the stability and compatibility classification model for OrbitFabric Core after v1.0.0.
 
 It is a documentation contract. It does not introduce new Mission Model semantics, new generated surfaces, new CLI behavior, new report fields, runtime behavior, ground behavior, plugin execution or Studio-specific APIs.
 
@@ -12,11 +12,11 @@ It is a documentation contract. It does not introduce new Mission Model semantic
 
 ## 1. Purpose
 
-v0.10.0 exists to make OrbitFabric's public contract boundaries explicit before v1.0.0.
+v1.0.0 establishes OrbitFabric's first stable narrow Mission Data Contract surface.
 
 The purpose of this document is to classify:
 
-- which surfaces are part of the Mission Data Contract;
+- which surfaces are part of the stable Mission Data Contract;
 - which surfaces are public but still preview;
 - which surfaces are generated and disposable;
 - which surfaces are internal implementation details;
@@ -31,7 +31,7 @@ OrbitFabric remains a Mission Data Contract framework.
 
 The Mission Model remains the source of truth.
 
-Core-owned generated surfaces, generated documentation, runtime-facing bindings, ground-facing artifacts and reports are derived from the validated Mission Model.
+Core-owned structured surfaces, generated documentation, runtime-facing bindings, ground-facing artifacts and reports are derived from the validated Mission Model.
 
 They must not become independent sources of mission semantics.
 
@@ -48,55 +48,53 @@ Downstream tools must consume Core-owned structured surfaces instead of reconstr
 
 ## 3. Stability labels
 
-OrbitFabric uses these stability labels before v1.0.0.
+OrbitFabric uses these stability labels from v1.0.0 onward.
 
-### 3.1 Public preview
-
-A public preview surface is intentionally documented and intended for users or downstream tools to inspect.
-
-Public preview surfaces may still change before v1.0.0, but changes should be deliberate, documented and reviewed.
-
-### 3.2 Candidate contract
-
-A candidate contract surface is public preview and is being evaluated as a future stable v1.0 surface.
-
-Candidate contract surfaces require extra care before changing field names, record shapes, command names or semantic meaning.
-
-### 3.3 Stable contract
+### 3.1 Stable contract
 
 A stable contract surface is a v1.0 or later compatibility commitment.
 
-No current pre-v1.0 OrbitFabric surface is classified as a stable contract.
+Changes to stable surfaces are compatibility-sensitive and must be explicit, reviewed and documented.
 
-### 3.4 Internal implementation detail
+### 3.2 Public preview
 
-An internal implementation detail is not a public compatibility surface.
+A public preview surface is intentionally documented and intended for users or downstream tools to inspect.
 
-It may change without migration support as long as public behavior and documented surfaces remain valid.
+Public preview surfaces may evolve, but changes should be deliberate, documented and reviewed.
 
-### 3.5 Disposable generated artifact
+### 3.3 Generated disposable artifact
 
 A disposable generated artifact is intended to be regenerated from the Mission Model.
 
 Users should not hand-edit it or treat it as authoritative source input.
 
+### 3.4 Internal implementation detail
+
+An internal implementation detail is not a public compatibility surface.
+
+It may change without migration support as long as public behavior and documented stable surfaces remain valid.
+
 ---
 
 ## 4. Current surface classification
 
-The current pre-v1.0 classification is:
+The current v1.0 classification is:
 
 | Surface | Classification | Notes |
 |---|---|---|
-| Mission Model YAML | Candidate contract | Source of truth. Still pre-v1.0. |
-| Scenario YAML | Public preview | Used for deterministic host-side evidence. Still pre-v1.0. |
-| CLI command names | Public preview | User-facing workflow surface. Should change only deliberately. |
+| Mission Model documented semantics | Stable contract | Source of truth for documented domains, fields, identifiers and reference rules. |
+| Core structural validation | Stable contract | Loader and validation responsibilities for documented inputs. |
+| Core semantic lint diagnostic policy | Stable contract | Diagnostic codes, severities and meanings are compatibility-sensitive. |
+| Scenario YAML evidence inputs | Stable contract | Host-side scenario evidence input semantics. |
+| lint JSON report | Stable contract | Machine-readable validation result. |
+| simulation JSON report | Stable contract | Machine-readable scenario evidence. |
+| `model_summary.json` | Stable contract | Core-owned domain-level structured surface. |
+| `entity_index.json` | Stable contract | Core-owned entity-level structured surface. |
+| `relationship_manifest.json` | Stable contract for admitted families | Core-owned relationship-level structured surface. |
+| documented CLI workflow commands and options | Stable contract | Human-oriented terminal wording remains preview. |
+| release compatibility policy | Stable governance surface | Post-v1 compatibility review discipline. |
+| extensibility boundary contract | Stable governance surface | Boundary without plugin execution. |
 | CLI textual output | Public preview, human-oriented | Useful for humans. Not a machine contract. |
-| lint JSON report | Public preview | Machine-readable validation report. Not yet v1.0 stable. |
-| simulation JSON report | Public preview | Machine-readable scenario evidence report. Not yet v1.0 stable. |
-| `model_summary.json` | Candidate contract | Core-owned read-only domain-level surface. |
-| `entity_index.json` | Candidate contract | Core-owned read-only entity-level surface. |
-| `relationship_manifest.json` | Candidate contract | Core-owned read-only relationship-level candidate surface. |
 | generated Markdown documentation | Public preview, generated artifact | Human-reviewable output. Not source of truth. |
 | generated runtime-facing bindings | Public preview, disposable generated artifact | Contract-facing bindings. Not flight software ABI. |
 | generated ground-facing artifacts | Public preview, disposable generated artifact | Integration artifacts. Not a ground segment runtime. |
@@ -108,7 +106,7 @@ The current pre-v1.0 classification is:
 
 ## 5. Compatibility-sensitive changes
 
-These changes are compatibility-sensitive before v1.0.0:
+These changes are compatibility-sensitive after v1.0.0:
 
 - removing or renaming documented Mission Model fields;
 - changing the meaning of documented Mission Model fields;
@@ -130,7 +128,7 @@ It means the change must be explicit, reviewed and documented.
 
 ## 6. Changes that do not require compatibility guarantees
 
-These areas are not compatibility promises before v1.0.0:
+These areas are not compatibility promises unless explicitly documented as stable:
 
 - internal Python function layout;
 - private helper names;
@@ -168,7 +166,6 @@ ground behavior
 Studio-specific API
 schema migration tooling
 JSON Schema publication
-v1.0 compatibility guarantee
 ```
 
 ---
@@ -197,28 +194,14 @@ This document complements the Versioning Model.
 
 Versioning explains which version fields exist and what they mean.
 
-This document explains which surfaces are compatibility-sensitive and how they should be treated before v1.0.0.
+This document explains which surfaces are stable, preview, disposable, internal or out of scope after v1.0.0.
 
-Pre-v1.0 compatibility classification does not imply that the OrbitFabric package version and the Mission Model version must match.
+The OrbitFabric package version and the Mission Model version remain distinct concepts.
 
 ---
 
-## 10. v1.0 direction
+## 10. Final statement
 
-Before v1.0.0, OrbitFabric should decide which candidate surfaces become stable contract surfaces.
+v1.0.0 means a stable Mission Data Contract framework.
 
-Likely v1.0 candidates include:
-
-- the Mission Model schema;
-- core lint rule codes;
-- core CLI workflows;
-- JSON report families;
-- model summary surface;
-- entity index surface;
-- relationship manifest surface;
-- generated runtime-facing binding contract boundaries;
-- generated ground-facing artifact contract boundaries.
-
-v1.0.0 should mean a stable Mission Data Contract framework.
-
-It should not mean a complete flight software framework, ground segment, simulator, mission control system, visual modeling tool or plugin execution platform.
+It does not mean a complete flight software framework, ground segment, simulator, mission control system, visual modeling tool or plugin execution platform.
