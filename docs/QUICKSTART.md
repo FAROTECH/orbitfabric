@@ -1,43 +1,33 @@
 # Quickstart
 
-This guide shows how to run the current OrbitFabric development preview locally.
+This guide shows how to run OrbitFabric locally from the current repository baseline.
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-The current vertical slice demonstrates:
+The current released baseline is:
 
 ```text
-Mission Model YAML
-  -> structural validation
-  -> semantic lint
-  -> generated Markdown docs
-  -> mission inspection
-  -> scenario validation
-  -> deterministic scenario execution
-  -> Payload Contract documentation
-  -> Data Product Contract documentation
-  -> Contact and Downlink Contract documentation
-  -> Commandability and Autonomy Contract documentation
-  -> Data Flow Evidence documentation
-  -> RuntimeContract generation
-  -> C++17 runtime-facing contract bindings
-  -> C++17 host-build smoke validation
-  -> GroundContract generation
-  -> ground-facing JSON dictionaries
-  -> ground-facing CSV dictionaries
-  -> human-reviewable ground Markdown artifacts
-  -> model_summary.json contract introspection report
-  -> entity_index.json entity index report
-  -> relationship_manifest.json candidate relationship report
-  -> stability and compatibility classification references
-  -> Extensibility Boundary Contract reference
-  -> v1.0 candidate surface inventory
-  -> golden output and regression confidence policy
-  -> v1.0 compatibility and migration notes
-  -> JSON lint reports
-  -> JSON simulation reports with data-flow evidence
-  -> simulation logs
+v0.12.0 - v1.0 Release Candidate Hardening
 ```
+
+The immediate target is:
+
+```text
+v1.0.0 - Stable Mission Data Contract
+```
+
+After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
+
+```text
+v1.0 Stable Surface Decision
+v1.0 golden signatures for selected Core-owned structured surfaces
+v1.0 Demo Evidence Chain
+v1.0 Compatibility and Migration Notes aligned to the current candidate posture
+```
+
+This does not mean v1.0.0 has already been released.
+
+It does not introduce new Mission Model semantics, YAML fields, CLI behavior, JSON report fields, generated Core surfaces, runtime behavior, ground behavior, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -45,9 +35,7 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
-
-Compatibility classification references, v0.12.0 hardening references and the Extensibility Boundary Contract are not runtime behavior, ground behavior, schema migration tooling, plugin discovery, plugin loading, plugin execution or a v1.0 stability guarantee.
+Core-owned structured surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
 ---
 
@@ -112,7 +100,7 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected version:
+Expected current package version:
 
 ```text
 orbitfabric 0.12.0
@@ -120,7 +108,7 @@ orbitfabric 0.12.0
 
 ---
 
-## 6. Run code quality checks
+## 6. Run core checks
 
 ```bash
 ruff check .
@@ -184,23 +172,13 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 ## 10. Export Core-owned structured surfaces
 
-Generate the domain-level model summary:
-
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
-```
 
-Generate the entity-level index:
-
-```bash
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
-```
 
-Generate the relationship-level manifest:
-
-```bash
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
@@ -213,37 +191,21 @@ generated/reports/entity_index.json
 generated/reports/relationship_manifest.json
 ```
 
-`model_summary.json` answers:
+These surfaces answer:
 
 ```text
-What contract domains are present in this mission?
+model_summary.json          -> What contract domains are present?
+entity_index.json           -> What contract entities are defined?
+relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-`entity_index.json` answers:
-
-```text
-What contract entities are defined in this mission?
-```
-
-`relationship_manifest.json` answers:
-
-```text
-How are indexed mission contract entities related?
-```
-
-These surfaces are Core-owned, read-only and derived from the loaded Mission Model.
+They are Core-owned, read-only and derived from the validated Mission Model.
 
 They do not expose plugin execution, graph engines, Studio-specific APIs, runtime behavior or ground behavior.
 
 ---
 
-## 11. Review stability, compatibility, extensibility and v1.0 hardening references
-
-v0.10.0 adds compatibility classification references for the path toward v1.0.0.
-
-v0.11.0 adds the Extensibility Boundary Contract before any plugin execution exists.
-
-v0.12.0 adds release candidate hardening references before the stable v1.0.0 decision.
+## 11. Review v1.0 candidate references
 
 Key references include:
 
@@ -254,6 +216,8 @@ CLI Contract v1 Preview
 Generated Surfaces Stability
 Extensibility Boundary Contract
 v1.0 Candidate Surface Inventory
+v1.0 Stable Surface Decision
+v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
 Lint Rule Code Stability
@@ -262,9 +226,9 @@ Scenario Evidence Stability
 Release Compatibility Policy
 ```
 
-These references classify existing public and preview surfaces, define how future extension-owned outputs must remain distinguishable from Core-owned outputs and document the v1.0 hardening path.
+These references classify existing surfaces, define the extensibility boundary, record the current v1.0 candidate posture and explain what is selected, preview, disposable, internal or out of scope.
 
-They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, golden files, snapshot tests, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a stable v1.0 compatibility guarantee.
+They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, migration tooling, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
 
 ---
 
@@ -303,8 +267,6 @@ They do not implement onboard behavior.
 
 ## 14. Validate the generated C++17 host-build smoke target
 
-After generating runtime bindings, run:
-
 ```bash
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
@@ -336,31 +298,10 @@ They do not implement a live ground segment, decoder, telemetry archive, databas
 
 ---
 
-## 16. Run the battery-low demo scenario
+## 16. Run demo scenarios
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
-```
-
-Expected result:
-
-```text
-Result: PASSED
-```
-
-Generate both JSON report and timeline log:
-
-```bash
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
-```
-
----
-
-## 17. Run the data-flow evidence scenario
-
-```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
@@ -370,15 +311,19 @@ Expected result:
 Result: PASSED
 ```
 
-Generate both JSON report and timeline log:
+Generate JSON reports and timeline logs:
 
 ```bash
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
+  --json generated/reports/battery_low_during_payload_report.json \
+  --log generated/logs/battery_low_during_payload.log
+
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
   --json generated/reports/payload_data_flow_evidence_report.json \
   --log generated/logs/payload_data_flow_evidence.log
 ```
 
-The JSON report includes a `data_flow_evidence` section tracing the declared contract path:
+The data-flow evidence report traces the declared contract path:
 
 ```text
 command -> data product -> storage intent -> downlink intent -> downlink flow -> contact window
@@ -386,37 +331,27 @@ command -> data product -> storage intent -> downlink intent -> downlink flow ->
 
 ---
 
-## 18. What this proves
+## 17. What this proves
 
 The current demo proves that OrbitFabric can:
 
 - load a multi-file YAML Mission Model;
-- load optional `payloads.yaml`, `data_products.yaml`, `contacts.yaml` and `commandability.yaml` domains;
 - validate Mission Model structure;
 - run semantic lint rules;
-- generate Markdown documentation;
+- generate documentation;
 - inspect a Mission Model summary;
-- export a model summary from the loaded Mission Model;
-- export an entity index from the loaded Mission Model;
-- export a relationship manifest from the loaded Mission Model;
-- classify public, preview, candidate, generated and internal compatibility surfaces;
-- document the extensibility boundary before plugin execution;
-- document the v1.0 release candidate hardening path;
+- export Core-owned structured surfaces;
 - validate scenarios without executing them;
-- execute deterministic operational sequences;
+- execute deterministic host-side scenario evidence;
 - record contract-level data-flow evidence;
-- assert command-to-data-product-to-contact evidence in a scenario;
-- produce JSON reports and logs;
-- build a RuntimeContract from the validated Mission Model;
-- generate deterministic C++17 runtime-facing contract bindings;
-- validate generated C++17 contract bindings with a host-build smoke target;
-- build a GroundContract from the validated Mission Model;
-- generate deterministic JSON, CSV and Markdown ground-facing contract artifacts;
-- export deterministic Core-owned structured surfaces for downstream inspection tools.
+- generate runtime-facing contract bindings;
+- validate generated C++17 bindings with a host-build smoke target;
+- generate ground-facing contract artifacts;
+- protect selected Core-owned structured surface fields with golden signatures.
 
 ---
 
-## 19. What this does not prove
+## 18. What this does not prove
 
 The current demo does not prove:
 
@@ -436,19 +371,16 @@ The current demo does not prove:
 - telemetry archive behavior;
 - database behavior;
 - operator console behavior;
-- orbital, attitude, power or thermal dynamics;
 - command dispatch runtime behavior;
 - telemetry polling runtime behavior;
 - HAL or RTOS integration;
 - relationship graph behavior;
 - dependency graph behavior;
-- security enforcement behavior;
 - plugin API behavior;
 - plugin discovery behavior;
 - plugin loading behavior;
 - plugin execution behavior;
-- metadata schema behavior;
-- v1.0 compatibility guarantee;
+- released v1.0.0 compatibility;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current development preview scope.
+Those are intentionally outside the current scope.
