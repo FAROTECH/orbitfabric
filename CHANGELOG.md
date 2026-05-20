@@ -23,6 +23,8 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 - Aligned the v1.0 Compatibility and Migration Notes reference with the current v1.0 candidate posture after the stable surface decision, golden signatures and demo evidence chain.
 - Documented that no migration is required from the v0.12.0 release candidate hardening baseline to the current v1.0 candidate documentation and regression-test state.
+- Aligned the public documentation homepage with the current v1.0 candidate posture.
+- Aligned the roadmap with the current v1.0 candidate alignment path before final v1.0.0 release preparation.
 
 ### Compatibility impact
 
@@ -41,6 +43,8 @@ The v1.0 Demo Evidence Chain reference is documentation-only and maps existing d
 It does not introduce new Mission Model semantics, new scenarios, new generated artifacts, new report fields or new compatibility guarantees.
 
 The v1.0 Compatibility and Migration Notes alignment is documentation-only and does not introduce migration tooling, compatibility scanners, JSON Schema publication, schema version negotiation or new compatibility guarantees beyond the proposed v1.0 posture.
+
+The homepage and roadmap alignment is documentation-only and does not change the package version, release status, Mission Model semantics, generated artifacts, CI behavior or v1.0 release state.
 
 ### Boundaries
 
@@ -79,6 +83,8 @@ The new golden signatures do not freeze full generated JSON files, absolute path
 The v1.0 Demo Evidence Chain reference does not claim flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
 
 The v1.0 Compatibility and Migration Notes reference does not claim that preview, disposable, internal or out-of-scope surfaces become stable.
+
+The public documentation claim alignment does not claim that v1.0.0 has been released.
 
 ---
 
@@ -388,7 +394,7 @@ Relationship Manifest Surface in v0.9.0 is a Core-owned read-only candidate rela
 ### Added
 
 - Added `entity_index_to_dict(model, mission_dir)`.
-- Added `write_entity_index(model, mission_dir, output_file)`.
+- Added `write_entity_index(model, mission_dir)`.
 - Added deterministic `entity_index.json` generation.
 - Added the `orbitfabric export entity-index` command.
 - Added `index_version 0.1` for the entity index surface.
@@ -438,7 +444,7 @@ The Entity Index Surface intentionally does not introduce:
 
 - Added the `orbitfabric.export` package.
 - Added `model_summary_to_dict(model, mission_dir)`.
-- Added `write_model_summary(model, mission_dir, output_file)`.
+- Added `write_model_summary(model, mission_dir)`.
 - Added the `orbitfabric export model-summary` command.
 - Added deterministic `model_summary.json` generation.
 - Added the first Core-owned read-only Contract Introspection Surface.
