@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 0.12.0
-Status: Draft
-Scope: Mission Data Contract foundation, Mission Data Chain, generated contract-facing artifacts, stability classification, extensibility boundary contract and v1.0 release candidate hardening references
+Version: 0.12.0 to v1.0 candidate path  
+Status: v1.0 candidate alignment  
+Scope: Mission Data Contract foundation, Core-owned structured surfaces, extensibility boundary and v1.0 stable-surface preparation
 
 ---
 
@@ -10,7 +10,7 @@ Scope: Mission Data Contract foundation, Mission Data Chain, generated contract-
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-Its purpose is to let small spacecraft teams define telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, storage intent, downlink assumptions, commandability/autonomy assumptions, operational scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classifications, extensibility boundary rules and v1.0 release candidate hardening references once, in a single mission contract, and then use that contract to validate consistency, generate documentation, run simulations, support tests and prepare integration and inspection artifacts for onboard, ground, downstream tooling and future extension-owned outputs.
+Its purpose is to let small spacecraft teams define mission data once, in a structured Mission Model, and then reuse that contract across validation, documentation, testing, scenario evidence, runtime-facing bindings, ground-facing artifacts, Core-owned structured surfaces and downstream inspection workflows.
 
 OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool, a payload runtime framework, a plugin execution platform, a plugin loader, a plugin discovery mechanism or a visual modeling backend.
 
@@ -22,7 +22,36 @@ The guiding principle is:
 
 ---
 
-## 2. Core Definition
+## 2. Current Status
+
+OrbitFabric is currently released at:
+
+```text
+v0.12.0 - v1.0 Release Candidate Hardening
+```
+
+The immediate target is:
+
+```text
+v1.0.0 - Stable Mission Data Contract
+```
+
+After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
+
+```text
+v1.0 Stable Surface Decision
+v1.0 golden signatures for selected Core-owned structured surfaces
+v1.0 Demo Evidence Chain
+v1.0 Compatibility and Migration Notes aligned to the current candidate posture
+```
+
+This does not mean v1.0.0 has already been released.
+
+It means the project has selected, protected, demonstrated and documented the proposed narrow v1.0 posture.
+
+---
+
+## 3. Core Definition
 
 OrbitFabric is a framework for defining and using a Mission Data Contract.
 
@@ -35,11 +64,10 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - events;
 - faults;
 - operational modes;
-- mode transitions;
 - packets;
 - payload contracts;
 - data products;
-- persistence, storage and retention policies;
+- storage and retention intent;
 - downlink priorities and contact assumptions;
 - commandability constraints;
 - autonomy and recovery expectations;
@@ -47,18 +75,16 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - validation and linting rules;
 - runtime-facing generated contract bindings;
 - ground-facing generated integration artifacts;
-- Core-owned contract introspection surfaces;
-- Core-owned entity index surfaces;
-- Core-owned relationship manifest surfaces;
+- Core-owned structured surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
-- v1.0 release candidate hardening references.
+- v1.0 candidate governance references.
 
 The Mission Data Contract is the single source of truth for all derived artifacts.
 
 ---
 
-## 3. Problem Statement
+## 4. Problem Statement
 
 Small spacecraft projects often suffer from mission data fragmentation.
 
@@ -81,13 +107,13 @@ The same information is commonly duplicated and reinterpreted across multiple pl
 
 This creates drift.
 
-A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A packet may exceed its expected size without being detected early. A mode may forbid an operation in principle, while the command router still accepts it in practice. A payload may produce data products that have no storage policy, retention rule or downlink path. A ground dictionary may describe data that the onboard design does not actually preserve or prioritize. A generated software boundary may diverge from the mission model it was supposed to represent. A downstream tool may infer contract semantics differently from the Core. A future extension may accidentally become a second semantic source if the ownership boundary is not explicit.
+A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A payload may produce data products that have no storage policy, retention rule or downlink path. A downstream tool may infer contract semantics differently from the Core. A future extension may accidentally become a second semantic source if the ownership boundary is not explicit.
 
-OrbitFabric addresses this by making the mission data model explicit, validated, executable, documented, reusable, introspectable, indexable, relatable, compatibility-classified, extensibility-bounded and hardened toward v1.0 through Core-owned structured surfaces and references.
+OrbitFabric addresses this by making the Mission Data Contract explicit, validated, executable as host-side scenario evidence, documented, reusable, introspectable, indexable, relatable, compatibility-classified, extensibility-bounded and protected through selected golden signatures.
 
 ---
 
-## 4. Target Users
+## 5. Target Users
 
 The initial target users are:
 
@@ -108,7 +134,7 @@ OrbitFabric must be accessible to students and power makers, but designed with t
 
 ---
 
-## 5. Positioning
+## 6. Positioning
 
 OrbitFabric does not compete directly with mature space software frameworks and tools.
 
@@ -130,495 +156,199 @@ The correct long-term role is:
 
 ---
 
-## 6. Core Principles
+## 7. Core Principles
 
-### 6.1 Mission Model First
+### 7.1 Mission Model First
 
 OrbitFabric starts from the Mission Model, not from the onboard runtime, the ground system, a plugin, an extension-owned output or a visual tool.
 
-The runtime-facing bindings, ground-facing artifacts, contract introspection reports, entity index reports, relationship manifest reports, simulator, documentation, compatibility classifications, extensibility boundary rules and v1.0 hardening references must derive from or describe the model, not the other way around.
+The Mission Model remains the source of truth.
 
-### 6.2 Contract Before Code
+### 7.2 Contract Before Code
 
 The first valuable artifact is the contract.
 
-Code generation, runtime execution, ground integration, inspection surfaces, relationship surfaces, entity surfaces, compatibility references, extension-owned outputs and integration bridges are secondary and must not redefine the model.
+Code generation, runtime-facing bindings, ground-facing artifacts, inspection surfaces, relationship surfaces, compatibility references, extension-owned outputs and integration bridges are secondary.
 
-### 6.3 Mission Data Chain Before Generated Artifacts
+They must not redefine the model.
 
-OrbitFabric must make the mission data chain explicit before generating software-facing, ground-facing, introspection, entity-index, relationship or extension-facing artifacts.
+### 7.3 Core Surfaces Before Plugins
 
-The current chain is:
+Downstream tools and future extensions must consume Core-owned structured surfaces.
+
+They must not reconstruct Mission Data Contract semantics from raw YAML, generated files, terminal output, logs, UI state or private assumptions.
+
+The current selected Core-owned structured surfaces are:
 
 ```text
-payload behavior
-        -> data products
-        -> onboard storage and retention intent
-        -> downlink queue intent
-        -> contact window assumptions
-        -> commandability constraints
-        -> autonomy and recovery expectations
-        -> end-to-end scenario evidence
-        -> runtime-facing contract bindings
-        -> ground-facing integration artifacts
-        -> contract introspection surface
-        -> entity index surface
-        -> relationship manifest surface
-        -> stability and compatibility classification
-        -> extensibility boundary contract
-        -> v1.0 release candidate hardening references
+model_summary.json
+entity_index.json
+relationship_manifest.json
 ```
 
-Only after these concepts are sufficiently clear should OrbitFabric derive plugin, tool-specific or external integration layers from them.
+### 7.4 Generated Artifacts Are Disposable Unless Classified Otherwise
 
-### 6.4 Generated Artifacts Are Disposable
-
-Generated runtime-facing contract bindings, ground-facing integration artifacts, contract introspection reports, entity index reports and relationship manifest reports are reproducible outputs.
+Generated runtime-facing bindings, generated ground-facing artifacts, generated Markdown documentation and plain-text logs are reproducible outputs.
 
 They are not the source of truth.
 
 Users must not place handwritten implementation code inside generated files.
 
-User implementation code and downstream integration code must live outside `generated/` and integrate through generated identifiers, descriptors, typed structures, abstract interfaces, manifests, dictionaries or Core-owned reports.
+### 7.5 Compatibility Must Be Explicit
 
-### 6.5 Linting as Engineering Judgment
+Before v1.0.0, any change to a selected stable candidate surface must include explicit compatibility or migration notes.
 
-OrbitFabric linting must not be limited to YAML syntax validation.
+A surface does not become stable only because it exists.
 
-It must perform mission consistency analysis.
-
-The lint system is a core feature, not a utility.
-
-### 6.6 Scenario-First Testing
+### 7.6 Scenario Evidence Is Host-Side Contract Evidence
 
 Operational scenarios must be first-class artifacts.
 
-A mission scenario should be expressible as structured data and executable by the simulator.
+The simulator validates deterministic host-side contract behavior.
 
-The simulator must be able to answer a practical engineering question:
-
-> Given this mission model and this scenario, does the system behave as expected?
-
-Scenarios provide evidence for mode transitions, command behavior, payload data production, storage intent, downlink assumptions, contact windows and recovery expectations.
-
-### 6.7 Ground by Construction
-
-OrbitFabric must not become a full ground segment.
-
-However, it must generate artifacts useful for ground integration:
-
-- generated review documentation;
-- JSON ground dictionaries;
-- CSV review dictionaries;
-- packet membership dictionaries;
-- data product dictionaries;
-- downlink policy descriptions;
-- future Yamcs/OpenC3/XTCE exports when explicitly implemented and tested.
-
-### 6.8 Core Surfaces Before Plugins
-
-Downstream tools and future extensions must consume Core-owned structured surfaces.
-
-They must not reconstruct Mission Model semantics from raw YAML, generated artifacts or human-oriented CLI output.
-
-v0.8.1 introduces `model_summary.json` as the first such surface.
-
-v0.8.2 introduces `entity_index.json` as the second such surface.
-
-v0.9.0 introduces `relationship_manifest.json` as the third such surface.
-
-v0.10.0 classifies public, preview, candidate, generated and internal surfaces before v1.0.0.
-
-v0.11.0 defines the extensibility boundary before any plugin execution exists.
-
-v0.12.0 hardens the release candidate path before the final v1.0 stable-surface decision.
-
-Future plugin extensibility must build on these surfaces without silently redefining Core semantics.
-
-### 6.9 Clean-Room Development
-
-OrbitFabric must be developed from scratch using public knowledge, synthetic examples and generic engineering concepts.
-
-It must not contain proprietary mission details, real non-public architectures, private protocols, real bus maps, real pinouts, real logs, real payload data or any information under NDA.
-
-### 6.10 Small Core, Extensible Edges
-
-The core must stay small.
-
-Extensibility should come through plugins, generators, custom lint rules and adapters only after the ownership, provenance, trust and execution boundaries are explicit.
-
-Plugin execution requires explicit trust, metadata and boundary design before arbitrary or untrusted plugin code is supported.
-
-v0.11.0 does not introduce plugin discovery, plugin loading or plugin execution.
-
-v0.12.0 does not introduce plugin discovery, plugin loading or plugin execution.
-
-### 6.11 Practical Before Perfect
-
-OrbitFabric must favor useful, testable, well-documented behavior over broad but shallow standard compliance.
-
-CCSDS, PUS, CFDP, XTCE, Yamcs, OpenC3, cFS, F Prime and Basilisk integrations are future extensions, not early-version requirements.
+It is not a real-time onboard runtime or a spacecraft dynamics simulator.
 
 ---
 
-## 7. Current Baseline
+## 8. v1.0 Candidate Stable Surface
 
-The current v0.12.0 baseline includes:
+The selected v1.0 candidate stable surface is intentionally narrow.
 
-- Mission Model YAML files;
-- model loading;
-- structural validation;
-- semantic linting;
-- generated Markdown documentation;
-- deterministic host-side scenario simulation;
-- scenario runner;
-- payload contract model;
-- data product contract model;
-- contact/downlink contract model;
-- commandability/autonomy contract model;
-- end-to-end mission data flow evidence;
-- RuntimeContract intermediate model;
-- generated C++17 runtime-facing contract bindings;
-- C++17 host-build smoke validation;
-- GroundContract intermediate model;
-- generated generic ground-facing dictionaries;
-- generated JSON ground dictionaries;
-- generated CSV ground dictionaries;
-- generated ground Markdown review artifacts;
-- Core-owned model summary export;
-- Core-owned entity index export;
-- Core-owned relationship manifest export;
-- stability and compatibility classification references;
-- Extensibility Boundary Contract reference;
-- ADR-0015 extensibility boundary decision;
-- v1.0 Candidate Surface Inventory;
-- Golden Output and Regression Confidence Policy;
-- v1.0 Compatibility and Migration Notes;
-- release compatibility policy;
-- readable logs;
-- JSON reports;
-- one complete demo mission named `demo-3u`.
-
-The current baseline supports these commands:
-
-```bash
-orbitfabric lint examples/demo-3u/mission/
-orbitfabric export model-summary examples/demo-3u/mission/ --json generated/reports/model_summary.json
-orbitfabric export entity-index examples/demo-3u/mission/ --json generated/reports/entity_index.json
-orbitfabric export relationship-manifest examples/demo-3u/mission/ --json generated/reports/relationship_manifest.json
-orbitfabric gen docs examples/demo-3u/mission/
-orbitfabric gen data-flow examples/demo-3u/mission/
-orbitfabric gen runtime examples/demo-3u/mission/
-orbitfabric gen ground examples/demo-3u/mission/
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
-orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
-```
-
-There are no extension commands in v0.12.0.
-
----
-
-## 8. Ground Integration Artifact Direction
-
-The Ground Integration Artifacts slice makes mission data visible to ground-side engineering workflows without turning OrbitFabric into ground software.
-
-A ground artifact may describe telemetry identity and metadata, command identity, arguments and allowed modes, event identity and severity, fault identity and recovery intent metadata, data product identity, storage intent and downlink intent, packet membership, manifest boundary flags and human-reviewable dictionary documentation.
-
-A ground artifact must not describe or implement live telemetry transport, binary packet decoding, command uplink, authentication or authorization, telemetry archive storage, operator displays, ground station scheduling, Yamcs/OpenC3/XTCE compatibility unless explicitly implemented and tested.
-
-Ground artifacts are part of the Mission Data Contract output chain.
-
-They are the foundation for later tool-specific exporters and plugin extensibility.
-
----
-
-## 9. Contract Introspection, Entity Index, Relationship Manifest, Compatibility, Extensibility and Hardening Direction
-
-Core-owned structured surfaces make the loaded Mission Model visible to downstream tools without letting those tools infer Core semantics privately.
-
-The v0.8.1 model summary report describes mission identity, source mission directory, contract domains, domain counts, required or optional domain status, source file metadata and explicit boundary flags.
-
-The v0.8.2 entity index report describes mission identity, source mission directory, contract entities, entity IDs, entity domains, entity types, display names, source file metadata and explicit boundary flags.
-
-The v0.9.0 relationship manifest report describes mission identity, source mission directory, relationship records, relationship IDs, relationship types, source and target indexed entities, relationship type counts, derivation policy and explicit boundary flags.
-
-The v0.10.0 compatibility references classify how public, preview, candidate, generated and internal surfaces should evolve before v1.0.0.
-
-The v0.11.0 extensibility boundary defines how future extension-owned outputs may relate to Core-owned semantics without becoming a second source of truth.
-
-The v0.12.0 hardening references define how v1.0 candidate surfaces, golden-output decisions and compatibility or migration notes should be reviewed before a stable Mission Data Contract release.
-
-These surfaces and references must not describe or implement:
-
-- relationship graph execution;
-- dependency graph execution;
-- source line or column tracking;
-- YAML AST export;
-- metadata schema;
-- metadata parser;
-- metadata loader;
-- metadata validator;
-- plugin API;
-- plugin discovery;
-- plugin loading;
-- plugin execution;
-- schema migration tooling;
-- JSON Schema publication;
-- security enforcement semantics;
-- Studio-specific API;
-- runtime behavior;
-- ground behavior;
-- stable v1.0 compatibility guarantee.
-
----
-
-## 10. Mission Data Chain Direction
-
-After the Payload Contract Model, OrbitFabric evolved toward explicit Mission Data Chain modeling.
-
-The current chain is:
+It includes:
 
 ```text
-Payload or subsystem activity
-        -> generated telemetry and data products
-        -> onboard storage and retention intent
-        -> downlink queue and priority intent
-        -> contact window assumptions
-        -> commandability and autonomy constraints
-        -> end-to-end scenario evidence
+Mission Model documented contract semantics
+Core structural validation
+Core semantic lint diagnostic policy
+scenario YAML evidence inputs
+lint JSON report
+simulation JSON report
+model_summary.json
+entity_index.json
+relationship_manifest.json for admitted families
+CLI command interface for documented workflows
+release compatibility policy
+extensibility boundary contract
+```
+
+The following remain preview, disposable, internal or out of scope unless explicitly promoted later:
+
+```text
+CLI textual output
+generated Markdown mission documentation
+plain-text simulation logs
+generated C++17 runtime-facing bindings
+generated ground-facing dictionaries
+runtime_contract_manifest.json
+ground_contract_manifest.json
+plugin discovery
+plugin loading
+plugin execution
+relationship graph behavior
+schema migration tooling
+JSON Schema publication
+security enforcement semantics
+Studio-specific API
+```
+
+---
+
+## 9. Non-Goals
+
+OrbitFabric must not become:
+
+- a flight software framework;
+- a ground segment;
+- a mission control system;
+- an operator console;
+- a telemetry archive;
+- a command uplink service;
+- a spacecraft dynamics simulator;
+- a hardware abstraction layer;
+- a CCSDS/PUS/CFDP implementation;
+- an XTCE mission database;
+- a Yamcs integration;
+- an OpenC3 integration;
+- an F Prime or cFS mapping layer;
+- a relationship graph engine;
+- a dependency graph engine;
+- a plugin execution framework;
+- a Studio-specific backend API;
+- a schema migration tool;
+- a JSON Schema publication layer;
+- a security enforcement framework;
+- a released v1.0.0 compatibility guarantee before v1.0.0 is actually released.
+
+These may be valid future directions only after separate design, implementation and tests.
+
+They are not part of the current Core charter.
+
+---
+
+## 10. Golden Signature Boundary
+
+The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
+
+They protect:
+
+```text
+surface kind
+surface version
+mission identity
+boundary flags
+domain counts
+entity identifiers
+relationship family counts
+selected relationship records
+```
+
+They do not freeze:
+
+```text
+full generated JSON files
+absolute paths
+human-oriented terminal output
+Markdown wording
+generated runtime bindings
+generated ground dictionaries
+disposable artifact formatting
+```
+
+---
+
+## 11. Demo Evidence Chain
+
+The selected v1.0 demo evidence chain is:
+
+```text
+payload.start_acquisition
+        -> payload.acquisition_started
+        -> payload.radiation_histogram data product evidence
+        -> storage intent declared
+        -> downlink intent declared
+        -> science_next_available_contact downlink flow
+        -> demo_contact_001 contact window
+        -> scenario JSON evidence
         -> runtime-facing contract bindings
-        -> ground-facing integration artifacts
-        -> contract introspection surface
-        -> entity index surface
-        -> relationship manifest surface
-        -> stability and compatibility classification
-        -> extensibility boundary contract
-        -> v1.0 release candidate hardening references
-        -> future extensions
+        -> ground-facing dictionaries
+        -> model_summary.json
+        -> entity_index.json
+        -> relationship_manifest.json
+        -> golden signatures protecting selected Core-owned surface fields
 ```
 
-This direction is essential for small spacecraft and CubeSat missions because the value of mission data depends on the full path from onboard generation to ground consumption and downstream inspection.
+This demonstrates Mission Data Contract continuity.
 
-OrbitFabric must model the contract of that path.
-
-It must not implement the physical, flight or operational stack behind that path.
+It does not demonstrate flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
 
 ---
 
-## 11. Early Non-Goals
+## 12. Final Charter Statement
 
-Early OrbitFabric versions must not include:
+OrbitFabric must remain excellent at one thing:
 
-- real spacecraft hardware support;
-- real SPI/I2C/UART drivers;
-- a complete onboard runtime;
-- a flight-ready C++ runtime;
-- RTOS integration;
-- Linux onboard integration;
-- CCSDS packet implementation;
-- PUS implementation;
-- CFDP implementation;
-- CSP integration;
-- SpaceWire integration;
-- CANopen integration;
-- cFS integration;
-- F Prime integration;
-- Yamcs integration as a live service;
-- OpenC3 integration as a live service;
-- XTCE compliance;
-- telemetry archive implementation;
-- operator console implementation;
-- command uplink implementation;
-- Basilisk integration as a dynamics simulator;
-- formal verification;
-- advanced security;
-- real mission operations procedures;
-- proprietary mission examples;
-- payload firmware support;
-- payload driver support;
-- physical payload simulation;
-- live ground operations;
-- schema migration tooling before versioning semantics are stable;
-- JSON Schema publication before schema semantics are stable;
-- metadata schema before the extension boundary is stable;
-- plugin APIs before Core-owned surfaces and plugin boundaries are stable;
-- plugin discovery before trust and boundary design are stable;
-- plugin loading before trust and boundary design are stable;
-- plugin execution before trust and boundary design are stable;
-- relationship graphs before entity indexing and relationship semantics are stable;
-- Mission Model security domain before v1.0.0;
-- security YAML fields before v1.0.0;
-- security enforcement semantics.
+> defining, validating, simulating, documenting, introspecting, indexing, relating and generating contract-facing artifacts from a Mission Data Contract for a small spacecraft.
 
-These items may become future integration targets, generated artifacts or external consumers only after the Mission Model, lint engine, scenario runner, mission data chain contracts, generated contract-facing artifacts, Core-owned surfaces, extensibility boundary and v1.0 release candidate hardening references prove valuable.
+The narrowness of the charter is intentional.
 
----
-
-## 12. Demo Mission
-
-The initial demo mission is `demo-3u`.
-
-It is a synthetic 3U CubeSat-like mission used only to demonstrate OrbitFabric concepts.
-
-It contains the full current Mission Data Chain from telemetry, commands, events, faults and modes through payload contracts, data products, contact/downlink assumptions, commandability/autonomy assumptions, data-flow evidence, runtime-facing contract bindings, ground-facing integration artifacts, contract introspection surface, entity index surface, relationship manifest surface, stability/compatibility classification, extensibility boundary documentation and v1.0 release candidate hardening references.
-
-The demo assumptions remain generic and do not encode private mission details, real ground station data, real orbit data or real RF behavior.
-
----
-
-## 13. Initial Technical Direction
-
-The recommended technical baseline is:
-
-- Python 3.11 or newer;
-- YAML for the Mission Model;
-- Pydantic v2 for typed model validation;
-- Typer for the command-line interface;
-- PyYAML for YAML loading;
-- pytest for tests;
-- ruff for formatting and linting;
-- MkDocs Material for documentation;
-- C++17 for the first generated runtime-facing binding profile;
-- CMake for host-build smoke validation;
-- JSON, CSV and Markdown for the first generated ground-facing artifact package;
-- JSON for Core-owned introspection, entity index and relationship manifest reports;
-- Markdown for stability, compatibility, extensibility boundary and v1.0 hardening references;
-- GitHub Actions for CI;
-- Apache-2.0 license.
-
-The generated C++17 surface is intentionally contract-facing and host-buildable.
-
-It is not a flight runtime.
-
-The generated ground-facing package is intentionally tool-neutral and reviewable.
-
-The generated model summary report is intentionally Core-owned and read-only.
-
-The generated entity index report is intentionally Core-owned and read-only.
-
-The generated relationship manifest report is intentionally Core-owned, read-only and candidate.
-
-The stability and compatibility references are intentionally classification documents, not implementation behavior or a stable v1.0 guarantee.
-
-The extensibility boundary is intentionally a documentation contract, not metadata schema, plugin discovery, plugin loading or plugin execution.
-
-The v0.12.0 hardening references are intentionally review and governance documents, not golden baselines, migration tooling, JSON Schema publication, security enforcement, generated Core surfaces or a stable v1.0 guarantee.
-
-None is a relationship graph engine, plugin execution mechanism or Studio-specific API.
-
----
-
-## 14. Repository Philosophy
-
-OrbitFabric should use a monorepo at the beginning.
-
-The repository should contain:
-
-- framework source code;
-- documentation;
-- examples;
-- tests;
-- generated artifact examples only when explicitly required;
-- architectural decision records.
-
-Initial repository structure:
-
-```text
-orbitfabric/
-├── README.md
-├── LICENSE
-├── pyproject.toml
-├── mkdocs.yml
-├── docs/
-├── examples/
-├── src/
-├── tests/
-└── generated/
-```
-
-Splitting into multiple repositories too early would add complexity without architectural benefit.
-
----
-
-## 15. Success Criteria for the Early Public Preview
-
-OrbitFabric is successful in the early public preview if a user can:
-
-1. inspect the `demo-3u` Mission Model;
-2. run mission linting;
-3. receive meaningful semantic errors and warnings;
-4. run the battery degradation scenario;
-5. see events, faults, mode transitions and auto-dispatched commands in the log;
-6. generate Markdown documentation from the same Mission Model;
-7. generate runtime-facing C++17 contract bindings from the same Mission Model;
-8. validate those generated bindings through a host-side C++17 smoke build;
-9. generate ground-facing JSON, CSV and Markdown artifacts from the same Mission Model;
-10. export a Core-owned model summary report from the same Mission Model;
-11. export a Core-owned entity index report from the same Mission Model;
-12. export a Core-owned relationship manifest report from the same Mission Model;
-13. understand the project positioning from the README in less than one minute;
-14. extend the demo mission with one telemetry item, one command or one event without modifying the simulator internals;
-15. understand how payload contracts fit into the Mission Data Contract;
-16. understand how data products, storage intent, downlink intent, contact assumptions, commandability constraints, recovery expectations, runtime-facing bindings, ground-facing artifacts, Core-owned surfaces, compatibility references, extensibility boundaries and v1.0 hardening references fit into the roadmap before plugin execution;
-17. understand which surfaces are public preview, candidate, internal or disposable before v1.0.0;
-18. understand that candidate, preview and generated surfaces do not become stable v1.0 automatically.
-
-A minimal but strong preview is better than a broad, fragile and unfinished feature set.
-
----
-
-## 16. Clean-Room Policy Summary
-
-OrbitFabric must not use or encode non-public mission information.
-
-Forbidden content includes:
-
-- real non-public mission names;
-- real proprietary subsystem architectures;
-- real payload interfaces;
-- real bus maps;
-- real pinouts;
-- real packet formats from private programs;
-- real logs;
-- real failure cases;
-- real operational procedures;
-- real data rates from private systems;
-- proprietary code;
-- proprietary documentation.
-
-Allowed content includes:
-
-- synthetic mission examples;
-- public standards and public documentation;
-- generic CubeSat concepts;
-- abstract subsystem models;
-- invented telemetry;
-- invented commands;
-- invented scenarios;
-- invented data products;
-- invented contact windows;
-- clean-room code written from scratch.
-
-If a design choice risks being too close to a private mission, it must be generalized or removed.
-
----
-
-## 17. Governance Principles
-
-Technical decisions should optimize for clarity, minimalism and architectural coherence.
-
-The project should prefer:
-
-- explicit models over implicit behavior;
-- small examples over large fake missions;
-- readable YAML over clever DSLs;
-- deterministic simulation over realism;
-- semantic lint rules over superficial validation;
-- generated documentation over manually duplicated references;
-- generated contract-facing artifacts over hidden implementation assumptions;
-- Core-owned structured surfaces over downstream semantic inference;
-- compatibility classifications over implicit stability assumptions;
-- extensibility boundary contracts over premature plugin execution;
-- v1.0 hardening references over implicit release stability assumptions;
-- clean interfaces over premature integrations;
-- mission data chain modeling before runtime-facing, ground-facing, introspection, entity indexing, relationship manifests, stability guarantees and plugin execution.
+That narrowness is a strength, not a limitation.
