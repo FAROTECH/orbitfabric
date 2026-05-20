@@ -1,0 +1,100 @@
+{
+  "surface": "relationship_manifest.json",
+  "fixture": "examples/demo-3u/mission",
+  "comparison_scope": [
+    "surface kind",
+    "surface schema version",
+    "mission identity",
+    "boundary flags",
+    "derivation policy",
+    "relationship family counts",
+    "selected end-to-end relationship records"
+  ],
+  "expected": {
+    "manifest_version": "0.1-candidate",
+    "kind": "orbitfabric.relationship_manifest",
+    "status": "candidate",
+    "mission": {
+      "id": "demo-3u",
+      "name": "Demo 3U Spacecraft",
+      "model_version": "0.1.0"
+    },
+    "boundaries": {
+      "source_of_truth": "mission_model",
+      "core_derived_report": true,
+      "read_only": true,
+      "contains_entity_index": false,
+      "contains_entity_records": false,
+      "contains_relationship_manifest": true,
+      "contains_relationship_records": true,
+      "contains_relationship_graph": false,
+      "contains_dependency_graph": false,
+      "contains_yaml_ast": false,
+      "contains_source_locations": false,
+      "contains_plugin_api": false,
+      "contains_studio_api": false,
+      "contains_runtime_behavior": false,
+      "contains_ground_behavior": false
+    },
+    "derivation_policy": {
+      "requires_explicit_loaded_mission_model_fields": true,
+      "references_entity_index_entities": true,
+      "forbids_naming_heuristics": true,
+      "forbids_raw_yaml_scanning": true,
+      "forbids_downstream_assumptions": true
+    },
+    "counts": {
+      "total_relationships": 46,
+      "relationship_types": {
+        "autonomous_action_dispatches_command": 2,
+        "command_emits_event": 4,
+        "command_targets_subsystem": 4,
+        "commandability_rule_constrains_command": 1,
+        "data_product_produced_by_payload": 1,
+        "downlink_flow_includes_data_product": 1,
+        "event_sourced_from_subsystem": 8,
+        "fault_emits_event": 3,
+        "fault_sourced_from_subsystem": 3,
+        "packet_includes_telemetry": 5,
+        "payload_accepts_command": 2,
+        "payload_belongs_to_subsystem": 1,
+        "payload_generates_event": 2,
+        "payload_may_raise_fault": 1,
+        "payload_produces_telemetry": 1,
+        "recovery_intent_reacts_to_fault": 2,
+        "telemetry_sourced_from_subsystem": 5
+      }
+    },
+    "relationship_types": [
+      {"relationship_type": "autonomous_action_dispatches_command", "display_name": "Autonomous action dispatches command", "from_domain": "autonomous_actions", "to_domain": "commands", "derived_from": {"model_field": "commandability.autonomous_actions[].dispatches.command"}, "relationship_count": 2},
+      {"relationship_type": "command_emits_event", "display_name": "Command emits event", "from_domain": "commands", "to_domain": "events", "derived_from": {"model_field": "commands[].emits"}, "relationship_count": 4},
+      {"relationship_type": "command_targets_subsystem", "display_name": "Command targets subsystem", "from_domain": "commands", "to_domain": "subsystems", "derived_from": {"model_field": "commands[].target"}, "relationship_count": 4},
+      {"relationship_type": "commandability_rule_constrains_command", "display_name": "Commandability rule constrains command", "from_domain": "commandability_rules", "to_domain": "commands", "derived_from": {"model_field": "commandability.rules[].command"}, "relationship_count": 1},
+      {"relationship_type": "data_product_produced_by_payload", "display_name": "Data product produced by payload", "from_domain": "data_products", "to_domain": "payloads", "derived_from": {"model_field": "data_products[].producer"}, "relationship_count": 1},
+      {"relationship_type": "downlink_flow_includes_data_product", "display_name": "Downlink flow includes data product", "from_domain": "downlink_flows", "to_domain": "data_products", "derived_from": {"model_field": "downlink_flows[].eligible_data_products"}, "relationship_count": 1},
+      {"relationship_type": "event_sourced_from_subsystem", "display_name": "Event sourced from subsystem", "from_domain": "events", "to_domain": "subsystems", "derived_from": {"model_field": "events[].source"}, "relationship_count": 8},
+      {"relationship_type": "fault_emits_event", "display_name": "Fault emits event", "from_domain": "faults", "to_domain": "events", "derived_from": {"model_field": "faults[].emits"}, "relationship_count": 3},
+      {"relationship_type": "fault_sourced_from_subsystem", "display_name": "Fault sourced from subsystem", "from_domain": "faults", "to_domain": "subsystems", "derived_from": {"model_field": "faults[].source"}, "relationship_count": 3},
+      {"relationship_type": "packet_includes_telemetry", "display_name": "Packet includes telemetry", "from_domain": "packets", "to_domain": "telemetry", "derived_from": {"model_field": "packets[].telemetry"}, "relationship_count": 5},
+      {"relationship_type": "payload_accepts_command", "display_name": "Payload accepts command", "from_domain": "payloads", "to_domain": "commands", "derived_from": {"model_field": "payloads[].commands.accepted"}, "relationship_count": 2},
+      {"relationship_type": "payload_belongs_to_subsystem", "display_name": "Payload belongs to subsystem", "from_domain": "payloads", "to_domain": "subsystems", "derived_from": {"model_field": "payloads[].subsystem"}, "relationship_count": 1},
+      {"relationship_type": "payload_generates_event", "display_name": "Payload generates event", "from_domain": "payloads", "to_domain": "events", "derived_from": {"model_field": "payloads[].events.generated"}, "relationship_count": 2},
+      {"relationship_type": "payload_may_raise_fault", "display_name": "Payload may raise fault", "from_domain": "payloads", "to_domain": "faults", "derived_from": {"model_field": "payloads[].faults.possible"}, "relationship_count": 1},
+      {"relationship_type": "payload_produces_telemetry", "display_name": "Payload produces telemetry", "from_domain": "payloads", "to_domain": "telemetry", "derived_from": {"model_field": "payloads[].telemetry.produced"}, "relationship_count": 1},
+      {"relationship_type": "recovery_intent_reacts_to_fault", "display_name": "Recovery intent reacts to fault", "from_domain": "recovery_intents", "to_domain": "faults", "derived_from": {"model_field": "commandability.recovery_intents[].fault"}, "relationship_count": 2},
+      {"relationship_type": "telemetry_sourced_from_subsystem", "display_name": "Telemetry sourced from subsystem", "from_domain": "telemetry", "to_domain": "subsystems", "derived_from": {"model_field": "telemetry[].source"}, "relationship_count": 5}
+    ],
+    "selected_relationship_ids": [
+      "commands:payload.start_acquisition->command_emits_event:events:payload.acquisition_started",
+      "commands:payload.start_acquisition->command_targets_subsystem:subsystems:payload",
+      "data_products:payload.radiation_histogram->data_product_produced_by_payload:payloads:demo_iod_payload",
+      "downlink_flows:science_next_available_contact->downlink_flow_includes_data_product:data_products:payload.radiation_histogram",
+      "payloads:demo_iod_payload->payload_accepts_command:commands:payload.start_acquisition",
+      "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
+      "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
+      "payloads:demo_iod_payload->payload_produces_telemetry:telemetry:payload.acquisition.active",
+      "recovery_intents:payload_battery_low_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_low_fault",
+      "telemetry:payload.acquisition.active->telemetry_sourced_from_subsystem:subsystems:payload"
+    ]
+  }
+}
