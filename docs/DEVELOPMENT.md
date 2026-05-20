@@ -5,27 +5,10 @@ This document explains how to work on OrbitFabric locally.
 OrbitFabric is currently released at:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-The immediate target is:
-
-```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
-
-```text
-v1.0 Stable Surface Decision
-v1.0 golden signatures for selected Core-owned structured surfaces
-v1.0 Demo Evidence Chain
-v1.0 Compatibility and Migration Notes aligned to the current candidate posture
-```
-
-This does not mean v1.0.0 has already been released.
-
-Development work before v1.0.0 must preserve the narrow Mission Data Contract scope.
+Development work after v1.0.0 must preserve the narrow Mission Data Contract scope and follow the release compatibility policy.
 
 ---
 
@@ -75,7 +58,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.12.0
+orbitfabric 1.0.0
 ```
 
 ---
@@ -100,7 +83,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current Candidate State
+## Verify the Current Stable State
 
 Run mission lint:
 
@@ -122,10 +105,9 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Review the v1.0 candidate references:
+Review the v1.0 references:
 
 ```text
-v1.0 Candidate Surface Inventory
 v1.0 Stable Surface Decision
 v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
@@ -224,7 +206,7 @@ Plain-text logs are human-oriented and non-contractual.
 
 Core-owned structured surfaces are derived from the validated Mission Model.
 
-The current selected Core-owned structured surfaces are:
+The current stable Core-owned structured surfaces are:
 
 ```text
 model_summary.json
@@ -253,7 +235,7 @@ For new behavior, follow this order:
 6. update user-facing documentation
 ```
 
-Before v1.0.0, any change to a selected stable candidate surface must include explicit compatibility or migration notes.
+After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
 
 Do not add simulator behavior that is not represented in the Mission Model.
 
@@ -265,15 +247,13 @@ Do not add plugin execution mechanisms before Core-owned structured surfaces and
 
 Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
 
-Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains before v1.0.0.
+Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains without a separate architectural decision.
 
 Do not put user code inside generated runtime bindings.
 
 Do not present generated ground artifacts as live ground behavior.
 
 Do not present Core-owned structured surfaces as relationship graphs, dependency graphs, plugin APIs, runtime behavior, ground behavior or Studio-specific APIs.
-
-Do not present v1.0 candidate governance references as released v1.0.0 compatibility guarantees.
 
 ---
 
