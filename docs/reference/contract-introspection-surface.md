@@ -1,8 +1,12 @@
 # Contract Introspection Surface
 
+Status: Stable v1.0 surface  
+Surface version: `0.1`  
+Default path: `generated/reports/model_summary.json`
+
 OrbitFabric v0.8.1 introduced the first Core-owned contract introspection surface.
 
-The initial surface is:
+The surface is:
 
 ```text
 model_summary.json
@@ -14,17 +18,7 @@ It answers one deliberately narrow question:
 What contract domains are present in this mission?
 ```
 
-OrbitFabric v0.8.2 adds a related but separate entity-level surface:
-
-```text
-entity_index.json
-```
-
-It answers:
-
-```text
-What contract entities are defined in this mission?
-```
+In v1.0.0, this surface is part of the stable narrow Mission Data Contract surface.
 
 ---
 
@@ -155,7 +149,7 @@ count_provenance
 
 ## Domain scope
 
-The v0.8.1 model summary includes Core-owned contract domains such as:
+The model summary includes Core-owned contract domains such as:
 
 ```text
 spacecraft
@@ -209,9 +203,9 @@ It does not introduce new Mission Model semantics.
 
 ---
 
-## Relationship to the Entity Index Surface
+## Relationship to entity and relationship surfaces
 
-`model_summary.json` and `entity_index.json` are separate Core-owned surfaces.
+`model_summary.json`, `entity_index.json` and `relationship_manifest.json` are separate Core-owned surfaces.
 
 `model_summary.json` is domain-level.
 
@@ -229,37 +223,21 @@ It answers:
 What contract entities are defined in this mission?
 ```
 
-The entity index is documented separately in:
+`relationship_manifest.json` is relationship-level.
+
+It answers:
 
 ```text
-Reference -> Entity Index Surface
+How are indexed mission contract entities related?
 ```
 
-Neither surface is a relationship graph.
-
-Neither surface is a plugin API.
-
-Neither surface is a Studio-specific API.
-
----
-
-## Relationship to v0.9
-
-The planned sequence is:
-
-```text
-v0.8.1 - Contract Introspection Surface
-v0.8.2 - Entity Index Surface
-v0.9   - Plugin and Extensibility Layer
-```
-
-v0.9 should introduce controlled extension points only after Core-owned introspection and entity surfaces exist.
+None of these surfaces is a relationship graph, plugin API or Studio-specific API.
 
 ---
 
 ## Final position
 
-`model_summary.json` is a Core-derived report.
+`model_summary.json` is a stable v1.0 Core-derived report.
 
 It is deterministic, inspectable and machine-readable.
 
