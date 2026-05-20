@@ -1,10 +1,10 @@
 # Lint Rule Code Stability
 
-Status: Development preview  
-Scope: v0.10.0 lint diagnostic compatibility classification  
-Applies to: OrbitFabric diagnostic and lint rule codes before v1.0.0
+Status: Active v1.0 contract  
+Scope: lint diagnostic compatibility classification  
+Applies to: OrbitFabric diagnostic and lint rule codes from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies OrbitFabric diagnostic and lint rule codes on the path toward v1.0.0.
+This page classifies OrbitFabric diagnostic and lint rule codes after v1.0.0.
 
 It is a documentation contract. It does not introduce new lint rules, new diagnostics, new severities, new Mission Model semantics, new report fields, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -14,9 +14,9 @@ It is a documentation contract. It does not introduce new lint rules, new diagno
 
 OrbitFabric diagnostics are part of the user-facing and machine-readable validation experience.
 
-Diagnostic codes appear in lint output, JSON reports and user workflows. They are therefore compatibility-sensitive before v1.0.0.
+Diagnostic codes appear in lint output, JSON reports and user workflows. From v1.0.0 onward, documented diagnostic codes and severities are part of the stable narrow Mission Data Contract surface.
 
-This document defines how diagnostic and lint rule codes should evolve before v1.0.0.
+This document defines how diagnostic and lint rule codes should evolve after v1.0.0.
 
 It covers:
 
@@ -38,16 +38,14 @@ Current diagnostic and lint rule surfaces are classified as follows:
 
 | Surface | Classification | Notes |
 |---|---|---|
-| diagnostic code prefixes | Public preview | Examples: `OF-SYN-*`, `OF-STR-*`, `OF-REF-*`. |
-| documented diagnostic codes | Public preview | Examples: `OF-SYN-001`, `OF-REF-001`, `OF-CMD-009`. |
-| diagnostic severity values | Public preview | Current values: `ERROR`, `WARNING`, `INFO`. |
-| diagnostic JSON fields | Public preview | Current common fields include `severity`, `code`, `file`, `domain`, `object_id`, `message`, `suggestion`. |
+| diagnostic code prefixes | Stable contract | Examples: `OF-SYN-*`, `OF-STR-*`, `OF-REF-*`. |
+| documented diagnostic codes | Stable contract | Examples: `OF-SYN-001`, `OF-REF-001`, `OF-CMD-009`. |
+| diagnostic severity values | Stable contract | Current values: `ERROR`, `WARNING`, `INFO`. |
+| diagnostic JSON fields | Stable contract | Current common fields include `severity`, `code`, `file`, `domain`, `object_id`, `message`, `suggestion`. |
 | human-readable diagnostic messages | Human-oriented public preview | Useful for users. Not a strict machine contract. |
 | diagnostic suggestions | Human-oriented public preview | May improve over time. Not a strict machine contract. |
 | lint engine internals | Internal implementation detail | Not a public compatibility surface. |
 | test helper structure | Internal validation asset | Not a public compatibility surface. |
-
-No diagnostic or lint rule surface is classified as a stable v1.0 contract yet.
 
 ---
 
@@ -55,7 +53,7 @@ No diagnostic or lint rule surface is classified as a stable v1.0 contract yet.
 
 A diagnostic code identifies a class of issue.
 
-Before v1.0.0, documented diagnostic codes should be treated as compatibility-sensitive.
+After v1.0.0, documented diagnostic codes should be treated as compatibility-sensitive.
 
 The same code should keep the same broad meaning across releases.
 
@@ -83,7 +81,7 @@ OF-SCN-*  scenario diagnostics
 
 Rule family prefixes are compatibility-sensitive.
 
-Adding a new family is allowed before v1.0.0, but it should be documented explicitly.
+Adding a new family is allowed if it is documented explicitly.
 
 Renaming an existing family is compatibility-sensitive and should be avoided unless the old family was clearly wrong.
 
@@ -91,7 +89,7 @@ Renaming an existing family is compatibility-sensitive and should be avoided unl
 
 ## 5. Compatibility-sensitive changes
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - removing a documented diagnostic code;
 - renaming a documented diagnostic code;
@@ -159,9 +157,9 @@ object_id
 
 Lint JSON reports expose diagnostic information for machine use.
 
-The diagnostic code and severity fields are public preview report fields.
+The diagnostic code and severity fields are stable report fields.
 
-Downstream tools may use diagnostic codes and severity values for automation, but must treat the current pre-v1.0 surface as public preview rather than stable v1.0 compatibility.
+Downstream tools may use diagnostic codes and severity values for automation.
 
 If a future release changes diagnostic JSON structure, that change should be documented in the JSON report reference and the stability contract.
 
@@ -169,7 +167,7 @@ If a future release changes diagnostic JSON structure, that change should be doc
 
 ## 9. Adding new diagnostics
 
-Adding a new diagnostic is allowed before v1.0.0.
+Adding a new diagnostic is allowed when compatible with the release policy.
 
 A new diagnostic should:
 
@@ -188,9 +186,7 @@ Adding a new diagnostic can be compatibility-sensitive if it makes existing miss
 
 ## 10. Removing or deprecating diagnostics
 
-Before v1.0.0, diagnostics may still evolve.
-
-However, removal should be deliberate.
+Diagnostics may evolve, but removal should be deliberate.
 
 A removed diagnostic should not leave a validation gap in the Mission Data Contract unless the rule itself has been explicitly reconsidered.
 
@@ -243,7 +239,6 @@ SARIF export
 JSON Schema publication
 plugin lint rules
 custom lint plugin support
-stable v1.0 diagnostic guarantee
 ```
 
 ---
@@ -261,24 +256,10 @@ Stability and Compatibility Contract
 
 `Diagnostics and Lint Rules` remains the source for the current list of diagnostic families and implemented rules.
 
-This page defines how those codes should be treated as compatibility-sensitive surfaces before v1.0.0.
+This page defines how those codes should be treated as compatibility-sensitive surfaces after v1.0.0.
 
 ---
 
-## 14. v1.0 direction
+## 14. Final statement
 
-Before v1.0.0, OrbitFabric should decide which diagnostic families and codes become stable.
-
-Likely v1.0 candidates include:
-
-```text
-core syntax diagnostics
-core structural diagnostics
-core identifier diagnostics
-core reference diagnostics
-core telemetry, command, event, fault, mode and packet diagnostics
-core payload, data product, contact/downlink and commandability diagnostics
-core scenario diagnostics
-```
-
-v1.0.0 should stabilize diagnostic meaning enough for users and CI workflows to rely on codes, without freezing implementation internals or human-readable wording permanently.
+v1.0.0 stabilizes diagnostic meaning enough for users and CI workflows to rely on codes, without freezing implementation internals or human-readable wording permanently.
