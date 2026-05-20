@@ -14,6 +14,8 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 - Added the v1.0 Stable Surface Decision page to the MkDocs Reference navigation.
 - Added explicit v1.0 classification for stable surfaces, public preview surfaces, generated disposable artifacts, internal implementation details and out-of-scope topics.
 - Added the selected v1.0 demonstration use-case boundary for Mission Data Contract continuity.
+- Added contract-significant golden signatures for the demo-3u Core-owned structured surfaces: `model_summary.json`, `entity_index.json` and `relationship_manifest.json`.
+- Added regression tests comparing generated Core-owned structured surfaces against those golden signatures.
 
 ### Compatibility impact
 
@@ -22,6 +24,10 @@ This change has no Mission Data Contract semantic impact.
 It does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics, scenario expectations, JSON report fields, generated surfaces or CLI behavior.
 
 It documents the proposed narrow v1.0 stable surface selected from existing OrbitFabric Core behavior and surfaces.
+
+The golden signatures protect selected contract-significant fields for existing Core-owned structured surfaces.
+
+They do not introduce new generated surfaces or new report fields.
 
 ### Boundaries
 
@@ -35,8 +41,6 @@ This change intentionally does not introduce:
 - new generated Core surfaces;
 - new lint diagnostics;
 - new scenario behavior;
-- new golden files;
-- new snapshot tests;
 - schema migration tooling;
 - JSON Schema publication;
 - XTCE export;
@@ -56,6 +60,8 @@ This change intentionally does not introduce:
 - runtime behavior;
 - ground behavior;
 - Studio-specific API.
+
+The new golden signatures do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
 
 ---
 
