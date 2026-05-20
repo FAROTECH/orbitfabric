@@ -1,0 +1,194 @@
+{
+  "surface": "model_summary.json",
+  "fixture": "examples/demo-3u/mission",
+  "comparison_scope": [
+    "surface kind",
+    "surface schema version",
+    "mission identity",
+    "boundary flags",
+    "domain counts",
+    "domain source files"
+  ],
+  "expected": {
+    "summary_version": "0.1",
+    "kind": "orbitfabric.model_summary",
+    "mission": {
+      "id": "demo-3u",
+      "name": "Demo 3U Spacecraft",
+      "model_version": "0.1.0"
+    },
+    "boundaries": {
+      "source_of_truth": "mission_model",
+      "core_derived_report": true,
+      "contains_entity_index": false,
+      "contains_relationship_manifest": false,
+      "contains_plugin_api": false,
+      "contains_runtime_behavior": false,
+      "contains_ground_behavior": false
+    },
+    "counts": {
+      "spacecraft": 1,
+      "subsystems": 4,
+      "modes": 6,
+      "mode_transitions": 6,
+      "telemetry": 5,
+      "commands": 4,
+      "events": 8,
+      "faults": 3,
+      "packets": 3,
+      "policies": 1,
+      "payloads": 1,
+      "data_products": 1,
+      "contact_profiles": 1,
+      "link_profiles": 1,
+      "contact_windows": 1,
+      "downlink_flows": 1,
+      "command_sources": 2,
+      "commandability_rules": 1,
+      "autonomous_actions": 2,
+      "recovery_intents": 2
+    },
+    "domains": [
+      {
+        "id": "autonomous_actions",
+        "required": false,
+        "present": true,
+        "source_file": "commandability.yaml",
+        "count": 2
+      },
+      {
+        "id": "command_sources",
+        "required": false,
+        "present": true,
+        "source_file": "commandability.yaml",
+        "count": 2
+      },
+      {
+        "id": "commandability_rules",
+        "required": false,
+        "present": true,
+        "source_file": "commandability.yaml",
+        "count": 1
+      },
+      {
+        "id": "commands",
+        "required": true,
+        "present": true,
+        "source_file": "commands.yaml",
+        "count": 4
+      },
+      {
+        "id": "contact_profiles",
+        "required": false,
+        "present": true,
+        "source_file": "contacts.yaml",
+        "count": 1
+      },
+      {
+        "id": "contact_windows",
+        "required": false,
+        "present": true,
+        "source_file": "contacts.yaml",
+        "count": 1
+      },
+      {
+        "id": "data_products",
+        "required": false,
+        "present": true,
+        "source_file": "data_products.yaml",
+        "count": 1
+      },
+      {
+        "id": "downlink_flows",
+        "required": false,
+        "present": true,
+        "source_file": "contacts.yaml",
+        "count": 1
+      },
+      {
+        "id": "events",
+        "required": true,
+        "present": true,
+        "source_file": "events.yaml",
+        "count": 8
+      },
+      {
+        "id": "faults",
+        "required": true,
+        "present": true,
+        "source_file": "faults.yaml",
+        "count": 3
+      },
+      {
+        "id": "link_profiles",
+        "required": false,
+        "present": true,
+        "source_file": "contacts.yaml",
+        "count": 1
+      },
+      {
+        "id": "mode_transitions",
+        "required": false,
+        "present": true,
+        "source_file": "modes.yaml",
+        "count": 6
+      },
+      {
+        "id": "modes",
+        "required": true,
+        "present": true,
+        "source_file": "modes.yaml",
+        "count": 6
+      },
+      {
+        "id": "packets",
+        "required": true,
+        "present": true,
+        "source_file": "packets.yaml",
+        "count": 3
+      },
+      {
+        "id": "payloads",
+        "required": false,
+        "present": true,
+        "source_file": "payloads.yaml",
+        "count": 1
+      },
+      {
+        "id": "policies",
+        "required": true,
+        "present": true,
+        "source_file": "policies.yaml",
+        "count": 1
+      },
+      {
+        "id": "recovery_intents",
+        "required": false,
+        "present": true,
+        "source_file": "commandability.yaml",
+        "count": 2
+      },
+      {
+        "id": "spacecraft",
+        "required": true,
+        "present": true,
+        "source_file": "spacecraft.yaml",
+        "count": 1
+      },
+      {
+        "id": "subsystems",
+        "required": true,
+        "present": true,
+        "source_file": "subsystems.yaml",
+        "count": 4
+      },
+      {
+        "id": "telemetry",
+        "required": true,
+        "present": true,
+        "source_file": "telemetry.yaml",
+        "count": 5
+      }
+    ]
+  }
+}
