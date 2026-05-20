@@ -1,11 +1,15 @@
 # Diagnostics and Lint Rules
 
+Status: Active v1.0 reference  
+Scope: implemented diagnostic and lint rule catalog  
+Applies to: OrbitFabric `v1.0.0 - Stable Mission Data Contract`
+
 This page documents the diagnostics and lint rules currently implemented by OrbitFabric.
 
 Current documented baseline:
 
 ```text
-v0.8.2 - Entity Index Surface
+v1.0.0 - Stable Mission Data Contract
 ```
 
 OrbitFabric diagnostics are intentionally actionable. A diagnostic should tell the user:
@@ -22,11 +26,9 @@ Diagnostics may be produced by different layers:
 - the scenario loader;
 - scenario reference validation.
 
-Not every diagnostic listed here is produced by the same command.
+Documented diagnostic codes and severities are part of the v1.0 stable diagnostic policy.
 
-The `orbitfabric export model-summary` command consumes the already loaded Mission Model and reports loader diagnostics if the model cannot be loaded. It does not introduce a dedicated lint rule family in v0.8.1.
-
-The `orbitfabric export entity-index` command consumes the already loaded Mission Model and reports loader diagnostics if the model cannot be loaded. It does not introduce a dedicated lint rule family in v0.8.2.
+Human-readable message wording and suggestions may improve over time, but code meaning and severity are compatibility-sensitive after v1.0.0.
 
 ---
 
@@ -407,17 +409,16 @@ Current behavior:
 | `orbitfabric lint <mission-dir>` | Mission Model loading diagnostics, structural diagnostics, semantic lint findings. |
 | `orbitfabric export model-summary <mission-dir>` | Mission Model loading diagnostics before exporting the model summary report. |
 | `orbitfabric export entity-index <mission-dir>` | Mission Model loading diagnostics before exporting the entity index report. |
+| `orbitfabric export relationship-manifest <mission-dir>` | Mission Model loading diagnostics before exporting the relationship manifest report. |
 | `orbitfabric gen docs <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen data-flow <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen runtime <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric gen ground <mission-dir>` | Mission Model loading diagnostics; generation aborts if lint errors exist. |
 | `orbitfabric sim <scenario-file>` | Scenario loading diagnostics, Mission Model loading diagnostics, scenario reference diagnostics and scenario execution failures. |
 
-Ground artifact generation consumes the already validated Mission Model and aborts when lint errors exist. It does not add a dedicated ground-specific diagnostic family in v0.8.0.
+Ground artifact generation consumes the already validated Mission Model and aborts when lint errors exist. It does not add a dedicated ground-specific diagnostic family.
 
-Model summary export consumes the loaded Mission Model and does not add a dedicated export-specific diagnostic family in v0.8.1.
-
-Entity index export consumes the loaded Mission Model and does not add a dedicated export-specific diagnostic family in v0.8.2.
+Core-owned structured exports consume the loaded Mission Model and do not add dedicated export-specific diagnostic families.
 
 ---
 
@@ -432,6 +433,9 @@ When adding a new diagnostic or lint rule:
 5. provide an actionable message;
 6. provide a suggested fix where possible;
 7. add or update tests;
-8. update this rule catalog.
+8. update this rule catalog;
+9. include a compatibility or migration note when a stable diagnostic code, severity or meaning changes.
 
 Do not document a rule as implemented until it exists in code and is covered by tests.
+
+Do not reuse a diagnostic code for a different issue class.
