@@ -7,27 +7,10 @@ OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 The current released baseline is:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-The immediate target is:
-
-```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
-
-```text
-v1.0 Stable Surface Decision
-v1.0 golden signatures for selected Core-owned structured surfaces
-v1.0 Demo Evidence Chain
-v1.0 Compatibility and Migration Notes aligned to the current candidate posture
-```
-
-This does not mean v1.0.0 has already been released.
-
-It does not introduce new Mission Model semantics, YAML fields, CLI behavior, JSON report fields, generated Core surfaces, runtime behavior, ground behavior, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
+v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -103,7 +86,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.12.0
+orbitfabric 1.0.0
 ```
 
 ---
@@ -205,7 +188,7 @@ They do not expose plugin execution, graph engines, Studio-specific APIs, runtim
 
 ---
 
-## 11. Review v1.0 candidate references
+## 11. Review v1.0 references
 
 Key references include:
 
@@ -215,7 +198,6 @@ Mission Model Stability Contract
 CLI Contract v1 Preview
 Generated Surfaces Stability
 Extensibility Boundary Contract
-v1.0 Candidate Surface Inventory
 v1.0 Stable Surface Decision
 v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
@@ -226,7 +208,7 @@ Scenario Evidence Stability
 Release Compatibility Policy
 ```
 
-These references classify existing surfaces, define the extensibility boundary, record the current v1.0 candidate posture and explain what is selected, preview, disposable, internal or out of scope.
+These references classify existing surfaces, define the extensibility boundary, record the v1.0 stable posture and explain what is stable, preview, disposable, internal or out of scope.
 
 They do not introduce new Mission Model semantics, CLI behavior beyond version reporting, JSON report fields, generated surfaces, lint diagnostics, scenario behavior, migration tooling, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
 
@@ -380,7 +362,6 @@ The current demo does not prove:
 - plugin discovery behavior;
 - plugin loading behavior;
 - plugin execution behavior;
-- released v1.0.0 compatibility;
 - qualification for operational spacecraft use.
 
 Those are intentionally outside the current scope.
