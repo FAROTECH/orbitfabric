@@ -2,11 +2,11 @@
 
 OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references, extensibility boundary contracts and v1.0 release candidate hardening references in a single Mission Data Contract workflow.
+It defines telemetry, commands, events, faults, operational modes, packets, payload contracts, data products, contact/downlink assumptions, commandability/autonomy contracts, scenarios, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, compatibility classification references, extensibility boundary contracts and v1.0 candidate hardening references in a single Mission Data Contract workflow.
 
 From that contract, OrbitFabric validates consistency, generates documentation, executes host-side operational scenarios and generates deterministic integration and inspection artifacts.
 
-## Current development preview
+## Current status
 
 OrbitFabric is currently at:
 
@@ -14,68 +14,26 @@ OrbitFabric is currently at:
 v0.12.0 - v1.0 Release Candidate Hardening
 ```
 
-v0.12.0 hardens the path toward `v1.0.0 - Stable Mission Data Contract`.
-
-It introduces release candidate hardening references, not new Mission Model behavior.
-
-It introduces no Mission Model semantics, CLI behavior beyond version reporting, generated Core surfaces, JSON report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, security enforcement semantics, plugin discovery, plugin loading, plugin execution, metadata schema, metadata parser, metadata loader, metadata validator or Studio-specific APIs.
-
-It builds on:
+The immediate target is:
 
 ```text
-v0.8.1  -> model_summary.json
-v0.8.2  -> entity_index.json
-v0.9.0  -> relationship_manifest.json
-v0.10.0 -> stability and compatibility classification
-v0.10.1 -> documentation and published-site consistency
-v0.11.0 -> extensibility boundary contract, no execution
-v0.12.0 -> v1.0 release candidate hardening references
+v1.0.0 - Stable Mission Data Contract
 ```
 
-The current public preview includes:
+The repository now contains the v1.0 candidate documentation and regression-confidence material needed before the final v1.0.0 release alignment:
 
-- Mission Model YAML loading;
-- structural validation;
-- semantic linting;
-- generated Markdown documentation;
-- deterministic scenario execution;
-- optional Payload / IOD Payload Contracts;
-- optional Data Product and Storage Contracts;
-- optional Contact Windows and Downlink Flow Contracts;
-- optional Commandability and Autonomy Contracts;
-- command-declared data product effects;
-- generated payload documentation;
-- generated data product documentation;
-- generated contact/downlink documentation;
-- generated commandability/autonomy documentation;
-- generated data-flow evidence documentation;
-- JSON lint reports;
-- JSON simulation reports with contract-level data-flow evidence;
-- data-flow scenario assertions;
-- RuntimeContract generation;
-- generated C++17 runtime-facing contract bindings;
-- generated C++17 host-build smoke files;
-- GroundContract generation;
-- generated ground contract manifest;
-- generated JSON ground dictionaries;
-- generated CSV ground dictionaries;
-- generated human-reviewable ground Markdown artifacts;
-- `orbitfabric export model-summary`;
-- generated `model_summary.json` contract introspection report;
-- `orbitfabric export entity-index`;
-- generated `entity_index.json` entity index report;
-- `orbitfabric export relationship-manifest`;
-- generated `relationship_manifest.json` candidate relationship report;
-- stability and compatibility classification references;
-- Extensibility Boundary Contract reference documentation;
-- ADR-0015 for the extensibility boundary;
-- release compatibility policy;
-- v1.0 candidate surface inventory;
-- golden output and regression confidence policy;
-- v1.0 compatibility and migration notes;
-- a clean-room synthetic `demo-3u` mission.
+```text
+v1.0 Stable Surface Decision
+v1.0 Demo Evidence Chain
+v1.0 Compatibility and Migration Notes
+v1.0 golden signatures for selected Core-owned structured surfaces
+```
 
-## Core Idea
+These additions clarify the proposed v1.0 posture.
+
+They do not change the package version, add Mission Model behavior, add YAML fields, add CLI behavior, add JSON report fields, add generated Core surfaces, add runtime behavior, add ground behavior, introduce schema migration tooling, publish JSON Schema, add security enforcement semantics, add plugin discovery, add plugin loading, add plugin execution or create a tool-specific integration layer.
+
+## Core idea
 
 ```text
 Mission Model
@@ -96,7 +54,10 @@ Mission Model
   -> Core-owned relationship manifest surfaces
   -> stability and compatibility classification
   -> extensibility boundary contract
-  -> v1.0 release candidate hardening references
+  -> v1.0 stable surface decision
+  -> v1.0 demo evidence chain
+  -> v1.0 compatibility and migration posture
+  -> v1.0 golden signatures for selected Core-owned structured surfaces
 ```
 
 The current Core-owned structured surface chain is:
@@ -107,25 +68,15 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
-The extensibility boundary rule is:
+The current v1.0 candidate posture is:
 
 ```text
 Mission Model remains the source of truth.
 Core owns Mission Data Contract semantics.
-Extensions consume Core-owned structured surfaces.
-Extension-owned outputs remain distinguishable from Core-owned outputs.
-Extensions must not override Core semantics.
-Execution is out of scope.
-```
-
-The v0.12.0 hardening rule is:
-
-```text
-Review candidate v1.0 surfaces.
-Define confidence policy before adding golden baselines.
-Document compatibility and migration decisions before stabilization.
-Remove ambiguity before declaring a stable Mission Data Contract.
-Do not broaden OrbitFabric.
+Core-owned structured surfaces are derived from the validated Mission Model.
+Downstream tools consume Core-owned structured surfaces.
+Generated runtime-facing and ground-facing artifacts remain reproducible and disposable unless explicitly classified otherwise.
+Plugin execution remains out of scope.
 ```
 
 OrbitFabric is not a flight software framework, a ground segment or a spacecraft dynamics simulator.
@@ -138,4 +89,12 @@ Generated ground integration artifacts are not ground software.
 
 Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
-Compatibility classification references, v0.12.0 hardening references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or a v1.0 stability guarantee.
+Compatibility references, v1.0 candidate references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or tool-specific integrations.
+
+The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
+
+They do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
+
+The v1.0 demo evidence chain proves Mission Data Contract continuity from one validated Mission Model across scenario evidence, generated review artifacts and Core-owned structured surfaces.
+
+It does not prove flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
