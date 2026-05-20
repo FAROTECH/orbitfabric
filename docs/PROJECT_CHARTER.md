@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 0.12.0 to v1.0 candidate path  
-Status: v1.0 candidate alignment  
-Scope: Mission Data Contract foundation, Core-owned structured surfaces, extensibility boundary and v1.0 stable-surface preparation
+Version: 1.0.0  
+Status: Stable Mission Data Contract released  
+Scope: Mission Data Contract foundation, Core-owned structured surfaces, extensibility boundary and v1.0 stable surface
 
 ---
 
@@ -27,27 +27,12 @@ The guiding principle is:
 OrbitFabric is currently released at:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-The immediate target is:
-
-```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
+v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
 
-```text
-v1.0 Stable Surface Decision
-v1.0 golden signatures for selected Core-owned structured surfaces
-v1.0 Demo Evidence Chain
-v1.0 Compatibility and Migration Notes aligned to the current candidate posture
-```
-
-This does not mean v1.0.0 has already been released.
-
-It means the project has selected, protected, demonstrated and documented the proposed narrow v1.0 posture.
+The stable surface is intentionally limited.
 
 ---
 
@@ -78,7 +63,7 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - Core-owned structured surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
-- v1.0 candidate governance references.
+- v1.0 stable Mission Data Contract governance references.
 
 The Mission Data Contract is the single source of truth for all derived artifacts.
 
@@ -178,7 +163,7 @@ Downstream tools and future extensions must consume Core-owned structured surfac
 
 They must not reconstruct Mission Data Contract semantics from raw YAML, generated files, terminal output, logs, UI state or private assumptions.
 
-The current selected Core-owned structured surfaces are:
+The current stable Core-owned structured surfaces are:
 
 ```text
 model_summary.json
@@ -196,7 +181,7 @@ Users must not place handwritten implementation code inside generated files.
 
 ### 7.5 Compatibility Must Be Explicit
 
-Before v1.0.0, any change to a selected stable candidate surface must include explicit compatibility or migration notes.
+After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
 
 A surface does not become stable only because it exists.
 
@@ -210,9 +195,9 @@ It is not a real-time onboard runtime or a spacecraft dynamics simulator.
 
 ---
 
-## 8. v1.0 Candidate Stable Surface
+## 8. v1.0 Stable Surface
 
-The selected v1.0 candidate stable surface is intentionally narrow.
+The v1.0 stable surface is intentionally narrow.
 
 It includes:
 
@@ -276,8 +261,7 @@ OrbitFabric must not become:
 - a Studio-specific backend API;
 - a schema migration tool;
 - a JSON Schema publication layer;
-- a security enforcement framework;
-- a released v1.0.0 compatibility guarantee before v1.0.0 is actually released.
+- a security enforcement framework.
 
 These may be valid future directions only after separate design, implementation and tests.
 
