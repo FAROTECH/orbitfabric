@@ -1,20 +1,20 @@
 # v1.0 Demo Evidence Chain
 
-Status: Proposed for v1.0.0  
+Status: Accepted in v1.0.0  
 Scope: documentation-only evidence map for the `demo-3u` Mission Model  
-Applies to: OrbitFabric Core after `v0.12.0 - v1.0 Release Candidate Hardening`
+Applies to: OrbitFabric Core `v1.0.0 - Stable Mission Data Contract`
 
 This page records the selected v1.0 demonstration evidence chain for OrbitFabric Core.
 
 It explains how the existing `examples/demo-3u` Mission Model demonstrates Mission Data Contract continuity across validation, scenario evidence, generated artifacts and Core-owned structured surfaces.
 
-This page does not introduce new Mission Model semantics, new YAML fields, new CLI behavior, new generated surfaces, new scenario behavior or new compatibility guarantees.
+This page does not introduce new Mission Model semantics, new YAML fields, new CLI behavior, new generated surfaces, new scenario behavior or new compatibility guarantees beyond the v1.0.0 stable release boundary.
 
 ---
 
 ## 1. Purpose
 
-The v1.0 demo must prove one thing clearly:
+The v1.0 demo proves one thing clearly:
 
 ```text
 A single validated Mission Model can carry the same mission-data meaning across commands, events, payloads, data products, storage/downlink intent, scenario evidence, generated artifacts and Core-owned structured surfaces.
@@ -268,7 +268,7 @@ They are not inferred from naming conventions, YAML scanning or downstream assum
 
 ## 10. Golden signature protection
 
-The v1.0 path includes golden signatures for selected Core-owned structured surface fields:
+The v1.0 release includes golden signatures for selected Core-owned structured surface fields:
 
 ```text
 tests/golden/demo_3u_core_surfaces/model_summary_contract_signature.json
@@ -391,4 +391,4 @@ Protect selected stable surface fields with golden signatures.
 Keep the Mission Model as the source of truth.
 ```
 
-That is the correct v1.0 demonstration posture for OrbitFabric Core.
+That is the v1.0 demonstration posture for OrbitFabric Core.
