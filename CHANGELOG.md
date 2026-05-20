@@ -16,6 +16,8 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 - Added the selected v1.0 demonstration use-case boundary for Mission Data Contract continuity.
 - Added contract-significant golden signatures for the demo-3u Core-owned structured surfaces: `model_summary.json`, `entity_index.json` and `relationship_manifest.json`.
 - Added regression tests comparing generated Core-owned structured surfaces against those golden signatures.
+- Added the v1.0 Demo Evidence Chain reference.
+- Added the v1.0 Demo Evidence Chain page to the MkDocs Reference navigation.
 
 ### Compatibility impact
 
@@ -28,6 +30,10 @@ It documents the proposed narrow v1.0 stable surface selected from existing Orbi
 The golden signatures protect selected contract-significant fields for existing Core-owned structured surfaces.
 
 They do not introduce new generated surfaces or new report fields.
+
+The v1.0 Demo Evidence Chain reference is documentation-only and maps existing demo mission declarations, scenario evidence, generated artifacts and Core-owned structured surfaces.
+
+It does not introduce new Mission Model semantics, new scenarios, new generated artifacts, new report fields or new compatibility guarantees.
 
 ### Boundaries
 
@@ -62,6 +68,8 @@ This change intentionally does not introduce:
 - Studio-specific API.
 
 The new golden signatures do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
+
+The v1.0 Demo Evidence Chain reference does not claim flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
 
 ---
 
