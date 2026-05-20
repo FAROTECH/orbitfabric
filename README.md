@@ -45,31 +45,16 @@ future extension-owned outputs
 OrbitFabric is currently released at:
 
 ```text
-v0.12.0 - v1.0 Release Candidate Hardening
-```
-
-The immediate target is:
-
-```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-After v0.12.0, the repository now contains the v1.0 candidate alignment material needed before final release preparation:
+v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
 
-```text
-v1.0 Stable Surface Decision
-v1.0 golden signatures for selected Core-owned structured surfaces
-v1.0 Demo Evidence Chain
-v1.0 Compatibility and Migration Notes aligned to the current candidate posture
-```
+The stable surface is intentionally limited.
 
-This work selects, protects, demonstrates and documents the proposed narrow v1.0 posture.
+OrbitFabric v1.0.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
 
-It does not mean v1.0.0 has already been released.
-
-It does not change the package version, add Mission Model behavior, add YAML fields, add CLI behavior, add JSON report fields, add generated Core surfaces, add runtime behavior, add ground behavior, introduce schema migration tooling, publish JSON Schema, add plugin discovery, add plugin loading, add plugin execution or create a tool-specific integration layer.
-
-The current Core-owned structured surface chain is:
+The stable Core-owned structured surface chain is:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -77,7 +62,7 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-The current v1.0 candidate posture is:
+The stable v1.0 posture is:
 
 ```text
 Mission Model remains the source of truth.
@@ -123,7 +108,7 @@ It models:
 - Core-owned relationship manifest surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
-- v1.0 candidate governance and release preparation references.
+- v1.0 stable Mission Data Contract governance references.
 
 The structured surface chain is:
 
@@ -164,8 +149,7 @@ OrbitFabric is not:
 - a Studio-specific backend API;
 - schema migration tooling;
 - a JSON Schema publication layer;
-- a tool-specific integration layer;
-- a released v1.0.0 compatibility guarantee.
+- a tool-specific integration layer.
 
 Generated Runtime Skeletons are runtime-facing contract bindings.
 
@@ -173,7 +157,7 @@ Ground Integration Artifacts are ground-facing contract exports.
 
 Contract Introspection, Entity Index and Relationship Manifest surfaces are Core-derived read-only structured surfaces.
 
-Stability, compatibility, extensibility and v1.0 candidate references are governance and documentation surfaces.
+Stability, compatibility, extensibility and v1.0 references are governance and documentation surfaces.
 
 None of them is flight software, ground software, plugin execution or a visual modeling tool.
 
@@ -247,7 +231,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 0.12.0
+orbitfabric 1.0.0
 ```
 
 Run checks:
@@ -344,7 +328,7 @@ Useful entry points:
 - `docs/reference/v1-compatibility-migration-notes.md`
 - `docs/reference/golden-output-regression-confidence.md`
 - `docs/reference/extensibility-boundary-contract.md`
-- `docs/releases/v0.12.0.md`
+- `docs/releases/v1.0.0.md`
 
 Build the documentation site locally:
 
