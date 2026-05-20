@@ -1,10 +1,10 @@
 # Mission Model Stability Contract
 
-Status: Development preview  
-Scope: v0.10.0 Mission Model compatibility classification  
-Applies to: OrbitFabric Mission Model before v1.0.0
+Status: Active v1.0 contract  
+Scope: Mission Model compatibility classification  
+Applies to: OrbitFabric Mission Model from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies the OrbitFabric Mission Model surface on the path toward v1.0.0.
+This page classifies the OrbitFabric Mission Model surface after v1.0.0.
 
 It is a documentation contract. It does not introduce new YAML fields, new Mission Model semantics, new validation rules, new generated surfaces, new CLI behavior, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
@@ -14,9 +14,9 @@ It is a documentation contract. It does not introduce new YAML fields, new Missi
 
 The Mission Model is the canonical Mission Data Contract in OrbitFabric.
 
-Before v1.0.0, the Mission Model is still a development-preview contract. However, documented files, top-level domain keys, field meanings, controlled values and identifier rules are compatibility-sensitive.
+From v1.0.0 onward, documented files, top-level domain keys, field meanings, controlled values and identifier rules are part of the stable narrow Mission Data Contract surface.
 
-This document defines how the Mission Model should evolve before v1.0.0.
+This document defines how the Mission Model should evolve after v1.0.0.
 
 It covers:
 
@@ -58,29 +58,27 @@ relationship_manifest.json
 
 ## 3. Current classification
 
-Current Mission Model surface classification before v1.0.0:
+Current Mission Model surface classification after v1.0.0:
 
 | Surface | Classification | Notes |
 |---|---|---|
-| Mission Model directory layout | Candidate contract | Current multi-file structure is compatibility-sensitive. |
-| required core YAML files | Candidate contract | Core v0.1 files are required for the current Mission Model baseline. |
-| optional extension YAML files | Public preview | Payload, data product, contact/downlink and commandability domains. |
-| top-level domain keys | Candidate contract | Each YAML file has one expected top-level domain key. |
-| documented field names | Candidate contract | Field names should change only deliberately. |
-| documented field meanings | Candidate contract | Semantic meaning is compatibility-sensitive. |
-| controlled values | Public preview, candidate where documented | Values such as severities, risks and priorities affect validation and generated outputs. |
-| identifier format rules | Candidate contract | Dotted identifiers are central to cross-references. |
+| Mission Model directory layout | Stable contract | Current multi-file structure is compatibility-sensitive. |
+| required core YAML files | Stable contract | Core v0.1 files are required for the current Mission Model baseline. |
+| optional extension YAML files | Stable where documented, preview for future expansion | Payload, data product, contact/downlink and commandability domains are part of the current contract. |
+| top-level domain keys | Stable contract | Each YAML file has one expected top-level domain key. |
+| documented field names | Stable contract | Field names should change only deliberately with compatibility notes. |
+| documented field meanings | Stable contract | Semantic meaning is compatibility-sensitive. |
+| controlled values | Stable where documented | Values such as severities, risks and priorities affect validation and generated outputs. |
+| identifier format rules | Stable contract | Dotted identifiers are central to cross-references. |
 | raw YAML ordering | Not a semantic contract | Ordering should not carry hidden semantics unless explicitly documented. |
 | comments and formatting | Not a semantic contract | Human formatting is not contract semantics. |
 | internal Pydantic model layout | Internal implementation detail | Not a public compatibility surface unless explicitly documented. |
-
-No Mission Model surface is classified as a stable v1.0 contract yet.
 
 ---
 
 ## 4. Current domain classes
 
-The current Mission Model is composed of core domains and extension domains.
+The current Mission Model is composed of core domains and contract extension domains.
 
 ### 4.1 Core domains
 
@@ -101,9 +99,9 @@ policies
 
 These domains define the core Mission Data Contract baseline.
 
-### 4.2 Extension domains
+### 4.2 Contract extension domains
 
-Current extension domains include:
+Current contract extension domains include:
 
 ```text
 payloads
@@ -122,9 +120,9 @@ The current multi-file Mission Model layout is compatibility-sensitive.
 
 Changing a documented YAML file name, removing a documented file, renaming a top-level key or changing whether a domain is required or optional can affect users, examples, CI workflows and downstream tools.
 
-Such changes are allowed before v1.0.0 only when explicit, reviewed and documented.
+Such changes are allowed only when explicit, reviewed and documented.
 
-A new optional domain may be added before v1.0.0 if it is clearly documented and does not silently alter existing domain semantics.
+A new optional domain may be added in a future release if it is clearly documented and does not silently alter existing domain semantics.
 
 ---
 
@@ -192,7 +190,7 @@ Controlled values should remain explicit and documented.
 
 ## 9. Compatibility-sensitive Mission Model changes
 
-The following changes are compatibility-sensitive before v1.0.0:
+The following changes are compatibility-sensitive after v1.0.0:
 
 - removing a documented YAML file;
 - renaming a documented YAML file;
@@ -219,7 +217,7 @@ It means the change must be explicit, reviewed and documented.
 
 ## 10. Preferred evolution rules
 
-Before v1.0.0, Mission Model evolution should follow these rules.
+Mission Model evolution should follow these rules.
 
 ### 10.1 Prefer additive changes
 
@@ -247,7 +245,7 @@ Downstream tools should consume Core-owned structured surfaces rather than becom
 
 ## 11. What is not a Mission Model compatibility promise
 
-The following are not Mission Model compatibility promises before v1.0.0:
+The following are not Mission Model compatibility promises unless explicitly documented as stable:
 
 - internal Python class names;
 - internal loader function layout;
@@ -314,7 +312,6 @@ plugin loader
 runtime behavior
 ground behavior
 Studio-specific API
-stable v1.0 Mission Model guarantee
 ```
 
 ---
@@ -336,27 +333,10 @@ Lint Rule Code Stability
 
 The dedicated reference pages remain the source for field-level schema documentation.
 
-This page defines how those documented Mission Model surfaces should be treated as compatibility-sensitive before v1.0.0.
+This page defines how those documented Mission Model surfaces should be treated after v1.0.0.
 
 ---
 
-## 15. v1.0 direction
+## 15. Final statement
 
-Before v1.0.0, OrbitFabric should decide which Mission Model domains, fields, controlled values and identifier rules become stable.
-
-Likely v1.0 candidates include:
-
-```text
-core Mission Model directory layout
-core domain top-level keys
-core identifier rules
-core reference rules
-core telemetry, command, event, fault, mode and packet fields
-payload contract fields
-data product contract fields
-contact and downlink contract fields
-commandability and autonomy contract fields
-scenario linkage expectations
-```
-
-v1.0.0 should stabilize the Mission Data Contract enough for users and downstream tools to build around it, without turning the Mission Model into flight software, ground software, a simulator runtime, a visual modeling database or a plugin execution interface.
+v1.0.0 stabilizes the Mission Data Contract enough for users and downstream tools to build around it, without turning the Mission Model into flight software, ground software, a simulator runtime, a visual modeling database or a plugin execution interface.
