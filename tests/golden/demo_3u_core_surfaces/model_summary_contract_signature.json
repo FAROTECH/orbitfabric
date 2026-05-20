@@ -128,7 +128,7 @@
       },
       {
         "id": "mode_transitions",
-        "required": false,
+        "required": true,
         "present": true,
         "source_file": "modes.yaml",
         "count": 6
