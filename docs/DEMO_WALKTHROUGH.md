@@ -20,7 +20,7 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 
 The goal is not to model a real CubeSat.
 
-The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces and compatibility classification references.
+The goal is to show how a Mission Data Contract can define mission data and operational behavior once, then reuse it across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, Core-owned introspection surfaces, entity index surfaces, relationship manifest surfaces, golden signatures and v1.0 compatibility governance references.
 
 ---
 
@@ -52,7 +52,7 @@ examples/demo-3u/
 
 The `mission/` directory contains the Mission Model.
 
-The `scenarios/` directory contains executable operational scenarios.
+The `scenarios/` directory contains executable host-side operational scenarios.
 
 ---
 
@@ -60,7 +60,7 @@ The `scenarios/` directory contains executable operational scenarios.
 
 The Mission Model defines the synthetic spacecraft, subsystems, modes, telemetry, commands, events, faults, packets and policies.
 
-It also defines optional contract domains:
+It also defines contract domains:
 
 ```text
 payloads.yaml          -> synthetic IOD payload contract
@@ -110,7 +110,7 @@ These are contract assumptions only. They do not implement live uplink, operator
 
 ## 4. Scenarios
 
-The demo currently includes:
+The demo includes:
 
 ```text
 examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -122,13 +122,13 @@ examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 
 `nominal_payload_acquisition.yaml` demonstrates a nominal payload lifecycle path.
 
-`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path introduced in v0.6 and retained in the current baseline.
+`payload_data_flow_evidence.yaml` demonstrates the contract-level data-flow evidence path.
 
 ---
 
 ## 5. Scenario: battery low during payload operation
 
-The battery-low scenario demonstrates this operational sequence:
+The battery-low scenario demonstrates this host-side sequence:
 
 ```text
 payload.start_acquisition
@@ -186,7 +186,7 @@ It is not real payload file generation, onboard storage, downlink queue executio
 
 ## 7. Export Core-owned structured surfaces
 
-The current Core-owned structured surface chain is:
+The stable Core-owned structured surface chain is:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -194,54 +194,30 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-v0.8.1 adds the first Core-owned Contract Introspection Surface for the same `demo-3u` Mission Model.
-
-Run:
+Export the model summary:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
 ```
 
-Generated file:
-
-```text
-generated/reports/model_summary.json
-```
-
-v0.8.2 adds the first Core-owned Entity Index Surface for the same `demo-3u` Mission Model.
-
-Run:
+Export the entity index:
 
 ```bash
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
 ```
 
-Generated file:
-
-```text
-generated/reports/entity_index.json
-```
-
-v0.9.0 adds the first Core-owned Relationship Manifest Surface for the same `demo-3u` Mission Model.
-
-Run:
+Export the relationship manifest:
 
 ```bash
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Generated file:
+For `demo-3u`, the relationship manifest emits 46 relationship records across 17 emitted relationship families.
 
-```text
-generated/reports/relationship_manifest.json
-```
-
-For `demo-3u`, the relationship manifest currently emits 46 relationship records across 17 emitted relationship families.
-
-The candidate surface admits 19 deliberately narrow relationship families documented in `docs/reference/relationship-manifest-surface.md`.
+The stable v1.0 relationship manifest surface admits 19 deliberately narrow relationship families documented in `docs/reference/relationship-manifest-surface.md`.
 
 These reports are read-only Core-owned structured surfaces.
 
@@ -249,34 +225,35 @@ They do not expose relationship graph behavior, dependency graph behavior, plugi
 
 ---
 
-## 8. Review stability and compatibility classification
+## 8. Review stability and compatibility references
 
-v0.10.0 adds the first compatibility classification baseline for the current public and preview surfaces.
-
-The key references are:
+v1.0.0 defines the stable Mission Data Contract posture through these references:
 
 ```text
 Stability and Compatibility Contract
 Mission Model Stability Contract
-CLI Contract v1 Preview
+CLI Contract v1
 Generated Surfaces Stability
 Lint Rule Code Stability
 JSON Report Compatibility
 Scenario Evidence Stability
 Release Compatibility Policy
+v1.0 Stable Surface Decision
+v1.0 Demo Evidence Chain
+v1.0 Compatibility and Migration Notes
+Golden Output and Regression Confidence Policy
+Extensibility Boundary Contract
 ```
 
-These references classify the current Mission Model, CLI, JSON reports, lint diagnostics, generated surfaces, scenario evidence and release compatibility expectations before v1.0.0.
+These references classify the current Mission Model, CLI, JSON reports, lint diagnostics, generated surfaces, scenario evidence and release compatibility expectations.
 
-They do not add Mission Model semantics, YAML fields, generated surfaces, CLI behavior, report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior, plugin execution or a stable v1.0 compatibility guarantee.
+They do not add Mission Model semantics, YAML fields, generated surfaces, CLI behavior, report fields, lint diagnostics, scenario behavior, runtime behavior, ground behavior or plugin execution.
 
 ---
 
 ## 9. Generate runtime-facing contract bindings
 
-v0.7.0 added generated runtime-facing contract bindings for the same `demo-3u` Mission Model.
-
-Run:
+Generate runtime-facing contract bindings for the same `demo-3u` Mission Model:
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -298,9 +275,11 @@ generated/runtime/cpp17/
     └── orbitfabric_runtime_contract_smoke.cpp
 ```
 
-The generated C++17 files expose the contract surface as identifiers, metadata registries, command argument structs and abstract adapter interfaces.
+The generated C++17 files expose the contract surface as deterministic identifiers, metadata registries, command argument structs and abstract adapter interfaces.
 
 They do not implement command dispatch, telemetry polling, scheduling, HAL, drivers, storage, downlink or flight behavior.
+
+They remain public preview disposable generated artifacts in v1.0.0.
 
 ---
 
@@ -321,9 +300,7 @@ It does not validate flight behavior.
 
 ## 11. Generate ground-facing integration artifacts
 
-v0.8.0 adds generated ground-facing integration artifacts for the same `demo-3u` Mission Model.
-
-Run:
+Generate ground-facing integration artifacts for the same `demo-3u` Mission Model:
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
@@ -353,6 +330,8 @@ generated/ground/generic/
 ```
 
 These artifacts expose the mission data contract to ground-side review and downstream integration workflows.
+
+They remain public preview disposable generated artifacts in v1.0.0.
 
 They do not implement a ground segment, decoder, telemetry archive, database, operator console, command uplink service, Yamcs integration, OpenC3 integration or XTCE-compliant mission database.
 
@@ -464,7 +443,7 @@ During execution, OrbitFabric checks that:
 - matching contact window evidence is inspectable;
 - scenario expectations pass.
 
-The simulator does not execute real storage, real downlink, live uplink, contact scheduling or autonomy runtime behavior in the current development preview.
+The simulator does not execute real storage, real downlink, live uplink, contact scheduling or autonomy runtime behavior.
 
 ---
 
@@ -502,7 +481,7 @@ command accepted
   -> model summary exported from the same model
   -> entity index exported from the same model
   -> relationship manifest exported from the same model
-  -> compatibility classification references explain current surface stability
+  -> v1.0 compatibility governance explains current surface stability
 ```
 
 ---
