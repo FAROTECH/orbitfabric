@@ -2,6 +2,31 @@
 
 This document explains how to work on OrbitFabric locally.
 
+OrbitFabric is currently released at:
+
+```text
+v0.12.0 - v1.0 Release Candidate Hardening
+```
+
+The immediate target is:
+
+```text
+v1.0.0 - Stable Mission Data Contract
+```
+
+After v0.12.0, the repository contains the v1.0 candidate alignment material needed before final release preparation:
+
+```text
+v1.0 Stable Surface Decision
+v1.0 golden signatures for selected Core-owned structured surfaces
+v1.0 Demo Evidence Chain
+v1.0 Compatibility and Migration Notes aligned to the current candidate posture
+```
+
+This does not mean v1.0.0 has already been released.
+
+Development work before v1.0.0 must preserve the narrow Mission Data Contract scope.
+
 ---
 
 ## Requirements
@@ -75,7 +100,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current v0.12.0 Slice
+## Verify the Current Candidate State
 
 Run mission lint:
 
@@ -84,42 +109,29 @@ orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
 ```
 
-Export the Core-owned model summary report:
+Export the Core-owned structured surfaces:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json generated/reports/model_summary.json
-```
 
-Export the Core-owned entity index report:
-
-```bash
 orbitfabric export entity-index examples/demo-3u/mission/ \
   --json generated/reports/entity_index.json
-```
 
-Export the Core-owned relationship manifest report:
-
-```bash
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
 ```
 
-Review the compatibility, extensibility and v1.0 hardening references, which remain the current documentation foundation before v1.0.0:
+Review the v1.0 candidate references:
 
 ```text
-Stability and Compatibility Contract
-Mission Model Stability Contract
-CLI Contract v1 Preview
-Generated Surfaces Stability
-Extensibility Boundary Contract
 v1.0 Candidate Surface Inventory
+v1.0 Stable Surface Decision
+v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
-Lint Rule Code Stability
-JSON Report Compatibility
-Scenario Evidence Stability
 Release Compatibility Policy
+Extensibility Boundary Contract
 ```
 
 Generate documentation:
@@ -135,15 +147,10 @@ orbitfabric gen data-flow examples/demo-3u/mission/ \
   --output-file generated/docs/data_flow.md
 ```
 
-Generate runtime-facing contract bindings:
+Generate runtime-facing contract bindings and validate the host-build smoke target:
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
-```
-
-Validate the generated C++17 host-build smoke target:
-
-```bash
 cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
 cmake --build generated/runtime/cpp17/build
 ```
@@ -154,17 +161,13 @@ Generate ground-facing integration artifacts:
 orbitfabric gen ground examples/demo-3u/mission/
 ```
 
-Run the battery-low recovery scenario:
+Run the demo scenarios:
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
   --json generated/reports/battery_low_during_payload_report.json \
   --log generated/logs/battery_low_during_payload.log
-```
 
-Run the data-flow evidence scenario:
-
-```bash
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
   --json generated/reports/payload_data_flow_evidence_report.json \
   --log generated/logs/payload_data_flow_evidence.log
@@ -183,63 +186,6 @@ gen runtime                  -> Result: PASSED
 cmake build                  -> passing
 gen ground                   -> Result: PASSED
 sim                          -> Result: PASSED
-```
-
-The generated Core-owned structured reports should include:
-
-```text
-generated/reports/model_summary.json
-generated/reports/entity_index.json
-generated/reports/relationship_manifest.json
-```
-
-The generated mission documentation should include:
-
-```text
-generated/docs/telemetry.md
-generated/docs/commands.md
-generated/docs/events.md
-generated/docs/faults.md
-generated/docs/modes.md
-generated/docs/packets.md
-generated/docs/payloads.md
-generated/docs/data_products.md
-generated/docs/contacts.md
-generated/docs/commandability.md
-generated/docs/data_flow.md
-```
-
-The generated runtime-facing contract bindings should include:
-
-```text
-generated/runtime/cpp17/runtime_contract_manifest.json
-generated/runtime/cpp17/include/orbitfabric/generated/mission_ids.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/mission_enums.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/mission_registries.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/command_args.hpp
-generated/runtime/cpp17/include/orbitfabric/generated/adapter_interfaces.hpp
-generated/runtime/cpp17/CMakeLists.txt
-generated/runtime/cpp17/src/orbitfabric_runtime_contract_smoke.cpp
-```
-
-The generated ground-facing integration artifacts should include:
-
-```text
-generated/ground/generic/ground_contract_manifest.json
-generated/ground/generic/README.md
-generated/ground/generic/dictionaries/telemetry_dictionary.json
-generated/ground/generic/dictionaries/command_dictionary.json
-generated/ground/generic/dictionaries/event_dictionary.json
-generated/ground/generic/dictionaries/fault_dictionary.json
-generated/ground/generic/dictionaries/data_product_dictionary.json
-generated/ground/generic/dictionaries/packet_dictionary.json
-generated/ground/generic/csv/telemetry_dictionary.csv
-generated/ground/generic/csv/command_dictionary.csv
-generated/ground/generic/csv/event_dictionary.csv
-generated/ground/generic/csv/fault_dictionary.csv
-generated/ground/generic/csv/data_product_dictionary.csv
-generated/ground/generic/csv/packet_dictionary.csv
-generated/ground/generic/ground_dictionaries.md
 ```
 
 ---
@@ -265,28 +211,69 @@ The source of truth is:
 
 ```text
 examples/demo-3u/mission/*.yaml
-examples/demo-3u/mission/payloads.yaml
-examples/demo-3u/mission/data_products.yaml
-examples/demo-3u/mission/contacts.yaml
-examples/demo-3u/mission/commandability.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
-Generated runtime-facing contract bindings are disposable.
+Generated runtime-facing contract bindings are disposable unless explicitly classified otherwise.
 
-Generated ground-facing integration artifacts are disposable.
+Generated ground-facing integration artifacts are disposable unless explicitly classified otherwise.
 
-Generated contract introspection reports are disposable.
+Generated Markdown documentation is disposable.
 
-Generated entity index reports are disposable.
+Plain-text logs are human-oriented and non-contractual.
 
-Generated relationship manifest reports are disposable.
+Core-owned structured surfaces are derived from the validated Mission Model.
 
-Current v0.12.0 hardening references are documentation and review surfaces.
+The current selected Core-owned structured surfaces are:
 
-They are not generated artifacts, not new Mission Model semantics and not stable v1.0 guarantees.
+```text
+model_summary.json
+entity_index.json
+relationship_manifest.json
+```
+
+The v1.0 golden signatures protect selected contract-significant fields of these surfaces.
+
+They do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
 
 User implementation code and downstream integration code must live outside `generated/`.
+
+---
+
+## Development Order
+
+For new behavior, follow this order:
+
+```text
+1. update or define the Mission Model semantics
+2. add or update lint rules
+3. add tests
+4. update generated docs or reports if needed
+5. update runtime-facing, ground-facing, introspection, entity-index or relationship exporters if needed
+6. update user-facing documentation
+```
+
+Before v1.0.0, any change to a selected stable candidate surface must include explicit compatibility or migration notes.
+
+Do not add simulator behavior that is not represented in the Mission Model.
+
+Do not add generated artifacts that bypass validation.
+
+Do not add runtime or ground integration artifacts before the relevant contract layer exists.
+
+Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
+
+Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
+
+Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains before v1.0.0.
+
+Do not put user code inside generated runtime bindings.
+
+Do not present generated ground artifacts as live ground behavior.
+
+Do not present Core-owned structured surfaces as relationship graphs, dependency graphs, plugin APIs, runtime behavior, ground behavior or Studio-specific APIs.
+
+Do not present v1.0 candidate governance references as released v1.0.0 compatibility guarantees.
 
 ---
 
@@ -305,47 +292,6 @@ mkdocs serve
 ```
 
 The public site is deployed by the GitHub Pages workflow after pushes to `main`.
-
----
-
-## Recommended Development Order
-
-For new behavior, follow this order:
-
-```text
-1. update or define the Mission Model semantics
-2. add or update lint rules
-3. add tests
-4. update generated docs or reports if needed
-5. update runtime-facing, ground-facing, introspection, entity-index or relationship exporters if needed
-6. update user-facing documentation
-```
-
-Do not add simulator behavior that is not represented in the Mission Model.
-
-Do not add generated artifacts that bypass validation.
-
-Do not add runtime or ground integration artifacts before the relevant contract layer exists.
-
-Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
-
-Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
-
-Do not introduce golden baselines without an explicit golden-output scope and acceptance criteria.
-
-Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains during v0.12.0 release candidate hardening.
-
-Do not put user code inside generated runtime bindings.
-
-Do not present generated ground artifacts as live ground behavior.
-
-Do not present contract introspection reports as relationship graphs or Studio-specific APIs.
-
-Do not present entity index reports as relationship graphs, dependency graphs, plugin APIs or Studio-specific APIs.
-
-Do not present relationship manifest reports as graph engines, dependency graphs, runtime routing tables, ground routing tables, plugin APIs or Studio-specific APIs.
-
-Do not present compatibility classification references or v0.12.0 hardening references as implementation changes, schema migration tooling, runtime behavior, ground behavior, plugin execution or a stable v1.0 guarantee.
 
 ---
 
