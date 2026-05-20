@@ -8,7 +8,54 @@ This project follows a lightweight pre-1.0 changelog style while the Mission Mod
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+
+- Added the v1.0 Stable Surface Decision reference.
+- Added the v1.0 Stable Surface Decision page to the MkDocs Reference navigation.
+- Added explicit v1.0 classification for stable surfaces, public preview surfaces, generated disposable artifacts, internal implementation details and out-of-scope topics.
+- Added the selected v1.0 demonstration use-case boundary for Mission Data Contract continuity.
+
+### Compatibility impact
+
+This change has no Mission Data Contract semantic impact.
+
+It does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics, scenario expectations, JSON report fields, generated surfaces or CLI behavior.
+
+It documents the proposed narrow v1.0 stable surface selected from existing OrbitFabric Core behavior and surfaces.
+
+### Boundaries
+
+This change intentionally does not introduce:
+
+- new Mission Model semantics;
+- new YAML fields;
+- new model domains;
+- new CLI behavior;
+- new JSON report fields;
+- new generated Core surfaces;
+- new lint diagnostics;
+- new scenario behavior;
+- new golden files;
+- new snapshot tests;
+- schema migration tooling;
+- JSON Schema publication;
+- XTCE export;
+- Yamcs integration;
+- OpenC3 integration;
+- F Prime mapping;
+- cFS integration;
+- CCSDS/PUS/CFDP implementation;
+- Mission Model security domain;
+- security YAML fields;
+- security enforcement semantics;
+- plugin discovery;
+- plugin loading;
+- plugin execution;
+- relationship graph;
+- dependency graph;
+- runtime behavior;
+- ground behavior;
+- Studio-specific API.
 
 ---
 

@@ -26,6 +26,7 @@ nav:
       - Stability and Compatibility Contract: reference/stability-compatibility-contract.md
       - Release Compatibility Policy: reference/release-compatibility-policy.md
       - v1.0 Candidate Surface Inventory: reference/v1-candidate-surface-inventory.md
+      - v1.0 Stable Surface Decision: reference/v1-stable-surface-decision.md
       - Golden Output and Regression Confidence Policy: reference/golden-output-regression-confidence.md
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
       - CLI Contract v1 Preview: reference/cli-contract-v1.md
