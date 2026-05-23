@@ -73,6 +73,10 @@ Other JSON files in the same directory are ignored.
 
 This allows the same reports directory to contain lint reports, dashboard summaries or other Core-owned surfaces without turning them into scenario runs.
 
+The index counts report files, not unique scenario identifiers.
+
+If the same scenario is executed multiple times and each execution writes a distinct simulation JSON report, each report is indexed as a separate scenario run.
+
 ---
 
 ## Top-level fields
@@ -123,7 +127,7 @@ They prevent consumers from treating the scenario run index as a coverage report
 
 ## Summary section
 
-The summary section contains aggregate run counts.
+The summary section contains aggregate indexed report counts.
 
 Shape:
 
@@ -138,6 +142,8 @@ Shape:
 ```
 
 Only simulation JSON reports indexed as scenario runs contribute to these counts.
+
+These counts are file/run counts, not unique scenario counts.
 
 ---
 
@@ -169,6 +175,18 @@ failed_expectations
 The run record does not include timeline entries, event records, command records, mode transition records, data-flow evidence records or final state.
 
 Those details remain in the original simulation JSON report.
+
+---
+
+## Duplicate scenario identifiers
+
+The scenario run index does not deduplicate by `mission` or `scenario`.
+
+This is intentional.
+
+Different report files may represent separate executions of the same scenario.
+
+Consumers that need unique scenario views must derive those views explicitly from the indexed run records without changing the meaning of the Core report.
 
 ---
 
