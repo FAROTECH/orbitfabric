@@ -81,6 +81,32 @@ def test_scenario_run_index_contains_runs_and_summary(tmp_path: Path) -> None:
     assert data_flow["summary"]["data_flow_evidence"] == 1
 
 
+def test_scenario_run_index_counts_report_files_not_unique_scenarios(
+    tmp_path: Path,
+) -> None:
+    reports_dir = _write_demo_reports(tmp_path)
+    _write_sim_report(
+        DEMO_SCENARIO,
+        reports_dir / "battery_low_duplicate_report.json",
+    )
+
+    index = scenario_run_index_to_dict(reports_dir)
+
+    assert index["summary"] == {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+    }
+    assert [
+        run["report_file"]
+        for run in index["runs"]
+        if run["scenario"] == "battery_low_during_payload"
+    ] == [
+        "battery_low_duplicate_report.json",
+        "battery_low_report.json",
+    ]
+
+
 def test_scenario_run_index_ignores_non_simulation_json(tmp_path: Path) -> None:
     reports_dir = _write_demo_reports(tmp_path)
     (reports_dir / "lint_report.json").write_text(
