@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Any
 
 from orbitfabric import __version__
-from orbitfabric.sim.state import SimDataFlowEvidenceRecord, SimulationResult
+from orbitfabric.sim.state import (
+    SimDataFlowEvidenceRecord,
+    SimExpectationRecord,
+    SimulationResult,
+)
 
 
 def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
@@ -21,6 +25,8 @@ def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
             "commands": len(result.state.commands),
             "mode_transitions": len(result.state.mode_transitions),
             "data_flow_evidence": len(result.state.data_flow_evidence),
+            "expectations": len(result.state.expectations),
+            "passed_expectations": _expectation_count(result, "passed"),
             "failed_expectations": len(result.state.failed_expectations),
         },
         "timeline": [
@@ -62,6 +68,15 @@ def simulation_result_to_dict(result: SimulationResult) -> dict[str, Any]:
             _data_flow_evidence_to_dict(evidence)
             for evidence in result.state.data_flow_evidence
         ],
+        "expectations": {
+            "total": len(result.state.expectations),
+            "passed": _expectation_count(result, "passed"),
+            "failed": _expectation_count(result, "failed"),
+            "records": [
+                _expectation_to_dict(expectation)
+                for expectation in result.state.expectations
+            ],
+        },
         "final_state": {
             "mode": result.state.current_mode,
             "telemetry": result.state.telemetry,
@@ -97,6 +112,22 @@ def _data_flow_evidence_to_dict(
         "eligible_downlink_flows": evidence.eligible_downlink_flows,
         "contact_windows": evidence.contact_windows,
     }
+
+
+def _expectation_to_dict(expectation: SimExpectationRecord) -> dict[str, Any]:
+    return {
+        "t": expectation.t,
+        "expectation_type": expectation.expectation_type,
+        "target": expectation.target,
+        "expected": expectation.expected,
+        "actual": expectation.actual,
+        "result": expectation.result,
+        "message": expectation.message,
+    }
+
+
+def _expectation_count(result: SimulationResult, label: str) -> int:
+    return sum(1 for item in result.state.expectations if item.result == label)
 
 
 def _json_result_label(result: SimulationResult) -> str:

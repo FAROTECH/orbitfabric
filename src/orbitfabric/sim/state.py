@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 CommandDispatchKind = Literal["GROUND", "AUTO"]
 CommandStatus = Literal["ACCEPTED", "REJECTED", "AUTO_DISPATCHED", "FAILED"]
+ExpectationResult = Literal["passed", "failed"]
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,17 @@ class SimDataFlowEvidenceRecord:
     contact_windows: list[str]
 
 
+@dataclass(frozen=True)
+class SimExpectationRecord:
+    t: float
+    expectation_type: str
+    target: str
+    expected: Any
+    actual: Any
+    result: ExpectationResult
+    message: str
+
+
 @dataclass
 class SimulationState:
     current_time: float
@@ -63,10 +75,33 @@ class SimulationState:
     commands: list[SimCommandRecord] = field(default_factory=list)
     mode_transitions: list[SimModeTransitionRecord] = field(default_factory=list)
     data_flow_evidence: list[SimDataFlowEvidenceRecord] = field(default_factory=list)
+    expectations: list[SimExpectationRecord] = field(default_factory=list)
     failed_expectations: list[str] = field(default_factory=list)
 
     def log(self, t: float, message: str) -> None:
         self.logs.append(SimLogEntry(t=t, message=message))
+
+    def record_expectation(
+        self,
+        t: float,
+        expectation_type: str,
+        target: str,
+        expected: Any,
+        actual: Any,
+        result: ExpectationResult,
+        message: str,
+    ) -> None:
+        self.expectations.append(
+            SimExpectationRecord(
+                t=t,
+                expectation_type=expectation_type,
+                target=target,
+                expected=expected,
+                actual=actual,
+                result=result,
+                message=message,
+            )
+        )
 
     def fail_expectation(self, t: float, message: str) -> None:
         self.failed_expectations.append(message)

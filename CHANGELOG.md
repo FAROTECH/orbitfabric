@@ -18,6 +18,9 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added `orbitfabric export scenario-run-index --simulation-reports <dir> --json <path>`.
 - Added the Scenario Run Index Surface reference page and MkDocs navigation entry.
 - Added tests for scenario run index identity, boundaries, filtering of non-simulation JSON reports, deterministic JSON writing and CLI export.
+- Added additive structured expectation accounting to simulation JSON reports.
+- Added `summary.expectations`, `summary.passed_expectations` and the structured top-level `expectations` object to simulation JSON reports.
+- Added tests covering passed expectation accounting, failed expectation accounting and legacy `failed_expectations` compatibility.
 
 ### Compatibility impact
 
@@ -30,6 +33,10 @@ The new dashboard summary and scenario run index are additive candidate post-v1 
 The dashboard summary does not introduce coverage metrics, model completeness scoring, mission health scoring, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
 
 The scenario run index is derived from simulation JSON reports only. It does not parse plain-text logs and does not introduce coverage metrics, structured expectation accounting, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
+
+The structured expectation accounting fields are additive simulation JSON report fields. They preserve the legacy top-level `failed_expectations` array for compatibility.
+
+The structured expectation accounting fields do not introduce formal verification, coverage metrics, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
 
 ---
 
