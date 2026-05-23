@@ -32,6 +32,7 @@ nav:
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
       - Dashboard and Coverage Foundation: reference/dashboard-coverage-foundation.md
       - Dashboard Summary Surface: reference/dashboard-summary-surface.md
+      - Scenario Run Index Surface: reference/scenario-run-index-surface.md
       - CLI Contract v1: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
@@ -79,7 +80,7 @@ nav:
       - ADR-0007 Mission Data Chain Before Runtime: adr/ADR-0007-mission-data-chain-before-runtime.md
       - ADR-0008 Data Product and Storage Contracts: adr/ADR-0008-data-product-and-storage-contracts.md
       - ADR-0009 Contact Windows and Downlink Flow Contracts: adr/ADR-0009-contact-windows-and-downlink-flow-contracts.md
-      - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-and-autonomy-contracts.md
+      - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-contract-model.md
       - ADR-0011 Generated Runtime Skeleton Boundary: adr/ADR-0011-generated-runtime-skeleton-boundary.md
       - ADR-0012 Ground Integration Artifacts Boundary: adr/ADR-0012-ground-integration-artifacts-boundary.md
       - ADR-0013 Contract Introspection Surfaces: adr/ADR-0013-contract-introspection-surfaces.md
