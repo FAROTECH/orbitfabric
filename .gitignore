@@ -19,10 +19,11 @@ dist/
 *.egg-info/
 
 # Generated OrbitFabric outputs
-generated/docs/*
-generated/reports/*
-generated/logs/*
+generated/*
 !generated/.gitkeep
+
+# Generated outputs inside example missions
+examples/**/generated/
 
 # OS/editor
 .DS_Store

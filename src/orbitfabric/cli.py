@@ -7,7 +7,11 @@ from typing import Annotated
 import typer
 
 from orbitfabric import __version__
-from orbitfabric.export import write_entity_index, write_model_summary
+from orbitfabric.export import (
+    write_dashboard_summary,
+    write_entity_index,
+    write_model_summary,
+)
 from orbitfabric.export.relationship_manifest import write_relationship_manifest
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
 from orbitfabric.gen.docs import generate_markdown_docs
@@ -472,6 +476,46 @@ def export_relationship_manifest(
     typer.echo(f"Model version: {model.spacecraft.model_version}")
     typer.echo("Status: candidate")
     typer.echo(f"Relationships emitted: {relationship_count}")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@export_app.command("dashboard-summary")
+def export_dashboard_summary(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to export the dashboard summary.",
+        ),
+    ],
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the candidate dashboard summary to this JSON file.",
+        ),
+    ] = Path("generated/reports/dashboard_summary.json"),
+) -> None:
+    """Export a candidate Core-owned dashboard foundation summary."""
+    typer.echo(f"OrbitFabric Dashboard Summary Export {__version__}")
+
+    try:
+        model = MissionModelLoader().load(mission_dir)
+    except MissionModelError as exc:
+        _print_model_error(exc)
+        raise typer.Exit(code=1) from exc
+
+    report = LintEngine().run(model)
+    written_file = write_dashboard_summary(model, mission_dir, report, json_output)
+
+    typer.echo(f"\nMission: {model.spacecraft.id}")
+    typer.echo(f"Model version: {model.spacecraft.model_version}")
+    typer.echo("Status: candidate")
+    typer.echo("Coverage: not_available")
     typer.echo(f"JSON report written to: {written_file}")
     typer.echo("\nResult: PASSED")
 
