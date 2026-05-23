@@ -21,6 +21,10 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added additive structured expectation accounting to simulation JSON reports.
 - Added `summary.expectations`, `summary.passed_expectations` and the structured top-level `expectations` object to simulation JSON reports.
 - Added tests covering passed expectation accounting, failed expectation accounting and legacy `failed_expectations` compatibility.
+- Added the candidate `coverage_summary.json` Core-owned structured surface.
+- Added `orbitfabric export coverage-summary <mission_dir> --entity-index <path> --relationship-manifest <path> --scenario-run-index <path> --json <path>`.
+- Added the Coverage Summary Surface reference page and MkDocs navigation entry.
+- Added tests for coverage summary identity, boundaries, entity coverage, expectation coverage, relationship coverage, deterministic JSON writing and CLI export.
 
 ### Compatibility impact
 
@@ -28,7 +32,7 @@ No Mission Data Contract semantic impact.
 
 This change does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics or scenario expectations.
 
-The new dashboard summary and scenario run index are additive candidate post-v1 Core-owned structured surfaces. They do not change the v1.0.0 stable surface.
+The new dashboard summary, scenario run index and coverage summary are additive candidate post-v1 Core-owned structured surfaces. They do not change the v1.0.0 stable surface.
 
 The dashboard summary does not introduce coverage metrics, model completeness scoring, mission health scoring, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
 
@@ -37,6 +41,10 @@ The scenario run index is derived from simulation JSON reports only. It does not
 The structured expectation accounting fields are additive simulation JSON report fields. They preserve the legacy top-level `failed_expectations` array for compatibility.
 
 The structured expectation accounting fields do not introduce formal verification, coverage metrics, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
+
+The coverage summary is derived only from Core-owned structured outputs: `entity_index.json`, `relationship_manifest.json`, `scenario_run_index.json` and simulation JSON reports referenced by the scenario run index.
+
+The coverage summary does not read plain-text logs, scan raw YAML, compute mission health, compute model completeness, introduce formal verification, introduce runtime behavior, introduce ground behavior, introduce relationship graph behavior, introduce plugin execution or introduce Studio-specific APIs.
 
 ---
 

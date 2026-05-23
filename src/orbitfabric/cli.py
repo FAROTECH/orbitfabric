@@ -8,6 +8,7 @@ import typer
 
 from orbitfabric import __version__
 from orbitfabric.export import (
+    write_coverage_summary,
     write_dashboard_summary,
     write_entity_index,
     write_model_summary,
@@ -558,6 +559,85 @@ def export_scenario_run_index(
     typer.echo("Status: candidate")
     typer.echo(f"Scenario runs indexed: {payload['summary']['total']}")
     typer.echo("Coverage: not_available")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@export_app.command("coverage-summary")
+def export_coverage_summary(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory associated with the coverage summary.",
+        ),
+    ],
+    entity_index_file: Annotated[
+        Path,
+        typer.Option(
+            "--entity-index",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Core entity_index.json file used as the coverage denominator.",
+        ),
+    ] = Path("generated/reports/entity_index.json"),
+    relationship_manifest_file: Annotated[
+        Path,
+        typer.Option(
+            "--relationship-manifest",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Core relationship_manifest.json file used as relationship denominator.",
+        ),
+    ] = Path("generated/reports/relationship_manifest.json"),
+    scenario_run_index_file: Annotated[
+        Path,
+        typer.Option(
+            "--scenario-run-index",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Core scenario_run_index.json file used to locate simulation reports.",
+        ),
+    ] = Path("generated/reports/scenario_run_index.json"),
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the candidate coverage summary to this JSON file.",
+        ),
+    ] = Path("generated/reports/coverage_summary.json"),
+) -> None:
+    """Export a candidate Core-owned coverage summary."""
+    typer.echo(f"OrbitFabric Coverage Summary Export {__version__}")
+
+    try:
+        written_file = write_coverage_summary(
+            mission_dir,
+            entity_index_file,
+            relationship_manifest_file,
+            scenario_run_index_file,
+            json_output,
+        )
+    except ValueError as exc:
+        typer.echo(f"\nError: {exc}")
+        typer.echo("\nResult: FAILED")
+        raise typer.Exit(code=1) from exc
+
+    payload = json.loads(written_file.read_text(encoding="utf-8"))
+
+    typer.echo(f"\nMission: {payload['mission']['id']}")
+    typer.echo("Status: candidate")
+    typer.echo(f"Scenario runs: {payload['scenario_runs']['total']}")
+    typer.echo("Coverage: emitted")
     typer.echo(f"JSON report written to: {written_file}")
     typer.echo("\nResult: PASSED")
 
