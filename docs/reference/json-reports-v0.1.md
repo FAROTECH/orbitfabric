@@ -47,6 +47,8 @@ runtime_contract_manifest.json
 ground_contract_manifest.json
 ```
 
+Post-v1 additive extensions may introduce new fields into existing stable report families when they preserve existing fields and include compatibility notes.
+
 Future versions may introduce:
 
 - JSON Schema definitions;
@@ -177,8 +179,11 @@ orbitfabric-sim
 | `commands` | array | Executed commands. |
 | `mode_transitions` | array | Mode transitions. |
 | `data_flow_evidence` | array | Contract-level data-flow evidence records. |
+| `expectations` | object | Structured scenario expectation accounting. |
 | `final_state` | object | Final simulator state. |
-| `failed_expectations` | array | Failed scenario expectations. |
+| `failed_expectations` | array | Legacy compatibility list of failed expectation messages. |
+
+The `expectations` object is additive. The legacy `failed_expectations` array remains present for compatibility.
 
 ---
 
@@ -203,7 +208,106 @@ Current fields:
 | `commands` | Number of executed or auto-dispatched commands. |
 | `mode_transitions` | Number of mode transitions. |
 | `data_flow_evidence` | Number of data-flow evidence records. |
-| `failed_expectations` | Number of failed expectations. |
+| `expectations` | Number of structured expectation records. |
+| `passed_expectations` | Number of structured expectation records with result `passed`. |
+| `failed_expectations` | Number of failed expectations. Preserved from the legacy failed expectation list. |
+
+---
+
+## Structured expectation accounting
+
+The simulation report includes structured expectation accounting in the additive `expectations` object.
+
+Shape:
+
+```json
+{
+  "expectations": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "records": []
+  }
+}
+```
+
+Each expectation record includes:
+
+```text
+t
+expectation_type
+target
+expected
+actual
+result
+message
+```
+
+Record example:
+
+```json
+{
+  "t": 9,
+  "expectation_type": "data_flow",
+  "target": "payload.radiation_histogram",
+  "expected": {
+    "data_product": "payload.radiation_histogram",
+    "triggered_by_command": "payload.start_acquisition",
+    "storage_intent_declared": true,
+    "downlink_intent_declared": true,
+    "eligible_downlink_flow": "science_next_available_contact",
+    "contact_window": "demo_contact_001"
+  },
+  "actual": {
+    "data_product": "payload.radiation_histogram",
+    "triggered_by_command": "payload.start_acquisition",
+    "storage_intent_declared": true,
+    "downlink_intent_declared": true,
+    "eligible_downlink_flows": [
+      "science_next_available_contact"
+    ],
+    "contact_windows": [
+      "demo_contact_001"
+    ]
+  },
+  "result": "passed",
+  "message": "expectation passed"
+}
+```
+
+Current expectation record result values:
+
+| Value | Meaning |
+|---|---|
+| `passed` | The expectation was evaluated and passed. |
+| `failed` | The expectation was evaluated and failed. |
+
+Current expectation types may include:
+
+```text
+mode
+event
+command
+command_status
+telemetry
+payload_lifecycle
+data_flow
+scenario_status
+```
+
+Structured expectation accounting is scenario evidence metadata. It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
+
+---
+
+## Legacy failed expectations compatibility
+
+The top-level `failed_expectations` array remains present.
+
+It contains the same human-readable failed expectation messages as before.
+
+This field is retained for compatibility with existing consumers.
+
+New consumers that need passed and failed accounting should read the structured `expectations` object.
 
 ---
 
@@ -484,6 +588,8 @@ Compact example:
     "commands": 2,
     "mode_transitions": 1,
     "data_flow_evidence": 1,
+    "expectations": 12,
+    "passed_expectations": 12,
     "failed_expectations": 0
   },
   "timeline": [],
@@ -491,6 +597,12 @@ Compact example:
   "commands": [],
   "mode_transitions": [],
   "data_flow_evidence": [],
+  "expectations": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "records": []
+  },
   "final_state": {
     "mode": "PAYLOAD_ACTIVE",
     "telemetry": {}
