@@ -8,7 +8,22 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- Added the candidate `dashboard_summary.json` Core-owned structured surface.
+- Added `orbitfabric export dashboard-summary <mission_dir> --json <path>`.
+- Added the Dashboard Summary Surface reference page and MkDocs navigation entry.
+- Added tests for dashboard summary identity, boundaries, inventory, coverage-unavailable posture, deterministic JSON writing and CLI export.
+
+### Compatibility impact
+
+No Mission Data Contract semantic impact.
+
+This change does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics or scenario expectations.
+
+The new dashboard summary is an additive candidate post-v1 Core-owned structured surface. It does not change the v1.0.0 stable surface.
+
+The dashboard summary does not introduce coverage metrics, model completeness scoring, mission health scoring, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
 
 ---
 
