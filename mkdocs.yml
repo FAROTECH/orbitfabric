@@ -30,6 +30,7 @@ nav:
       - v1.0 Demo Evidence Chain: reference/v1-demo-evidence-chain.md
       - Golden Output and Regression Confidence Policy: reference/golden-output-regression-confidence.md
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
+      - Dashboard and Coverage Foundation: reference/dashboard-coverage-foundation.md
       - CLI Contract v1: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
