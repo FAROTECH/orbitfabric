@@ -11,6 +11,7 @@ from orbitfabric.export import (
     write_dashboard_summary,
     write_entity_index,
     write_model_summary,
+    write_scenario_run_index,
 )
 from orbitfabric.export.relationship_manifest import write_relationship_manifest
 from orbitfabric.gen.data_flow import generate_data_flow_markdown_doc
@@ -515,6 +516,47 @@ def export_dashboard_summary(
     typer.echo(f"\nMission: {model.spacecraft.id}")
     typer.echo(f"Model version: {model.spacecraft.model_version}")
     typer.echo("Status: candidate")
+    typer.echo("Coverage: not_available")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
+@export_app.command("scenario-run-index")
+def export_scenario_run_index(
+    simulation_reports_dir: Annotated[
+        Path,
+        typer.Option(
+            "--simulation-reports",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Directory containing simulation JSON reports to index.",
+        ),
+    ] = Path("generated/reports"),
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the candidate scenario run index to this JSON file.",
+        ),
+    ] = Path("generated/reports/scenario_run_index.json"),
+) -> None:
+    """Export a candidate Core-owned scenario run index."""
+    typer.echo(f"OrbitFabric Scenario Run Index Export {__version__}")
+
+    try:
+        written_file = write_scenario_run_index(simulation_reports_dir, json_output)
+    except ValueError as exc:
+        typer.echo(f"\nError: {exc}")
+        typer.echo("\nResult: FAILED")
+        raise typer.Exit(code=1) from exc
+
+    payload = json.loads(written_file.read_text(encoding="utf-8"))
+
+    typer.echo(f"\nSimulation reports directory: {simulation_reports_dir}")
+    typer.echo("Status: candidate")
+    typer.echo(f"Scenario runs indexed: {payload['summary']['total']}")
     typer.echo("Coverage: not_available")
     typer.echo(f"JSON report written to: {written_file}")
     typer.echo("\nResult: PASSED")

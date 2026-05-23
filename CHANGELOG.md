@@ -14,6 +14,10 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added `orbitfabric export dashboard-summary <mission_dir> --json <path>`.
 - Added the Dashboard Summary Surface reference page and MkDocs navigation entry.
 - Added tests for dashboard summary identity, boundaries, inventory, coverage-unavailable posture, deterministic JSON writing and CLI export.
+- Added the candidate `scenario_run_index.json` Core-owned structured surface.
+- Added `orbitfabric export scenario-run-index --simulation-reports <dir> --json <path>`.
+- Added the Scenario Run Index Surface reference page and MkDocs navigation entry.
+- Added tests for scenario run index identity, boundaries, filtering of non-simulation JSON reports, deterministic JSON writing and CLI export.
 
 ### Compatibility impact
 
@@ -21,9 +25,11 @@ No Mission Data Contract semantic impact.
 
 This change does not add, remove or rename Mission Model fields, model domains, controlled values, reference rules, lint diagnostics or scenario expectations.
 
-The new dashboard summary is an additive candidate post-v1 Core-owned structured surface. It does not change the v1.0.0 stable surface.
+The new dashboard summary and scenario run index are additive candidate post-v1 Core-owned structured surfaces. They do not change the v1.0.0 stable surface.
 
 The dashboard summary does not introduce coverage metrics, model completeness scoring, mission health scoring, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
+
+The scenario run index is derived from simulation JSON reports only. It does not parse plain-text logs and does not introduce coverage metrics, structured expectation accounting, runtime behavior, ground behavior, relationship graph behavior, plugin execution or Studio-specific APIs.
 
 ---
 
