@@ -33,6 +33,7 @@ nav:
       - Dashboard and Coverage Foundation: reference/dashboard-coverage-foundation.md
       - Dashboard Summary Surface: reference/dashboard-summary-surface.md
       - Scenario Run Index Surface: reference/scenario-run-index-surface.md
+      - Coverage Summary Surface: reference/coverage-summary-surface.md
       - CLI Contract v1: reference/cli-contract-v1.md
       - Generated Surfaces Stability: reference/generated-surfaces-stability.md
       - Extensibility Boundary Contract: reference/extensibility-boundary-contract.md
