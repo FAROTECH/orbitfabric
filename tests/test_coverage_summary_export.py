@@ -100,8 +100,8 @@ def test_coverage_summary_contains_entity_coverage(tmp_path: Path) -> None:
             "payload.stop_acquisition",
         ],
         "uncovered_ids": [
-            "obc.enter_safe_mode",
-            "radio.downlink_window_open",
+            "eps.get_status",
+            "radio.downlink_housekeeping",
         ],
     }
     assert payload["entity_coverage"]["events"] == {
