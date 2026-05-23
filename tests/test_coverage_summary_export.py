@@ -114,12 +114,12 @@ def test_coverage_summary_contains_entity_coverage(tmp_path: Path) -> None:
             "payload.acquisition_stopped",
         ],
         "uncovered_ids": [
-            "adcs.safe_attitude_requested",
             "eps.battery_critical",
             "eps.battery_low",
-            "obc.safe_mode_entered",
-            "payload.fault_detected",
-            "radio.downlink_started",
+            "eps.status_requested",
+            "obc.mode_changed",
+            "payload.command_timeout",
+            "radio.housekeeping_downlink_requested",
         ],
     }
     assert payload["entity_coverage"]["data_products"] == {
