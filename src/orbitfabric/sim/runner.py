@@ -14,6 +14,7 @@ from orbitfabric.sim.event_bus import EventBus
 from orbitfabric.sim.fault_monitor import FaultMonitor, FaultTrigger
 from orbitfabric.sim.mode_manager import ModeManager
 from orbitfabric.sim.state import (
+    ExpectationResult,
     SimDataFlowEvidenceRecord,
     SimulationResult,
     SimulationState,
@@ -259,11 +260,20 @@ class ScenarioRunner:
         if expected_status is None:
             return
 
-        if result.status != expected_status:
-            state.fail_expectation(
-                step.t,
-                f"expected command status {expected_status} but got {result.status}",
-            )
+        actual_status = result.status
+        message = (
+            f"expected command status {expected_status} but got {actual_status}"
+        )
+        self._record_expectation_result(
+            state=state,
+            t=step.t,
+            expectation_type="command_status",
+            target=step.command or "<unknown>",
+            expected=expected_status,
+            actual=actual_status,
+            passed=actual_status == expected_status,
+            failure_message=message,
+        )
 
     def _check_expectations(
         self,
@@ -274,23 +284,53 @@ class ScenarioRunner:
         mode_manager: ModeManager,
         command_router: CommandRouter,
     ) -> None:
-        if step.expect_event is not None and not event_bus.has_event(step.expect_event):
-            state.fail_expectation(step.t, f"missing event {step.expect_event}")
+        if step.expect_event is not None:
+            has_event = event_bus.has_event(step.expect_event)
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="event",
+                target=step.expect_event,
+                expected=True,
+                actual=has_event,
+                passed=has_event,
+                failure_message=f"missing event {step.expect_event}",
+            )
 
-        if step.expect_mode is not None and mode_manager.current_mode != step.expect_mode:
-            state.fail_expectation(
-                step.t,
-                f"expected mode {step.expect_mode} but got {mode_manager.current_mode}",
+        if step.expect_mode is not None:
+            actual_mode = mode_manager.current_mode
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="mode",
+                target="current_mode",
+                expected=step.expect_mode,
+                actual=actual_mode,
+                passed=actual_mode == step.expect_mode,
+                failure_message=(
+                    f"expected mode {step.expect_mode} but got {actual_mode}"
+                ),
             )
 
         if step.expect_command is not None:
             expected_dispatch = step.expect_command.dispatch
-            if not command_router.has_command(step.expect_command.id, expected_dispatch):
-                state.fail_expectation(
-                    step.t,
+            has_command = command_router.has_command(
+                step.expect_command.id,
+                expected_dispatch,
+            )
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="command",
+                target=step.expect_command.id,
+                expected={"dispatch": expected_dispatch, "present": True},
+                actual={"dispatch": expected_dispatch, "present": has_command},
+                passed=has_command,
+                failure_message=(
                     "missing command "
-                    f"{step.expect_command.id} with dispatch {expected_dispatch}",
-                )
+                    f"{step.expect_command.id} with dispatch {expected_dispatch}"
+                ),
+            )
 
         if step.expect_telemetry is not None:
             self._check_telemetry_expectations(step, telemetry, state)
@@ -311,13 +351,21 @@ class ScenarioRunner:
 
         for telemetry_id, expected_value in step.expect_telemetry.items():
             actual_value = telemetry.get(telemetry_id)
-            if actual_value != expected_value:
-                state.fail_expectation(
-                    step.t,
+            passed = actual_value == expected_value
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="telemetry",
+                target=telemetry_id,
+                expected=expected_value,
+                actual=actual_value,
+                passed=passed,
+                failure_message=(
                     f"expected telemetry {telemetry_id}={_format_value(expected_value)} "
-                    f"but got {_format_value(actual_value)}",
-                )
-            else:
+                    f"but got {_format_value(actual_value)}"
+                ),
+            )
+            if passed:
                 state.log(
                     step.t,
                     f"TELEMETRY {telemetry_id}={_format_value(actual_value)}",
@@ -339,17 +387,34 @@ class ScenarioRunner:
         expected_state = expected_lifecycle.get("state")
 
         if not isinstance(payload_id, str) or not isinstance(expected_state, str):
-            state.fail_expectation(step.t, "invalid payload lifecycle expectation")
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="payload_lifecycle",
+                target="<invalid>",
+                expected=expected_lifecycle,
+                actual=None,
+                passed=False,
+                failure_message="invalid payload lifecycle expectation",
+            )
             return
 
         actual_state = state.payload_lifecycle.get(payload_id)
-        if actual_state != expected_state:
-            state.fail_expectation(
-                step.t,
+        passed = actual_state == expected_state
+        self._record_expectation_result(
+            state=state,
+            t=step.t,
+            expectation_type="payload_lifecycle",
+            target=payload_id,
+            expected=expected_state,
+            actual=actual_state,
+            passed=passed,
+            failure_message=(
                 f"expected payload {payload_id} lifecycle {expected_state} "
-                f"but got {actual_state}",
-            )
-        else:
+                f"but got {actual_state}"
+            ),
+        )
+        if passed:
             state.log(step.t, f"PAYLOAD {payload_id} LIFECYCLE={actual_state}")
 
     def _check_data_flow_expectation(
@@ -366,21 +431,46 @@ class ScenarioRunner:
 
         data_product_id = expected_data_flow.get("data_product")
         if not isinstance(data_product_id, str):
-            state.fail_expectation(step.t, "invalid data flow expectation")
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="data_flow",
+                target="<invalid>",
+                expected=expected_data_flow,
+                actual=None,
+                passed=False,
+                failure_message="invalid data flow expectation",
+            )
             return
 
         evidence = _find_data_flow_evidence(state, data_product_id)
         if evidence is None:
-            state.fail_expectation(
-                step.t,
-                f"missing data flow evidence for {data_product_id}",
+            self._record_expectation_result(
+                state=state,
+                t=step.t,
+                expectation_type="data_flow",
+                target=data_product_id,
+                expected=expected_data_flow,
+                actual=None,
+                passed=False,
+                failure_message=f"missing data flow evidence for {data_product_id}",
             )
             return
 
+        actual = _data_flow_evidence_expectation_view(evidence)
         mismatches = _data_flow_expectation_mismatches(expected_data_flow, evidence)
-        if mismatches:
-            state.fail_expectation(step.t, "; ".join(mismatches))
-        else:
+        passed = not mismatches
+        self._record_expectation_result(
+            state=state,
+            t=step.t,
+            expectation_type="data_flow",
+            target=data_product_id,
+            expected=expected_data_flow,
+            actual=actual,
+            passed=passed,
+            failure_message="; ".join(mismatches),
+        )
+        if passed:
             state.log(step.t, f"DATA_FLOW {data_product_id} EXPECTATION_MET")
 
     def _check_scenario_status_expectation(
@@ -396,11 +486,43 @@ class ScenarioRunner:
             return
 
         actual_status = "PASSED" if state.passed else "FAILED"
-        if actual_status != expected_status:
-            state.fail_expectation(
-                step.t,
-                f"expected scenario status {expected_status} but got {actual_status}",
-            )
+        self._record_expectation_result(
+            state=state,
+            t=step.t,
+            expectation_type="scenario_status",
+            target="scenario",
+            expected=expected_status,
+            actual=actual_status,
+            passed=actual_status == expected_status,
+            failure_message=(
+                f"expected scenario status {expected_status} but got {actual_status}"
+            ),
+        )
+
+    def _record_expectation_result(
+        self,
+        state: SimulationState,
+        t: float,
+        expectation_type: str,
+        target: str,
+        expected: Any,
+        actual: Any,
+        passed: bool,
+        failure_message: str,
+    ) -> None:
+        result: ExpectationResult = "passed" if passed else "failed"
+        message = "expectation passed" if passed else failure_message
+        state.record_expectation(
+            t=t,
+            expectation_type=expectation_type,
+            target=target,
+            expected=expected,
+            actual=actual,
+            result=result,
+            message=message,
+        )
+        if not passed:
+            state.fail_expectation(t, failure_message)
 
 
 def _build_data_flow_evidence(
@@ -482,6 +604,19 @@ def _find_data_flow_evidence(
             return evidence
 
     return None
+
+
+def _data_flow_evidence_expectation_view(
+    evidence: SimDataFlowEvidenceRecord,
+) -> dict[str, Any]:
+    return {
+        "data_product": evidence.data_product_id,
+        "triggered_by_command": evidence.command_id,
+        "storage_intent_declared": evidence.storage_intent.get("declared"),
+        "downlink_intent_declared": evidence.downlink_intent.get("declared"),
+        "eligible_downlink_flows": evidence.eligible_downlink_flows,
+        "contact_windows": evidence.contact_windows,
+    }
 
 
 def _data_flow_expectation_mismatches(
