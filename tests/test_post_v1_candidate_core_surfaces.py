@@ -8,13 +8,17 @@ from orbitfabric.export.coverage_summary import coverage_summary_to_dict
 from orbitfabric.export.dashboard_summary import dashboard_summary_to_dict
 from orbitfabric.export.entity_index import write_entity_index
 from orbitfabric.export.relationship_manifest import write_relationship_manifest
-from orbitfabric.export.scenario_run_index import scenario_run_index_to_dict
-from orbitfabric.export.scenario_run_index import write_scenario_run_index
+from orbitfabric.export.scenario_run_index import (
+    scenario_run_index_to_dict,
+    write_scenario_run_index,
+)
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.model.loader import MissionModelLoader
 from orbitfabric.model.scenario_loader import ScenarioLoader
-from orbitfabric.sim.json_report import simulation_result_to_dict
-from orbitfabric.sim.json_report import write_simulation_report_json
+from orbitfabric.sim.json_report import (
+    simulation_result_to_dict,
+    write_simulation_report_json,
+)
 from orbitfabric.sim.runner import ScenarioRunner
 
 DEMO_MISSION = Path("examples/demo-3u/mission")
@@ -276,12 +280,25 @@ def test_coverage_summary_candidate_contract_signature(tmp_path: Path) -> None:
         "coverage_ratio",
         "covered_relationship_ids",
         "uncovered_relationship_ids",
+        "by_type",
     }
     assert relationships["supported_relationship_types"] == [
         "data_product_produced_by_payload",
         "data_product_produced_by_subsystem",
         "downlink_flow_includes_data_product",
     ]
+    assert set(relationships["by_type"]) == set(
+        relationships["supported_relationship_types"]
+    )
+    for relationship_type_signature in relationships["by_type"].values():
+        assert set(relationship_type_signature) == {
+            "total",
+            "covered",
+            "uncovered",
+            "coverage_ratio",
+            "covered_relationship_ids",
+            "uncovered_relationship_ids",
+        }
     assert "unsupported" in payload
     assert set(payload["unsupported"]) == {
         "entity_domains",
