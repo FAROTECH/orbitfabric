@@ -296,8 +296,8 @@ def test_coverage_summary_candidate_contract_signature(tmp_path: Path) -> None:
             "covered",
             "uncovered",
             "coverage_ratio",
-            "covered_relationship_ids",
-            "uncovered_relationship_ids",
+            "covered_ids",
+            "uncovered_ids",
         }
     assert "unsupported" in payload
     assert set(payload["unsupported"]) == {
