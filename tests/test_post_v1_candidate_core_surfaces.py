@@ -303,6 +303,7 @@ def test_coverage_summary_candidate_contract_signature(tmp_path: Path) -> None:
     assert set(payload["unsupported"]) == {
         "entity_domains",
         "relationship_types",
+        "reason",
     }
 
 
