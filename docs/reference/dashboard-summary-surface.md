@@ -1,12 +1,14 @@
 # Dashboard Summary Surface
 
-Status: Candidate post-v1 Core-owned structured surface  
+Status: Candidate post-v1 Core-owned structured surface consolidated in v1.1.0  
 Scope: dashboard foundation summary  
-Applies to: OrbitFabric Core after `v1.0.0 - Stable Mission Data Contract`
+Applies to: OrbitFabric Core `v1.1.0 - Candidate Integration Surface Consolidation` and later, until any future promotion decision
 
 The Dashboard Summary Surface is a Core-owned read-only JSON report that aggregates existing Core-owned facts into a dashboard foundation.
 
 It does not introduce coverage metrics.
+
+Coverage metrics live in the separate `coverage_summary.json` candidate surface.
 
 It does not introduce a mission health score.
 
@@ -18,7 +20,7 @@ It does not introduce runtime behavior, ground behavior, plugin execution, graph
 
 ```bash
 orbitfabric export dashboard-summary examples/demo-3u/mission/ \
-  --json generated/reports/dashboard_summary.json
+  --json examples/demo-3u/generated/reports/dashboard_summary.json
 ```
 
 If `--json` is omitted, the default output path is mission-workspace relative.
@@ -186,7 +188,7 @@ A declared relationship is not automatically exercised by scenario evidence.
 
 ## Coverage section
 
-The first dashboard summary version explicitly marks coverage as unavailable.
+The dashboard summary explicitly marks coverage as unavailable inside this report.
 
 Shape:
 
@@ -202,9 +204,9 @@ Shape:
 
 This is intentional.
 
-Coverage must be introduced later through a dedicated Core-owned surface.
+Coverage is defined separately by the dedicated Core-owned candidate surface `coverage_summary.json`.
 
-Downstream tools should render this status as `Unavailable`, `Requires Core output` or equivalent.
+Downstream tools should render this status as `Unavailable`, `Requires Core output` or equivalent when only `dashboard_summary.json` is available.
 
 They must not compute coverage from raw YAML, logs, generated Markdown, terminal output or UI state.
 
@@ -212,7 +214,7 @@ They must not compute coverage from raw YAML, logs, generated Markdown, terminal
 
 ## Compatibility posture
 
-`dashboard_summary.json` is introduced as a candidate post-v1 Core-owned structured surface.
+`dashboard_summary.json` is introduced as a candidate post-v1 Core-owned structured surface and consolidated in v1.1.0.
 
 It is not part of the original v1.0.0 stable surface.
 
@@ -250,5 +252,5 @@ It is deliberately narrow:
 ```text
 aggregate existing Core facts
 expose explicit boundaries
-mark coverage unavailable until Core defines coverage
+point to coverage_summary.json when coverage is required
 ```

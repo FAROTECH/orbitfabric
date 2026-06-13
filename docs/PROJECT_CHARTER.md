@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 1.0.0  
-Status: Stable Mission Data Contract released  
-Scope: Mission Data Contract foundation, Core-owned structured surfaces, extensibility boundary and v1.0 stable surface
+Version: 1.1.0  
+Status: Current public release with v1.0.0 Stable Mission Data Contract baseline preserved  
+Scope: Mission Data Contract foundation, Core-owned stable surfaces, post-v1 candidate integration surfaces, extensibility boundary and compatibility governance
 
 ---
 
@@ -27,12 +27,21 @@ The guiding principle is:
 OrbitFabric is currently released at:
 
 ```text
-v1.0.0 - Stable Mission Data Contract
+v1.1.0 - Candidate Integration Surface Consolidation
 ```
 
-v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
+v1.1.0 consolidates a narrow set of post-v1 Core-owned candidate integration surfaces while preserving the deliberately narrow `v1.0.0 - Stable Mission Data Contract` baseline.
 
-The stable surface is intentionally limited.
+The stable v1.0.0 surface is intentionally limited.
+
+The current release distinction is:
+
+```text
+v1.1.0 -> current public project release
+v1.0.0 -> stable Mission Data Contract baseline
+```
+
+The post-v1 candidate surfaces are Core-owned read-only structured outputs, but they have not been promoted to the original v1.0.0 stable compatibility class.
 
 ---
 
@@ -63,7 +72,8 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 - Core-owned structured surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
-- v1.0 stable Mission Data Contract governance references.
+- v1.0 stable Mission Data Contract governance references;
+- post-v1 candidate Core-owned integration surface references.
 
 The Mission Data Contract is the single source of truth for all derived artifacts.
 
@@ -163,13 +173,24 @@ Downstream tools and future extensions must consume Core-owned structured surfac
 
 They must not reconstruct Mission Data Contract semantics from raw YAML, generated files, terminal output, logs, UI state or private assumptions.
 
-The current stable Core-owned structured surfaces are:
+The stable v1.0.0 Core-owned structured surfaces are:
 
 ```text
 model_summary.json
 entity_index.json
 relationship_manifest.json
 ```
+
+The post-v1 candidate Core-owned integration surfaces consolidated in v1.1.0 are:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+The candidate surfaces are Core-owned, but they are not part of the original v1.0.0 stable surface.
 
 ### 7.4 Generated Artifacts Are Disposable Unless Classified Otherwise
 
@@ -238,7 +259,28 @@ Studio-specific API
 
 ---
 
-## 9. Non-Goals
+## 9. v1.1 Candidate Integration Surfaces
+
+v1.1.0 consolidates post-v1 Core-owned candidate integration surfaces.
+
+These surfaces are:
+
+```text
+dashboard_summary.json      -> dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> simulation JSON report run index
+coverage_summary.json       -> limited coverage derived from Core structured outputs
+simulation JSON expectations -> additive structured expectation accounting
+```
+
+They are candidate surfaces, not stable v1.0.0 surfaces.
+
+They are designed for downstream inspection tools to consume Core-defined facts without inventing private coverage, health, completeness or dashboard semantics.
+
+They do not make OrbitFabric Core a dashboard backend, ground segment, Studio API, OpenOBSW/OpenSVF-specific generator, graph engine or plugin system.
+
+---
+
+## 10. Non-Goals
 
 OrbitFabric must not become:
 
@@ -269,7 +311,7 @@ They are not part of the current Core charter.
 
 ---
 
-## 10. Golden Signature Boundary
+## 11. Golden Signature Boundary
 
 The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
 
@@ -300,7 +342,7 @@ disposable artifact formatting
 
 ---
 
-## 11. Demo Evidence Chain
+## 12. Demo Evidence Chain
 
 The selected v1.0 demo evidence chain is:
 
@@ -327,7 +369,7 @@ It does not demonstrate flight readiness, ground readiness, protocol compliance,
 
 ---
 
-## 12. Final Charter Statement
+## 13. Final Charter Statement
 
 OrbitFabric must remain excellent at one thing:
 

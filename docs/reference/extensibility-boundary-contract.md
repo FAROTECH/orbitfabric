@@ -1,14 +1,14 @@
 # Extensibility Boundary Contract
 
-Status: Active v1.0 governance contract  
+Status: Active governance contract with v1.1 candidate surface alignment  
 Scope: extensibility boundary classification, no execution  
 Applies to: future extension metadata, extension-owned outputs and downstream consumers from `v1.0.0 - Stable Mission Data Contract` onward
 
 This page documents the OrbitFabric extensibility boundary.
 
-It is a stable v1.0 governance surface.
+It is a stable v1.0 governance surface, aligned with the candidate Core-owned integration surfaces consolidated in v1.1.0.
 
-It does not introduce plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, new Mission Model semantics, new YAML fields, new generated Core surfaces, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior or Studio-specific APIs.
+It does not introduce plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, new Mission Model semantics, new YAML fields, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior or Studio-specific APIs.
 
 ---
 
@@ -37,9 +37,9 @@ extensibility is descriptive before it is executable
 
 ---
 
-## 2. Current Core-owned surface chain
+## 2. Stable v1.0.0 Core-owned surface chain
 
-OrbitFabric Core exposes these Core-owned structured surfaces:
+OrbitFabric Core exposes these stable v1.0.0 Core-owned structured surfaces:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -67,7 +67,26 @@ Downstream tools and future extensions must consume Core-owned surfaces instead 
 
 ---
 
-## 3. Core-owned semantics
+## 3. Candidate v1.1.0 Core-owned integration surfaces
+
+OrbitFabric Core also exposes these candidate Core-owned integration surfaces consolidated in v1.1.0:
+
+```text
+dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> Index of Core simulation JSON report runs
+coverage_summary.json       -> Limited coverage derived from Core structured outputs
+simulation JSON expectations -> Additive structured expectation accounting
+```
+
+These surfaces are Core-owned, read-only and intended for downstream inspection.
+
+They are not part of the original v1.0.0 stable compatibility class.
+
+They do not make OrbitFabric Core a dashboard backend, Studio API, OpenOBSW/OpenSVF-specific generator, graph engine, runtime framework, ground segment or plugin system.
+
+---
+
+## 4. Core-owned semantics
 
 The following remain Core-owned:
 
@@ -77,22 +96,26 @@ structural validation
 semantic linting
 scenario validation
 scenario evidence semantics
+structured expectation accounting semantics
 runtime-facing contract binding semantics
 ground-facing artifact semantics
 model_summary.json semantics
 entity_index.json semantics
 relationship_manifest.json semantics
+dashboard_summary.json semantics
+scenario_run_index.json semantics
+coverage_summary.json semantics
 stability and compatibility classification
 release compatibility policy
 ```
 
 A future extension must not override, replace, mutate or privately reinterpret these semantics.
 
-A future extension may consume Core-owned outputs only after the Core has produced them from the validated Mission Model.
+A future extension may consume Core-owned outputs only after the Core has produced them from the validated Mission Model or from Core-generated structured reports.
 
 ---
 
-## 4. Extension-owned outputs
+## 5. Extension-owned outputs
 
 Future extension-owned outputs must be distinguishable from Core-owned outputs.
 
@@ -117,7 +140,7 @@ An extension-owned output must not be presented as a Core output unless it is ge
 
 ---
 
-## 5. Provenance expectations
+## 6. Provenance expectations
 
 Future extension metadata or extension-generated outputs should declare provenance clearly.
 
@@ -139,64 +162,6 @@ These are descriptive expectations for future work.
 This document does not define a metadata schema.
 
 It does not define field names, JSON structure, validation rules, a file path, parser, loader, registry or CLI command.
-
----
-
-## 6. Non-normative future metadata guidance
-
-Future extension metadata, if introduced by a later milestone, should remain descriptive, inspectable and non-authoritative with respect to Core semantics.
-
-This section is intentionally non-normative.
-
-It is guidance for future design work, not a schema commitment.
-
-A future metadata declaration may need to answer these engineering questions:
-
-```text
-Who produced this extension-owned artifact?
-Which OrbitFabric Core version or surface version was it designed around?
-Which Core-owned surfaces were consumed as input?
-What kind of artifact was produced?
-Who owns the meaning of the produced artifact?
-Is the result descriptive, diagnostic or generated?
-Is the result safe for downstream inspection?
-Does the result claim any authority over Core semantics?
-```
-
-The expected answer to the last question must be:
-
-```text
-No.
-```
-
-Future metadata should classify intent rather than enable execution.
-
-Useful descriptive dimensions may include:
-
-```text
-identity
-compatibility
-input surfaces
-output ownership
-artifact intent
-diagnostic scope
-downstream inspection safety
-non-authority over Core semantics
-```
-
-These dimensions are not field names.
-
-They are not a JSON shape.
-
-They are not a metadata manifest format.
-
-They are not a validation contract.
-
-They are not a plugin API.
-
-They are only design constraints for future reviewed work.
-
-A future PR that turns any of these dimensions into a concrete file format, schema, CLI command, loader or execution behavior must be treated as a separate architectural step.
 
 ---
 
@@ -247,7 +212,7 @@ They do not imply a plugin runtime.
 
 ## 9. Disallowed capabilities
 
-The v1.0 extensibility boundary does not introduce:
+The extensibility boundary does not introduce:
 
 ```text
 plugin discovery
@@ -322,21 +287,7 @@ An extension must not promote its own output to Core-owned status.
 
 ---
 
-## 12. Relationship to ADR-0015
-
-ADR-0015 records the original architectural decision for the extensibility boundary.
-
-This reference page makes that decision easier to consume from the public documentation.
-
-ADR-0015 is the decision record.
-
-This page is the reference contract.
-
-If the two diverge, the project must resolve the discrepancy explicitly.
-
----
-
-## 13. Compatibility-sensitive changes
+## 12. Compatibility-sensitive changes
 
 The following changes are compatibility-sensitive after v1.0.0:
 
@@ -357,9 +308,13 @@ It means the change must be explicit, reviewed and documented.
 
 ---
 
-## 14. Final statement
+## 13. Final statement
 
-The v1.0 extensibility boundary stabilizes these rules:
+v1.1.0 is the current project release.
+
+v1.0.0 remains the stable Mission Data Contract baseline.
+
+The extensibility boundary stabilizes these rules:
 
 ```text
 Core remains semantic owner.
@@ -370,4 +325,4 @@ Semantic override remains forbidden.
 Execution remains outside the stable v1.0 Core boundary unless separately designed and accepted.
 ```
 
-v1.0.0 stabilizes the Mission Data Contract without turning OrbitFabric into a plugin execution platform.
+v1.1.0 aligns the boundary with candidate Core-owned integration surfaces without turning OrbitFabric into a plugin execution platform.

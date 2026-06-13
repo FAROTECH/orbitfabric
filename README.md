@@ -145,11 +145,12 @@ It models:
 - Core-owned contract introspection surfaces;
 - Core-owned entity index surfaces;
 - Core-owned relationship manifest surfaces;
+- Core-owned post-v1 candidate integration surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
 - v1.0 stable Mission Data Contract governance references.
 
-The structured surface chain is:
+The stable structured surface chain is:
 
 ```text
 Mission Model
@@ -160,6 +161,8 @@ Mission Model
         -> relationship_manifest.json
         -> downstream tools and future extensions consume Core-owned structured surfaces
 ```
+
+The v1.1.0 candidate integration surface chain extends downstream inspection evidence without changing the stable Mission Data Contract baseline.
 
 ---
 
@@ -194,7 +197,7 @@ Generated Runtime Skeletons are runtime-facing contract bindings.
 
 Ground Integration Artifacts are ground-facing contract exports.
 
-Contract Introspection, Entity Index and Relationship Manifest surfaces are Core-derived read-only structured surfaces.
+Contract Introspection, Entity Index, Relationship Manifest and post-v1 candidate integration surfaces are Core-derived read-only structured surfaces.
 
 Stability, compatibility, extensibility and v1.0 references are governance and documentation surfaces.
 
@@ -247,6 +250,8 @@ payload.start_acquisition
         -> golden signatures protecting selected Core-owned surface fields
 ```
 
+The v1.1.0 candidate integration surfaces add dashboard-ready aggregation, scenario run indexing, limited coverage summary and structured expectation accounting on top of that evidence chain.
+
 ---
 
 ## Local Development
@@ -270,7 +275,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 1.0.0
+orbitfabric 1.1.0
 ```
 
 Run checks:
@@ -293,44 +298,44 @@ For `examples/demo-3u/mission/`, omitted report outputs resolve under:
 examples/demo-3u/generated/reports/
 ```
 
-Pass `--json`, `--output-dir` or `--output-file` explicitly when a different destination is required.
+Pass `--json`, `--output-dir` or `--output-file` explicitly when a different destination is required. Explicit paths are preserved exactly as provided.
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+  --json examples/demo-3u/generated/reports/lint_report.json
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json generated/reports/model_summary.json
+  --json examples/demo-3u/generated/reports/model_summary.json
 
 orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json generated/reports/entity_index.json
+  --json examples/demo-3u/generated/reports/entity_index.json
 
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
-  --json generated/reports/relationship_manifest.json
+  --json examples/demo-3u/generated/reports/relationship_manifest.json
 
 orbitfabric export dashboard-summary examples/demo-3u/mission/
 
 orbitfabric export scenario-run-index \
-  --simulation-reports generated/reports \
-  --json generated/reports/scenario_run_index.json
+  --simulation-reports examples/demo-3u/generated/reports \
+  --json examples/demo-3u/generated/reports/scenario_run_index.json
 
 orbitfabric export coverage-summary examples/demo-3u/mission/
 
 orbitfabric gen docs examples/demo-3u/mission/
 
 orbitfabric gen runtime examples/demo-3u/mission/
-cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
-cmake --build generated/runtime/cpp17/build
+cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
+cmake --build examples/demo-3u/generated/runtime/cpp17/build
 
 orbitfabric gen ground examples/demo-3u/mission/
 
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+  --json examples/demo-3u/generated/reports/battery_low_during_payload_report.json \
+  --log examples/demo-3u/generated/logs/battery_low_during_payload.log
 
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
-  --json generated/reports/payload_data_flow_evidence_report.json \
-  --log generated/logs/payload_data_flow_evidence.log
+  --json examples/demo-3u/generated/reports/payload_data_flow_evidence_report.json \
+  --log examples/demo-3u/generated/logs/payload_data_flow_evidence.log
 ```
 
 Expected command result for the demo mission:
@@ -389,6 +394,7 @@ Useful entry points:
 - `docs/reference/dashboard-summary-surface.md`
 - `docs/reference/scenario-run-index-surface.md`
 - `docs/reference/coverage-summary-surface.md`
+- `docs/releases/v1.1.0.md`
 - `docs/releases/v1.0.0.md`
 
 Build the documentation site locally:
