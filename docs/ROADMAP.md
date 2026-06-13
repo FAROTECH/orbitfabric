@@ -1,8 +1,8 @@
 # OrbitFabric - Roadmap
 
 Version: v1.0.0  
-Status: Stable Mission Data Contract released  
-Scope: completed path to v1.0.0 and post-v1.0 direction
+Status: Stable Mission Data Contract released; post-v1 candidate surface consolidation in progress  
+Scope: completed path to v1.0.0, post-v1 candidate Core-owned integration surfaces and v1.1.0 consolidation direction
 
 ---
 
@@ -52,10 +52,11 @@ v0.10.1 Documentation and Published Site Consistency             completed
 v0.11.0 Extensibility Boundary Contract, no execution            completed
 v0.12.0 v1.0 Release Candidate Hardening                         completed
 v1.0.0  Stable Mission Data Contract                             completed
-post-v1  Narrow evolution of Core and downstream integrations     future
+post-v1  Candidate Core-owned integration surfaces                in progress
+v1.1.0   Candidate surface consolidation release                  planned
 ```
 
-The current completed milestone is:
+The current stable completed milestone is:
 
 ```text
 v1.0.0 - Stable Mission Data Contract
@@ -138,7 +139,70 @@ Studio-specific API
 
 ---
 
-## 5. Post-v1.0 Direction
+## 5. Post-v1 Candidate Core-owned Integration Surfaces
+
+After v1.0.0, OrbitFabric Core introduced a narrow set of candidate Core-owned integration surfaces:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+These surfaces are intended to support downstream inspection without moving Mission Data Contract semantics into downstream tools.
+
+The ownership rule is:
+
+```text
+Core defines, computes and emits.
+Studio and other downstream tools consume, navigate and render.
+Downstream tools must not invent private coverage, health or completeness semantics.
+```
+
+These surfaces remain candidate until a later compatibility decision promotes selected fields or surfaces.
+
+They do not change the v1.0.0 stable Mission Data Contract.
+
+They do not introduce:
+
+```text
+new Mission Model semantics
+new YAML fields
+runtime behavior
+ground behavior
+mission health scoring
+model completeness scoring
+formal verification
+relationship graph behavior
+dependency graph behavior
+plugin execution
+Studio-specific APIs
+OpenOBSW/OpenSVF-specific generation
+Projection Profiles implementation
+OSRA/SAVOIR implementation
+```
+
+---
+
+## 6. v1.1.0 Consolidation Direction
+
+OrbitFabric Core v1.1.0 should be a consolidation release, not a conceptual expansion release.
+
+The v1.1.0 preparation scope is:
+
+```text
+document candidate Core-owned integration surfaces
+clarify stable vs candidate boundaries
+keep generated artifact defaults mission-workspace relative
+preserve explicit user-provided output paths
+add release notes and checklist in a later release-metadata PR
+avoid Projection Profiles implementation until a separate RFC/design decision
+```
+
+---
+
+## 7. Post-v1.0 Direction
 
 Post-v1.0 work must preserve the same discipline:
 
@@ -168,7 +232,7 @@ plugin discovery/loading/execution, only after a separate architectural decision
 
 ---
 
-## 6. Backlog Parking Lot
+## 8. Backlog Parking Lot
 
 These ideas are valid but are not part of the v1.0.0 stable release boundary:
 
@@ -216,7 +280,7 @@ plugin execution
 
 ---
 
-## 7. Final Roadmap Statement
+## 9. Final Roadmap Statement
 
 OrbitFabric v1.0.0 stabilizes OrbitFabric Core as a Mission Data Contract framework.
 

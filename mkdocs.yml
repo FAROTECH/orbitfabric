@@ -31,6 +31,7 @@ nav:
       - Golden Output and Regression Confidence Policy: reference/golden-output-regression-confidence.md
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
       - Dashboard and Coverage Foundation: reference/dashboard-coverage-foundation.md
+      - Post-v1 Candidate Integration Surfaces: reference/post-v1-candidate-integration-surfaces.md
       - Dashboard Summary Surface: reference/dashboard-summary-surface.md
       - Scenario Run Index Surface: reference/scenario-run-index-surface.md
       - Coverage Summary Surface: reference/coverage-summary-surface.md

@@ -55,6 +55,40 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
+The current post-v1 candidate Core-owned integration surfaces are:
+
+```text
+dashboard_summary.json      -> dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> simulation JSON run index
+coverage_summary.json       -> limited coverage from Core structured outputs
+simulation JSON expectations -> additive structured expectation accounting
+```
+
+These surfaces are candidate post-v1 outputs.
+
+They are Core-owned and read-only, but they are not part of the original v1.0.0 stable surface.
+
+They exist so downstream tools can inspect Core evidence without becoming a second source of Mission Data Contract semantics.
+
+The boundary is:
+
+```text
+Core owns Mission Data Contract semantics.
+Core emits structured surfaces.
+Downstream tools consume and render them.
+Downstream tools do not invent coverage, health or completeness semantics.
+```
+
+Generated artifact defaults for mission-based commands are mission-workspace relative.
+
+For `examples/demo-3u/mission/`, omitted generated outputs are written under:
+
+```text
+examples/demo-3u/generated/
+```
+
+Explicit output paths remain explicit and are not rewritten.
+
 The stable v1.0 posture is:
 
 ```text

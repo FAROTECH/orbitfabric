@@ -1,14 +1,14 @@
 # Dashboard and Coverage Foundation
 
-Status: Proposed post-v1 Core boundary  
-Scope: dashboard and coverage enablement for downstream tools  
+Status: Implemented post-v1 candidate Core boundary  
+Scope: dashboard and coverage enablement through candidate Core-owned structured surfaces  
 Applies to: OrbitFabric Core after `v1.0.0 - Stable Mission Data Contract`
 
-This page defines the boundary for future dashboard and coverage work in OrbitFabric Core.
+This page defines the implemented boundary for dashboard and coverage work in OrbitFabric Core after v1.0.0.
 
-It is a documentation boundary only.
+It began as a proposed boundary and now describes the candidate Core-owned surfaces that implement that boundary.
 
-It does not introduce new Mission Model semantics, new YAML fields, new CLI commands, new JSON report fields, new generated surfaces, runtime behavior, ground behavior, plugin execution, graph behavior, mission control behavior or Studio-specific APIs.
+It does not promote those surfaces to the original v1.0.0 stable surface and does not introduce new Mission Model semantics, new YAML fields, runtime behavior, ground behavior, plugin execution, graph behavior, mission control behavior or Studio-specific APIs.
 
 ---
 
@@ -98,9 +98,9 @@ Coverage must be derived from Core-owned structured outputs, for example:
 entity_index.json
 relationship_manifest.json
 simulation JSON reports
-future scenario_run_index.json
-future structured expectation accounting
-future coverage_summary.json
+scenario_run_index.json
+structured expectation accounting
+coverage_summary.json
 ```
 
 Coverage must not be derived from:
@@ -116,7 +116,7 @@ raw YAML parsing in downstream tools
 naming heuristics in downstream tools
 ```
 
-Until Core emits a coverage summary, downstream tools must show coverage as unavailable or requiring Core output.
+When Core does not emit a specific coverage value, downstream tools must show that value as unavailable or requiring Core output.
 
 ---
 
@@ -149,17 +149,17 @@ No downstream tool should invent such a score.
 
 ---
 
-## 6. Required Core sequence
+## 6. Implemented Core sequence
 
-The preferred post-v1 sequence is:
+The post-v1 sequence is now:
 
 ```text
-1. document dashboard and coverage boundaries
-2. add a Core-owned dashboard_summary.json report
-3. add a Core-owned scenario_run_index.json report
-4. add structured scenario expectation accounting
-5. add a Core-owned coverage_summary.json report
-6. protect selected mature fields with golden signatures
+1. documented dashboard and coverage boundaries
+2. added a Core-owned dashboard_summary.json report
+3. added a Core-owned scenario_run_index.json report
+4. added structured scenario expectation accounting
+5. added a Core-owned coverage_summary.json report
+6. added selected regression confidence for candidate contract-significant fields
 ```
 
 The sequence is intentionally staged.
@@ -172,7 +172,7 @@ Coverage must come after Core can index scenario runs and account for expectatio
 
 ## 7. dashboard_summary.json boundary
 
-A future `dashboard_summary.json` report should aggregate existing Core facts without introducing coverage semantics.
+`dashboard_summary.json` aggregates existing Core facts without introducing coverage semantics.
 
 Candidate identity:
 
@@ -213,7 +213,7 @@ This prevents downstream tools from inventing coverage while still allowing a re
 
 ## 8. scenario_run_index.json boundary
 
-A future `scenario_run_index.json` report should aggregate simulation JSON reports produced by Core.
+`scenario_run_index.json` aggregates simulation JSON reports produced by Core.
 
 Candidate identity:
 
@@ -246,11 +246,11 @@ This report would support recent-run dashboards and prepare coverage derivation.
 
 ## 9. Structured expectation accounting boundary
 
-Current simulation JSON reports expose failed expectations, but they do not expose a complete structured list of evaluated expectations.
+Current simulation JSON reports expose additive structured expectation accounting while preserving the legacy `failed_expectations` compatibility list.
 
-Future expectation accounting should be additive.
+Expectation accounting is additive.
 
-It should preserve existing `failed_expectations` compatibility and add a structured section for evaluated expectations.
+It preserves existing `failed_expectations` compatibility and adds a structured section for evaluated expectations.
 
 Candidate content may include:
 
@@ -270,7 +270,7 @@ This is required before Core can provide defensible expectation coverage.
 
 ## 10. coverage_summary.json boundary
 
-A future `coverage_summary.json` report should be the first Core-owned coverage surface.
+`coverage_summary.json` is the first Core-owned coverage surface.
 
 Candidate identity:
 

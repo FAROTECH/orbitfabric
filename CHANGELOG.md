@@ -8,6 +8,17 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
+### Changed
+
+- Consolidated post-v1 candidate integration surface documentation across README, documentation home, roadmap and reference pages.
+- Added a dedicated post-v1 candidate integration surfaces index page to keep stable, candidate, Core-owned and downstream-owned boundaries explicit.
+- Reclassified the Dashboard and Coverage Foundation reference from a proposed future boundary to the implemented post-v1 candidate surface boundary.
+
+### Fixed
+
+- Fixed generated artifact default paths for mission-based CLI commands so omitted output paths resolve under the mission workspace instead of the current working directory.
+- Documented that explicit user-provided output paths are preserved unchanged.
+
 ### Added
 
 - Added the candidate `dashboard_summary.json` Core-owned structured surface.

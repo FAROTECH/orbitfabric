@@ -21,11 +21,17 @@ orbitfabric export dashboard-summary examples/demo-3u/mission/ \
   --json generated/reports/dashboard_summary.json
 ```
 
-Default output path:
+If `--json` is omitted, the default output path is mission-workspace relative.
+
+For `examples/demo-3u/mission/`, the default output path is:
 
 ```text
-generated/reports/dashboard_summary.json
+examples/demo-3u/generated/reports/dashboard_summary.json
 ```
+
+An explicit `--json` path is preserved unchanged.
+
+`dashboard-summary` is mission-based and therefore follows the workspace-relative generated artifact default rule.
 
 ---
 

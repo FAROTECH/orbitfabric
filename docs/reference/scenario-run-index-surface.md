@@ -10,7 +10,7 @@ It does not read plain-text logs.
 
 It does not introduce coverage metrics.
 
-It does not introduce structured expectation accounting.
+It does not compute structured expectation accounting; it preserves simulation summary values already emitted by simulation JSON reports.
 
 It does not introduce runtime behavior, ground behavior, graph behavior, plugin execution or Studio-specific APIs.
 
@@ -169,6 +169,8 @@ events
 commands
 mode_transitions
 data_flow_evidence
+expectations
+passed_expectations
 failed_expectations
 ```
 
@@ -244,7 +246,7 @@ The scenario run index does not provide:
 coverage metrics
 model completeness score
 mission health score
-structured expectation accounting
+new structured expectation accounting
 runtime facts
 live telemetry
 command uplink
