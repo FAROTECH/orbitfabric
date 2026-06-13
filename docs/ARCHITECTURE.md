@@ -1,8 +1,8 @@
 # OrbitFabric - Architecture
 
-Version: 1.0.0  
-Status: Stable Mission Data Contract released  
-Scope: Mission Data Contract architecture, Core-owned structured surfaces and v1.0 stable surface
+Version: 1.1.0  
+Status: Current public release with v1.0.0 Stable Mission Data Contract baseline preserved  
+Scope: Mission Data Contract architecture, stable Core-owned surfaces, post-v1 candidate integration surfaces and extensibility boundary
 
 ---
 
@@ -20,13 +20,19 @@ The Mission Model remains the source of truth.
 
 OrbitFabric validates that model, executes deterministic host-side scenario evidence, generates documentation, generates runtime-facing and ground-facing contract artifacts and exports Core-owned structured surfaces for downstream inspection.
 
-The current released baseline is:
+The current public release is:
+
+```text
+v1.1.0 - Candidate Integration Surface Consolidation
+```
+
+The stable Mission Data Contract baseline remains:
 
 ```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
+v1.1.0 consolidates a deliberately narrow set of post-v1 Core-owned candidate integration surfaces. It does not replace the v1.0.0 stable Mission Data Contract baseline.
 
 ---
 
@@ -81,7 +87,7 @@ Its architectural role is:
 
 The Mission Model is the source of truth.
 
-Runtime-facing bindings, ground-facing artifacts, Core-owned structured surfaces, simulation evidence, generated documentation, compatibility classifications, extensibility rules and v1.0 references must derive from or describe the Mission Model.
+Runtime-facing bindings, ground-facing artifacts, Core-owned structured surfaces, simulation evidence, generated documentation, compatibility classifications, extensibility rules, v1.0 references and post-v1 candidate surface references must derive from or describe the Mission Model.
 
 No important mission behavior should live only in Python code, generated files, documentation, simulator internals, extension-owned outputs, plugin outputs or downstream tools.
 
@@ -103,7 +109,7 @@ Downstream tools and future extensions must consume Core-owned structured surfac
 
 They must not reconstruct Mission Data Contract semantics from raw YAML, generated files, terminal output, logs, UI state or private assumptions.
 
-The stable Core-owned structured surface chain is:
+The stable v1.0.0 Core-owned structured surface chain is:
 
 ```text
 model_summary.json          -> What contract domains are present?
@@ -111,9 +117,20 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-These surfaces are derived from the validated Mission Model.
+The post-v1 candidate Core-owned integration surface chain consolidated in v1.1.0 is:
+
+```text
+dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> Index of Core simulation JSON report runs
+coverage_summary.json       -> Limited coverage derived from Core structured outputs
+simulation JSON expectations -> Additive structured expectation accounting
+```
+
+These surfaces are derived from validated Core facts.
 
 They are not a second source of truth.
+
+The v1.1.0 candidate surfaces do not promote dashboard, coverage, scenario indexing or expectation accounting to the original v1.0.0 stable compatibility class.
 
 ### 3.4 Generated Artifacts Are Disposable Unless Classified Otherwise
 
@@ -176,6 +193,9 @@ OrbitFabric
 │   ├── orbitfabric export model-summary
 │   ├── orbitfabric export entity-index
 │   ├── orbitfabric export relationship-manifest
+│   ├── orbitfabric export dashboard-summary
+│   ├── orbitfabric export scenario-run-index
+│   ├── orbitfabric export coverage-summary
 │   └── orbitfabric sim
 │
 ├── Model Layer
@@ -203,6 +223,7 @@ semantic lint
 scenario loading and reference validation
 host-side deterministic scenario execution
 contract-level data-flow evidence recording
+additive structured expectation accounting in simulation JSON
 generated Markdown documentation
 generated runtime-facing C++17 contract bindings
 generated runtime host-build smoke target
@@ -210,10 +231,14 @@ generated ground-facing JSON, CSV and Markdown artifacts
 model_summary.json export
 entity_index.json export
 relationship_manifest.json export
+dashboard_summary.json export
+scenario_run_index.json export
+coverage_summary.json export
 v1.0 stable surface decision
 v1.0 golden signatures for selected Core-owned structured surfaces
 v1.0 demo evidence chain
 v1.0 compatibility and migration posture
+v1.1 candidate integration surface consolidation
 ```
 
 OrbitFabric currently does not include:
@@ -288,7 +313,26 @@ Studio-specific API
 
 ---
 
-## 7. Demo Evidence Chain
+## 7. v1.1 Candidate Integration Surfaces
+
+The v1.1.0 candidate integration surfaces are Core-owned read-only structured outputs:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+They are intended for downstream inspection and documentation workflows.
+
+They do not make OrbitFabric Core a dashboard backend, ground segment, Studio API, OpenOBSW/OpenSVF-specific generator, plugin system or graph engine.
+
+They remain candidate until a later reviewed stability decision explicitly promotes them.
+
+---
+
+## 8. Demo Evidence Chain
 
 The selected v1.0 demonstration chain is:
 
@@ -311,11 +355,13 @@ payload.start_acquisition
 
 This demonstrates Mission Data Contract continuity.
 
+The v1.1.0 candidate surfaces add downstream inspection evidence on top of that chain.
+
 It does not demonstrate flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
 
 ---
 
-## 8. Final Architecture Boundary
+## 9. Final Architecture Boundary
 
 OrbitFabric Core must remain a Mission Data Contract framework.
 
