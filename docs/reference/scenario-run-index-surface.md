@@ -1,8 +1,8 @@
 # Scenario Run Index Surface
 
-Status: Candidate post-v1 Core-owned structured surface  
+Status: Candidate post-v1 Core-owned structured surface consolidated in v1.1.0  
 Scope: scenario run indexing from simulation JSON reports  
-Applies to: OrbitFabric Core after `v1.0.0 - Stable Mission Data Contract`
+Applies to: OrbitFabric Core `v1.1.0 - Candidate Integration Surface Consolidation` and later, until any future promotion decision
 
 The Scenario Run Index Surface is a Core-owned read-only JSON report that indexes simulation JSON reports produced by OrbitFabric Core.
 
@@ -20,20 +20,20 @@ It does not introduce runtime behavior, ground behavior, graph behavior, plugin 
 
 ```bash
 orbitfabric export scenario-run-index \
-  --simulation-reports generated/reports \
-  --json generated/reports/scenario_run_index.json
+  --simulation-reports examples/demo-3u/generated/reports \
+  --json examples/demo-3u/generated/reports/scenario_run_index.json
 ```
 
-Default input directory:
+Documented input directory:
 
 ```text
-generated/reports
+examples/demo-3u/generated/reports
 ```
 
-Default output path:
+Documented output path:
 
 ```text
-generated/reports/scenario_run_index.json
+examples/demo-3u/generated/reports/scenario_run_index.json
 ```
 
 ---
@@ -71,7 +71,7 @@ It aggregates only simulation JSON reports with:
 
 Other JSON files in the same directory are ignored.
 
-This allows the same reports directory to contain lint reports, dashboard summaries or other Core-owned surfaces without turning them into scenario runs.
+This allows the same reports directory to contain lint reports, dashboard summaries, coverage summaries or other Core-owned surfaces without turning them into scenario runs.
 
 The index counts report files, not unique scenario identifiers.
 
@@ -212,7 +212,7 @@ Logs remain human-oriented preview artifacts.
 
 The scenario run index does not provide coverage.
 
-It prepares one input required by a future coverage summary, but does not compute:
+It provides one input consumed by the dedicated v1.1.0 candidate `coverage_summary.json` surface, but does not compute:
 
 ```text
 scenario coverage
@@ -224,13 +224,13 @@ relationship coverage
 expectation coverage
 ```
 
-Coverage must be introduced later through a dedicated Core-owned `coverage_summary.json` surface.
+Coverage is defined separately through the Core-owned candidate `coverage_summary.json` surface.
 
 ---
 
 ## Compatibility posture
 
-`scenario_run_index.json` is introduced as a candidate post-v1 Core-owned structured surface.
+`scenario_run_index.json` is introduced as a candidate post-v1 Core-owned structured surface and consolidated in v1.1.0.
 
 It is not part of the original v1.0.0 stable surface.
 
@@ -247,9 +247,6 @@ coverage metrics
 model completeness score
 mission health score
 new structured expectation accounting
-runtime facts
-live telemetry
-command uplink
 relationship graph behavior
 dependency graph behavior
 Studio-specific API
@@ -260,13 +257,13 @@ plugin execution
 
 ## Final statement
 
-The scenario run index is the Core-owned bridge between individual simulation JSON reports and future coverage work.
+The scenario run index is the Core-owned bridge between individual simulation JSON reports and the dedicated v1.1.0 candidate coverage summary.
 
 It is deliberately narrow:
 
 ```text
 read simulation JSON reports
 index scenario run summaries
-ignore logs and unrelated JSON files
-mark coverage out of scope
+ignore unrelated JSON files
+leave coverage computation to coverage_summary.json
 ```
