@@ -1,8 +1,8 @@
 # Dashboard and Coverage Foundation
 
-Status: Implemented post-v1 candidate Core boundary  
+Status: Implemented post-v1 candidate Core boundary consolidated in v1.1.0  
 Scope: dashboard and coverage enablement through candidate Core-owned structured surfaces  
-Applies to: OrbitFabric Core after `v1.0.0 - Stable Mission Data Contract`
+Applies to: OrbitFabric Core `v1.1.0 - Candidate Integration Surface Consolidation` and later, until any future promotion decision
 
 This page defines the implemented boundary for dashboard and coverage work in OrbitFabric Core after v1.0.0.
 
@@ -14,9 +14,9 @@ It does not promote those surfaces to the original v1.0.0 stable surface and doe
 
 ## 1. Purpose
 
-OrbitFabric Core already emits stable and documented machine-readable surfaces for validation, scenario evidence, contract introspection, entity indexing and relationship inspection.
+OrbitFabric Core emits stable and documented machine-readable surfaces for validation, scenario evidence, contract introspection, entity indexing and relationship inspection.
 
-Future dashboard and coverage work must build on those Core-owned surfaces instead of moving Mission Data Contract semantics into downstream tools.
+The v1.1.0 dashboard and coverage surfaces build on those Core-owned surfaces instead of moving Mission Data Contract semantics into downstream tools.
 
 The rule is:
 
@@ -32,7 +32,7 @@ This applies equally to OrbitFabric Studio, scripts, CI jobs and future integrat
 
 ## 2. Current Core-owned inputs
 
-The current Core-owned structured inputs that may support dashboard-oriented views are:
+The current Core-owned structured inputs that support dashboard-oriented and coverage-oriented views are:
 
 ```text
 lint JSON report
@@ -40,6 +40,10 @@ simulation JSON report
 model_summary.json
 entity_index.json
 relationship_manifest.json
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+structured expectation accounting
 ```
 
 These surfaces can support inventory and status views such as:
@@ -56,12 +60,13 @@ relationship inventory
 scenario execution result
 scenario execution summary
 data-flow evidence records
-failed scenario expectations
+structured expectation counts
+limited coverage values emitted by Core
 ```
 
 These are useful dashboard facts.
 
-They are not coverage metrics by themselves.
+They are coverage metrics only when emitted by `coverage_summary.json`.
 
 ---
 
@@ -92,7 +97,7 @@ It must not rename inventory, validation status or scenario evidence into covera
 
 Coverage is a Core-defined measurement of which declared Mission Data Contract entities or relationships have been exercised by scenario evidence.
 
-Coverage must be derived from Core-owned structured outputs, for example:
+Coverage is derived from Core-owned structured outputs, for example:
 
 ```text
 entity_index.json
@@ -164,9 +169,9 @@ The post-v1 sequence is now:
 
 The sequence is intentionally staged.
 
-Dashboard inventory can come before coverage.
+Dashboard inventory can exist without being a coverage report.
 
-Coverage must come after Core can index scenario runs and account for expectations structurally.
+Coverage is emitted only by the dedicated `coverage_summary.json` candidate surface.
 
 ---
 
@@ -183,7 +188,7 @@ Candidate identity:
 }
 ```
 
-Candidate content may include:
+Candidate content includes:
 
 ```text
 mission identity
@@ -196,16 +201,7 @@ relationship inventory summary
 coverage availability status
 ```
 
-The first dashboard summary should explicitly mark coverage as unavailable, for example:
-
-```json
-{
-  "coverage": {
-    "status": "not_available",
-    "reason": "Coverage metrics are not emitted by OrbitFabric Core in this report version."
-  }
-}
-```
+The dashboard summary explicitly marks coverage as unavailable and points to `coverage_summary.json` when coverage is required.
 
 This prevents downstream tools from inventing coverage while still allowing a real dashboard foundation.
 
@@ -224,11 +220,11 @@ Candidate identity:
 }
 ```
 
-It should read simulation JSON reports only.
+It reads simulation JSON reports only.
 
-It must not read plain-text logs.
+It does not read plain-text logs.
 
-Candidate content may include:
+Candidate content includes:
 
 ```text
 scenario run records
@@ -240,7 +236,7 @@ simulation report path
 aggregate passed and failed counts
 ```
 
-This report would support recent-run dashboards and prepare coverage derivation.
+This report supports recent-run dashboards and provides an input to `coverage_summary.json`.
 
 ---
 
@@ -304,11 +300,11 @@ Downstream tools must render the Core result, not recompute private percentages.
 
 Dashboard and coverage reports are not part of the v1.0.0 stable surface.
 
-When first introduced, they should start as candidate or public preview Core-owned structured surfaces.
+They are candidate Core-owned structured surfaces consolidated in v1.1.0.
 
 If any future change modifies a stable v1.0 surface, it must include a compatibility or migration note.
 
-Additive report families should clearly state:
+Candidate report families clearly state:
 
 ```text
 kind
@@ -339,7 +335,7 @@ They must not infer hidden semantics from raw files, logs, terminal output or UI
 
 ## 13. Final statement
 
-Dashboard and coverage are valid post-v1 directions for OrbitFabric Core.
+Dashboard and coverage are valid post-v1 directions for OrbitFabric Core because v1.1.0 keeps them as narrow Core-owned candidate Mission Data Contract surfaces.
 
 They must remain Mission Data Contract surfaces, not UI features disguised as Core semantics.
 
