@@ -5,10 +5,16 @@ This document explains how to work on OrbitFabric locally.
 OrbitFabric is currently released at:
 
 ```text
+v1.1.0 - Candidate Integration Surface Consolidation
+```
+
+The stable Mission Data Contract baseline remains:
+
+```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-Development work after v1.0.0 must preserve the narrow Mission Data Contract scope and follow the release compatibility policy.
+Development work after v1.0.0 must preserve the narrow Mission Data Contract scope and follow the release compatibility policy. v1.1.0 candidate integration surfaces are Core-owned, but they are not promoted to the original v1.0.0 stable compatibility class.
 
 ---
 
@@ -58,7 +64,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 1.0.0
+orbitfabric 1.1.0
 ```
 
 ---
@@ -83,26 +89,26 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the Current Stable State
+## Verify the v1.0 Stable State
 
 Run mission lint:
 
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+  --json examples/demo-3u/generated/reports/lint_report.json
 ```
 
-Export the Core-owned structured surfaces:
+Export the v1.0 stable Core-owned structured surfaces:
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json generated/reports/model_summary.json
+  --json examples/demo-3u/generated/reports/model_summary.json
 
 orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json generated/reports/entity_index.json
+  --json examples/demo-3u/generated/reports/entity_index.json
 
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
-  --json generated/reports/relationship_manifest.json
+  --json examples/demo-3u/generated/reports/relationship_manifest.json
 ```
 
 Review the v1.0 references:
@@ -126,15 +132,15 @@ Generate the dedicated data-flow evidence reference:
 
 ```bash
 orbitfabric gen data-flow examples/demo-3u/mission/ \
-  --output-file generated/docs/data_flow.md
+  --output-file examples/demo-3u/generated/docs/data_flow.md
 ```
 
 Generate runtime-facing contract bindings and validate the host-build smoke target:
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
-cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
-cmake --build generated/runtime/cpp17/build
+cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
+cmake --build examples/demo-3u/generated/runtime/cpp17/build
 ```
 
 Generate ground-facing integration artifacts:
@@ -147,12 +153,12 @@ Run the demo scenarios:
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
+  --json examples/demo-3u/generated/reports/battery_low_during_payload_report.json \
+  --log examples/demo-3u/generated/logs/battery_low_during_payload.log
 
 orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
-  --json generated/reports/payload_data_flow_evidence_report.json \
-  --log generated/logs/payload_data_flow_evidence.log
+  --json examples/demo-3u/generated/reports/payload_data_flow_evidence_report.json \
+  --log examples/demo-3u/generated/logs/payload_data_flow_evidence.log
 ```
 
 Expected results:
@@ -172,18 +178,47 @@ sim                          -> Result: PASSED
 
 ---
 
-## Generated Outputs
+## Verify the v1.1 Candidate Integration Surfaces
 
-Generated outputs are written under:
+Export the post-v1 candidate Core-owned integration surfaces:
+
+```bash
+orbitfabric export dashboard-summary examples/demo-3u/mission/
+
+orbitfabric export scenario-run-index \
+  --simulation-reports examples/demo-3u/generated/reports \
+  --json examples/demo-3u/generated/reports/scenario_run_index.json
+
+orbitfabric export coverage-summary examples/demo-3u/mission/
+```
+
+With omitted output paths, mission-based commands write under the mission workspace:
 
 ```text
-generated/
+examples/demo-3u/generated/reports/dashboard_summary.json
+examples/demo-3u/generated/reports/coverage_summary.json
+```
+
+These surfaces are Core-owned candidate outputs consolidated in v1.1.0.
+
+They must not be treated as dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
+
+---
+
+## Generated Outputs
+
+For the demo mission, mission-based commands write omitted generated artifact paths under:
+
+```text
+examples/demo-3u/generated/
 ├── docs/
 ├── reports/
 ├── logs/
 ├── runtime/
 └── ground/
 ```
+
+Explicit user-provided output paths are preserved exactly as provided.
 
 These files are reproducible outputs.
 
@@ -204,9 +239,9 @@ Generated Markdown documentation is disposable.
 
 Plain-text logs are human-oriented and non-contractual.
 
-Core-owned structured surfaces are derived from the validated Mission Model.
+Core-owned structured surfaces are derived from the validated Mission Model or from Core-generated structured outputs.
 
-The current stable Core-owned structured surfaces are:
+The stable v1.0.0 Core-owned structured surfaces are:
 
 ```text
 model_summary.json
@@ -214,7 +249,16 @@ entity_index.json
 relationship_manifest.json
 ```
 
-The v1.0 golden signatures protect selected contract-significant fields of these surfaces.
+The v1.1.0 candidate Core-owned integration surfaces are:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+The v1.0 golden signatures protect selected contract-significant fields of the stable surfaces.
 
 They do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
 
@@ -231,7 +275,7 @@ For new behavior, follow this order:
 2. add or update lint rules
 3. add tests
 4. update generated docs or reports if needed
-5. update runtime-facing, ground-facing, introspection, entity-index or relationship exporters if needed
+5. update runtime-facing, ground-facing, introspection, entity-index, relationship or candidate-surface exporters if needed
 6. update user-facing documentation
 ```
 
@@ -246,8 +290,6 @@ Do not add runtime or ground integration artifacts before the relevant contract 
 Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
 
 Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
-
-Do not introduce schema migration tooling, JSON Schema publication, security enforcement semantics or Mission Model security domains without a separate architectural decision.
 
 Do not put user code inside generated runtime bindings.
 
