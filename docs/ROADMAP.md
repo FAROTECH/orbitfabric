@@ -1,7 +1,7 @@
 # OrbitFabric - Roadmap
 
-Version: v1.0.0  
-Status: Stable Mission Data Contract released; post-v1 candidate surface consolidation in progress  
+Version: v1.1.0  
+Status: Candidate Integration Surface Consolidation released  
 Scope: completed path to v1.0.0, post-v1 candidate Core-owned integration surfaces and v1.1.0 consolidation direction
 
 ---
@@ -52,14 +52,14 @@ v0.10.1 Documentation and Published Site Consistency             completed
 v0.11.0 Extensibility Boundary Contract, no execution            completed
 v0.12.0 v1.0 Release Candidate Hardening                         completed
 v1.0.0  Stable Mission Data Contract                             completed
-post-v1  Candidate Core-owned integration surfaces                in progress
-v1.1.0   Candidate surface consolidation release                  planned
+post-v1  Candidate Core-owned integration surfaces                completed
+v1.1.0   Candidate surface consolidation release                  completed
 ```
 
-The current stable completed milestone is:
+The current completed milestone is:
 
 ```text
-v1.0.0 - Stable Mission Data Contract
+v1.1.0 - Candidate Integration Surface Consolidation
 ```
 
 ---
@@ -196,7 +196,7 @@ document candidate Core-owned integration surfaces
 clarify stable vs candidate boundaries
 keep generated artifact defaults mission-workspace relative
 preserve explicit user-provided output paths
-add release notes and checklist in a later release-metadata PR
+release notes and checklist added in the v1.1.0 release metadata PR
 avoid Projection Profiles implementation until a separate RFC/design decision
 ```
 
