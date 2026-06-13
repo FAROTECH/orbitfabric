@@ -11,14 +11,14 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 OrbitFabric is currently at:
 
 ```text
-v1.0.0 - Stable Mission Data Contract
+v1.1.0 - Candidate Integration Surface Consolidation
 ```
 
-v1.0.0 stabilizes a deliberately narrow Core surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
+v1.1.0 consolidates the post-v1 candidate Core-owned integration surfaces while preserving the deliberately narrow v1.0.0 Stable Mission Data Contract.
 
 The stable surface is intentionally limited.
 
-OrbitFabric v1.0.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
+OrbitFabric v1.1.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
 
 ## Core idea
 

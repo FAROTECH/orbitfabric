@@ -8,6 +8,10 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [v1.1.0] - 2026-06-13
+
 ### Changed
 
 - Consolidated post-v1 candidate integration surface documentation across README, documentation home, roadmap and reference pages.
