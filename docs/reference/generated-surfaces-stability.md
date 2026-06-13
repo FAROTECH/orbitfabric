@@ -1,39 +1,36 @@
 # Generated Surfaces Stability
 
-Status: Active v1.0 classification  
+Status: Active v1.1 classification  
 Scope: generated and exported surface compatibility classification  
 Applies to: OrbitFabric generated and exported surfaces from `v1.0.0 - Stable Mission Data Contract` onward
 
-This page classifies OrbitFabric generated and exported surfaces after v1.0.0.
+This page classifies OrbitFabric generated and exported surfaces after v1.1.0.
 
-It is a documentation contract. It does not introduce new generated surfaces, new report fields, new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+It documents stable v1.0.0 surfaces and candidate v1.1.0 surfaces. It does not introduce new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 ---
 
 ## 1. Purpose
 
-OrbitFabric generates and exports several surfaces derived from the validated Mission Model.
-
-This document defines how those surfaces are treated after v1.0.0:
-
-- which surfaces are stable Core-owned inspection surfaces;
-- which surfaces are machine-readable validation or evidence reports;
-- which surfaces are generated artifact packages;
-- which surfaces are disposable generated outputs;
-- which changes are compatibility-sensitive;
-- which assumptions downstream tools must not make.
+OrbitFabric generates and exports several surfaces derived from the validated Mission Model and from Core-generated structured evidence.
 
 The Mission Model remains the source of truth.
 
+This document separates:
+
+- stable v1.0.0 Core-owned inspection surfaces;
+- candidate v1.1.0 Core-owned integration surfaces;
+- machine-readable validation and evidence reports;
+- generated runtime-facing artifacts;
+- generated ground-facing artifacts;
+- generated Markdown documentation;
+- disposable outputs.
+
 ---
 
-## 2. Surface categories
+## 2. Stable v1.0.0 Core-owned structured inspection surfaces
 
-OrbitFabric distinguishes these generated or exported surface categories.
-
-### 2.1 Core-owned structured inspection surfaces
-
-These are machine-readable, read-only surfaces exported by OrbitFabric Core for downstream inspection:
+The stable v1.0.0 surfaces are:
 
 ```text
 model_summary.json
@@ -42,92 +39,6 @@ relationship_manifest.json
 ```
 
 They exist to prevent downstream tools from reconstructing Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
-
-These surfaces are part of the narrow v1.0 stable surface.
-
-### 2.2 Machine-readable validation and evidence reports
-
-These are JSON reports produced by validation or scenario execution workflows:
-
-```text
-lint JSON report
-simulation JSON report
-```
-
-They are intended for CI, automated checks and reproducible evidence.
-
-These report families are part of the narrow v1.0 stable surface.
-
-### 2.3 Generated runtime-facing artifacts
-
-These are generated contract-facing artifacts intended to help runtime integration work:
-
-```text
-runtime_contract_manifest.json
-generated C++17 runtime-facing bindings
-generated C++17 host-build smoke files
-```
-
-They are not flight software.
-
-They are not a flight ABI guarantee.
-
-They remain public preview and disposable unless explicitly promoted later.
-
-### 2.4 Generated ground-facing artifacts
-
-These are generated contract-facing artifacts intended to help ground integration work:
-
-```text
-ground_contract_manifest.json
-generated JSON ground dictionaries
-generated CSV ground dictionaries
-generated human-reviewable ground Markdown artifacts
-```
-
-They are not a ground segment runtime.
-
-They are not a mission control system.
-
-They remain public preview and disposable unless explicitly promoted later.
-
-### 2.5 Generated Markdown documentation
-
-These are generated human-reviewable documentation artifacts:
-
-```text
-generated mission documentation
-generated data-flow documentation
-```
-
-They are useful for review and communication.
-
-They are not the source of truth.
-
-They remain public preview generated documentation.
-
----
-
-## 3. Current classification
-
-The current v1.0 classification is:
-
-| Surface | Classification | Source of truth | Notes |
-|---|---|---|---|
-| `model_summary.json` | Stable contract | Mission Model | Core-owned domain-level inspection surface. |
-| `entity_index.json` | Stable contract | Mission Model | Core-owned entity-level inspection surface. |
-| `relationship_manifest.json` | Stable contract for admitted families | Mission Model | Core-owned relationship-level surface. |
-| lint JSON report | Stable contract | Mission Model and lint rules | Machine-readable validation result. |
-| simulation JSON report | Stable contract | Mission Model and scenario YAML | Machine-readable scenario evidence. |
-| `runtime_contract_manifest.json` | Public preview generated artifact | Mission Model | Runtime-facing contract manifest, not flight runtime. |
-| generated C++17 runtime bindings | Public preview disposable artifact | Mission Model | Regenerable contract-facing bindings, not flight software. |
-| `ground_contract_manifest.json` | Public preview generated artifact | Mission Model | Ground-facing contract manifest, not ground runtime. |
-| generated ground dictionaries | Public preview disposable artifact | Mission Model | Integration dictionaries, not live decoder or database behavior. |
-| generated Markdown docs | Public preview disposable artifact | Mission Model | Human-reviewable docs, not machine contract. |
-
----
-
-## 4. Core-owned inspection surface chain
 
 The stable Core-owned inspection chain is:
 
@@ -139,15 +50,108 @@ relationship_manifest.json  -> How are indexed mission contract entities related
 
 These surfaces are intentionally narrow.
 
-`model_summary.json` does not contain entity records.
-
-`entity_index.json` does not contain relationship records.
-
 `relationship_manifest.json` does not contain a graph engine, dependency graph, runtime routing table, ground routing table, plugin API or Studio-specific API.
 
 ---
 
-## 5. Compatibility-sensitive surface changes
+## 3. Candidate v1.1.0 Core-owned integration surfaces
+
+The candidate v1.1.0 surfaces are:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+They are Core-owned, but they are not part of the original v1.0.0 stable surface.
+
+They remain candidate until a later reviewed decision promotes selected fields or surfaces.
+
+The candidate integration chain is:
+
+```text
+dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> Index of Core simulation JSON report runs
+coverage_summary.json       -> Limited coverage derived from Core structured outputs
+simulation JSON expectations -> Additive structured expectation accounting
+```
+
+These surfaces are intentionally narrow.
+
+They are not dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
+
+---
+
+## 4. Machine-readable validation and evidence reports
+
+These JSON report families are part of the narrow v1.0.0 stable surface:
+
+```text
+lint JSON report
+simulation JSON report
+```
+
+The v1.1.0 structured expectation accounting inside simulation JSON is additive.
+
+The legacy top-level `failed_expectations` compatibility list remains available.
+
+---
+
+## 5. Generated artifacts
+
+Generated runtime-facing artifacts include:
+
+```text
+runtime_contract_manifest.json
+generated C++17 runtime-facing bindings
+generated C++17 host-build smoke files
+```
+
+They are not flight software and not a flight ABI guarantee.
+
+Generated ground-facing artifacts include:
+
+```text
+ground_contract_manifest.json
+generated JSON ground dictionaries
+generated CSV ground dictionaries
+generated human-reviewable ground Markdown artifacts
+```
+
+They are not a ground segment runtime and not a mission control system.
+
+Generated Markdown documentation includes:
+
+```text
+generated mission documentation
+generated data-flow documentation
+```
+
+Generated artifacts remain public preview and disposable unless explicitly promoted later.
+
+---
+
+## 6. Current classification
+
+| Surface | Classification | Source of truth | Notes |
+|---|---|---|---|
+| `model_summary.json` | Stable v1.0.0 contract | Mission Model | Core-owned domain-level inspection surface. |
+| `entity_index.json` | Stable v1.0.0 contract | Mission Model | Core-owned entity-level inspection surface. |
+| `relationship_manifest.json` | Stable v1.0.0 for admitted families | Mission Model | Core-owned relationship-level surface. |
+| lint JSON report | Stable v1.0.0 contract | Mission Model and lint rules | Machine-readable validation result. |
+| simulation JSON report | Stable v1.0.0 contract with additive v1.1 accounting | Mission Model and scenario YAML | Machine-readable scenario evidence. |
+| `dashboard_summary.json` | Candidate v1.1.0 surface | Mission Model and Core structured surfaces | Dashboard-ready aggregation of existing Core facts. |
+| `scenario_run_index.json` | Candidate v1.1.0 surface | Simulation JSON reports | Index of simulation report runs. |
+| `coverage_summary.json` | Candidate v1.1.0 surface | Core structured outputs | Limited coverage derived from Core outputs. |
+| generated runtime artifacts | Public preview disposable artifact | Mission Model | Contract-facing artifacts, not flight software. |
+| generated ground artifacts | Public preview disposable artifact | Mission Model | Integration artifacts, not ground runtime. |
+| generated Markdown docs | Public preview disposable artifact | Mission Model | Human-reviewable docs, not machine contract. |
+
+---
+
+## 7. Compatibility-sensitive surface changes
 
 The following changes are compatibility-sensitive after v1.0.0:
 
@@ -157,11 +161,10 @@ The following changes are compatibility-sensitive after v1.0.0:
 - renaming a documented top-level JSON field;
 - changing the meaning of a documented field;
 - changing a documented `kind` value;
-- changing a documented format version field such as `summary_version`, `index_version` or `manifest_version`;
+- changing a documented format version field;
 - removing explicit boundary flags that downstream tools may inspect;
-- changing the answer represented by a Core-owned inspection surface;
+- changing the answer represented by a Core-owned inspection or candidate integration surface;
 - changing generated artifact profile names such as `cpp17` or `generic`;
-- changing generated manifest boundary claims;
 - changing whether a generated artifact is disposable.
 
 Compatibility-sensitive does not mean forbidden.
@@ -170,41 +173,7 @@ It means the change must be explicit, reviewed and documented.
 
 ---
 
-## 6. Preferred evolution rules
-
-Generated and exported surfaces should evolve with these rules.
-
-### 6.1 Prefer additive changes
-
-When possible, add fields instead of renaming or removing existing documented fields.
-
-### 6.2 Keep boundary flags explicit
-
-Boundary flags are part of OrbitFabric's architectural safety model.
-
-They should remain explicit when a generated or exported surface might otherwise be misread as runtime behavior, ground behavior, plugin behavior or Studio-specific behavior.
-
-### 6.3 Keep generated artifacts disposable
-
-Generated artifacts should remain reproducible from the Mission Model.
-
-User-owned implementation should live outside generated output directories unless a future reviewed design explicitly changes that rule.
-
-### 6.4 Keep Core-owned surfaces read-only
-
-Core-owned inspection surfaces are exported for inspection.
-
-Downstream tools may consume them, but must not write back mission semantics through them.
-
-### 6.5 Keep machine-readable surfaces separate from terminal text
-
-Downstream tools should consume documented JSON outputs and generated manifests.
-
-They should not parse human-oriented terminal output.
-
----
-
-## 7. Downstream tool rule
+## 8. Downstream tool rule
 
 Downstream tools must consume Core-owned structured surfaces when they need Mission Data Contract inspection.
 
@@ -225,14 +194,11 @@ Generated and exported surfaces are derived from that Core-owned interpretation.
 
 ---
 
-## 8. Current non-goals
+## 9. Current non-goals
 
 This generated surfaces stability classification does not introduce:
 
 ```text
-new generated surfaces
-new JSON report fields
-new manifest fields
 new CLI behavior
 new Mission Model semantics
 relationship graph
@@ -249,9 +215,7 @@ schema migration tooling
 
 ---
 
-## 9. Relationship to existing reference pages
-
-This page does not replace the existing surface reference pages.
+## 10. Relationship to existing reference pages
 
 Detailed structure remains documented in the dedicated references:
 
@@ -259,15 +223,24 @@ Detailed structure remains documented in the dedicated references:
 Contract Introspection Surface
 Entity Index Surface
 Relationship Manifest Surface
+Dashboard Summary Surface
+Scenario Run Index Surface
+Coverage Summary Surface
 JSON Reports v0.1
 Runtime Contract Bindings
 Ground Integration Artifacts
 ```
 
-This page classifies their stability and compatibility expectations after v1.0.0.
+This page classifies their stability and compatibility expectations after v1.1.0.
 
 ---
 
-## 10. Final statement
+## 11. Final statement
+
+v1.1.0 is the current project release.
+
+v1.0.0 remains the stable Mission Data Contract baseline.
 
 v1.0.0 stabilizes selected Mission Data Contract surfaces without turning generated artifacts into user-owned source files or runtime implementations.
+
+v1.1.0 consolidates candidate Core-owned integration surfaces without promoting them to the original v1.0.0 stable compatibility class.
