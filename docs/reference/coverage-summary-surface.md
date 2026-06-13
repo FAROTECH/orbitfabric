@@ -24,11 +24,20 @@ orbitfabric export coverage-summary examples/demo-3u/mission/ \
   --json generated/reports/coverage_summary.json
 ```
 
-Default output path:
+If the input and output options are omitted, the default paths are mission-workspace relative.
+
+For `examples/demo-3u/mission/`, the default paths are:
 
 ```text
-generated/reports/coverage_summary.json
+examples/demo-3u/generated/reports/entity_index.json
+examples/demo-3u/generated/reports/relationship_manifest.json
+examples/demo-3u/generated/reports/scenario_run_index.json
+examples/demo-3u/generated/reports/coverage_summary.json
 ```
+
+Explicit `--entity-index`, `--relationship-manifest`, `--scenario-run-index` and `--json` paths are preserved unchanged.
+
+`coverage-summary` is mission-based and therefore follows the workspace-relative generated artifact default rule.
 
 ---
 

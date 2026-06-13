@@ -62,6 +62,45 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
+The post-v1 candidate Core-owned integration surface chain is:
+
+```text
+dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
+scenario_run_index.json     -> Index of Core simulation JSON report runs
+coverage_summary.json       -> Limited coverage derived from Core structured outputs
+simulation JSON expectations -> Additive structured expectation accounting
+```
+
+These post-v1 surfaces are **candidate**, not part of the original v1.0.0 stable surface.
+
+They are Core-owned read-only structured outputs intended for downstream inspection tools.
+
+They do not make OrbitFabric Core a dashboard backend, flight software framework, ground segment, runtime framework, graph engine, Studio API or OpenOBSW/OpenSVF-specific generator.
+
+The ownership boundary is:
+
+```text
+Core defines, computes and emits contract-significant structured surfaces.
+Studio and other downstream tools consume, link, navigate and render them.
+Downstream tools must not invent private coverage, health or completeness semantics.
+```
+
+Generated artifact default paths are mission-workspace relative for mission-based commands.
+
+For example:
+
+```bash
+orbitfabric gen ground examples/demo-3u/mission/
+```
+
+writes to:
+
+```text
+examples/demo-3u/generated/ground/generic/
+```
+
+Explicit user-provided output paths are preserved unchanged.
+
 The stable v1.0 posture is:
 
 ```text
@@ -246,6 +285,16 @@ mkdocs build --strict
 
 ## Common Commands
 
+Mission-based commands write omitted generated artifact paths under the mission workspace.
+
+For `examples/demo-3u/mission/`, omitted report outputs resolve under:
+
+```text
+examples/demo-3u/generated/reports/
+```
+
+Pass `--json`, `--output-dir` or `--output-file` explicitly when a different destination is required.
+
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json generated/reports/lint_report.json
@@ -258,6 +307,14 @@ orbitfabric export entity-index examples/demo-3u/mission/ \
 
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json generated/reports/relationship_manifest.json
+
+orbitfabric export dashboard-summary examples/demo-3u/mission/
+
+orbitfabric export scenario-run-index \
+  --simulation-reports generated/reports \
+  --json generated/reports/scenario_run_index.json
+
+orbitfabric export coverage-summary examples/demo-3u/mission/
 
 orbitfabric gen docs examples/demo-3u/mission/
 
@@ -328,6 +385,10 @@ Useful entry points:
 - `docs/reference/v1-compatibility-migration-notes.md`
 - `docs/reference/golden-output-regression-confidence.md`
 - `docs/reference/extensibility-boundary-contract.md`
+- `docs/reference/post-v1-candidate-integration-surfaces.md`
+- `docs/reference/dashboard-summary-surface.md`
+- `docs/reference/scenario-run-index-surface.md`
+- `docs/reference/coverage-summary-surface.md`
 - `docs/releases/v1.0.0.md`
 
 Build the documentation site locally:
