@@ -141,15 +141,21 @@ def gen_docs(
         ),
     ],
     output_dir: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--output-dir",
             help="Directory where generated Markdown documentation will be written.",
         ),
-    ] = Path("generated/docs"),
+    ] = None,
 ) -> None:
     """Generate Markdown documentation from a Mission Model."""
     typer.echo(f"OrbitFabric Docs Generator {__version__}")
+
+    output_dir = _mission_workspace_default_path(
+        mission_dir,
+        output_dir,
+        "generated/docs",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -192,15 +198,21 @@ def gen_data_flow(
         ),
     ],
     output_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--output-file",
             help="Markdown file where data-flow documentation will be written.",
         ),
-    ] = Path("generated/docs/data_flow.md"),
+    ] = None,
 ) -> None:
     """Generate Markdown data-flow documentation from a Mission Model."""
     typer.echo(f"OrbitFabric Data Flow Docs Generator {__version__}")
+
+    output_file = _mission_workspace_default_path(
+        mission_dir,
+        output_file,
+        "generated/docs/data_flow.md",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -236,12 +248,12 @@ def gen_runtime(
         ),
     ],
     output_dir: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--output-dir",
             help="Directory where runtime generation artifacts will be written.",
         ),
-    ] = Path("generated/runtime"),
+    ] = None,
     profile: Annotated[
         str,
         typer.Option(
@@ -252,6 +264,12 @@ def gen_runtime(
 ) -> None:
     """Generate runtime-facing contract artifacts from a Mission Model."""
     typer.echo(f"OrbitFabric Runtime Generator {__version__}")
+
+    output_dir = _mission_workspace_default_path(
+        mission_dir,
+        output_dir,
+        "generated/runtime",
+    )
 
     if profile != "cpp17":
         typer.echo(f"\nUnsupported runtime generation profile: {profile}")
@@ -307,12 +325,12 @@ def gen_ground(
         ),
     ],
     output_dir: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--output-dir",
             help="Directory where ground generation artifacts will be written.",
         ),
-    ] = Path("generated/ground"),
+    ] = None,
     profile: Annotated[
         str,
         typer.Option(
@@ -323,6 +341,12 @@ def gen_ground(
 ) -> None:
     """Generate ground-facing contract artifacts from a Mission Model."""
     typer.echo(f"OrbitFabric Ground Generator {__version__}")
+
+    output_dir = _mission_workspace_default_path(
+        mission_dir,
+        output_dir,
+        "generated/ground",
+    )
 
     if profile != "generic":
         typer.echo(f"\nUnsupported ground generation profile: {profile}")
@@ -379,15 +403,21 @@ def export_model_summary(
         ),
     ],
     json_output: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--json",
             help="Write the machine-readable model summary to this JSON file.",
         ),
-    ] = Path("generated/reports/model_summary.json"),
+    ] = None,
 ) -> None:
     """Export a Core-owned read-only Mission Model summary."""
     typer.echo(f"OrbitFabric Model Summary Export {__version__}")
+
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/model_summary.json",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -416,15 +446,21 @@ def export_entity_index(
         ),
     ],
     json_output: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--json",
             help="Write the machine-readable entity index to this JSON file.",
         ),
-    ] = Path("generated/reports/entity_index.json"),
+    ] = None,
 ) -> None:
     """Export a Core-owned read-only Mission Model entity index."""
     typer.echo(f"OrbitFabric Entity Index Export {__version__}")
+
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/entity_index.json",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -453,15 +489,21 @@ def export_relationship_manifest(
         ),
     ],
     json_output: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--json",
             help="Write the candidate relationship manifest to this JSON file.",
         ),
-    ] = Path("generated/reports/relationship_manifest.json"),
+    ] = None,
 ) -> None:
     """Export a candidate Core-owned relationship manifest."""
     typer.echo(f"OrbitFabric Relationship Manifest Export {__version__}")
+
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/relationship_manifest.json",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -495,15 +537,21 @@ def export_dashboard_summary(
         ),
     ],
     json_output: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--json",
             help="Write the candidate dashboard summary to this JSON file.",
         ),
-    ] = Path("generated/reports/dashboard_summary.json"),
+    ] = None,
 ) -> None:
     """Export a candidate Core-owned dashboard foundation summary."""
     typer.echo(f"OrbitFabric Dashboard Summary Export {__version__}")
+
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/dashboard_summary.json",
+    )
 
     try:
         model = MissionModelLoader().load(mission_dir)
@@ -576,7 +624,7 @@ def export_coverage_summary(
         ),
     ],
     entity_index_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--entity-index",
             exists=True,
@@ -585,9 +633,9 @@ def export_coverage_summary(
             readable=True,
             help="Core entity_index.json file used as the coverage denominator.",
         ),
-    ] = Path("generated/reports/entity_index.json"),
+    ] = None,
     relationship_manifest_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--relationship-manifest",
             exists=True,
@@ -596,9 +644,9 @@ def export_coverage_summary(
             readable=True,
             help="Core relationship_manifest.json file used as relationship denominator.",
         ),
-    ] = Path("generated/reports/relationship_manifest.json"),
+    ] = None,
     scenario_run_index_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--scenario-run-index",
             exists=True,
@@ -607,17 +655,38 @@ def export_coverage_summary(
             readable=True,
             help="Core scenario_run_index.json file used to locate simulation reports.",
         ),
-    ] = Path("generated/reports/scenario_run_index.json"),
+    ] = None,
     json_output: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--json",
             help="Write the candidate coverage summary to this JSON file.",
         ),
-    ] = Path("generated/reports/coverage_summary.json"),
+    ] = None,
 ) -> None:
     """Export a candidate Core-owned coverage summary."""
     typer.echo(f"OrbitFabric Coverage Summary Export {__version__}")
+
+    entity_index_file = _mission_workspace_default_path(
+        mission_dir,
+        entity_index_file,
+        "generated/reports/entity_index.json",
+    )
+    relationship_manifest_file = _mission_workspace_default_path(
+        mission_dir,
+        relationship_manifest_file,
+        "generated/reports/relationship_manifest.json",
+    )
+    scenario_run_index_file = _mission_workspace_default_path(
+        mission_dir,
+        scenario_run_index_file,
+        "generated/reports/scenario_run_index.json",
+    )
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/coverage_summary.json",
+    )
 
     try:
         written_file = write_coverage_summary(
@@ -756,6 +825,23 @@ def sim(
 
     if not result.passed:
         raise typer.Exit(code=1)
+
+
+def _mission_workspace_default_path(
+    mission_dir: Path,
+    explicit_path: Path | None,
+    default_relative_path: str,
+) -> Path:
+    """Resolve default generated artifact paths under the mission workspace.
+
+    Explicit CLI paths are intentionally returned unchanged. Only omitted CLI
+    paths are resolved relative to the mission workspace directory, conventionally
+    the parent directory of the Mission Model directory.
+    """
+    if explicit_path is not None:
+        return explicit_path
+
+    return mission_dir.parent / default_relative_path
 
 
 def _print_model_error(exc: MissionModelError) -> None:
