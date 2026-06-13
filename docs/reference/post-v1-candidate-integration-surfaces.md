@@ -1,10 +1,10 @@
 # Post-v1 Candidate Integration Surfaces
 
-Status: Active post-v1 reference  
+Status: Active v1.1.0 reference  
 Scope: candidate Core-owned integration surfaces after `v1.0.0 - Stable Mission Data Contract`  
-Applies to: OrbitFabric Core after v1.0.0 and before any future promotion decision
+Applies to: OrbitFabric Core `v1.1.0 - Candidate Integration Surface Consolidation` and later, until any future promotion decision
 
-This page is the public index for candidate Core-owned integration surfaces introduced after the v1.0.0 stable Mission Data Contract release.
+This page is the public index for candidate Core-owned integration surfaces introduced after the v1.0.0 stable Mission Data Contract release and consolidated in v1.1.0.
 
 It exists to keep the boundary explicit:
 
@@ -32,9 +32,9 @@ The Mission Model remains the source of truth.
 
 ---
 
-## 2. Current post-v1 candidate Core-owned integration surfaces
+## 2. Current v1.1.0 candidate Core-owned integration surfaces
 
-The current candidate post-v1 surfaces are:
+The candidate post-v1 surfaces consolidated in v1.1.0 are:
 
 ```text
 dashboard_summary.json
@@ -183,11 +183,11 @@ ground segment behavior
 
 ## 8. v1.1.0 release implication
 
-Core v1.1.0 should consolidate these candidate surfaces.
+Core v1.1.0 consolidates these candidate surfaces.
 
-It should not turn candidate surfaces into a broad new framework.
+It does not turn candidate surfaces into a broad new framework.
 
-The release should communicate:
+The release communicates:
 
 ```text
 what is stable
