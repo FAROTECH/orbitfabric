@@ -433,6 +433,64 @@ def export_model_summary(
     typer.echo("\nResult: PASSED")
 
 
+@export_app.command("mission-snapshot")
+def export_mission_snapshot(
+    mission_dir: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Mission Model directory used to export the full loaded-model snapshot.",
+        ),
+    ],
+    json_output: Annotated[
+        Path | None,
+        typer.Option(
+            "--json",
+            help="Write the machine-readable mission snapshot to this JSON file.",
+        ),
+    ] = None,
+) -> None:
+    """Export a Core-owned read-only snapshot of the full loaded Mission Model."""
+    from orbitfabric.export.mission_snapshot import write_mission_snapshot
+
+    typer.echo(f"OrbitFabric Mission Snapshot Export {__version__}")
+
+    json_output = _mission_workspace_default_path(
+        mission_dir,
+        json_output,
+        "generated/reports/mission_snapshot.json",
+    )
+
+    written_file = write_mission_snapshot(mission_dir, json_output)
+    payload = json.loads(written_file.read_text(encoding="utf-8"))
+
+    if payload["result"] == "failed":
+        typer.echo("\nFindings:")
+        for diagnostic in payload["diagnostics"]:
+            parts = [diagnostic["severity"], diagnostic["code"]]
+            if diagnostic["file"]:
+                parts.append(diagnostic["file"])
+            if diagnostic["object_id"]:
+                parts.append(diagnostic["object_id"])
+            parts.append(diagnostic["message"])
+            if diagnostic["suggestion"]:
+                parts.append(f"Suggestion: {diagnostic['suggestion']}")
+            typer.echo(f"  {' '.join(parts)}")
+
+        typer.echo(f"\nJSON report written to: {written_file}")
+        typer.echo("\nResult: FAILED")
+        raise typer.Exit(code=1)
+
+    mission = payload["mission"]
+    typer.echo(f"\nMission: {mission['id']}")
+    typer.echo(f"Model version: {mission['model_version']}")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
+
+
 @export_app.command("entity-index")
 def export_entity_index(
     mission_dir: Annotated[
