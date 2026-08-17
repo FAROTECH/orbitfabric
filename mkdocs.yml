@@ -51,6 +51,7 @@ nav:
       - Runtime Contract Bindings: reference/runtime-contract-bindings.md
       - Ground Integration Artifacts: reference/ground-integration-artifacts.md
       - Contract Introspection Surface: reference/contract-introspection-surface.md
+      - Mission Snapshot Surface: reference/mission-snapshot-surface.md
       - Entity Index Surface: reference/entity-index-surface.md
       - Relationship Manifest Surface: reference/relationship-manifest-surface.md
   - Releases:
