@@ -14,6 +14,8 @@ DEMO_MISSION = Path("examples/demo-3u/mission")
 
 EXPECTED_RELATIONSHIP_TYPE_COUNTS = {
     "autonomous_action_dispatches_command": 2,
+    "autonomous_action_triggered_by_fault": 2,
+    "autonomous_action_uses_command_source": 2,
     "command_emits_event": 4,
     "command_targets_subsystem": 4,
     "commandability_rule_constrains_command": 1,
@@ -21,6 +23,9 @@ EXPECTED_RELATIONSHIP_TYPE_COUNTS = {
     "downlink_flow_includes_data_product": 1,
     "event_sourced_from_subsystem": 8,
     "fault_emits_event": 3,
+    "fault_observes_telemetry": 3,
+    "fault_recovery_dispatches_command": 3,
+    "fault_recovery_targets_mode": 3,
     "fault_sourced_from_subsystem": 3,
     "packet_includes_telemetry": 5,
     "payload_accepts_command": 2,
@@ -28,7 +33,9 @@ EXPECTED_RELATIONSHIP_TYPE_COUNTS = {
     "payload_generates_event": 2,
     "payload_may_raise_fault": 1,
     "payload_produces_telemetry": 1,
+    "recovery_intent_includes_command": 2,
     "recovery_intent_reacts_to_fault": 2,
+    "recovery_intent_targets_mode": 2,
     "telemetry_sourced_from_subsystem": 5,
 }
 
@@ -38,6 +45,18 @@ EXPECTED_RELATIONSHIP_TYPE_SPECS = {
         "from_domain": "autonomous_actions",
         "to_domain": "commands",
         "model_field": "commandability.autonomous_actions[].dispatches.command",
+    },
+    "autonomous_action_triggered_by_fault": {
+        "display_name": "Autonomous action triggered by fault",
+        "from_domain": "autonomous_actions",
+        "to_domain": "faults",
+        "model_field": "commandability.autonomous_actions[].trigger.fault",
+    },
+    "autonomous_action_uses_command_source": {
+        "display_name": "Autonomous action uses command source",
+        "from_domain": "autonomous_actions",
+        "to_domain": "command_sources",
+        "model_field": "commandability.autonomous_actions[].dispatches.source",
     },
     "command_emits_event": {
         "display_name": "Command emits event",
@@ -81,6 +100,24 @@ EXPECTED_RELATIONSHIP_TYPE_SPECS = {
         "to_domain": "events",
         "model_field": "faults[].emits",
     },
+    "fault_observes_telemetry": {
+        "display_name": "Fault observes telemetry",
+        "from_domain": "faults",
+        "to_domain": "telemetry",
+        "model_field": "faults[].condition.telemetry",
+    },
+    "fault_recovery_dispatches_command": {
+        "display_name": "Fault recovery dispatches command",
+        "from_domain": "faults",
+        "to_domain": "commands",
+        "model_field": "faults[].recovery.auto_commands",
+    },
+    "fault_recovery_targets_mode": {
+        "display_name": "Fault recovery targets mode",
+        "from_domain": "faults",
+        "to_domain": "modes",
+        "model_field": "faults[].recovery.mode_transition",
+    },
     "fault_sourced_from_subsystem": {
         "display_name": "Fault sourced from subsystem",
         "from_domain": "faults",
@@ -123,11 +160,23 @@ EXPECTED_RELATIONSHIP_TYPE_SPECS = {
         "to_domain": "telemetry",
         "model_field": "payloads[].telemetry.produced",
     },
+    "recovery_intent_includes_command": {
+        "display_name": "Recovery intent includes command",
+        "from_domain": "recovery_intents",
+        "to_domain": "commands",
+        "model_field": "commandability.recovery_intents[].commands",
+    },
     "recovery_intent_reacts_to_fault": {
         "display_name": "Recovery intent reacts to fault",
         "from_domain": "recovery_intents",
         "to_domain": "faults",
         "model_field": "commandability.recovery_intents[].fault",
+    },
+    "recovery_intent_targets_mode": {
+        "display_name": "Recovery intent targets mode",
+        "from_domain": "recovery_intents",
+        "to_domain": "modes",
+        "model_field": "commandability.recovery_intents[].target_mode",
     },
     "telemetry_sourced_from_subsystem": {
         "display_name": "Telemetry sourced from subsystem",
@@ -180,7 +229,7 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
     assert manifest["counts"] == {
-        "total_relationships": 46,
+        "total_relationships": 63,
         "relationship_types": EXPECTED_RELATIONSHIP_TYPE_COUNTS,
     }
     assert manifest["relationship_types"] == [
@@ -198,13 +247,14 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
     ]
 
     relationships = manifest["relationships"]
-    assert len(relationships) == 46
+    assert len(relationships) == 63
     assert relationships == sorted(relationships, key=lambda item: item["relationship_id"])
     assert {
         relationship["relationship_id"] for relationship in relationships
     } >= {
         "autonomous_actions:stop_payload_on_battery_critical->autonomous_action_dispatches_command:commands:payload.stop_acquisition",
-        "autonomous_actions:stop_payload_on_battery_low->autonomous_action_dispatches_command:commands:payload.stop_acquisition",
+        "autonomous_actions:stop_payload_on_battery_low->autonomous_action_triggered_by_fault:faults:eps.battery_low_fault",
+        "autonomous_actions:stop_payload_on_battery_low->autonomous_action_uses_command_source:command_sources:onboard_autonomy",
         "commandability_rules:payload_start_ground_rule->commandability_rule_constrains_command:commands:payload.start_acquisition",
         "commands:eps.get_status->command_emits_event:events:eps.status_requested",
         "commands:eps.get_status->command_targets_subsystem:subsystems:eps",
@@ -225,17 +275,19 @@ def test_relationship_manifest_emits_admitted_relationship_records() -> None:
         "events:payload.command_timeout->event_sourced_from_subsystem:subsystems:payload",
         "events:radio.housekeeping_downlink_requested->event_sourced_from_subsystem:subsystems:radio",
         "faults:eps.battery_critical_fault->fault_emits_event:events:eps.battery_critical",
-        "faults:eps.battery_critical_fault->fault_sourced_from_subsystem:subsystems:eps",
-        "faults:eps.battery_low_fault->fault_emits_event:events:eps.battery_low",
+        "faults:eps.battery_low_fault->fault_observes_telemetry:telemetry:eps.battery.voltage",
+        "faults:eps.battery_low_fault->fault_recovery_dispatches_command:commands:payload.stop_acquisition",
+        "faults:eps.battery_low_fault->fault_recovery_targets_mode:modes:DEGRADED",
         "faults:eps.battery_low_fault->fault_sourced_from_subsystem:subsystems:eps",
         "faults:payload.command_timeout_fault->fault_emits_event:events:payload.command_timeout",
-        "faults:payload.command_timeout_fault->fault_sourced_from_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_belongs_to_subsystem:subsystems:payload",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_started",
         "payloads:demo_iod_payload->payload_generates_event:events:payload.acquisition_stopped",
         "payloads:demo_iod_payload->payload_may_raise_fault:faults:payload.command_timeout_fault",
         "recovery_intents:payload_battery_critical_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_critical_fault",
+        "recovery_intents:payload_battery_low_recovery->recovery_intent_includes_command:commands:payload.stop_acquisition",
         "recovery_intents:payload_battery_low_recovery->recovery_intent_reacts_to_fault:faults:eps.battery_low_fault",
+        "recovery_intents:payload_battery_low_recovery->recovery_intent_targets_mode:modes:DEGRADED",
         "telemetry:eps.battery.current->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:eps.battery.voltage->telemetry_sourced_from_subsystem:subsystems:eps",
         "telemetry:obc.mode->telemetry_sourced_from_subsystem:subsystems:obc",
@@ -250,12 +302,14 @@ def test_relationship_manifest_relationships_reference_indexed_entities() -> Non
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
     indexed_ids_by_domain = {
         "autonomous_actions": {item.id for item in model.commandability.autonomous_actions},
+        "command_sources": {item.id for item in model.commandability.sources},
         "commandability_rules": {item.id for item in model.commandability.rules},
         "commands": {item.id for item in model.commands},
         "data_products": {item.id for item in model.data_products},
         "downlink_flows": {item.id for item in model.contacts.downlink_flows},
         "events": {item.id for item in model.events},
         "faults": {item.id for item in model.faults},
+        "modes": set(model.modes),
         "packets": {item.id for item in model.packets},
         "payloads": {item.id for item in model.payloads},
         "recovery_intents": {item.id for item in model.commandability.recovery_intents},

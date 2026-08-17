@@ -49,7 +49,7 @@ Current JSON report families are classified as follows:
 | simulation JSON report | Stable contract with additive v1.1 expectation accounting | Machine-readable scenario evidence. |
 | `model_summary.json` | Stable v1.0.0 Core-owned surface | Domain-level inspection surface. |
 | `entity_index.json` | Stable v1.0.0 Core-owned surface | Entity-level inspection surface. |
-| `relationship_manifest.json` | Stable v1.0.0 for admitted families | Relationship-level surface. |
+| `relationship_manifest.json` | Stable v1.0.0 for original admitted families; supports explicit additive family extensions | Relationship-level surface. |
 | `dashboard_summary.json` | Candidate v1.1.0 Core-owned integration surface | Dashboard-ready aggregation of existing Core facts. |
 | `scenario_run_index.json` | Candidate v1.1.0 Core-owned integration surface | Index of simulation JSON report runs. |
 | `coverage_summary.json` | Candidate v1.1.0 Core-owned integration surface | Limited coverage derived from Core structured outputs. |
@@ -116,6 +116,8 @@ These fields must not be treated as interchangeable.
 
 Changing the meaning of a documented version field is compatibility-sensitive.
 
+A format identifier does not necessarily encode the complete set of additive semantic record types emitted by every later minor release when the record and envelope format themselves remain unchanged.
+
 ---
 
 ## 6. Top-level field stability
@@ -167,6 +169,12 @@ relationship_manifest.json
 
 Their documented fields, `kind` values, format version fields and boundary flags are compatibility-sensitive.
 
+For `relationship_manifest.json`, the original v1 admitted relationship families remain stable compatibility commitments.
+
+A later minor release may add a new relationship family as an explicitly documented additive stable-surface extension only when the family has a narrow meaning and is deterministically derived from an explicit loaded Mission Model field.
+
+Adding a relationship family must not rename, remove or change the meaning of an existing family.
+
 ---
 
 ## 9. Candidate Core-owned integration surface posture
@@ -196,6 +204,21 @@ Adding an optional field is usually safer than renaming or removing an existing 
 
 The v1.1.0 simulation JSON structured expectation accounting is additive. The legacy top-level `failed_expectations` compatibility list remains available.
 
+For typed record collections such as `relationship_manifest.relationships`, a documented new record type may also be additive when:
+
+```text
+the existing record shape remains valid
+the new type has explicit Core-owned semantics
+existing types keep their names and meanings
+the compatibility impact is documented
+```
+
+Consumers of such a collection should consume the types they explicitly understand and safely preserve or ignore an unknown additive type.
+
+They must not guess the semantics of an unknown type from its name, endpoints or surrounding records.
+
+A consumer that intentionally requires an exact closed set of relationship types should pin that expectation to the release contract it supports rather than assuming all later minor releases emit the same type set.
+
 ---
 
 ## 11. Downstream tool rule
@@ -216,6 +239,8 @@ coverage_summary.json
 ```
 
 They should not parse human-oriented terminal text, plain-text logs, Markdown prose or generated formatting as machine contracts.
+
+For relationship records specifically, downstream tools must not infer missing relationship types or reinterpret unknown additive relationship types.
 
 ---
 
@@ -244,5 +269,7 @@ v1.1.0 is the current project release.
 v1.0.0 remains the stable Mission Data Contract baseline.
 
 v1.0.0 stabilizes selected machine-readable JSON report families and Core-owned structured surfaces.
+
+Later minor releases may extend stable surfaces additively when the extension preserves existing meaning and is explicit, reviewed and documented.
 
 v1.1.0 consolidates additional candidate Core-owned integration surfaces without making generated manifests, generated runtime bindings, generated ground dictionaries, terminal text, logs or Markdown prose stable machine contracts unless explicitly promoted by a later reviewed decision.

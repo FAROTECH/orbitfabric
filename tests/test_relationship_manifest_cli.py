@@ -30,7 +30,7 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
     assert "Mission: demo-3u" in result.output
     assert "Model version: 0.1.0" in result.output
     assert "Status: candidate" in result.output
-    assert "Relationships emitted: 46" in result.output
+    assert "Relationships emitted: 63" in result.output
     assert f"JSON report written to: {output_file}" in result.output
     assert "Result: PASSED" in result.output
     assert output_file.exists()
@@ -40,9 +40,11 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
     assert manifest["manifest_version"] == "0.1-candidate"
     assert manifest["status"] == "candidate"
     assert manifest["mission"]["id"] == "demo-3u"
-    assert manifest["counts"]["total_relationships"] == 46
+    assert manifest["counts"]["total_relationships"] == 63
     assert manifest["counts"]["relationship_types"] == {
         "autonomous_action_dispatches_command": 2,
+        "autonomous_action_triggered_by_fault": 2,
+        "autonomous_action_uses_command_source": 2,
         "command_emits_event": 4,
         "command_targets_subsystem": 4,
         "commandability_rule_constrains_command": 1,
@@ -50,6 +52,9 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
         "downlink_flow_includes_data_product": 1,
         "event_sourced_from_subsystem": 8,
         "fault_emits_event": 3,
+        "fault_observes_telemetry": 3,
+        "fault_recovery_dispatches_command": 3,
+        "fault_recovery_targets_mode": 3,
         "fault_sourced_from_subsystem": 3,
         "packet_includes_telemetry": 5,
         "payload_accepts_command": 2,
@@ -57,11 +62,13 @@ def test_export_relationship_manifest_writes_candidate_json_report(tmp_path: Pat
         "payload_generates_event": 2,
         "payload_may_raise_fault": 1,
         "payload_produces_telemetry": 1,
+        "recovery_intent_includes_command": 2,
         "recovery_intent_reacts_to_fault": 2,
+        "recovery_intent_targets_mode": 2,
         "telemetry_sourced_from_subsystem": 5,
     }
-    assert len(manifest["relationship_types"]) == 17
-    assert len(manifest["relationships"]) == 46
+    assert len(manifest["relationship_types"]) == 24
+    assert len(manifest["relationships"]) == 63
     assert manifest["boundaries"]["contains_relationship_manifest"] is True
     assert manifest["boundaries"]["contains_relationship_graph"] is False
     assert manifest["boundaries"]["contains_plugin_api"] is False

@@ -22,6 +22,8 @@ from orbitfabric.model.mission import (
 )
 
 REL_AUTONOMOUS_ACTION_DISPATCHES_COMMAND = "autonomous_action_dispatches_command"
+REL_AUTONOMOUS_ACTION_TRIGGERED_BY_FAULT = "autonomous_action_triggered_by_fault"
+REL_AUTONOMOUS_ACTION_USES_COMMAND_SOURCE = "autonomous_action_uses_command_source"
 REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND = "commandability_rule_constrains_command"
 REL_COMMAND_EMITS_EVENT = "command_emits_event"
 REL_COMMAND_TARGETS_SUBSYSTEM = "command_targets_subsystem"
@@ -30,6 +32,9 @@ REL_DATA_PRODUCT_PRODUCED_BY_SUBSYSTEM = "data_product_produced_by_subsystem"
 REL_DOWNLINK_FLOW_INCLUDES_DATA_PRODUCT = "downlink_flow_includes_data_product"
 REL_EVENT_SOURCED_FROM_SUBSYSTEM = "event_sourced_from_subsystem"
 REL_FAULT_EMITS_EVENT = "fault_emits_event"
+REL_FAULT_OBSERVES_TELEMETRY = "fault_observes_telemetry"
+REL_FAULT_RECOVERY_DISPATCHES_COMMAND = "fault_recovery_dispatches_command"
+REL_FAULT_RECOVERY_TARGETS_MODE = "fault_recovery_targets_mode"
 REL_FAULT_SOURCED_FROM_SUBSYSTEM = "fault_sourced_from_subsystem"
 REL_PACKET_INCLUDES_TELEMETRY = "packet_includes_telemetry"
 REL_PAYLOAD_ACCEPTS_COMMAND = "payload_accepts_command"
@@ -37,8 +42,10 @@ REL_PAYLOAD_BELONGS_TO_SUBSYSTEM = "payload_belongs_to_subsystem"
 REL_PAYLOAD_GENERATES_EVENT = "payload_generates_event"
 REL_PAYLOAD_MAY_RAISE_FAULT = "payload_may_raise_fault"
 REL_PAYLOAD_PRODUCES_TELEMETRY = "payload_produces_telemetry"
+REL_RECOVERY_INTENT_INCLUDES_COMMAND = "recovery_intent_includes_command"
 REL_RECOVERY_INTENT_REACTS_TO_EVENT = "recovery_intent_reacts_to_event"
 REL_RECOVERY_INTENT_REACTS_TO_FAULT = "recovery_intent_reacts_to_fault"
+REL_RECOVERY_INTENT_TARGETS_MODE = "recovery_intent_targets_mode"
 REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM = "telemetry_sourced_from_subsystem"
 
 
@@ -138,6 +145,22 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     ]
     records.extend(
         record
+        for action in sorted(model.commandability.autonomous_actions, key=lambda item: item.id)
+        for record in _autonomous_action_fault_trigger_relationship_records(
+            action,
+            model.fault_ids,
+        )
+    )
+    records.extend(
+        record
+        for action in sorted(model.commandability.autonomous_actions, key=lambda item: item.id)
+        for record in _autonomous_action_command_source_relationship_records(
+            action,
+            model.command_source_ids,
+        )
+    )
+    records.extend(
+        record
         for command in sorted(model.commands, key=lambda item: item.id)
         for record in _command_event_relationship_records(command)
     )
@@ -194,6 +217,21 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     records.extend(
         record
         for fault in sorted(model.faults, key=lambda item: item.id)
+        for record in _fault_telemetry_relationship_records(fault, model.telemetry_ids)
+    )
+    records.extend(
+        record
+        for fault in sorted(model.faults, key=lambda item: item.id)
+        for record in _fault_recovery_mode_relationship_records(fault, model.mode_ids)
+    )
+    records.extend(
+        record
+        for fault in sorted(model.faults, key=lambda item: item.id)
+        for record in _fault_recovery_command_relationship_records(fault, model.command_ids)
+    )
+    records.extend(
+        record
+        for fault in sorted(model.faults, key=lambda item: item.id)
         for record in _fault_subsystem_relationship_records(fault, model.subsystem_ids)
     )
     records.extend(
@@ -244,6 +282,22 @@ def _relationship_records(model: MissionModel) -> list[dict[str, Any]]:
     )
     records.extend(
         record
+        for intent in sorted(model.commandability.recovery_intents, key=lambda item: item.id)
+        for record in _recovery_intent_mode_relationship_records(
+            intent,
+            model.mode_ids,
+        )
+    )
+    records.extend(
+        record
+        for intent in sorted(model.commandability.recovery_intents, key=lambda item: item.id)
+        for record in _recovery_intent_command_relationship_records(
+            intent,
+            model.command_ids,
+        )
+    )
+    records.extend(
+        record
         for telemetry in sorted(model.telemetry, key=lambda item: item.id)
         for record in _telemetry_subsystem_relationship_records(
             telemetry,
@@ -279,6 +333,68 @@ def _autonomous_action_command_relationship_records(
             },
             "derived_from": {
                 "model_field": "commandability.autonomous_actions[].dispatches.command",
+            },
+        }
+    ]
+
+
+def _autonomous_action_fault_trigger_relationship_records(
+    action: AutonomousActionContract,
+    fault_ids: set[str],
+) -> list[dict[str, Any]]:
+    fault_id = action.trigger.fault
+    if fault_id is None or fault_id not in fault_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"autonomous_actions:{action.id}->"
+                f"{REL_AUTONOMOUS_ACTION_TRIGGERED_BY_FAULT}:"
+                f"faults:{fault_id}"
+            ),
+            "relationship_type": REL_AUTONOMOUS_ACTION_TRIGGERED_BY_FAULT,
+            "from": {
+                "domain": "autonomous_actions",
+                "id": action.id,
+            },
+            "to": {
+                "domain": "faults",
+                "id": fault_id,
+            },
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].trigger.fault",
+            },
+        }
+    ]
+
+
+def _autonomous_action_command_source_relationship_records(
+    action: AutonomousActionContract,
+    command_source_ids: set[str],
+) -> list[dict[str, Any]]:
+    source_id = action.dispatches.source
+    if source_id not in command_source_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"autonomous_actions:{action.id}->"
+                f"{REL_AUTONOMOUS_ACTION_USES_COMMAND_SOURCE}:"
+                f"command_sources:{source_id}"
+            ),
+            "relationship_type": REL_AUTONOMOUS_ACTION_USES_COMMAND_SOURCE,
+            "from": {
+                "domain": "autonomous_actions",
+                "id": action.id,
+            },
+            "to": {
+                "domain": "command_sources",
+                "id": source_id,
+            },
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].dispatches.source",
             },
         }
     ]
@@ -506,6 +622,100 @@ def _fault_event_relationship_records(fault: Fault) -> list[dict[str, Any]]:
             },
         }
         for event_id in sorted(fault.emits)
+    ]
+
+
+def _fault_telemetry_relationship_records(
+    fault: Fault,
+    telemetry_ids: set[str],
+) -> list[dict[str, Any]]:
+    telemetry_id = fault.condition.telemetry
+    if telemetry_id is None or telemetry_id not in telemetry_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"faults:{fault.id}->{REL_FAULT_OBSERVES_TELEMETRY}:"
+                f"telemetry:{telemetry_id}"
+            ),
+            "relationship_type": REL_FAULT_OBSERVES_TELEMETRY,
+            "from": {
+                "domain": "faults",
+                "id": fault.id,
+            },
+            "to": {
+                "domain": "telemetry",
+                "id": telemetry_id,
+            },
+            "derived_from": {
+                "model_field": "faults[].condition.telemetry",
+            },
+        }
+    ]
+
+
+def _fault_recovery_mode_relationship_records(
+    fault: Fault,
+    mode_ids: set[str],
+) -> list[dict[str, Any]]:
+    if fault.recovery is None:
+        return []
+
+    mode_id = fault.recovery.mode_transition
+    if mode_id is None or mode_id not in mode_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"faults:{fault.id}->{REL_FAULT_RECOVERY_TARGETS_MODE}:"
+                f"modes:{mode_id}"
+            ),
+            "relationship_type": REL_FAULT_RECOVERY_TARGETS_MODE,
+            "from": {
+                "domain": "faults",
+                "id": fault.id,
+            },
+            "to": {
+                "domain": "modes",
+                "id": mode_id,
+            },
+            "derived_from": {
+                "model_field": "faults[].recovery.mode_transition",
+            },
+        }
+    ]
+
+
+def _fault_recovery_command_relationship_records(
+    fault: Fault,
+    command_ids: set[str],
+) -> list[dict[str, Any]]:
+    if fault.recovery is None:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"faults:{fault.id}->{REL_FAULT_RECOVERY_DISPATCHES_COMMAND}:"
+                f"commands:{command_id}"
+            ),
+            "relationship_type": REL_FAULT_RECOVERY_DISPATCHES_COMMAND,
+            "from": {
+                "domain": "faults",
+                "id": fault.id,
+            },
+            "to": {
+                "domain": "commands",
+                "id": command_id,
+            },
+            "derived_from": {
+                "model_field": "faults[].recovery.auto_commands",
+            },
+        }
+        for command_id in sorted(fault.recovery.auto_commands)
+        if command_id in command_ids
     ]
 
 
@@ -759,6 +969,64 @@ def _recovery_intent_fault_relationship_records(
     ]
 
 
+def _recovery_intent_mode_relationship_records(
+    intent: RecoveryIntent,
+    mode_ids: set[str],
+) -> list[dict[str, Any]]:
+    mode_id = intent.target_mode
+    if mode_id is None or mode_id not in mode_ids:
+        return []
+
+    return [
+        {
+            "relationship_id": (
+                f"recovery_intents:{intent.id}->{REL_RECOVERY_INTENT_TARGETS_MODE}:"
+                f"modes:{mode_id}"
+            ),
+            "relationship_type": REL_RECOVERY_INTENT_TARGETS_MODE,
+            "from": {
+                "domain": "recovery_intents",
+                "id": intent.id,
+            },
+            "to": {
+                "domain": "modes",
+                "id": mode_id,
+            },
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].target_mode",
+            },
+        }
+    ]
+
+
+def _recovery_intent_command_relationship_records(
+    intent: RecoveryIntent,
+    command_ids: set[str],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "relationship_id": (
+                f"recovery_intents:{intent.id}->{REL_RECOVERY_INTENT_INCLUDES_COMMAND}:"
+                f"commands:{command_id}"
+            ),
+            "relationship_type": REL_RECOVERY_INTENT_INCLUDES_COMMAND,
+            "from": {
+                "domain": "recovery_intents",
+                "id": intent.id,
+            },
+            "to": {
+                "domain": "commands",
+                "id": command_id,
+            },
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].commands",
+            },
+        }
+        for command_id in sorted(intent.commands)
+        if command_id in command_ids
+    ]
+
+
 def _telemetry_subsystem_relationship_records(
     telemetry: TelemetryItem,
     subsystem_ids: set[str],
@@ -805,6 +1073,24 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "commands",
             "derived_from": {
                 "model_field": "commandability.autonomous_actions[].dispatches.command",
+            },
+        },
+        REL_AUTONOMOUS_ACTION_TRIGGERED_BY_FAULT: {
+            "relationship_type": REL_AUTONOMOUS_ACTION_TRIGGERED_BY_FAULT,
+            "display_name": "Autonomous action triggered by fault",
+            "from_domain": "autonomous_actions",
+            "to_domain": "faults",
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].trigger.fault",
+            },
+        },
+        REL_AUTONOMOUS_ACTION_USES_COMMAND_SOURCE: {
+            "relationship_type": REL_AUTONOMOUS_ACTION_USES_COMMAND_SOURCE,
+            "display_name": "Autonomous action uses command source",
+            "from_domain": "autonomous_actions",
+            "to_domain": "command_sources",
+            "derived_from": {
+                "model_field": "commandability.autonomous_actions[].dispatches.source",
             },
         },
         REL_COMMANDABILITY_RULE_CONSTRAINS_COMMAND: {
@@ -879,6 +1165,33 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
                 "model_field": "faults[].emits",
             },
         },
+        REL_FAULT_OBSERVES_TELEMETRY: {
+            "relationship_type": REL_FAULT_OBSERVES_TELEMETRY,
+            "display_name": "Fault observes telemetry",
+            "from_domain": "faults",
+            "to_domain": "telemetry",
+            "derived_from": {
+                "model_field": "faults[].condition.telemetry",
+            },
+        },
+        REL_FAULT_RECOVERY_DISPATCHES_COMMAND: {
+            "relationship_type": REL_FAULT_RECOVERY_DISPATCHES_COMMAND,
+            "display_name": "Fault recovery dispatches command",
+            "from_domain": "faults",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "faults[].recovery.auto_commands",
+            },
+        },
+        REL_FAULT_RECOVERY_TARGETS_MODE: {
+            "relationship_type": REL_FAULT_RECOVERY_TARGETS_MODE,
+            "display_name": "Fault recovery targets mode",
+            "from_domain": "faults",
+            "to_domain": "modes",
+            "derived_from": {
+                "model_field": "faults[].recovery.mode_transition",
+            },
+        },
         REL_FAULT_SOURCED_FROM_SUBSYSTEM: {
             "relationship_type": REL_FAULT_SOURCED_FROM_SUBSYSTEM,
             "display_name": "Fault sourced from subsystem",
@@ -942,6 +1255,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
                 "model_field": "payloads[].telemetry.produced",
             },
         },
+        REL_RECOVERY_INTENT_INCLUDES_COMMAND: {
+            "relationship_type": REL_RECOVERY_INTENT_INCLUDES_COMMAND,
+            "display_name": "Recovery intent includes command",
+            "from_domain": "recovery_intents",
+            "to_domain": "commands",
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].commands",
+            },
+        },
         REL_RECOVERY_INTENT_REACTS_TO_EVENT: {
             "relationship_type": REL_RECOVERY_INTENT_REACTS_TO_EVENT,
             "display_name": "Recovery intent reacts to event",
@@ -958,6 +1280,15 @@ def _relationship_types(type_counts: dict[str, int]) -> list[dict[str, Any]]:
             "to_domain": "faults",
             "derived_from": {
                 "model_field": "commandability.recovery_intents[].fault",
+            },
+        },
+        REL_RECOVERY_INTENT_TARGETS_MODE: {
+            "relationship_type": REL_RECOVERY_INTENT_TARGETS_MODE,
+            "display_name": "Recovery intent targets mode",
+            "from_domain": "recovery_intents",
+            "to_domain": "modes",
+            "derived_from": {
+                "model_field": "commandability.recovery_intents[].target_mode",
             },
         },
         REL_TELEMETRY_SOURCED_FROM_SUBSYSTEM: {
