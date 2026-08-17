@@ -78,11 +78,28 @@ def _select_entity_index_contract_fields(index: dict[str, Any]) -> dict[str, Any
 
 def _select_relationship_manifest_contract_fields(
     manifest: dict[str, Any],
-    selected_relationship_ids: list[str],
+    expected: dict[str, Any],
 ) -> dict[str, Any]:
+    """Select the original v1 stable relationship-family contract.
+
+    The manifest may grow through explicitly documented additive relationship
+    families in later minor releases. The v1 golden remains a fixed assertion
+    that the original admitted families keep their names, meanings, counts for
+    this fixture and selected relationship IDs.
+    """
+    stable_types = set(expected["counts"]["relationship_types"])
     emitted_relationship_ids = {
         relationship["relationship_id"] for relationship in manifest["relationships"]
     }
+    stable_type_counts = {
+        relationship_type: manifest["counts"]["relationship_types"][relationship_type]
+        for relationship_type in sorted(stable_types)
+    }
+    stable_relationship_types = [
+        relationship_type
+        for relationship_type in manifest["relationship_types"]
+        if relationship_type["relationship_type"] in stable_types
+    ]
 
     return {
         "manifest_version": manifest["manifest_version"],
@@ -91,11 +108,14 @@ def _select_relationship_manifest_contract_fields(
         "mission": manifest["mission"],
         "boundaries": manifest["boundaries"],
         "derivation_policy": manifest["derivation_policy"],
-        "counts": manifest["counts"],
-        "relationship_types": manifest["relationship_types"],
+        "counts": {
+            "total_relationships": sum(stable_type_counts.values()),
+            "relationship_types": stable_type_counts,
+        },
+        "relationship_types": stable_relationship_types,
         "selected_relationship_ids": [
             relationship_id
-            for relationship_id in selected_relationship_ids
+            for relationship_id in expected["selected_relationship_ids"]
             if relationship_id in emitted_relationship_ids
         ],
     }
@@ -124,9 +144,6 @@ def test_demo_3u_relationship_manifest_matches_golden_contract_signature() -> No
     model = MissionModelLoader().load(DEMO_MISSION)
     manifest = relationship_manifest_to_dict(model, DEMO_MISSION)
 
-    actual = _select_relationship_manifest_contract_fields(
-        manifest,
-        selected_relationship_ids=expected["selected_relationship_ids"],
-    )
+    actual = _select_relationship_manifest_contract_fields(manifest, expected)
 
     assert actual == expected
