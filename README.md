@@ -62,18 +62,31 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-The post-v1 candidate Core-owned integration surface chain is:
+The post-v1 candidate Core-owned integration surface chain consolidated in v1.1.0 is:
 
 ```text
-dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
-scenario_run_index.json     -> Index of Core simulation JSON report runs
-coverage_summary.json       -> Limited coverage derived from Core structured outputs
+dashboard_summary.json       -> Dashboard-ready aggregation of existing Core facts
+scenario_run_index.json      -> Index of Core simulation JSON report runs
+coverage_summary.json        -> Limited coverage derived from Core structured outputs
 simulation JSON expectations -> Additive structured expectation accounting
 ```
 
 These post-v1 surfaces are **candidate**, not part of the original v1.0.0 stable surface.
 
 They are Core-owned read-only structured outputs intended for downstream inspection tools.
+
+Current `main` also contains unreleased additive development after v1.1.0:
+
+```text
+mission_snapshot.json        -> Complete loaded Mission Model in a versioned read-only envelope
+relationship_manifest.json   -> Seven additive explicit FDIR relationship families
+```
+
+`mission_snapshot.json` is a candidate Core-owned inspection surface. It exposes the complete model actually loaded by Core, including structured load diagnostics, without creating a second semantic authority or a Studio-specific API.
+
+The additive FDIR relationship families extend the existing Relationship Manifest from explicit Mission Model fields. They do not rename, remove or change the meaning of the original v1.0 relationship families.
+
+These unreleased additions are development-state capabilities on `main`; they are not retroactively part of the v1.1.0 release.
 
 They do not make OrbitFabric Core a dashboard backend, flight software framework, ground segment, runtime framework, graph engine, Studio API or OpenOBSW/OpenSVF-specific generator.
 
@@ -146,6 +159,8 @@ It models:
 - Core-owned entity index surfaces;
 - Core-owned relationship manifest surfaces;
 - Core-owned post-v1 candidate integration surfaces;
+- a candidate full Mission Model snapshot surface on current `main`;
+- additive explicit FDIR relationship families on current `main`;
 - stability and compatibility classifications;
 - extensibility boundary rules;
 - v1.0 stable Mission Data Contract governance references.
@@ -163,6 +178,8 @@ Mission Model
 ```
 
 The v1.1.0 candidate integration surface chain extends downstream inspection evidence without changing the stable Mission Data Contract baseline.
+
+Current unreleased development additionally exposes the complete loaded Mission Model through `mission_snapshot.json` and extends the Relationship Manifest with explicit additive FDIR relationships.
 
 ---
 
@@ -197,7 +214,7 @@ Generated Runtime Skeletons are runtime-facing contract bindings.
 
 Ground Integration Artifacts are ground-facing contract exports.
 
-Contract Introspection, Entity Index, Relationship Manifest and post-v1 candidate integration surfaces are Core-derived read-only structured surfaces.
+Contract Introspection, Entity Index, Relationship Manifest, Mission Snapshot and post-v1 candidate integration surfaces are Core-derived read-only structured surfaces.
 
 Stability, compatibility, extensibility and v1.0 references are governance and documentation surfaces.
 
@@ -252,6 +269,8 @@ payload.start_acquisition
 
 The v1.1.0 candidate integration surfaces add dashboard-ready aggregation, scenario run indexing, limited coverage summary and structured expectation accounting on top of that evidence chain.
 
+Current unreleased development can additionally export the complete loaded demo contract through `mission_snapshot.json` and expose explicit FDIR relationships through the Relationship Manifest.
+
 ---
 
 ## Local Development
@@ -303,6 +322,9 @@ Pass `--json`, `--output-dir` or `--output-file` explicitly when a different des
 ```bash
 orbitfabric lint examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/lint_report.json
+
+orbitfabric export mission-snapshot examples/demo-3u/mission/ \
+  --json examples/demo-3u/generated/reports/mission_snapshot.json
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/model_summary.json
@@ -391,6 +413,8 @@ Useful entry points:
 - `docs/reference/golden-output-regression-confidence.md`
 - `docs/reference/extensibility-boundary-contract.md`
 - `docs/reference/post-v1-candidate-integration-surfaces.md`
+- `docs/reference/mission-snapshot-surface.md`
+- `docs/reference/relationship-manifest-surface.md`
 - `docs/reference/dashboard-summary-surface.md`
 - `docs/reference/scenario-run-index-surface.md`
 - `docs/reference/coverage-summary-surface.md`
