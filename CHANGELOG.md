@@ -8,7 +8,38 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- Added the candidate `mission_snapshot.json` Core-owned read-only inspection surface for the complete loaded Mission Model.
+- Added `orbitfabric export mission-snapshot <mission_dir> --json <path>`.
+- Added structured load-failure diagnostics to the Mission Snapshot envelope while preserving the rule that no partial semantic Mission Model is exposed when Core cannot load the contract.
+- Added Mission Snapshot reference documentation and regression tests for export and CLI behavior.
+- Added seven explicit FDIR-oriented relationship families to `relationship_manifest.json`:
+  - `autonomous_action_triggered_by_fault`;
+  - `autonomous_action_uses_command_source`;
+  - `fault_observes_telemetry`;
+  - `fault_recovery_dispatches_command`;
+  - `fault_recovery_targets_mode`;
+  - `recovery_intent_includes_command`;
+  - `recovery_intent_targets_mode`.
+- Added tests covering the additive FDIR relationship families while preserving the original v1 relationship-family golden contract.
+
+### Changed
+
+- Documented that Relationship Manifest relationship types are extensible through reviewed additive families derived deterministically from explicit loaded Mission Model fields.
+- Aligned README, public documentation home, architecture, project charter, roadmap, quickstart and post-v1 candidate surface references with the actual post-v1.1 development state.
+
+### Compatibility impact
+
+No Mission Data Contract semantic migration is introduced by these unreleased changes.
+
+`mission_snapshot.json` is an additive candidate Core-owned surface. It does not replace the Mission Model as source of truth, does not expose a YAML AST or source-editing model, and is not a Studio-specific API.
+
+The seven FDIR relationship families are additive relationship types derived from explicit existing Mission Model fields. They do not rename, remove or change the meaning of any original v1.0 relationship family.
+
+The original v1 golden regression remains fixed on the original relationship-family contract. Compatible downstream consumers must tolerate unknown additive relationship types or explicitly pin themselves to a narrower supported release contract.
+
+These unreleased additions do not introduce plugin execution, runtime behavior, ground behavior, relationship graph behavior, dependency graph behavior or tool-specific integration behavior.
 
 ## [v1.1.0] - 2026-06-13
 
