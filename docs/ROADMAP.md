@@ -1,8 +1,8 @@
 # OrbitFabric - Roadmap
 
-Version: v1.1.0  
-Status: Candidate Integration Surface Consolidation released  
-Scope: completed path to v1.0.0, current v1.1.0 candidate Core-owned integration surfaces and post-v1 direction
+Version: v1.1.0 public release baseline with unreleased post-v1.1 development  
+Status: Candidate Integration Surface Consolidation released; additive inspection development present on `main`  
+Scope: completed path to v1.0.0, v1.1.0 candidate surfaces, current unreleased Core additions and post-v1 direction
 
 ---
 
@@ -30,6 +30,8 @@ The v1.0.0 release completed the first stable narrow Mission Data Contract basel
 
 The v1.1.0 release consolidates post-v1 Core-owned candidate integration surfaces without replacing that baseline.
 
+Current `main` contains additional additive candidate inspection development that remains unreleased until a separate release decision classifies it.
+
 ---
 
 ## 2. Roadmap Overview
@@ -55,14 +57,17 @@ v0.11.0 Extensibility Boundary Contract, no execution            completed
 v0.12.0 v1.0 Release Candidate Hardening                         completed
 v1.0.0  Stable Mission Data Contract                             completed
 post-v1  Candidate Core-owned integration surfaces               completed
-v1.1.0   Candidate surface consolidation release                 completed
+v1.1.0  Candidate surface consolidation release                  completed
+post-v1.1 Mission Snapshot + additive FDIR relationships          implemented on main / unreleased
 ```
 
-The current completed milestone is:
+The current public release is:
 
 ```text
 v1.1.0 - Candidate Integration Surface Consolidation
 ```
+
+The current repository development baseline additionally contains the Mission Snapshot candidate surface and additive explicit FDIR relationship families.
 
 ---
 
@@ -115,7 +120,7 @@ lint JSON report
 simulation JSON report
 model_summary.json
 entity_index.json
-relationship_manifest.json for admitted families
+relationship_manifest.json for original admitted families
 CLI command interface for documented workflows
 release compatibility policy
 extensibility boundary contract
@@ -203,7 +208,53 @@ avoid Projection Profiles implementation until a separate RFC/design decision
 
 ---
 
-## 7. Post-v1.0 Direction
+## 7. Current Unreleased Development
+
+After v1.1.0, two additive Core changes have been implemented on `main`:
+
+```text
+mission_snapshot.json
+seven explicit FDIR relationship families in relationship_manifest.json
+```
+
+### Mission Snapshot
+
+The Mission Snapshot is a candidate Core-owned read-only surface that answers:
+
+```text
+What complete Mission Model did Core actually load?
+```
+
+It exposes the loaded model in a versioned envelope with structured load diagnostics.
+
+It does not expose a YAML AST, source editing semantics, a partial semantic model after structural load failure, plugin execution or a Studio-specific API.
+
+### Additive FDIR relationships
+
+The Relationship Manifest now includes seven additional FDIR-oriented relationship families derived only from explicit Mission Model fields.
+
+The original v1 relationship families remain unchanged and protected by the original compatibility posture.
+
+The relationship-type set must therefore be treated as additively extensible rather than permanently closed unless a downstream consumer intentionally pins itself to a narrower release contract.
+
+### Release posture
+
+These additions are implemented but unreleased.
+
+They must not be described as part of v1.1.0.
+
+Before a future minor release, Core must explicitly decide:
+
+```text
+which surfaces remain candidate
+whether any compatibility promises are strengthened
+which additional golden or regression signatures are required
+whether a release should remain a consolidation slice rather than adding new Mission Model semantics
+```
+
+---
+
+## 8. Post-v1.0 Direction
 
 Post-v1.0 work must preserve the same discipline:
 
@@ -214,6 +265,7 @@ Post-v1.0 work must preserve the same discipline:
 4. require compatibility or migration notes for stable-surface changes
 5. avoid tool-specific claims without implementation and tests
 6. avoid plugin execution until a separate design accepts that scope
+7. distinguish published release contents from unreleased main development
 ```
 
 Valid future work may include:
@@ -229,13 +281,14 @@ schema migration tooling, if separately designed
 tool-specific exports, if implemented and tested
 extension metadata, if kept descriptive and non-executing
 plugin discovery/loading/execution, only after a separate architectural decision
+Projection Profiles, only after RFC/design closure and without moving ecosystem-specific semantics into Core
 ```
 
 ---
 
-## 8. Backlog Parking Lot
+## 9. Backlog Parking Lot
 
-These ideas are valid but are not part of the v1.0.0 stable release boundary and are not part of the v1.1.0 candidate surface consolidation unless explicitly stated:
+These ideas are valid but are not part of the v1.0.0 stable release boundary, are not part of the v1.1.0 candidate surface consolidation and are not implied by the current unreleased Mission Snapshot/FDIR additions unless explicitly stated:
 
 ```text
 XTCE export
@@ -281,11 +334,13 @@ plugin execution
 
 ---
 
-## 9. Final Roadmap Statement
+## 10. Final Roadmap Statement
 
-OrbitFabric v1.1.0 is the current project release.
+OrbitFabric v1.1.0 is the current public project release.
 
 OrbitFabric v1.0.0 remains the stable Mission Data Contract baseline.
+
+Current `main` contains unreleased additive inspection development that must be classified explicitly before the next release.
 
 The stable statement is:
 

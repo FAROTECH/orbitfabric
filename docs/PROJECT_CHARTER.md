@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 1.1.0  
+Version: 1.1.0 public release baseline with unreleased post-v1.1 development  
 Status: Current public release with v1.0.0 Stable Mission Data Contract baseline preserved  
-Scope: Mission Data Contract foundation, Core-owned stable surfaces, post-v1 candidate integration surfaces, extensibility boundary and compatibility governance
+Scope: Mission Data Contract foundation, Core-owned stable surfaces, post-v1 candidate integration surfaces, current unreleased inspection additions, extensibility boundary and compatibility governance
 
 ---
 
@@ -40,6 +40,15 @@ The current release distinction is:
 v1.1.0 -> current public project release
 v1.0.0 -> stable Mission Data Contract baseline
 ```
+
+Current `main` additionally contains unreleased additive development:
+
+```text
+mission_snapshot.json      -> candidate full loaded Mission Model inspection surface
+relationship_manifest     -> seven additive explicit FDIR relationship families
+```
+
+These additions are not retroactively part of v1.1.0 and do not change the v1.0.0 stable Mission Data Contract baseline.
 
 The post-v1 candidate surfaces are Core-owned read-only structured outputs, but they have not been promoted to the original v1.0.0 stable compatibility class.
 
@@ -190,7 +199,18 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-The candidate surfaces are Core-owned, but they are not part of the original v1.0.0 stable surface.
+Current unreleased development adds:
+
+```text
+mission_snapshot.json
+seven explicit FDIR relationship families in relationship_manifest.json
+```
+
+The Mission Snapshot exposes the complete loaded contract through a versioned, Core-owned read-only envelope. It does not create a second source of truth, a YAML editing model or a Studio-specific API.
+
+The additive FDIR relationship families are derived only from explicit Mission Model fields and preserve the original v1 relationship-family commitments.
+
+The candidate surfaces are Core-owned, but they are not part of the original v1.0.0 stable surface unless explicitly promoted by a later compatibility decision.
 
 ### 7.4 Generated Artifacts Are Disposable Unless Classified Otherwise
 
@@ -205,6 +225,8 @@ Users must not place handwritten implementation code inside generated files.
 After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
 
 A surface does not become stable only because it exists.
+
+Additive relationship types must remain explicitly documented compatibility additions and must not be silently treated as a permanently closed enumeration.
 
 ### 7.6 Scenario Evidence Is Host-Side Contract Evidence
 
@@ -231,7 +253,7 @@ lint JSON report
 simulation JSON report
 model_summary.json
 entity_index.json
-relationship_manifest.json for admitted families
+relationship_manifest.json for original admitted families
 CLI command interface for documented workflows
 release compatibility policy
 extensibility boundary contract
@@ -266,9 +288,9 @@ v1.1.0 consolidates post-v1 Core-owned candidate integration surfaces.
 These surfaces are:
 
 ```text
-dashboard_summary.json      -> dashboard-ready aggregation of existing Core facts
-scenario_run_index.json     -> simulation JSON report run index
-coverage_summary.json       -> limited coverage derived from Core structured outputs
+dashboard_summary.json       -> dashboard-ready aggregation of existing Core facts
+scenario_run_index.json      -> simulation JSON report run index
+coverage_summary.json        -> limited coverage derived from Core structured outputs
 simulation JSON expectations -> additive structured expectation accounting
 ```
 
@@ -280,7 +302,24 @@ They do not make OrbitFabric Core a dashboard backend, ground segment, Studio AP
 
 ---
 
-## 10. Non-Goals
+## 10. Current Unreleased Candidate Development
+
+Current `main` contains two additive developments after v1.1.0:
+
+```text
+mission_snapshot.json
+seven explicit FDIR relationship families in relationship_manifest.json
+```
+
+The Mission Snapshot provides deterministic full-loaded-model inspection and structured load diagnostics without exposing partial semantic models on structural load failure.
+
+The FDIR extension increases explicit relationship visibility without introducing inferred relationship or dependency graph behavior.
+
+A future release decision must classify these additions explicitly. Their presence on `main` does not automatically promote them to a stable compatibility class.
+
+---
+
+## 11. Non-Goals
 
 OrbitFabric must not become:
 
@@ -311,7 +350,7 @@ They are not part of the current Core charter.
 
 ---
 
-## 11. Golden Signature Boundary
+## 12. Golden Signature Boundary
 
 The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
 
@@ -342,7 +381,7 @@ disposable artifact formatting
 
 ---
 
-## 12. Demo Evidence Chain
+## 13. Demo Evidence Chain
 
 The selected v1.0 demo evidence chain is:
 
@@ -365,11 +404,13 @@ payload.start_acquisition
 
 This demonstrates Mission Data Contract continuity.
 
+Current unreleased development adds full loaded-contract inspection and additional explicit FDIR relationship visibility around that stable evidence chain.
+
 It does not demonstrate flight readiness, ground readiness, protocol compliance, tool-specific integration, security enforcement or operational completeness.
 
 ---
 
-## 13. Final Charter Statement
+## 14. Final Charter Statement
 
 OrbitFabric must remain excellent at one thing:
 
