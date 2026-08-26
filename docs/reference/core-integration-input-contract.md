@@ -1,6 +1,6 @@
 # Core Integration Input Contract
 
-Status: Architecture candidate  
+Status: Architecture candidate — Phase B.1 design-frozen pending release gate  
 Contract version: `0.1-candidate`  
 Scope: Core-owned machine-readable input boundary for external ecosystem integrations  
 Parent architecture issue: #227  
@@ -44,7 +44,7 @@ The Integration Input Set is derived, read-only and non-authoritative.
 
 ## 2. Architectural constraints
 
-The Integration Input Contract must preserve these existing OrbitFabric rules:
+The Integration Input Contract preserves these existing OrbitFabric rules:
 
 ```text
 Mission Model semantics are Core-owned.
@@ -104,11 +104,20 @@ The canonical production boundary is therefore a **Core Integration Input Set** 
 
 ---
 
-## 4. Canonical input-set roles
+## 4. Frozen canonical input-set roles
 
 ### 4.1 Required projection surfaces
 
-A projection-capable loaded input set requires:
+A loaded input set is projection-capable only when these four roles are available and compatible:
+
+```text
+mission_snapshot
+entity_index
+relationship_manifest
+lint_report
+```
+
+Their canonical files are:
 
 ```text
 mission_snapshot.json
@@ -117,9 +126,7 @@ relationship_manifest.json
 lint_report.json
 ```
 
-Their roles are distinct.
-
-### `mission_snapshot.json`
+#### `mission_snapshot`
 
 Role:
 
@@ -129,11 +136,11 @@ complete loaded Mission Model semantics
 
 The adapter consumes Mission Model fields from this surface instead of reading Mission Model YAML.
 
-This role is conditional on the release/compatibility decision in #224.
+This role remains conditional on the release/compatibility decision in #224.
 
 Until #224 resolves Mission Snapshot classification sufficiently for production integration, this contract remains an architecture candidate.
 
-### `entity_index.json`
+#### `entity_index`
 
 Role:
 
@@ -143,7 +150,7 @@ canonical indexed entity identity/domain inventory
 
 The adapter must use Core-owned entity identity rather than inventing entity records or deriving identities from target naming conventions.
 
-### `relationship_manifest.json`
+#### `relationship_manifest`
 
 Role:
 
@@ -155,7 +162,7 @@ The adapter must not reconstruct missing Core relationship semantics from Missio
 
 Unknown additive relationship families must follow the Relationship Manifest compatibility rules. Their semantics must never be guessed.
 
-### `lint_report.json`
+#### `lint_report`
 
 Role:
 
@@ -165,13 +172,21 @@ Core-owned semantic lint result and findings
 
 Loadability and semantic lint remain different questions.
 
+The lint report is required because a production adapter must know the Core semantic-validation state before projection/generation.
+
 An Integration Adapter may use lint state as a generation gate, but it must not rewrite Core findings as integration diagnostics.
 
 ---
 
 ### 4.2 Canonical companion surface
 
-The coherent set should also include:
+The input set also defines one canonical companion role:
+
+```text
+model_summary
+```
+
+Canonical file:
 
 ```text
 model_summary.json
@@ -183,13 +198,21 @@ Role:
 domain-level introspection and consistency information
 ```
 
-`model_summary.json` is useful to downstream inspection and orchestration, but it is not the complete semantic input and must not be used to reconstruct entity semantics.
+`model_summary` is useful to downstream inspection, orchestration and UI composition, but it is not required for semantic projection.
 
-An adapter implementation must not require model-summary-only information that cannot be obtained through documented Core-owned semantics.
+Therefore:
+
+```text
+model_summary unavailable
+    -> input set is degraded for introspection
+    -> projection may still proceed when every required role is valid
+```
+
+An adapter must not depend on model-summary-only information that cannot be obtained through documented Core-owned semantics.
 
 ---
 
-## 5. Integration Input Manifest
+## 5. Frozen Integration Input Manifest envelope
 
 The input set is described by a small Core-owned manifest:
 
@@ -201,7 +224,7 @@ The manifest is metadata/provenance only.
 
 It must not duplicate Mission Model semantic payloads.
 
-Conceptual shape:
+The v0 candidate envelope is:
 
 ```json
 {
@@ -216,52 +239,162 @@ Conceptual shape:
   "lint_result": "passed",
   "surfaces": [
     {
-      "role": "mission_snapshot",
-      "kind": "orbitfabric.mission_snapshot",
-      "format_version": "0.1-candidate",
-      "path": "mission_snapshot.json",
-      "sha256": "..."
-    },
-    {
       "role": "entity_index",
+      "requirement": "required",
+      "status": "available",
       "kind": "orbitfabric.entity_index",
       "format_version": "0.1",
       "path": "entity_index.json",
-      "sha256": "..."
-    },
-    {
-      "role": "relationship_manifest",
-      "kind": "orbitfabric.relationship_manifest",
-      "format_version": "0.1-candidate",
-      "path": "relationship_manifest.json",
-      "sha256": "..."
+      "sha256": "...",
+      "unavailable_reason": null
     },
     {
       "role": "lint_report",
+      "requirement": "required",
+      "status": "available",
       "kind": "orbitfabric-lint",
       "format_version": "v1",
       "path": "lint_report.json",
-      "sha256": "..."
+      "sha256": "...",
+      "unavailable_reason": null
+    },
+    {
+      "role": "mission_snapshot",
+      "requirement": "required",
+      "status": "available",
+      "kind": "orbitfabric.mission_snapshot",
+      "format_version": "0.1-candidate",
+      "path": "mission_snapshot.json",
+      "sha256": "...",
+      "unavailable_reason": null
     },
     {
       "role": "model_summary",
+      "requirement": "companion",
+      "status": "available",
       "kind": "orbitfabric.model_summary",
       "format_version": "0.1",
       "path": "model_summary.json",
-      "sha256": "..."
+      "sha256": "...",
+      "unavailable_reason": null
+    },
+    {
+      "role": "relationship_manifest",
+      "requirement": "required",
+      "status": "available",
+      "kind": "orbitfabric.relationship_manifest",
+      "format_version": "0.1-candidate",
+      "path": "relationship_manifest.json",
+      "sha256": "...",
+      "unavailable_reason": null
     }
   ],
   "input_set_sha256": "..."
 }
 ```
 
-The exact JSON schema remains candidate until #228 is accepted.
+The `surfaces` array is emitted in ascending lexical order by `role` for deterministic serialization.
+
+Every canonical role has exactly one surface record.
+
+A surface record is never silently omitted merely because the surface could not be produced.
 
 ---
 
-## 6. Surface-version normalization
+## 6. Surface record contract
 
-Different Core surfaces currently expose different version-field names.
+Every surface record contains:
+
+```text
+role
+requirement
+status
+kind
+format_version
+path
+sha256
+unavailable_reason
+```
+
+### `requirement`
+
+Allowed v0 values:
+
+```text
+required
+companion
+```
+
+Meaning:
+
+```text
+required
+    -> unavailable/incompatible blocks semantic projection
+
+companion
+    -> unavailable/incompatible degrades inspection/orchestration
+       but does not by itself block projection
+```
+
+### `status`
+
+Allowed v0 values:
+
+```text
+available
+unavailable
+```
+
+### Available record
+
+When:
+
+```text
+status = available
+```
+
+then:
+
+```text
+path                  = non-null relative path
+sha256                = non-null lowercase hexadecimal SHA-256
+unavailable_reason    = null
+```
+
+### Unavailable record
+
+When:
+
+```text
+status = unavailable
+```
+
+then:
+
+```text
+path                  = null
+sha256                = null
+unavailable_reason    = non-null controlled value
+```
+
+`kind` and `format_version` remain present even for an unavailable record because they identify the contract role Core attempted to produce.
+
+Initial controlled `unavailable_reason` values are:
+
+```text
+load_failed
+generation_failed
+```
+
+A later additive reason may be introduced only with documented meaning.
+
+Consumers must not infer a reason from file-system state when the manifest already declares one.
+
+---
+
+## 7. Surface-version normalization
+
+Different Core surfaces expose different native version-field names.
 
 Examples include:
 
@@ -281,19 +414,43 @@ surfaces[].format_version
 
 This does not replace or change the version field inside the underlying surface.
 
-It records the Core-declared compatibility identifier that an Integration Adapter must negotiate for that role.
+It records the Core-declared compatibility identifier that an Integration Adapter negotiates for that role.
 
-For stable report families that do not currently expose an independent report-format version field, such as the lint JSON report, the manifest may expose a Core-governed compatibility label such as:
+### Lint JSON compatibility label
+
+The stable lint JSON report does not currently expose an independent report-format version field. Its top-level:
+
+```text
+version
+```
+
+is the OrbitFabric package version, not a report-schema identifier.
+
+For the Core Integration Input Contract, the lint JSON shape stabilized from the v1.0 Mission Data Contract baseline is therefore identified by the normalized compatibility label:
 
 ```text
 v1
 ```
 
-This label is part of the Integration Input Contract, not a reinterpretation of the lint report's top-level package `version` field.
+Thus the frozen v0 role record is:
+
+```json
+{
+  "role": "lint_report",
+  "kind": "orbitfabric-lint",
+  "format_version": "v1"
+}
+```
+
+`v1` is an Integration Input Contract compatibility label.
+
+It does not reinterpret the lint report's native package `version` field.
+
+A future breaking lint JSON contract would require a new normalized label such as `v2`; an additive change compatible with the documented v1 lint contract need not do so.
 
 ---
 
-## 7. Compatibility negotiation
+## 8. Compatibility negotiation
 
 An Integration Adapter must negotiate compatibility using:
 
@@ -301,7 +458,7 @@ An Integration Adapter must negotiate compatibility using:
 input-set kind
 input-set version
 surface role
-surface kind / report identity
+surface kind/report identity
 surface format version
 supported typed records where applicable
 ```
@@ -310,10 +467,10 @@ supported typed records where applicable
 
 It must not be treated as the only compatibility key.
 
-A compatible consumer should:
+A compatible consumer must:
 
 - tolerate unknown additive fields where the underlying Core surface contract permits additive evolution;
-- reject missing fields that are required by the supported contract;
+- reject missing fields required by the supported contract;
 - consume only relationship families whose semantics it understands;
 - safely ignore or preserve unknown additive relationship families according to the Relationship Manifest contract;
 - reject incompatible required surface versions;
@@ -323,9 +480,9 @@ No raw-YAML fallback is permitted when a required Core surface is incompatible.
 
 ---
 
-## 8. Coherent generation invariant
+## 9. Coherent generation invariant
 
-The canonical Integration Input Set must be produced from one logical Core load/lint operation.
+The canonical Integration Input Set is produced from one logical Core load/lint operation.
 
 Conceptually:
 
@@ -334,19 +491,15 @@ load Mission Model once
         ↓
 structural validation
         ↓
-semantic lint
+if loaded: semantic lint
         ↓
-Mission Snapshot
+produce all technically valid Core surfaces
         ↓
-Entity Index
+compute exact surface digests
         ↓
-Relationship Manifest
+record unavailable roles explicitly
         ↓
-Lint Report
-        ↓
-Model Summary
-        ↓
-compute surface digests
+compute input-set digest
         ↓
 write Integration Input Manifest LAST
 ```
@@ -355,36 +508,59 @@ The manifest is written last deliberately.
 
 Consumer invariant:
 
-> A directory containing some integration-input files but no valid Integration Input Manifest is not a coherent Integration Input Set.
-
-This prevents a partially written export from being treated as complete merely because some expected file names exist.
+> A directory containing integration-input files but no valid Integration Input Manifest is not a coherent Integration Input Set.
 
 Implementation may use temporary files/directories and atomic replacement where practical, but the public contract is the manifest-last completeness rule.
 
 ---
 
-## 9. Proposed CLI boundary
+## 10. Frozen CLI boundary
 
-A future implementation may expose a command conceptually equivalent to:
+The v0 candidate CLI shape is:
 
 ```bash
 orbitfabric export integration-input-set <mission_dir> \
-  --output-dir <dir>
+  [--output-dir <dir>]
 ```
 
-The exact command name and options remain subject to review under the v1 CLI compatibility contract.
+When `--output-dir` is omitted, the default is:
 
-The command would produce the coherent set as one Core-owned operation.
+```text
+<mission_workspace>/generated/reports/integration_input/
+```
 
-An external Integration Adapter may invoke this CLI before projection.
+The canonical file names inside that directory are:
+
+```text
+integration_input_manifest.json
+mission_snapshot.json
+entity_index.json
+relationship_manifest.json
+lint_report.json
+model_summary.json
+```
+
+The command does not expose `--json` because the output is a coherent multi-file set.
+
+The v0 candidate does not expose `--warnings-as-errors`.
+
+Warnings remain represented by:
+
+```text
+lint_result = passed_with_warnings
+```
+
+A stricter workflow policy may be imposed by a caller or adapter without changing the Core semantic lint result.
+
+This CLI remains candidate until implemented and classified through the normal Core CLI compatibility process.
 
 The adapter must not depend on OrbitFabric internal Python module APIs as a substitute for this public boundary.
 
 ---
 
-## 10. Load and lint state model
+## 11. Frozen load/lint state model
 
-The input contract preserves separate machine-readable states.
+The input contract preserves separate machine-readable states:
 
 ```text
 process exit status
@@ -395,62 +571,104 @@ load_result
 !=
 lint_result
 !=
+surface availability
+!=
 adapter compatibility result
 ```
 
-### 10.1 Successful load
+Allowed `load_result` values:
 
 ```text
-load_result = loaded
+loaded
+failed
 ```
 
-The Mission Snapshot contains the complete loaded `MissionModel`.
-
-Entity Index, Relationship Manifest and Model Summary may be produced from that loaded model.
-
-Semantic lint is then represented separately.
-
-### 10.2 Structural load failure
+Allowed `lint_result` values:
 
 ```text
-load_result = failed
+passed
+passed_with_warnings
+failed
+not_run
 ```
 
-The Mission Snapshot follows its existing failure contract:
-
-```text
-mission = null
-model = null
-structured diagnostics present
-```
-
-Core must not expose a partial semantic Mission Model.
-
-The Integration Input Manifest should still be written when technically possible so a downstream caller can inspect the failure state.
-
-Loaded-model-dependent surfaces must not be synthesized from partial YAML.
-
-An Integration Adapter must not proceed with semantic projection.
-
-### 10.3 Loaded model with lint errors
-
-A valid loaded model may coexist with:
-
-```text
-lint_result = failed
-```
-
-This is not structural load failure.
-
-The default production projection/generation posture should remain consistent with existing Core generation commands: Core lint errors block generation.
-
-A future adapter may offer an inspection-only mode, but such a mode must preserve the Core lint result and must not claim production-ready projection.
+`not_run` is valid only when semantic lint could not be executed because the Mission Model was not successfully loaded.
 
 ---
 
-## 11. Diagnostic ownership
+## 12. Failure-state matrix
 
-Diagnostic authority remains explicit.
+The v0 candidate producer/consumer behavior is:
+
+| Condition | Manifest | Mission Snapshot | Entity Index | Relationship Manifest | Lint Report | Model Summary | CLI exit | Projection |
+|---|---|---|---|---|---|---|---|---|
+| loaded + lint passed | available | available | available | available | available | available | `0` | allowed |
+| loaded + lint warnings | available | available | available | available | available | available | `0` | allowed; warnings preserved |
+| loaded + lint failed | available | available | available | available | available | available | non-zero | blocked by default |
+| structural load failed | available when technically possible | failed-envelope available | unavailable | unavailable | unavailable | unavailable | non-zero | blocked |
+| required-surface generation failed after load | available when technically possible | per-role state | per-role state | per-role state | per-role state | per-role state | non-zero | blocked |
+| companion-only generation failed | available when technically possible | available | available | available | available | unavailable | non-zero | allowed, degraded |
+| manifest write failed | unavailable/invalid | partial files may exist | partial files may exist | partial files may exist | partial files may exist | partial files may exist | non-zero | rejected as incoherent |
+
+### Structural load failure envelope
+
+When structural loading fails:
+
+```text
+load_result = failed
+lint_result = not_run
+mission = null
+```
+
+`mission_snapshot` is still `available` when Core can write its documented failed envelope:
+
+```text
+Mission Snapshot result = failed
+mission = null
+model = null
+structured Core load diagnostics present
+```
+
+The remaining loaded-model-dependent roles are explicitly represented as:
+
+```text
+status = unavailable
+unavailable_reason = load_failed
+```
+
+Example:
+
+```json
+{
+  "kind": "orbitfabric.integration_input_set",
+  "input_set_version": "0.1-candidate",
+  "orbitfabric_version": "1.x",
+  "mission": null,
+  "load_result": "failed",
+  "lint_result": "not_run",
+  "surfaces": [
+    {
+      "role": "entity_index",
+      "requirement": "required",
+      "status": "unavailable",
+      "kind": "orbitfabric.entity_index",
+      "format_version": "0.1",
+      "path": null,
+      "sha256": null,
+      "unavailable_reason": "load_failed"
+    }
+  ],
+  "input_set_sha256": "..."
+}
+```
+
+Core must not expose a partial semantic Mission Model and must not synthesize loaded-model surfaces from partial YAML.
+
+---
+
+## 13. Diagnostic ownership
+
+Diagnostic authority remains explicit:
 
 ```text
 Core structural/load diagnostic
@@ -468,40 +686,111 @@ An adapter may produce an integration diagnostic such as:
 projection blocked because Core lint result is failed
 ```
 
-but the diagnostic must reference the Core result rather than copying or rewriting Core findings into a new authority domain.
+but it must reference the Core result rather than copying or rewriting Core findings into a new authority domain.
 
 Adapter diagnostics must never be injected into Core lint output.
 
+The Integration Input Manifest does not duplicate diagnostic arrays.
+
+It points consumers to the Core-owned surfaces whose responsibility already includes those diagnostics:
+
+```text
+mission_snapshot -> structural/load diagnostics
+lint_report      -> semantic lint findings
+```
+
 ---
 
-## 12. Provenance and digests
+## 14. Exact per-surface digest
 
-Each surface record contains a SHA-256 digest of the exact serialized surface bytes referenced by the manifest.
+For every available role:
+
+```text
+surfaces[].sha256
+```
+
+is the lowercase hexadecimal SHA-256 of the exact serialized bytes referenced by `surfaces[].path`.
 
 This provides:
 
 ```text
-exact input reproducibility
+exact input identity
 artifact-to-input provenance
 later staleness comparison
 corruption/change detection
 ```
 
-The input set additionally contains an `input_set_sha256` derived deterministically from the manifest's compatibility/provenance fields and ordered surface records, excluding the `input_set_sha256` field itself.
+Because this is an exact-byte digest, independently regenerated surfaces may differ when their serialized provenance differs even if the underlying Mission Model semantics are equivalent.
 
-The exact canonical JSON encoding used for that calculation must be specified before implementation.
+The v0 contract intentionally does not claim cross-generation semantic equivalence.
 
-Timestamps are not required for identity and must never be the primary staleness mechanism.
-
-`mission_dir` may remain useful provenance, but an absolute path is not semantic identity and must not participate in portable equivalence decisions.
-
-Surface paths recorded by the Integration Input Manifest should be relative to the manifest location unless a later contract explicitly requires another URI scheme.
+Moving an already-generated input set without modifying its files does not invalidate these digests because manifest paths are relative to the manifest location.
 
 ---
 
-## 13. No semantic Mission fingerprint in v0
+## 15. Frozen `input_set_sha256` algorithm
 
-The v0 contract deliberately does **not** define a canonical Mission semantic fingerprint independent of serialization.
+`input_set_sha256` fingerprints the coherent input-set contract/provenance state.
+
+The producer constructs a **digest payload** from the manifest containing exactly:
+
+```text
+kind
+input_set_version
+orbitfabric_version
+mission
+load_result
+lint_result
+surfaces[]
+```
+
+For each surface record, the digest payload contains:
+
+```text
+role
+requirement
+status
+kind
+format_version
+sha256
+unavailable_reason
+```
+
+The digest payload deliberately excludes:
+
+```text
+surfaces[].path
+input_set_sha256
+file timestamps
+filesystem metadata
+absolute source/workspace paths not otherwise part of a surface digest
+```
+
+Before hashing:
+
+1. `surfaces` records are sorted in ascending lexical order by `role`;
+2. the digest payload is serialized using **RFC 8785 JSON Canonicalization Scheme (JCS)**;
+3. `input_set_sha256` is the lowercase hexadecimal SHA-256 of the resulting UTF-8 canonical bytes.
+
+Conceptually:
+
+```text
+manifest
+  ↓ select digest fields
+  ↓ sort surfaces by role
+  ↓ RFC 8785 / JCS
+  ↓ UTF-8 bytes
+  ↓ SHA-256
+input_set_sha256
+```
+
+This avoids a Python-specific or whitespace-sensitive manifest fingerprint and makes the algorithm reproducible by integration adapters implemented in other languages.
+
+---
+
+## 16. No semantic Mission fingerprint in v0
+
+The v0 contract deliberately does **not** define a canonical Mission semantic fingerprint independent of serialized Core surfaces.
 
 A semantic fingerprint would require a compatibility-sensitive canonicalization policy for concepts such as:
 
@@ -531,15 +820,33 @@ This safely answers:
 Were these exact Core integration inputs used?
 ```
 
-A future canonical semantic fingerprint may be introduced through a separate reviewed compatibility decision if experience proves that semantic-equivalence detection is required.
+It does not answer:
+
+```text
+Are two independently generated input sets semantically equivalent?
+```
+
+A future canonical semantic fingerprint may be introduced only through a separate reviewed compatibility decision.
 
 ---
 
-## 14. Missing or incompatible surfaces
+## 17. Missing, corrupt or incompatible surfaces
 
-The canonical manifest must make surface availability explicit.
+A required role that is:
 
-A required surface that is missing, unreadable, digest-invalid or version-incompatible blocks projection.
+```text
+unavailable
+missing from the manifest
+duplicated in the manifest
+unreadable
+digest-invalid
+kind-incompatible
+format-version-incompatible
+```
+
+blocks projection.
+
+A companion role with those conditions degrades companion functionality but does not by itself block projection.
 
 The adapter must not recover by:
 
@@ -557,7 +864,7 @@ The boundary remains Core-owned.
 
 ---
 
-## 15. Inputs deliberately excluded from the projection contract
+## 18. Inputs deliberately excluded from the projection contract
 
 The first Core Integration Input Set does not require:
 
@@ -581,33 +888,36 @@ These belong to dashboard/evidence/runtime/integration-output concerns, not to t
 
 ---
 
-## 16. Consumer algorithm
+## 19. Frozen consumer algorithm
 
-A projection-capable Integration Adapter should conceptually perform:
+A projection-capable Integration Adapter performs conceptually:
 
 ```text
 1. Load integration_input_manifest.json.
 2. Verify kind and input_set_version.
-3. Verify required surface roles exist.
-4. Verify each required surface SHA-256.
-5. Verify supported role/kind/format_version combinations.
-6. Verify Mission identity consistency exposed by Core.
-7. Inspect load_result.
-8. Stop if load_result != loaded.
-9. Inspect lint_result.
-10. Apply the adapter's documented generation gate without rewriting Core findings.
-11. Load Mission Snapshot semantics.
-12. Resolve authored Profile references against Entity Index identities.
-13. Consume admitted Core relationships from Relationship Manifest.
-14. Perform projection-specific validation.
-15. Produce extension-owned Integration Result and target artifacts.
+3. Verify exactly one record exists for every canonical role.
+4. Verify input_set_sha256 using the frozen JCS algorithm.
+5. Inspect load_result.
+6. Stop if load_result != loaded.
+7. Verify every required role has status = available.
+8. Verify each available surface SHA-256.
+9. Verify supported role/kind/format_version combinations.
+10. Verify Mission identity consistency exposed by Core surfaces.
+11. Inspect lint_result.
+12. Apply the documented generation gate without rewriting Core findings.
+13. Load Mission Snapshot semantics.
+14. Resolve authored Profile references against Entity Index identities.
+15. Consume admitted Core relationships from Relationship Manifest.
+16. Optionally consume Model Summary for introspection/orchestration.
+17. Perform projection-specific validation.
+18. Produce extension-owned Integration Result and target artifacts.
 ```
 
 At no point does the adapter reconstruct OrbitFabric semantics from raw YAML.
 
 ---
 
-## 17. Relationship to Projection Profiles
+## 20. Relationship to Projection Profiles
 
 The Projection Profile contract depends on this input contract.
 
@@ -629,7 +939,7 @@ Integration Result
 
 ---
 
-## 18. Relationship to Studio
+## 21. Relationship to Studio
 
 Studio may orchestrate generation of the Core Integration Input Set or inspect it through a future integration plugin.
 
@@ -643,11 +953,11 @@ replace Core lint findings
 calculate integration provenance from timestamps alone
 ```
 
-The same input contract should be usable from CLI-only workflows and Studio workflows.
+The same input contract is usable from CLI-only workflows and Studio workflows.
 
 ---
 
-## 19. Relationship to ecosystem-specific tools
+## 22. Relationship to ecosystem-specific tools
 
 The Core Integration Input Contract contains no OpenOBSW, OpenSVF, YAMCS, PUS, SRDB or other ecosystem-specific semantics.
 
@@ -657,53 +967,132 @@ The OpenOBSW/OpenSVF PoC is evidence used to derive this architecture; it is not
 
 ---
 
-## 20. Compatibility and release gate
+## 23. Frozen regression-protection requirements
 
-This document is an architecture candidate.
+Implementation of this candidate contract must add regression protection at three levels.
 
-It must not be described as a stable production contract until #224 resolves Mission Snapshot classification sufficiently for the role defined here.
+### 23.1 Manifest contract fixture
 
-Before implementation/freeze, #228 must resolve:
+Maintain a reviewed fixture for a successful loaded mission that protects:
 
 ```text
-exact manifest schema
-exact surface required/optional rules
-exact lint format-version label
-exact failure-surface availability rules
-exact input_set_sha256 canonical encoding
-exact CLI command/options
-required regression/golden protection
-release classification
+top-level field names
+kind
+input_set_version
+canonical role set
+requirement values
+status values
+kind/format_version mapping
+relative-path rule
+controlled result values
 ```
+
+Fields expected to vary between releases or generated content, such as `orbitfabric_version` and SHA-256 values, may be normalized by the fixture helper rather than hard-coded as false stability commitments.
+
+### 23.2 Failure-envelope fixture
+
+Maintain a structural-load-failure fixture protecting:
+
+```text
+mission = null
+load_result = failed
+lint_result = not_run
+failed Mission Snapshot availability
+loaded-model role unavailability
+unavailable_reason = load_failed
+no partial Mission Model reconstruction
+```
+
+### 23.3 Digest algorithm vector
+
+Maintain at least one fixed synthetic digest test vector for:
+
+```text
+digest payload
+RFC 8785 canonical bytes
+expected SHA-256
+```
+
+This vector must not depend on the current OrbitFabric package version or filesystem paths.
+
+### 23.4 End-to-end determinism
+
+Generate the same input set twice from the same mission, Core version and workspace state and verify:
+
+```text
+same surface bytes
+same surface digests
+same input_set_sha256
+```
+
+Existing regression protection for underlying stable surfaces remains authoritative for those surfaces and is not replaced by the new input-set tests.
+
+Mission Snapshot regression/golden scope remains additionally governed by #224.
 
 ---
 
-## 21. Test requirements for implementation
+## 24. Implementation test matrix
 
-A future implementation should cover at least:
+A future implementation must cover at least:
 
 ```text
 valid loaded mission + lint passed
 valid loaded mission + lint warnings
 valid loaded mission + lint failed
 structural load failure with machine-readable manifest
+companion-only generation failure
+required-surface generation failure
 missing required surface detection
+duplicate canonical role detection
 surface digest mismatch detection
+input-set digest mismatch detection
 unsupported input-set version
 unsupported Mission Snapshot version
 unsupported Entity Index version
 unknown additive Relationship Manifest family behavior
+lint format label v1 behavior
 manifest written last / incomplete-set rejection
-relative-path portability
+relative-path relocation of an already-generated set
 repeat generation determinism
+RFC 8785 digest test vector
 no raw-YAML fallback in the reference adapter
 ```
 
-Golden protection should be considered for the manifest envelope and required role records once the candidate contract is accepted.
+---
+
+## 25. Compatibility and release gate
+
+The following Phase B.1 design points are frozen for the `0.1-candidate` contract:
+
+```text
+required surface roles
+companion surface role
+manifest envelope and surface-record fields
+lint format-version label
+load/lint result vocabularies
+failure-surface availability behavior
+per-surface digest rule
+input_set_sha256 canonical algorithm
+CLI command/options/default path
+regression/golden strategy
+```
+
+The remaining gate is release/governance classification:
+
+```text
+#224
+Mission Snapshot release/compatibility decision
+```
+
+This document must not be described as a stable production contract until #224 resolves Mission Snapshot classification sufficiently for the semantic role defined here.
+
+The design freeze is sufficient for the dependent **Projection Profile Contract v0 architecture work** to proceed in parallel.
+
+It is not sufficient to claim a released production Integration Input Contract.
 
 ---
 
-## 22. Non-goals
+## 26. Non-goals
 
 This contract does not define:
 
@@ -723,18 +1112,30 @@ Studio plugin lifecycle
 plugin discovery/loading/execution
 new Mission Model fields
 new Mission Model semantics
+semantic equivalence fingerprinting
 ```
 
 ---
 
-## 23. Final position
+## 27. Final position
 
-The intended production boundary is:
+The design-frozen candidate boundary is:
 
 ```text
 OrbitFabric Core owns mission semantics.
 
 Core emits one coherent, versioned, digest-addressable Integration Input Set.
+
+Mission Snapshot provides complete loaded semantics, subject to #224.
+Entity Index provides canonical entity identity.
+Relationship Manifest provides admitted Core relationships.
+Lint Report provides Core semantic-validation state.
+Model Summary is a non-blocking introspection companion.
+
+The manifest records every canonical role explicitly, including unavailable states.
+
+Exact surface bytes are SHA-256 addressed.
+The coherent input set is SHA-256 addressed through RFC 8785 canonical JSON.
 
 External adapters consume that set and never reconstruct OrbitFabric semantics from raw source files.
 
