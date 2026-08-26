@@ -57,6 +57,7 @@ nav:
       - Core Integration Input Contract: reference/core-integration-input-contract.md
       - Projection Profile Contract: reference/projection-profile-contract.md
       - Projection Profile Integration Schema Publication: reference/projection-profile-schema-publication.md
+      - Integration Result Contract: reference/integration-result-contract.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
