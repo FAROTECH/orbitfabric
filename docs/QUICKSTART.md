@@ -18,6 +18,8 @@ v1.0.0 - Stable Mission Data Contract
 
 v1.1.0 consolidates post-v1 Core-owned candidate integration surfaces while preserving the deliberately narrow v1.0.0 stable surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
 
+Current `main` additionally includes unreleased candidate Mission Snapshot export and additive explicit FDIR Relationship Manifest families.
+
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
 Generated runtime-facing contract bindings are not flight software.
@@ -95,6 +97,8 @@ Expected current package version:
 orbitfabric 1.1.0
 ```
 
+The package version remains `1.1.0` while current `main` contains unreleased post-v1.1 development.
+
 ---
 
 ## 6. Run core checks
@@ -161,7 +165,36 @@ The explicit path is preserved exactly as provided.
 
 ---
 
-## 10. Export v1.0 stable Core-owned structured surfaces
+## 10. Export the current unreleased Mission Snapshot surface
+
+Current `main` can export the complete loaded Mission Model through the candidate Mission Snapshot surface:
+
+```bash
+orbitfabric export mission-snapshot examples/demo-3u/mission/ \
+  --json examples/demo-3u/generated/reports/mission_snapshot.json
+```
+
+Generated output:
+
+```text
+examples/demo-3u/generated/reports/mission_snapshot.json
+```
+
+The Mission Snapshot answers:
+
+```text
+What complete Mission Model did Core actually load?
+```
+
+It is Core-owned, read-only and versioned.
+
+It does not replace the Mission Model as source of truth, expose a YAML AST, provide source editing semantics, expose a partial semantic model after structural load failure or define a Studio-specific API.
+
+This surface is implemented on current `main` but is not part of the published v1.1.0 release.
+
+---
+
+## 11. Export v1.0 stable Core-owned structured surfaces
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
@@ -190,13 +223,17 @@ entity_index.json           -> What contract entities are defined?
 relationship_manifest.json  -> How are indexed contract entities related?
 ```
 
-They are Core-owned, read-only and derived from the validated Mission Model.
+The original v1 Relationship Manifest compatibility commitments remain stable. Current `main` additionally emits seven explicit FDIR-oriented relationship families derived from existing Mission Model fields.
+
+Compatible consumers must not guess semantics for unknown additive relationship types.
+
+These surfaces are Core-owned, read-only and derived from the validated Mission Model.
 
 They do not expose plugin execution, graph engines, Studio-specific APIs, runtime behavior or ground behavior.
 
 ---
 
-## 11. Export v1.1 candidate Core-owned integration surfaces
+## 12. Export v1.1 candidate Core-owned integration surfaces
 
 ```bash
 orbitfabric export dashboard-summary examples/demo-3u/mission/
@@ -221,7 +258,7 @@ These v1.1.0 surfaces are Core-owned candidate integration surfaces. They are no
 
 ---
 
-## 12. Review v1.0 and v1.1 references
+## 13. Review stable, candidate and unreleased references
 
 Key references include:
 
@@ -236,6 +273,8 @@ v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
 Post-v1 Candidate Integration Surfaces
+Mission Snapshot Surface
+Relationship Manifest Surface
 Dashboard Summary Surface
 Scenario Run Index Surface
 Coverage Summary Surface
@@ -245,13 +284,13 @@ Scenario Evidence Stability
 Release Compatibility Policy
 ```
 
-These references classify stable and candidate surfaces, define the extensibility boundary, record the v1.0 stable posture and explain what is stable, candidate, preview, disposable, internal or out of scope.
+These references classify stable, candidate and current unreleased surfaces, define the extensibility boundary, record the v1.0 stable posture and explain what is stable, candidate, preview, disposable, internal or out of scope.
 
-They do not introduce new Mission Model semantics, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
+They do not introduce runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
 
 ---
 
-## 13. Generate mission documentation
+## 14. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -270,7 +309,7 @@ Do not edit generated files manually.
 
 ---
 
-## 14. Generate runtime-facing contract bindings
+## 15. Generate runtime-facing contract bindings
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -284,7 +323,7 @@ They do not implement onboard behavior.
 
 ---
 
-## 15. Validate the generated C++17 host-build smoke target
+## 16. Validate the generated C++17 host-build smoke target
 
 ```bash
 cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
@@ -303,7 +342,7 @@ It does not validate flight behavior.
 
 ---
 
-## 16. Generate ground integration artifacts
+## 17. Generate ground integration artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
@@ -317,7 +356,7 @@ They do not implement a live ground segment, decoder, telemetry archive, databas
 
 ---
 
-## 17. Run demo scenarios
+## 18. Run demo scenarios
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -352,16 +391,18 @@ The v1.1.0 simulation JSON structured expectation accounting is additive. The le
 
 ---
 
-## 18. What this proves
+## 19. What this proves
 
-The current demo proves that OrbitFabric can:
+The current repository baseline proves that OrbitFabric can:
 
 - load a multi-file YAML Mission Model;
 - validate Mission Model structure;
 - run semantic lint rules;
 - generate documentation;
 - inspect a Mission Model summary;
+- export the candidate full Mission Model snapshot on current `main`;
 - export v1.0 stable Core-owned structured surfaces;
+- emit additive explicit FDIR relationship families on current `main`;
 - export v1.1 candidate Core-owned integration surfaces;
 - validate scenarios without executing them;
 - execute deterministic host-side scenario evidence;
@@ -373,7 +414,7 @@ The current demo proves that OrbitFabric can:
 
 ---
 
-## 19. What this does not prove
+## 20. What this does not prove
 
 The current demo does not prove:
 
