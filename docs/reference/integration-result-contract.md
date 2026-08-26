@@ -11,7 +11,7 @@ Depends on: #228, #231
 
 ## 1. Purpose
 
-The Integration Result Contract defines the machine-readable output boundary produced by an external OrbitFabric Integration Adapter after consuming:
+The Integration Result Contract defines the machine-readable output boundary produced by an external OrbitFabric Integration Adapter after attempting an integration operation against:
 
 ```text
 Core Integration Input Set
@@ -50,17 +50,7 @@ Integration Result
     └── external-tool provenance
 ```
 
-The Integration Result exists so CLI tooling, CI and OrbitFabric Studio do not need to reconstruct integration meaning from:
-
-```text
-generated filenames
-directory conventions
-target naming conventions
-timestamps
-stdout/stderr text
-private adapter state
-Studio state
-```
+The Integration Result exists so CLI tooling, CI and OrbitFabric Studio do not reconstruct integration meaning from generated filenames, directory conventions, target names, timestamps, stdout/stderr, private adapter state or Studio state.
 
 ---
 
@@ -68,7 +58,7 @@ Studio state
 
 An Integration Result is **extension-owned output**.
 
-OrbitFabric governance defines the generic envelope and generic cross-integration semantics documented here, but an Integration Result is not a Core Mission Data Contract surface and does not become a new Core semantic authority.
+OrbitFabric governance defines the generic envelope and generic cross-integration semantics documented here, but an Integration Result is not a Core Mission Data Contract surface and does not become a Core semantic authority.
 
 Ownership remains:
 
@@ -82,14 +72,14 @@ Profile-authored projection choices
 Adapter-resolved mappings, artifacts and diagnostics
     -> Integration Adapter-owned
 
-OpenOBSW/OpenSVF/YAMCS runtime or verification facts
-    -> external-owned and referenced with explicit producer/ownership
+external runtime/verification facts
+    -> remain external-owned and are referenced with explicit producer/ownership
 
 Studio
     -> consumer/orchestrator, never semantic owner
 ```
 
-Core lint findings must not be copied into the Integration Result and presented as integration diagnostics.
+Core structural/lint findings must not be copied into the Integration Result and presented as integration diagnostics.
 
 Integration traceability must not be injected into Core `relationship_manifest.json`.
 
@@ -97,11 +87,11 @@ Integration traceability must not be injected into Core `relationship_manifest.j
 
 ## 3. Relationship to the preceding contracts
 
-The three Phase B contracts have different responsibilities:
+The Phase B contracts have distinct responsibilities:
 
 ```text
 Core Integration Input Contract (#228)
-    -> exact Core-owned semantic/introspection inputs consumed
+    -> exact Core-owned semantic/introspection inputs
 
 Projection Profile Contract (#231)
     -> authored ecosystem-specific projection intent
@@ -110,7 +100,7 @@ Integration Result Contract (#233)
     -> what the adapter actually resolved/generated/validated
 ```
 
-The authority chain is therefore:
+The authority chain is:
 
 ```text
 Core semantic value
@@ -122,7 +112,7 @@ permitted Profile-authored target override
 Integration Result records the resolved outcome
 ```
 
-The Result may explain that chain, but it does not change the authority of any upstream layer.
+The Result may explain that chain but does not change the authority of any upstream layer.
 
 ---
 
@@ -138,15 +128,15 @@ The JSON data model is normative for v0.
 
 No YAML representation, include mechanism, inheritance mechanism or overlay mechanism is required for generated Results.
 
-The file is written **last** after the adapter has finalized result status, mappings, diagnostics, coverage and artifact status.
+The file is written **last** after the adapter has finalized the machine-readable state it can reliably establish.
 
 Consumer invariant:
 
 > A directory containing ecosystem artifacts but no valid `integration_result.json` is not a coherent OrbitFabric Integration Result bundle.
 
-This is analogous to the manifest-last rule of the Core Integration Input Set, while preserving separate ownership.
-
 A failed adapter process should still write an Integration Result when technically possible.
+
+This is best-effort rather than an impossible guarantee: a process may fail before it can construct a valid Result envelope at all. When a Result is written, it must never invent missing input identity merely to satisfy the envelope.
 
 Partial files may exist after failure, but file presence alone never establishes a valid integration result.
 
@@ -154,7 +144,7 @@ Partial files may exist after failure, but file presence alone never establishes
 
 ## 5. Generic top-level envelope
 
-The design-frozen v0 candidate shape is conceptually:
+A successful projection-oriented Result is conceptually:
 
 ```json
 {
@@ -173,21 +163,27 @@ The design-frozen v0 candidate shape is conceptually:
     "id": "project"
   },
   "mission": {
+    "status": "available",
     "id": "demo-3u",
-    "model_version": "0.1.0"
+    "model_version": "0.1.0",
+    "reason": null
   },
   "inputs": {
     "core_input_set": {
+      "status": "available",
       "kind": "orbitfabric.integration_input_set",
       "version": "0.1-candidate",
-      "sha256": "..."
+      "sha256": "...",
+      "reason": null
     },
     "profile": {
+      "status": "available",
       "kind": "orbitfabric.projection_profile",
       "profile_version": "0.1-candidate",
       "id": "openobsw-opensvf-demo",
       "version": "0.1.0",
-      "sha256": "..."
+      "sha256": "...",
+      "reason": null
     }
   },
   "capabilities": [
@@ -214,7 +210,7 @@ The design-frozen v0 candidate shape is conceptually:
 }
 ```
 
-The generic envelope must not contain OpenOBSW, OpenSVF, YAMCS, PUS, SRDB, XTCE or other ecosystem-specific semantic fields.
+The generic envelope contains no OpenOBSW, OpenSVF, YAMCS, PUS, SRDB, XTCE or other ecosystem-specific semantic fields.
 
 Target-specific meaning lives in adapter-owned identifiers, records and artifacts.
 
@@ -245,7 +241,7 @@ external_tools
 
 Arrays remain present even when empty.
 
-This gives generic consumers a predictable envelope without requiring target-specific knowledge.
+The presence of a top-level input/mission object does **not** imply that its identity was successfully resolved. Early-failure availability is represented explicitly as defined below.
 
 Unknown additive fields may be tolerated only according to the compatibility rules of the supported `result_version`.
 
@@ -257,13 +253,13 @@ These identifiers have distinct purposes and must not be collapsed:
 
 ```text
 result_version
-    -> generic OrbitFabric Integration Result envelope compatibility
+    -> generic Integration Result envelope compatibility
 
 integration.id
     -> logical ecosystem-integration family
 
 integration.schema_version
-    -> target-specific Profile/configuration schema consumed for this run
+    -> target-specific Profile/configuration schema used/requested for this run
 
 adapter.id
     -> implementation/package identity that produced the Result
@@ -280,7 +276,9 @@ inputs.profile.version
 
 `adapter.version` must not replace `result_version` or `integration.schema_version` as a compatibility key.
 
-The `integration.id + integration.schema_version` pair must be compatible with the Projection Profile consumed by this Result.
+`integration.id` is known from the adapter/package that was invoked and is required even for failed Results.
+
+`integration.schema_version` may be `null` only for a failed Result when the Profile schema identity could not be resolved reliably. A successful Result requires a non-null compatible schema version.
 
 ---
 
@@ -296,11 +294,11 @@ failed
 
 ### `succeeded`
 
-The requested integration operation completed validly and there are no integration-owned `ERROR` or `WARNING` diagnostics.
+The requested operation completed validly and there are no integration-owned `ERROR` or `WARNING` diagnostics.
 
 ### `succeeded_with_warnings`
 
-The requested integration operation completed validly, no integration-owned `ERROR` diagnostic exists, and at least one integration-owned `WARNING` exists.
+The requested operation completed validly, no integration-owned `ERROR` diagnostic exists, and at least one integration-owned `WARNING` exists.
 
 ### `failed`
 
@@ -308,21 +306,9 @@ The requested operation did not complete as a valid result and at least one inte
 
 Core lint state is upstream Core-owned provenance.
 
-For example:
+Core warnings do not automatically turn an Integration Result into `succeeded_with_warnings`.
 
-```text
-Core lint passed_with_warnings
-```
-
-does not automatically imply:
-
-```text
-Integration Result succeeded_with_warnings
-```
-
-The adapter may emit an integration diagnostic that an operation was blocked by upstream Core state, but it must reference that state rather than copying Core findings.
-
-External-tool diagnostics affect top-level result state only through an explicit integration-owned diagnostic that records the integration-level consequence.
+External-tool diagnostics affect top-level state only through an explicit integration-owned diagnostic describing their integration-level consequence.
 
 ---
 
@@ -338,23 +324,11 @@ Every Result records:
 }
 ```
 
-`operation.id` is an integration-defined identifier describing the operation that produced the Result.
+`operation.id` is an integration-defined, non-empty identifier describing the attempted operation.
 
-Generic OrbitFabric consumers must treat it as opaque.
+Generic consumers treat it as opaque and must not parse the string to infer behavior.
 
-Generic behavior must not depend on parsing the operation ID string.
-
-Generic behavior is instead driven by:
-
-```text
-result state
-exercised capabilities
-artifact records
-mapping records
-coverage records
-diagnostics
-evidence
-```
+Generic behavior is driven by the declared Result state, capabilities and record families.
 
 ---
 
@@ -379,107 +353,189 @@ live_telemetry
 commanding
 ```
 
-A future Integration Package Manifest may advertise the full capability set of an installed adapter before execution.
+Capability IDs are unique within the array.
 
-The Result should not duplicate that future package manifest as timeless package metadata.
+A future Integration Package Manifest (#235) advertises the full capability set of an installed adapter before execution.
 
 Unknown additive capability IDs must not receive guessed semantics.
 
 ---
 
-## 11. Input provenance
+## 11. Input provenance availability
 
-The Result must identify the exact Core and Profile inputs consumed.
+A failed operation may occur before reliable Core Input Set or Profile identity can be established.
 
-### Core input provenance
+The Result must never fabricate provenance in that case.
 
-Required:
+Both input records therefore have generic status:
 
 ```text
-Core Integration Input Set kind
-Core Integration Input Set contract version
-Core Integration Input Set input_set_sha256
+available
+unavailable
 ```
 
-Conceptually:
+`available` means the adapter could establish the contract identity/provenance required by this Result record. It does not by itself mean that the input is semantically compatible with the requested operation.
+
+### Available Core input
 
 ```json
 {
-  "core_input_set": {
-    "kind": "orbitfabric.integration_input_set",
-    "version": "0.1-candidate",
-    "sha256": "..."
-  }
+  "status": "available",
+  "kind": "orbitfabric.integration_input_set",
+  "version": "0.1-candidate",
+  "sha256": "...",
+  "reason": null
 }
 ```
 
-### Profile provenance
-
-Required:
+Requires:
 
 ```text
-Projection Profile kind
-generic Profile envelope version
-Profile ID
-Profile instance version
-exact SHA-256 of the consumed Profile bytes
+kind != null
+version != null
+sha256 != null
+reason = null
 ```
 
-Conceptually:
+The SHA-256 is the Core Input Set `input_set_sha256` defined by #228.
+
+### Unavailable Core input provenance
 
 ```json
 {
-  "profile": {
-    "kind": "orbitfabric.projection_profile",
-    "profile_version": "0.1-candidate",
-    "id": "openobsw-opensvf-demo",
-    "version": "0.1.0",
-    "sha256": "..."
-  }
+  "status": "unavailable",
+  "kind": null,
+  "version": null,
+  "sha256": null,
+  "reason": "input manifest could not be validated"
 }
 ```
 
-The exact Profile digest is a byte-level provenance fingerprint.
+Requires:
 
-No semantic-equivalence Profile fingerprint is introduced in v0.
+```text
+reason != null
+```
+
+The other identity fields are null; the adapter must not fill them from guesses, filenames or partial raw source reconstruction.
+
+### Available Profile provenance
+
+```json
+{
+  "status": "available",
+  "kind": "orbitfabric.projection_profile",
+  "profile_version": "0.1-candidate",
+  "id": "openobsw-opensvf-demo",
+  "version": "0.1.0",
+  "sha256": "...",
+  "reason": null
+}
+```
+
+Requires all identity/version/digest fields and `reason = null`.
+
+The Profile SHA-256 is the exact consumed Profile byte digest.
+
+### Unavailable Profile provenance
+
+```json
+{
+  "status": "unavailable",
+  "kind": null,
+  "profile_version": null,
+  "id": null,
+  "version": null,
+  "sha256": null,
+  "reason": "Profile document could not be parsed"
+}
+```
+
+Requires `reason != null` and no invented identity.
+
+A lower-level execution log may record a digest of unreadable/invalid input bytes if useful, but such a digest is not promoted into the resolved Profile provenance record in v0.
 
 ---
 
-## 12. Mission identity
+## 12. Successful-result input invariant
 
-The Result repeats the Mission identity reported by the consumed Core Integration Input Set:
+For:
 
-```json
-{
-  "mission": {
-    "id": "demo-3u",
-    "model_version": "0.1.0"
-  }
-}
+```text
+result = succeeded
+or
+result = succeeded_with_warnings
 ```
 
-This is convenience/provenance metadata.
+both input records must have:
 
-The Core Integration Input Set remains the authority for the Core semantic input.
+```text
+status = available
+```
 
-The adapter must verify consistency rather than silently accepting a mismatched Mission/Profile context.
+and `integration.schema_version` must be non-null and compatible with the consumed Profile.
+
+A successful Result cannot be built on unresolved input provenance.
 
 ---
 
-## 13. Staleness is derived, not serialized as timeless truth
+## 13. Mission identity availability
 
-The Result stores immutable fingerprints.
+Mission identity is convenience/provenance copied from the consumed Core Integration Input Set and is never independently invented by the adapter.
 
-It does **not** store a permanent truth such as:
+Generic status is:
+
+```text
+available
+unavailable
+```
+
+Available form:
+
+```json
+{
+  "status": "available",
+  "id": "demo-3u",
+  "model_version": "0.1.0",
+  "reason": null
+}
+```
+
+Unavailable form:
+
+```json
+{
+  "status": "unavailable",
+  "id": null,
+  "model_version": null,
+  "reason": "Core input identity unavailable"
+}
+```
+
+Rules:
+
+- `mission.status = available` requires `inputs.core_input_set.status = available`;
+- a successful Result requires `mission.status = available`;
+- a failed Result may use `mission.status = unavailable` when the Core input could not be resolved reliably.
+
+The Core Integration Input Set remains authoritative for Mission identity.
+
+---
+
+## 14. Staleness is derived, not timeless truth
+
+The Result stores immutable fingerprints when they are available.
+
+It does not store permanent truth such as:
 
 ```text
 stale = true
 current = true
 ```
 
-because staleness is a relationship between a historical Result and the inputs being inspected now.
+because staleness is a relationship between a historical Result and current inputs.
 
-Consumers derive state by comparison:
+When both required provenance records are available, consumers compare:
 
 ```text
 result.inputs.core_input_set.sha256
@@ -502,13 +558,11 @@ unknown
 incompatible
 ```
 
-That view vocabulary may evolve outside the immutable historical Result contract.
-
-Timestamps must not be the authority for staleness.
+If historical required provenance is unavailable, staleness is necessarily `unknown`; consumers must not fall back to timestamps.
 
 ---
 
-## 14. No self-digest in v0
+## 15. No self-digest in v0
 
 The v0 Result does not contain:
 
@@ -518,17 +572,15 @@ bundle_sha256
 semantic_result_fingerprint
 ```
 
-A consumer may hash the exact `integration_result.json` bytes externally if needed.
-
-Avoiding a self-digest keeps the envelope simple and avoids recursive serialization rules before a demonstrated requirement exists.
+A consumer may hash exact `integration_result.json` bytes externally if needed.
 
 Artifact and evidence bytes are fingerprinted separately where appropriate.
 
 ---
 
-## 15. Core source reference
+## 16. Core source reference
 
-Whenever a Result refers to an OrbitFabric semantic entity, it uses the same generic source reference as the Projection Profile:
+Whenever a Result refers to an OrbitFabric semantic entity, it uses:
 
 ```json
 {
@@ -537,27 +589,21 @@ Whenever a Result refers to an OrbitFabric semantic entity, it uses the same gen
 }
 ```
 
-Both `domain` and `id` are required.
+Both fields are required and the reference must resolve against the Entity Index of the consumed Core Input Set.
 
-The reference must resolve against the Entity Index of the consumed Core Integration Input Set.
-
-Forbidden substitutes include:
+Core source references are permitted only when:
 
 ```text
-YAML path
-source file/line
-C symbol
-SRDB name
-XTCE path
-YAMCS path
-Studio internal ID
+inputs.core_input_set.status = available
 ```
+
+and the Entity Index required for resolution was compatible/readable.
+
+Forbidden substitutes include YAML paths, source file/line, generated symbols, SRDB/XTCE/YAMCS names and Studio IDs.
 
 ---
 
-## 16. Target identity contract
-
-Integration traceability requires explicit target references.
+## 17. Target identity contract
 
 The generic target reference is:
 
@@ -579,21 +625,20 @@ is the adapter-owned target identity inside one integration-result family.
 
 Rules:
 
-- all three values are required strings;
-- `namespace` is integration-defined and documented;
-- `kind` is integration-defined and machine-readable;
+- all three values are required, non-empty strings;
+- `namespace` and `kind` are integration-defined/documented;
 - `id` is opaque to generic OrbitFabric consumers;
-- generic consumers must not parse semantic meaning from target ID string structure;
-- the same tuple should be reused by runtime/evidence records when it identifies the same target concept;
-- a target reference is not a Core entity and must not enter Core Entity Index or Relationship Manifest.
+- generic consumers must not parse semantic meaning from target ID structure;
+- the same tuple should be reused by runtime/evidence records for the same target concept;
+- target references never become Core entities or Core relationships.
 
 ---
 
-## 17. Traceability mappings
+## 18. Traceability mappings
 
-Mappings explicitly connect Core source entities to resolved target concepts.
+Mappings explicitly connect Core sources to resolved target concepts.
 
-Candidate record:
+Candidate:
 
 ```json
 {
@@ -617,11 +662,6 @@ Candidate record:
       "namespace": "opensvf",
       "kind": "srdb_parameter",
       "id": "eps.obc.bus_voltage_mv"
-    },
-    {
-      "namespace": "yamcs",
-      "kind": "parameter",
-      "id": "/orbitfabric/eps/obc/bus_voltage_mv"
     }
   ]
 }
@@ -630,39 +670,27 @@ Candidate record:
 Rules:
 
 ```text
-mapping IDs are unique within the Result
-sources contains one or more Core {domain,id} references
+mapping IDs unique within Result
+sources contains one or more Core references
 profile_bindings contains zero or more Profile binding IDs
 targets contains one or more explicit target references
 ```
 
-The contract supports:
+If Profile provenance is unavailable, `profile_bindings` must be empty because binding identity cannot be asserted reliably.
 
-```text
-one Core source -> one target
-one Core source -> multiple targets
-multiple Core sources -> one target construct
-multiple Core sources -> multiple target constructs
-one Core source participating in multiple mapping records
-```
+The contract supports one-to-one, one-to-many, many-to-one and many-to-many projection structures.
 
-The mapping means only:
-
-```text
-these Core semantics participated in this resolved projection to these target concepts
-```
-
-Generic consumers must not infer protocol, causal or runtime meaning beyond the explicit mapping.
+The mapping asserts participation in the resolved projection only; generic consumers must not infer protocol, causal or runtime semantics.
 
 ---
 
-## 18. Resolved-value provenance
+## 19. Resolved-value provenance
 
-`resolutions[]` is an optional-detail record family represented by an always-present array.
+`resolutions[]` is always present but may be empty.
 
-It exists for engineer-relevant or compatibility-sensitive resolved choices that Studio/CLI should be able to explain without reverse-engineering adapter logic.
+It explains engineer-relevant/compatibility-sensitive target choices without requiring consumers to reverse-engineer adapter logic.
 
-Candidate record:
+Candidate:
 
 ```json
 {
@@ -681,7 +709,7 @@ Candidate record:
 }
 ```
 
-Generic `origin` values are:
+Generic origins:
 
 ```text
 core
@@ -691,29 +719,24 @@ profile
 
 `property` and `value` remain integration-defined target-configuration data.
 
-An adapter is not required to serialize every internal intermediate value.
+Rules:
 
-Useful candidates include:
+- `id`, `property`, `value` and `origin` are required;
+- `mapping` and `binding` may be null when not applicable;
+- `sources` is present and may be empty only when another contextual anchor is present;
+- at least one of `mapping`, `binding` or `sources` provides context;
+- `origin = profile` requires non-null `binding` and available Profile provenance;
+- non-null mapping/binding references must resolve.
 
-```text
-stable numeric IDs
-target symbols
-target database names
-encoding/type choices
-protocol mappings
-```
-
-For `origin = profile`, the corresponding Profile binding should be referenced when the value came from binding-local authored state.
+Adapters are not required to serialize every internal intermediate value.
 
 ---
 
-## 19. Artifact contract
+## 20. Artifact contract
 
-Generated files are declared explicitly.
+Generated files are declared explicitly; generic consumers never discover them through filename conventions.
 
-They must never be discovered by generic consumers from filename conventions.
-
-Candidate artifact record:
+Candidate:
 
 ```json
 {
@@ -732,14 +755,14 @@ Candidate artifact record:
 }
 ```
 
-Generic `requirement` values:
+Generic requirement:
 
 ```text
 required
 optional
 ```
 
-Generic `status` values:
+Generic status:
 
 ```text
 generated
@@ -771,11 +794,7 @@ retained_partial = false
 
 ### `failed`
 
-Requires:
-
-```text
-reason != null
-```
+Requires `reason != null`.
 
 A failed artifact may retain a partial file only when:
 
@@ -785,51 +804,29 @@ path != null
 sha256 != null
 ```
 
-Such a file is diagnostic/evidence material and must never be interpreted as a valid generated artifact.
+When `retained_partial = false`, a failed artifact has `path = null` and `sha256 = null`.
 
-Artifact `kind` is integration-owned.
+A retained failed file is diagnostic/evidence material and never a valid generated artifact.
 
-`path` is relative to the directory containing `integration_result.json`.
-
-`media_type` is optional convenience metadata.
-
-`derived_from_mappings` references zero or more Result mapping IDs.
+Artifact `kind` is integration-owned; paths are relative to `integration_result.json`; `media_type` is optional convenience metadata; `derived_from_mappings` references zero or more mapping IDs.
 
 ---
 
-## 20. Required-artifact invariant
+## 21. Required-artifact invariant
 
-For:
-
-```text
-result = succeeded
-or
-result = succeeded_with_warnings
-```
-
-all artifacts with:
-
-```text
-requirement = required
-```
-
-must have:
-
-```text
-status = generated
-```
+For successful Results, every `requirement = required` artifact must be `status = generated`.
 
 Optional artifacts may be `not_generated` with an explicit reason without forcing top-level failure.
 
-A required artifact that is `failed` or `not_generated` forces the integration operation to `failed`.
+A required artifact that is `failed` or `not_generated` forces `result = failed` and an integration-owned ERROR diagnostic.
 
 ---
 
-## 21. Integration diagnostics
+## 22. Integration diagnostics
 
 Diagnostics are explicit machine-readable records.
 
-Candidate record:
+Candidate:
 
 ```json
 {
@@ -848,7 +845,7 @@ Candidate record:
 }
 ```
 
-Generic severity values are:
+Generic severities:
 
 ```text
 ERROR
@@ -874,62 +871,54 @@ Unknown additive phase values must not receive guessed semantics.
 
 ---
 
-## 22. Diagnostic ownership rules
+## 23. Diagnostic ownership
 
-Generic diagnostic `owner` values are:
+Generic diagnostic owners:
 
 ```text
 integration
 external
 ```
 
+`producer` is required for both.
+
 ### `owner = integration`
 
-The Integration Adapter/package is the diagnostic authority.
-
-`producer` identifies the adapter/integration component.
+The adapter/package is the diagnostic authority.
 
 ### `owner = external`
 
-The adapter is faithfully surfacing a diagnostic produced by an external tool/system.
+The adapter is surfacing a diagnostic produced by an external tool/system without claiming authority over its native semantics.
 
-`producer` is required and identifies that external authority.
+Core is deliberately not an allowed diagnostic owner inside `diagnostics[]`.
 
-Core is deliberately **not** an allowed diagnostic owner inside `diagnostics[]`.
+Core structural/load/lint diagnostics remain in the Core Input Set.
 
-Core structural/load/lint diagnostics remain in the Core Integration Input Set.
+If upstream Core state blocks projection, the adapter emits an integration-level diagnostic referencing that consequence, not copied Core findings.
 
-When upstream Core state blocks projection, the adapter may emit an integration diagnostic such as:
+Top-level Result classification is determined by **integration-owned** diagnostics.
 
-```text
-projection blocked because Core lint result is failed
-```
+If an external error causes operation failure, the adapter emits an integration-owned ERROR describing the integration consequence and may additionally preserve/reference the external diagnostic.
 
-but it must not duplicate the Core findings themselves.
-
-Top-level `result` classification is determined by **integration-owned** diagnostics.
-
-If an external error materially causes the operation to fail, the adapter emits an integration-owned diagnostic describing that integration-level consequence and may additionally preserve/reference the external diagnostic.
+Diagnostic Core-source references are allowed only when Core source resolution is available. Diagnostic `profile_bindings` must be empty when Profile provenance is unavailable.
 
 ---
 
-## 23. Projection coverage purpose
+## 24. Projection coverage purpose
 
 Integration coverage answers:
 
 > What happened to each Core entity in the declared scope of this integration operation?
 
-Coverage must not be inferred from generated artifacts or mappings alone.
+Coverage is distinct from Core `coverage_summary.json` and must not be inferred from artifacts or mappings.
 
-It is distinct from Core `coverage_summary.json`.
-
-The Integration Result is the authority only for **integration projection coverage**, not generic Mission Model coverage.
+The Integration Result is authoritative only for **integration projection coverage**.
 
 ---
 
-## 24. Coverage scope
+## 25. Coverage scope
 
-Coverage declares the Core Entity Index domains considered by this Result:
+Coverage declares Core Entity Index domains considered by the Result:
 
 ```json
 {
@@ -950,25 +939,17 @@ For `coverage.status = complete`:
 
 > every Core entity whose Entity Index domain is listed in `coverage.scope.domains` has exactly one coverage record.
 
-This avoids ambiguity between:
+Domains absent from the scope have no v0 coverage-record obligation.
 
-```text
-forgotten entity
-intentionally not projected entity
-unsupported entity
-blocked entity
-entity outside the declared domains
-```
+An entity inside a declared domain but irrelevant to this operation is represented explicitly as `not_applicable`.
 
-Domains absent from `coverage.scope.domains` carry no v0 coverage-record obligation.
-
-If an entity belongs to a listed domain but is not relevant to this particular integration scope, its explicit coverage state is `not_applicable`.
+Coverage records and non-empty domain scope require available/compatible Core entity resolution.
 
 ---
 
-## 25. Coverage completeness state
+## 26. Coverage completeness state
 
-Generic coverage status is:
+Generic coverage status:
 
 ```text
 complete
@@ -978,21 +959,17 @@ unavailable
 
 ### `complete`
 
-The declared-domain completeness invariant is satisfied.
-
-`reason = null`.
+The declared-domain completeness invariant is satisfied and `reason = null`.
 
 ### `partial`
 
-Some Core entities were resolved/covered before the operation failed, but the declared-domain completeness invariant is not satisfied.
+Some reliable entity coverage was established but the completeness invariant is not satisfied. `reason != null`.
 
-`reason != null`.
-
-The available coverage records remain useful failure evidence.
+All partial records must still refer to entities in `coverage.scope.domains`.
 
 ### `unavailable`
 
-Coverage could not be established, for example because input compatibility/source resolution failed before reliable entity enumeration.
+Reliable integration coverage could not be established.
 
 Requires:
 
@@ -1001,19 +978,19 @@ records = []
 reason != null
 ```
 
-`scope.domains` may be empty when reliable scope cannot be established.
+`scope.domains` may be empty when reliable scope itself could not be established.
 
-For a `succeeded` or `succeeded_with_warnings` Result that includes capability `projection`:
+If Core input/entity resolution is unavailable, coverage must be `unavailable`.
+
+A successful Result that includes capability `projection` requires:
 
 ```text
 coverage.status = complete
 ```
 
-is required.
-
 ---
 
-## 26. Entity-level coverage states
+## 27. Entity-level coverage states
 
 Each coverage record uses exactly one of:
 
@@ -1027,27 +1004,34 @@ blocked
 not_applicable
 ```
 
-### `projected`
-
-The adapter considers the Core entity fully represented for the declared integration scope.
-
-### `partially_projected`
-
-Some relevant target representation exists, but the adapter identifies a known incomplete projection.
-
-### `intentionally_not_projected`
-
-The result resolves from explicit Projection Profile:
+Meanings:
 
 ```text
-intent = do_not_project
+projected
+    fully represented for this integration scope
+
+partially_projected
+    target representation exists but known projection is incomplete
+
+intentionally_not_projected
+    resolved from explicit Profile intent = do_not_project
+
+not_projected
+    no projection exists, without explicit exclusion or target impossibility
+
+unsupported
+    adapter declares the target integration cannot represent the concept
+
+blocked
+    supported/intended projection prevented by compatibility/validation/generation failure
+
+not_applicable
+    entity belongs to a declared domain but is outside relevant operation scope
 ```
 
-### `not_projected`
+`intentionally_not_projected` requires available Profile provenance and an explicit resolvable `do_not_project` binding.
 
-No resolved projection exists, without explicit `do_not_project` intent and without claiming target impossibility.
-
-This state is required because:
+`not_projected` is required because:
 
 ```text
 Profile binding absent
@@ -1055,23 +1039,11 @@ Profile binding absent
 intentionally_not_projected
 ```
 
-### `unsupported`
-
-The adapter declares that the target integration cannot represent the relevant concept.
-
-### `blocked`
-
-Projection was intended/supported but compatibility, validation or generation failure prevented it.
-
-### `not_applicable`
-
-The entity belongs to a declared coverage domain but is outside the relevant projection scope for this result.
-
 ---
 
-## 27. Coverage record
+## 28. Coverage record
 
-Candidate record:
+Candidate:
 
 ```json
 {
@@ -1095,23 +1067,28 @@ Rules:
 
 - `source` is required and unique within coverage records;
 - `mappings` references zero or more mapping IDs;
-- `profile_bindings` references zero or more Profile binding IDs;
+- `profile_bindings` references zero or more Profile binding IDs and must be empty when Profile provenance is unavailable;
 - `diagnostics` references zero or more Result diagnostic IDs;
-- states requiring explanation should provide a non-empty `reason` where diagnostics alone do not establish the cause.
+- states requiring explanation provide a non-empty reason where diagnostics alone do not establish the cause.
 
-Aggregate counts in `coverage.summary` are convenience metadata.
-
-If present, they must be exactly derivable from `coverage.records` and must not disagree with entity-level records.
-
-Entity-level records remain authoritative.
+`coverage.summary` is convenience metadata. If non-empty, it must be exactly derivable from `coverage.records`; entity-level records remain authoritative.
 
 ---
 
-## 28. Evidence references
+## 29. Evidence references
 
 The Result may reference verification/runtime evidence without becoming the verification engine.
 
-Candidate bundled evidence:
+Generic evidence owners:
+
+```text
+integration
+external
+```
+
+`producer` is always required.
+
+Bundled evidence candidate:
 
 ```json
 {
@@ -1130,7 +1107,7 @@ Candidate bundled evidence:
 }
 ```
 
-Candidate external evidence:
+External evidence candidate:
 
 ```json
 {
@@ -1151,19 +1128,20 @@ Rules:
 
 - `id`, `owner`, `producer`, `kind` and `location` are required;
 - exactly one of `location.path` or `location.uri` is used;
-- bundled `path` is relative to `integration_result.json` and requires SHA-256;
+- bundled path is relative to `integration_result.json` and requires SHA-256;
 - external URI evidence may carry SHA-256 when stable bytes are available;
 - `kind` remains producer/integration-defined;
-- evidence may reference Result mappings and target references for deterministic navigation;
-- evidence ownership must remain explicit.
+- evidence mapping references must resolve;
+- evidence target references use the generic target-reference shape;
+- evidence ownership remains explicit.
 
-The Result must not reinterpret OpenSVF/YAMCS evidence semantics as Core facts.
+The Result must not reinterpret external evidence semantics as Core facts.
 
 ---
 
-## 29. External-tool provenance
+## 30. External-tool provenance
 
-Tools that materially affect integration outputs may be recorded in:
+Tools that materially affect outputs may be recorded as:
 
 ```json
 {
@@ -1173,81 +1151,88 @@ Tools that materially affect integration outputs may be recorded in:
 }
 ```
 
-`id` and `role` are integration-owned strings.
+External-tool IDs are unique within the Result.
 
-`version` should be recorded when available and materially relevant to reproducibility/support.
+`id` and `role` are integration-owned strings; version is recorded when available/materially relevant.
 
-External-tool provenance does not create a Core dependency on that tool.
-
-The integration-specific adapter/schema determines which tools are relevant.
+External-tool provenance creates no Core dependency on the tool.
 
 ---
 
-## 30. Portability
+## 31. Portability
 
 All bundled artifact/evidence paths are relative to the directory containing `integration_result.json`.
 
-Absolute workspace paths must not participate in:
+Absolute workspace paths must not participate in identity, compatibility, staleness or portable equivalence.
 
-```text
-identity
-compatibility
-staleness
-portable equivalence
-```
-
-Absolute paths may be exposed separately by an execution environment for convenience, but they are not portable Result identity.
-
-No Git branch name, repository checkout path or Studio workspace ID is a required Result identity field.
+Git branch names, checkout paths and Studio workspace IDs are not required Result identity fields.
 
 ---
 
-## 31. Failure-state matrix
+## 32. Failure-state matrix
 
-The generic contract supports these representative states:
+Representative states:
 
-| Condition | Result | Coverage | Artifacts | Required diagnostic behavior |
-|---|---|---|---|---|
-| Valid operation, no integration warnings | `succeeded` | `complete` when projection exercised | all required generated | no integration ERROR/WARNING |
-| Valid operation with integration warnings | `succeeded_with_warnings` | `complete` when projection exercised | all required generated | >=1 integration WARNING, no integration ERROR |
-| Core input incompatible before entity resolution | `failed` | normally `unavailable` | required outputs not valid | integration ERROR references upstream incompatibility; no copied Core findings |
-| Profile schema invalid | `failed` | `unavailable` or `partial` depending resolved context | required outputs not valid | integration ERROR identifies Profile/schema failure |
-| Source/profile resolution failure | `failed` | `partial` or `unavailable` | required outputs not valid | integration ERROR identifies resolution failure |
-| Projection validation failure after entity resolution | `failed` | may be `complete` with affected entities `blocked` | required outputs not valid | integration ERROR identifies projection failure |
-| Required artifact generation failure | `failed` | `complete` or `partial` depending progress | failed artifact explicit | integration ERROR identifies generation failure |
-| Required external tool failure | `failed` | depends on operation stage | affected outputs explicit | integration ERROR records integration consequence; external diagnostic may be referenced |
+| Condition | Input identity | Mission | Result | Coverage | Required diagnostic behavior |
+|---|---|---|---|---|---|
+| Valid operation, no integration warnings | both available | available | `succeeded` | `complete` when projection exercised | no integration ERROR/WARNING |
+| Valid operation with integration warnings | both available | available | `succeeded_with_warnings` | `complete` when projection exercised | >=1 integration WARNING, no integration ERROR |
+| Core manifest/identity cannot be established | Core unavailable | unavailable | `failed` | `unavailable` | integration ERROR; no guessed Core identity |
+| Core input identified but incompatible | Core available | available if Core exposes it | `failed` | usually `unavailable` | integration ERROR references incompatibility; no copied Core findings |
+| Profile document cannot be identified/parsed | Profile unavailable | depends on Core | `failed` | `unavailable`, `partial`, or `complete` blocked coverage if Core scope is reliably known | integration ERROR; no invented Profile binding identity |
+| Profile schema invalid after Profile identity established | Profile available | available | `failed` | depends on resolved Core context | integration ERROR identifies schema failure |
+| Source/profile resolution failure | both available | available | `failed` | `partial` or `complete` with blocked entities when possible | integration ERROR identifies resolution failure |
+| Projection validation failure | both available | available | `failed` | may be `complete` with affected entities `blocked` | integration ERROR identifies projection failure |
+| Required artifact generation failure | both available | available | `failed` | `complete` or `partial` depending progress | failed artifact + integration ERROR |
+| Required external-tool failure | depends on stage | depends on Core | `failed` | depends on stage | integration ERROR records consequence; external diagnostic may also be present |
 
-A failure Result is still valuable evidence and should preserve valid mappings/artifacts/coverage already established where doing so does not misrepresent them as complete.
+A failure Result should preserve reliable mappings, artifacts, diagnostics and coverage already established without presenting them as complete when they are not.
 
 ---
 
-## 32. Referential-integrity requirements
+## 33. Referential-integrity requirements
 
-A valid Result must satisfy:
+A valid Result satisfies all applicable rules:
 
 ```text
+capability IDs are unique
+coverage scope domains are unique
+mapping IDs are unique
+resolution IDs are unique
+artifact IDs are unique
+diagnostic IDs are unique
+evidence IDs are unique
+external-tool IDs are unique
+
+Core source references exist only when Core entity resolution is available
 all Core source references resolve against the consumed Entity Index
-all profile_bindings references resolve against the consumed Profile
-all mapping IDs are unique
-all resolution IDs are unique
-all artifact IDs are unique
-all diagnostic IDs are unique
-all evidence IDs are unique
-all mapping references from artifacts/coverage/evidence resolve
-all diagnostic references from coverage resolve
-all mapping sources resolve to Core source references
-all target references satisfy namespace+kind+id shape
+Profile binding references exist only when Profile provenance is available
+all Profile binding references resolve against the consumed Profile
+
+all artifact/coverage/evidence mapping references resolve
+all coverage diagnostic references resolve
+all non-null resolution mapping references resolve
+all non-null resolution binding references resolve
+all mapping sources resolve
+all resolution sources resolve
+all target references satisfy namespace+kind+id
 all coverage source records are unique
-coverage summary agrees with coverage records
+all partial/complete coverage records belong to declared scope domains
+coverage summary agrees exactly with coverage records when non-empty
+
+mission available implies Core input available
+successful Result implies Core input available + Profile available + Mission available
+successful projection Result implies coverage complete
+successful Result implies every required artifact generated
 ```
 
-A consumer must reject generic-contract referential corruption rather than guessing intended references.
+A consumer rejects generic-contract referential corruption rather than guessing intended references.
 
 Target-specific semantic validation remains adapter-owned.
 
 ---
 
-## 33. Compatibility negotiation
+## 34. Compatibility negotiation
 
 Generic consumers negotiate:
 
@@ -1255,8 +1240,6 @@ Generic consumers negotiate:
 kind
 result_version
 ```
-
-They then consume known generic fields and records according to that contract.
 
 Target-specific compatibility is represented separately by:
 
@@ -1274,15 +1257,17 @@ Rules:
 - unknown target namespaces/kinds remain opaque and must not be guessed;
 - unknown artifact/evidence kinds remain opaque and must not be guessed;
 - unknown additive capability IDs may be preserved/displayed without invented behavior;
-- generic consumers must not require target-specific schema knowledge merely to read Result status/provenance/artifacts/mappings/coverage.
+- generic consumers do not need target-specific schema knowledge merely to read generic Result status/provenance/artifacts/mappings/coverage.
+
+Input `status = unavailable` is a valid failed-Result state, not a signal for a consumer to reconstruct missing identity from source files.
 
 ---
 
-## 34. Integration-specific extensions
+## 35. Integration-specific meaning
 
-The generic Result contract deliberately avoids a generic free-form semantic override object.
+The v0 generic Result deliberately avoids a free-form semantic escape hatch.
 
-Integration-specific meaning should primarily be carried through:
+Integration-specific meaning is carried through:
 
 ```text
 namespaced target references
@@ -1294,13 +1279,11 @@ operation identity
 external-tool roles
 ```
 
-If experience proves that a generic extension object is required, it should be introduced through an explicit compatibility-reviewed contract change rather than becoming an unstructured escape hatch in v0.
+If a generic extension object later proves necessary, it requires an explicit compatibility-reviewed contract change.
 
 ---
 
-## 35. Relationship to Studio
-
-Studio should be able to render the integration from the same generic Result used by CLI/CI workflows.
+## 36. Relationship to Studio
 
 Studio may use:
 
@@ -1308,17 +1291,17 @@ Studio may use:
 result + diagnostics
     -> integration health/status
 
-inputs fingerprints
-    -> derived staleness
+input availability + fingerprints
+    -> provenance health and derived staleness
 
 artifacts
-    -> artifact explorer
+    -> Artifact Explorer
 
 mappings + targets
     -> Contract Continuity Explorer and reverse navigation
 
 resolutions
-    -> explain why a target value/name/allocation exists
+    -> explain target values/names/allocations
 
 coverage
     -> Projection Coverage Dashboard
@@ -1327,28 +1310,18 @@ evidence
     -> verification/evidence navigation
 
 capabilities
-    -> show which capabilities this Result exercised
+    -> capabilities exercised by this Result
 ```
 
-Studio must not:
+Studio must not scan generated files, parse target IDs for semantics, reconstruct mappings from names, infer coverage from artifact presence, copy Core lint findings, calculate staleness from timestamps or invent missing identity.
 
-```text
-scan generated files to discover artifacts
-parse target IDs to infer semantics
-reconstruct mappings from matching names
-infer coverage from artifact presence
-copy Core lint findings into integration diagnostics
-calculate staleness from timestamps alone
-invent target identities
-```
-
-This keeps Studio a consumer/orchestrator rather than another integration authority.
+When input provenance is unavailable, Studio renders that state explicitly rather than trying to repair it from Mission YAML or private state.
 
 ---
 
-## 36. Relationship to the OpenOBSW/OpenSVF reference integration
+## 37. Relationship to the OpenOBSW/OpenSVF reference integration
 
-The OpenOBSW/OpenSVF PoC provides the first concrete evidence for this generic contract.
+The OpenOBSW/OpenSVF PoC is the first concrete evidence for the generic contract.
 
 Representative target namespaces may eventually include:
 
@@ -1358,45 +1331,9 @@ opensvf
 yamcs
 ```
 
-Representative artifact kinds may include integration-owned values for:
+Representative artifact/evidence kinds and external-tool roles remain integration-owned and are deliberately not frozen here.
 
-```text
-C contract header
-SRDB
-XTCE-facing/generated material
-runtime/campaign descriptors
-```
-
-Those values are **not** generic Core semantics and are deliberately not frozen by this document.
-
-The reference adapter/schema should refine them after PoC PR #30 ownership review.
-
----
-
-## 37. Relationship to Gonçalo / PoC PR #30
-
-Gonçalo's review remains important for reference-integration details such as:
-
-```text
-SRDB -> XTCE ownership
-OpenOBSW generated-contract boundary
-OpenSVF supported runtime/campaign interfaces
-YamcsBridge reuse
-compatibility/version markers
-verification/campaign evidence interfaces
-```
-
-Those answers may refine:
-
-```text
-target namespace/kind values
-artifact kinds
-external-tool roles
-evidence kinds
-reference adapter capabilities
-```
-
-They must not move OpenOBSW/OpenSVF/YAMCS semantics into the generic Result envelope unless a genuinely ecosystem-independent requirement emerges.
+PoC PR #30 should refine those reference-integration details.
 
 ---
 
@@ -1407,7 +1344,8 @@ Before implementation/release, protection should include at least:
 ```text
 clean succeeded Result
 succeeded_with_warnings Result
-failed Result before source resolution
+failed Result with unavailable Core identity
+failed Result with unavailable Profile identity
 failed Result after partial projection
 required artifact generation failure
 optional artifact not generated
@@ -1425,23 +1363,22 @@ all entity-level coverage states
 bundled evidence path+digest
 external evidence URI
 unknown additive target namespace/kind behavior
-referential-integrity failure detection
-staleness comparison from input/profile fingerprints
+conditional referential-integrity rules
+staleness comparison from available fingerprints
+unknown staleness when provenance unavailable
 manifest-last/incomplete-bundle rejection
 relative-path portability
 ```
 
-Golden fixtures should protect the generic envelope and representative record families once the candidate schema is accepted for implementation.
+Golden fixtures protect the generic envelope/representative records once the candidate schema is accepted for implementation.
 
-Target-specific fixtures belong to the reference adapter repository/package rather than Core generic regression fixtures.
+Target-specific fixtures belong to the reference adapter package.
 
 ---
 
 ## 39. Implementation boundary
 
-This document defines architecture and generic serialization semantics.
-
-It does not require OrbitFabric Core to execute adapters.
+This contract does not require Core to execute adapters.
 
 The first production execution boundary remains:
 
@@ -1451,14 +1388,14 @@ OrbitFabric Core CLI
 
 external Integration Adapter/package
     -> loads Input Set + Projection Profile
-    -> validates Profile/integration schema
-    -> performs target projection/integration work
-    -> writes Integration Result last
+    -> validates compatibility/profile schema
+    -> performs target work
+    -> writes Integration Result last when technically possible
 ```
 
 This remains consistent with ADR-0015.
 
-Core may later provide shared schema definitions/helpers if governance decides they are useful, but the adapter remains external execution.
+Integration Package discovery/advertised capabilities/out-of-process invocation are owned by #235 rather than duplicated here.
 
 ---
 
@@ -1470,15 +1407,19 @@ The following generic Phase B.3 decisions are frozen for `0.1-candidate`:
 extension-owned Integration Result
 UTF-8 JSON output
 conventional integration_result.json name
-manifest/result written last as coherent-bundle marker
+Result written last as coherent-bundle marker
+best-effort failed Result without invented provenance
 fixed generic top-level envelope
 separate Result/integration-schema/adapter/Profile versions
 explicit operation identity
-capabilities represent exercised Result capabilities, not full adapter discovery
+capabilities represent exercised Result capabilities
 result = succeeded | succeeded_with_warnings | failed
 result classification based on integration-owned diagnostics
-exact Core Input Set and Profile fingerprints
-staleness derived by comparison, not serialized as timeless truth
+input provenance status = available | unavailable
+Mission identity status = available | unavailable
+successful Result requires resolved Core/Profile/Mission provenance
+exact Core Input Set and Profile fingerprints when available
+staleness derived by comparison; unavailable provenance => unknown
 no Result self-digest or semantic fingerprint in v0
 Core source reference = {domain,id}
 target reference = {namespace,kind,id}, opaque to generic consumers
@@ -1492,14 +1433,14 @@ coverage scope expressed as Core domains
 coverage status = complete | partial | unavailable
 exactly one coverage record per entity in declared domains when complete
 entity states projected|partially_projected|intentionally_not_projected|not_projected|unsupported|blocked|not_applicable
-explicit evidence ownership/producer/location
-generic referential-integrity rules
+evidence owner = integration | external with explicit producer/location
+generic conditional referential-integrity rules
 relative bundled paths
 no generic free-form semantic escape hatch
-Studio consumes the Result without reconstructing target semantics
+Studio consumes the Result without reconstructing target semantics or missing provenance
 ```
 
-Remaining reference-integration details belong to the OpenOBSW/OpenSVF schema/adapter review rather than reopening this generic boundary unless they reveal a genuinely generic requirement.
+Remaining OpenOBSW/OpenSVF details may refine target namespaces/kinds, artifact/evidence kinds, external-tool roles and adapter capabilities, but do not reopen the generic envelope unless a genuinely ecosystem-independent requirement emerges.
 
 ---
 
@@ -1513,16 +1454,14 @@ Projection Profile settings/config schema
 OpenOBSW/PUS behavior
 OpenSVF behavior
 YAMCS behavior
-SRDB semantics
-XTCE semantics
-adapter package discovery
-adapter installation
+SRDB/XTCE semantics
+adapter package discovery/installation
 full pre-execution capability discovery
 runtime transport/API protocols
 verification engine behavior
 Studio plugin lifecycle
 Core plugin discovery/loading/execution
-a marketplace
+marketplace/signing/sandboxing
 a generic free-form extension object
 semantic-equivalence fingerprinting
 ```
@@ -1531,8 +1470,6 @@ semantic-equivalence fingerprinting
 
 ## 42. Final position
 
-The production boundary is:
-
 ```text
 Core owns mission semantics and emits exact, coherent integration inputs.
 
@@ -1540,9 +1477,9 @@ Projection Profile owns authored ecosystem-specific projection intent.
 
 Integration Adapter owns target resolution, validation, generation and integration diagnostics.
 
-Integration Result records exactly what that adapter resolved/generated and how it maps back to Core/Profile identity.
+Integration Result records what the adapter could reliably resolve/generate and makes unavailable provenance explicit rather than guessing.
 
-External runtime/verification systems retain ownership of their native behavior and evidence semantics.
+External runtime/verification systems retain ownership of native behavior and evidence semantics.
 
-Studio consumes the same machine-readable Result used by CLI/CI workflows and never reconstructs integration meaning from filenames, names or timestamps.
+Studio consumes the same machine-readable Result used by CLI/CI workflows and never reconstructs integration meaning or missing provenance from filenames, names, raw YAML or timestamps.
 ```
