@@ -8,7 +8,7 @@ From that contract, OrbitFabric validates consistency, generates documentation, 
 
 ## Current status
 
-OrbitFabric is currently at:
+OrbitFabric is currently released at:
 
 ```text
 v1.1.0 - Candidate Integration Surface Consolidation
@@ -18,7 +18,16 @@ v1.1.0 consolidates the post-v1 candidate Core-owned integration surfaces while 
 
 The stable surface is intentionally limited.
 
-OrbitFabric v1.1.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
+Current `main` contains additional unreleased additive development after v1.1.0:
+
+```text
+mission_snapshot.json        -> complete loaded Mission Model inspection surface
+relationship_manifest.json   -> seven additive explicit FDIR relationship families
+```
+
+These additions are development-state capabilities. They are not retroactively part of v1.1.0 and do not change the v1.0.0 stable Mission Data Contract baseline.
+
+OrbitFabric is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
 
 ## Core idea
 
@@ -39,6 +48,7 @@ Mission Model
   -> Core-owned contract introspection surfaces
   -> Core-owned entity index surfaces
   -> Core-owned relationship manifest surfaces
+  -> candidate full Mission Model snapshot surface
   -> stability and compatibility classification
   -> extensibility boundary contract
   -> v1.0 stable surface decision
@@ -55,20 +65,25 @@ entity_index.json           -> entity navigation
 relationship_manifest.json  -> relationship navigation
 ```
 
-The current post-v1 candidate Core-owned integration surfaces are:
+The post-v1 candidate Core-owned integration surfaces consolidated in v1.1.0 are:
 
 ```text
-dashboard_summary.json      -> dashboard-ready aggregation of existing Core facts
-scenario_run_index.json     -> simulation JSON run index
-coverage_summary.json       -> limited coverage from Core structured outputs
+dashboard_summary.json       -> dashboard-ready aggregation of existing Core facts
+scenario_run_index.json      -> simulation JSON run index
+coverage_summary.json        -> limited coverage from Core structured outputs
 simulation JSON expectations -> additive structured expectation accounting
 ```
 
-These surfaces are candidate post-v1 outputs.
+Current unreleased development adds:
 
-They are Core-owned and read-only, but they are not part of the original v1.0.0 stable surface.
+```text
+mission_snapshot.json        -> full loaded contract inspection
+FDIR relationship families   -> additive explicit relationship types in relationship_manifest.json
+```
 
-They exist so downstream tools can inspect Core evidence without becoming a second source of Mission Data Contract semantics.
+`mission_snapshot.json` is Core-owned and read-only. It exposes what Core actually loaded without asking downstream consumers to reparse OrbitFabric YAML and without becoming a second source of truth or a Studio-specific API.
+
+The additive FDIR relationship families are derived deterministically from explicit Mission Model fields. They preserve the original v1 relationship-family compatibility commitments.
 
 The boundary is:
 
@@ -108,7 +123,7 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Contract introspection, entity index and relationship manifest surfaces are not plugin APIs, graph engines or Studio-specific APIs.
+Contract introspection, entity index, relationship manifest and Mission Snapshot surfaces are not plugin APIs, graph engines or Studio-specific APIs.
 
 Compatibility references and the Extensibility Boundary Contract are not schema migration tooling, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or tool-specific integrations.
 
