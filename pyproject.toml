@@ -48,7 +48,7 @@ dev = [
 ]
 
 [project.scripts]
-orbitfabric = "orbitfabric.cli:app"
+orbitfabric = "orbitfabric.entrypoint:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/orbitfabric"]
