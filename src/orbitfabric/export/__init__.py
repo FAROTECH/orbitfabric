@@ -7,6 +7,10 @@ from orbitfabric.export.dashboard_summary import (
     write_dashboard_summary,
 )
 from orbitfabric.export.entity_index import entity_index_to_dict, write_entity_index
+from orbitfabric.export.integration_input_set import (
+    IntegrationInputSetResult,
+    write_integration_input_set,
+)
 from orbitfabric.export.mission_snapshot import (
     failed_mission_snapshot_to_dict,
     mission_snapshot_from_dir,
@@ -20,6 +24,7 @@ from orbitfabric.export.scenario_run_index import (
 )
 
 __all__ = [
+    "IntegrationInputSetResult",
     "coverage_summary_to_dict",
     "dashboard_summary_to_dict",
     "entity_index_to_dict",
@@ -31,6 +36,7 @@ __all__ = [
     "write_coverage_summary",
     "write_dashboard_summary",
     "write_entity_index",
+    "write_integration_input_set",
     "write_mission_snapshot",
     "write_model_summary",
     "write_scenario_run_index",
