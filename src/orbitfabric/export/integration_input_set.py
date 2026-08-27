@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from hashlib import sha256
 import json
 import os
+from collections.abc import Callable
+from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Callable
+from typing import Any
 
 import rfc8785
 
@@ -20,7 +21,7 @@ from orbitfabric.export.model_summary import model_summary_to_dict
 from orbitfabric.export.relationship_manifest import relationship_manifest_to_dict
 from orbitfabric.lint.engine import LintEngine
 from orbitfabric.lint.json_report import lint_report_to_dict
-from orbitfabric.model.errors import MissionModelError
+from orbitfabric.model.errors import MissionModelError, ModelDiagnostic
 from orbitfabric.model.loader import MissionModelLoader
 from orbitfabric.model.mission import MissionModel
 
@@ -177,7 +178,7 @@ def _write_load_failure_set(
     mission_dir: Path,
     output_dir: Path,
     staging_dir: Path,
-    diagnostics: list[Any],
+    diagnostics: list[ModelDiagnostic],
 ) -> IntegrationInputSetResult:
     records: list[dict[str, Any]] = []
     generation_failed = False
