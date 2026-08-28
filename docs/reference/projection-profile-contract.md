@@ -518,6 +518,28 @@ resolved target values
   -> Integration Result with provenance
 ```
 
+The detailed PoC-to-production disposition remains useful engineering context:
+
+| PoC field or concept | v0 disposition |
+|---|---|
+| `contract.name` | maps to `profile.id` |
+| `contract.version` | maps to `profile.version` |
+| `c_prefix` | integration-owned `settings` |
+| local entity `name` | replaced by Core `{domain,id}` source reference |
+| `of_id` / `OF_*` symbol | deterministic adapter default where possible; explicit target-symbol override only when required |
+| `of_id_value` | Profile-authored target allocation when stable external identity is required |
+| `srdb_name` | deterministic Core-ID-derived default where valid; optional target override |
+| `c_type` | adapter-derived from Core type by default; explicit target override only where justified |
+| `unit` | removed when duplicating Core semantic unit |
+| `pus_service` / `pus_subtype` | integration-specific binding `config` |
+| `hk_set` / `sid` | integration-specific mapping/allocation; multi-source binding where appropriate |
+| `sample_rate_hz` | removed when duplicating Core timing; allowed only when explicitly target-specific |
+| `collection_interval_s` | Core-derived unless the integration schema defines a distinct target scheduling choice |
+| command `arguments` | removed; Core-derived command signature |
+| `expected_responses` | integration/verification config only when required; not Core command semantics |
+| event `severity` | removed when duplicating Core semantic severity |
+| trigger parameter/condition/threshold | removed; Core-owned event/fault semantics |
+
 This authority split has been exercised by the OpenOBSW/OpenSVF reference package and remains the reference behavior for the generic candidate contract.
 
 ## 25. Example
@@ -579,7 +601,30 @@ A consumer of a Projection Profile must:
 
 A consumer must not use raw Mission Model YAML as a semantic fallback when the stable Core Integration Input Set is required.
 
-## 27. Non-goals
+## 27. Acceptance criteria
+
+The current `0.1-candidate` contract is considered design-frozen and reference-proven because the following points have been exercised and reviewed:
+
+```text
+generic envelope field set is explicit and bounded
+YAML authoring rules and no generic include/inheritance are explicit
+profile, integration and schema version identities are distinct
+Core source identity is always {domain,id}
+project and do_not_project intent are distinct
+one-to-many and many-to-one bindings are representable
+source ordering carries no hidden generic semantics
+settings and binding config remain integration-owned
+Core semantic authority cannot be overridden by Profile state
+deterministic defaults and stable external allocations have distinct roles
+validation ownership is split between Core and the Integration Package
+package-published JSON Schema remains the target-specific schema authority
+Studio-private state cannot become authoritative Profile state
+reference OpenOBSW/OpenSVF extraction has been reviewed against the PoC and exercised end to end
+```
+
+These criteria describe the maturity reached by the candidate contract. They do not promote it to a stable Core Mission Data Contract surface.
+
+## 28. Non-goals
 
 The Projection Profile Contract does not introduce:
 
@@ -595,7 +640,7 @@ ground behavior
 Studio-specific semantic authority
 ```
 
-## 28. Current maturity
+## 29. Current maturity
 
 The generic Profile envelope and authority rules are design-frozen and reference-proven.
 
@@ -609,7 +654,7 @@ The contract nevertheless remains:
 
 It is an extension contract with its own maturity lifecycle. v1.2.0 stabilizes the Core input boundary, not every extension contract that consumes it.
 
-## 29. Final statement
+## 30. Final statement
 
 The Projection Profile records authored target-specific intent without becoming a second Mission Model.
 
