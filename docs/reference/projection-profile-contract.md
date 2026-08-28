@@ -1,6 +1,6 @@
 # Projection Profile Contract
 
-Status: Architecture candidate — Phase B.2 generic envelope design-frozen; reference integration schema review pending  
+Status: Candidate extension contract, design-frozen and reference-proven  
 Contract version: `0.1-candidate`  
 Scope: Generic authored projection-profile envelope for external ecosystem integrations  
 Parent architecture issue: #227  
@@ -8,11 +8,9 @@ Design issue: #231
 Concept RFC: #213  
 Core input dependency: #228
 
----
-
 ## 1. Purpose
 
-The Projection Profile Contract defines how an engineer records **ecosystem-specific projection intent** without duplicating or redefining the OrbitFabric Mission Model.
+The Projection Profile Contract defines how an engineer records ecosystem-specific projection intent without duplicating or redefining the OrbitFabric Mission Model.
 
 It answers:
 
@@ -25,59 +23,52 @@ The intended architecture is:
 
 ```text
 Core Integration Input Set
-        ↓
-Projection Profile
-        ↓
-Integration Adapter
-        ↓
-Integration Result
+    -> Projection Profile
+    -> Integration Adapter
+    -> Integration Result
 ```
 
 The Mission Model remains the semantic source of truth.
 
-The Profile is authored configuration.
+The Profile is authored target-specific configuration. The Integration Result records the resolved/generated outcome.
 
-The Integration Result is resolved/generated output.
+The generic contract is design-frozen and has been exercised by the OpenOBSW/OpenSVF reference integration. It remains `0.1-candidate` and is not promoted to a stable Core Mission Data Contract surface by v1.2.0.
 
----
+## 2. Ownership boundary
 
-## 2. Architectural boundary
+The contract deliberately separates generic governance from integration-specific semantics.
 
-The generic Profile contract is deliberately split into two ownership layers.
-
-### OrbitFabric Core governance owns
+OrbitFabric governance owns:
 
 ```text
-generic envelope identity/versioning
-Profile instance identity/versioning
-integration-schema identity/versioning
+generic envelope identity and versioning
+Profile instance identity and versioning
+integration schema identity and versioning
 Core source-reference shape
 binding identity and authored intent
 settings/config placement rules
-authority/precedence rules
+authority and precedence rules
 validation ownership boundaries
 ```
 
-### Integration package owns
+The Integration Package owns:
 
 ```text
 target-specific settings keys
 target-specific binding config keys
-numeric-allocation rules
+numeric allocation rules
 protocol mappings
 target naming rules
 target type projection rules
-adapter-specific defaults/overrides
+adapter defaults and overrides
 target-specific validation
 ```
 
-Core must not learn OpenOBSW, OpenSVF, YAMCS, PUS, SRDB, cFS or other target-specific semantics merely to define the Profile envelope.
+Core must not learn OpenOBSW, OpenSVF, YAMCS, PUS, SRDB, cFS, F Prime or other ecosystem-specific semantics merely to define the Profile envelope.
 
----
+## 3. Authoring format
 
-## 3. v0 authoring format
-
-The v0 Profile is a single human-reviewable YAML document with a JSON-compatible data model.
+The v0 Profile is one human-reviewable YAML document with a JSON-compatible loaded data model.
 
 Requirements:
 
@@ -88,36 +79,16 @@ mapping keys are strings
 no custom YAML tags
 no duplicate mapping keys
 no opaque binary state
-no Studio-only database
+no Studio-only authoritative database
 ```
 
-Standard YAML anchors/aliases may be used as authoring syntax if the parser supports them, but they create no additional Profile semantics.
-
-The loaded Profile data must remain representable as ordinary JSON-compatible objects, arrays, strings, numbers, booleans and null values.
-
-### No generic include/inheritance in v0
-
-The generic v0 contract defines no:
-
-```text
-include
-extends
-inheritance
-overlay chain
-remote import
-```
-
-A Profile is one explicit document.
-
-This keeps provenance, review and exact-byte digesting unambiguous.
+The generic v0 contract defines no include, inheritance, overlay chain or remote import mechanism.
 
 A future composition mechanism requires a separate reviewed contract.
 
----
+## 4. Generic envelope
 
-## 4. Frozen generic envelope
-
-The v0 candidate envelope is:
+The candidate envelope is:
 
 ```yaml
 kind: orbitfabric.projection_profile
@@ -160,21 +131,15 @@ bindings[].reason
 
 No target-specific key is admitted into the generic envelope outside `settings` and `bindings[].config`.
 
----
-
 ## 5. Version identities
 
-The Profile contract keeps three version concepts distinct.
+Three version concepts remain distinct.
 
 ### `profile_version`
 
-Meaning:
+Identifies the generic OrbitFabric Projection Profile envelope.
 
-```text
-OrbitFabric generic Projection Profile envelope version
-```
-
-Current candidate:
+Current value:
 
 ```text
 0.1-candidate
@@ -182,40 +147,19 @@ Current candidate:
 
 ### `profile.version`
 
-Meaning:
+Identifies the mission/project-authored revision of one Profile instance.
 
-```text
-mission/project-authored Profile instance revision
-```
-
-This value is controlled by the Profile author/project.
-
-It is not a substitute for an exact content digest.
+It is controlled by the Profile author and is not a substitute for an exact content digest.
 
 ### `integration.schema_version`
 
-Meaning:
+Identifies the integration-specific schema required to interpret `settings` and `bindings[].config` together with `integration.id`.
 
-```text
-integration-specific settings/config schema version
-```
-
-The pair:
-
-```text
-integration.id
-integration.schema_version
-```
-
-identifies the target-specific schema required to interpret `settings` and binding `config` objects.
-
-The adapter package/software version remains separate implementation/provenance information.
-
----
+The adapter package/software version remains separate implementation and provenance information.
 
 ## 6. Profile identity
 
-`profile.id` identifies the authored Profile instance family.
+`profile.id` identifies the authored Profile lineage.
 
 It must be:
 
@@ -226,33 +170,25 @@ version-controlled
 independent from filesystem path
 ```
 
-`profile.id` is not a Mission Model entity ID and must not be inserted into Core Entity Index or Relationship Manifest.
+It is not a Mission Model entity ID and must not be inserted into Core Entity Index or Relationship Manifest.
 
 `profile.description` is optional human-readable metadata and carries no machine semantic authority.
 
----
-
 ## 7. Integration identity
 
-`integration.id` identifies the integration/schema family expected to consume the Profile.
-
-Examples are integration-package identifiers, not external runtime names.
-
-The generic contract does not prescribe a repository/package naming convention.
+`integration.id` identifies the integration and schema family expected to consume the Profile.
 
 An adapter must reject a Profile whose `integration.id` or `integration.schema_version` it does not support.
 
-An adapter must not guess compatibility from package name similarity.
+It must not guess compatibility from package names, repository names or string similarity.
 
----
+## 8. Integration-owned settings
 
-## 8. Integration-owned `settings`
+`settings` is a JSON-compatible mapping owned by the integration-specific schema.
 
-`settings` is a mapping owned by the integration-specific schema.
+It is intended for target-wide authored configuration that is not naturally attached to one Core entity.
 
-It is intended for target-wide authored configuration that is not naturally attached to one Core semantic entity.
-
-Examples in a reference integration may include concepts such as:
+Reference examples may include:
 
 ```text
 target naming prefix
@@ -262,34 +198,28 @@ SRDB-generation policy
 target-tool compatibility selection
 ```
 
-Those examples do not become generic Core semantics.
+These examples do not become Core semantics.
 
-The generic contract treats `settings` as an opaque JSON-compatible object after envelope validation.
-
-Integration-specific schema validation remains adapter-owned.
-
----
+The generic contract treats `settings` as opaque after generic envelope validation. Detailed validation remains integration-owned.
 
 ## 9. Core source reference
 
-Every semantic source reference in a binding uses:
+Every semantic source reference uses the domain-qualified Core identity:
 
 ```yaml
 domain: telemetry
 id: eps.obc.bus_voltage_mv
 ```
 
-Both `domain` and `id` are required.
+Both fields are required.
 
-The pair must resolve to exactly one entity in the Core Integration Input Set Entity Index.
+The pair must resolve to exactly one Entity Index record in the Core Integration Input Set.
 
-This prevents a Profile from replacing Core identity with target conventions.
-
-Forbidden substitutes include:
+Forbidden substitutes for Core semantic identity include:
 
 ```text
 Mission YAML path
-source filename/line
+source filename or line
 C symbol
 numeric target ID
 SRDB name
@@ -299,13 +229,11 @@ artifact filename
 Studio internal ID
 ```
 
-Those may appear as target-specific configuration/result data, but they are never Core semantic references.
-
----
+Those values may appear as target-specific configuration or result data, but never as replacements for Core identity.
 
 ## 10. Binding contract
 
-A binding is one stable, profile-local authored projection decision.
+A binding records one stable Profile-local projection decision.
 
 Generic shape:
 
@@ -325,36 +253,30 @@ Each binding contains:
 id        required
 intent    required
 sources   required, at least one source
-config    optional integration-owned mapping; defaults to {}
+config    optional integration-owned mapping, default {}
 reason    conditionally required for do_not_project
 ```
 
----
-
 ## 11. Binding identity
 
-`bindings[].id`:
+`bindings[].id` is:
 
 ```text
-is unique within the Profile
-is authored and version-controlled
-identifies the Profile mapping record
-is case-sensitive
-is not a Mission Model semantic entity
-is not an Integration Result target identity
+unique within the Profile
+authored and version-controlled
+case-sensitive
+an identifier for the Profile mapping record
+not a Mission Model entity
+not a target artifact identity
 ```
 
-Downstream tools should treat a binding ID as opaque unless the integration-specific schema explicitly adds conventions.
-
-Core does not infer semantics from binding-ID prefixes.
-
----
+Core and generic consumers must not infer semantics from binding-ID prefixes.
 
 ## 12. Source cardinality
 
-A v0 binding requires one or more Core source references.
+A binding contains one or more Core source references.
 
-This supports:
+The envelope supports:
 
 ```text
 one source -> one binding
@@ -362,56 +284,30 @@ one Core entity -> multiple bindings
 multiple Core entities -> one binding
 ```
 
-Therefore the generic envelope can represent both one-to-many and many-to-one authored projection intent.
-
-### No source-less semantic binding
-
 Pure target-wide configuration with no Core semantic anchor belongs in `settings`.
 
-The v0 generic contract does not permit `sources: []` for a binding.
+The generic v0 contract does not permit a source-less semantic binding.
 
-This prevents target-only infrastructure from masquerading as a mission-semantic mapping.
+## 13. Source ordering
 
----
+The generic contract assigns no semantic meaning to the order of `bindings[].sources`.
 
-## 13. Source ordering is not generic semantics
+If a target requires packing order, field position or another ordered target concept, the integration-specific schema must represent that explicitly inside `config`.
 
-The generic contract does **not** assign semantic meaning to the order of `bindings[].sources`.
+Incidental YAML array order must not become hidden target semantics.
 
-If a target construct requires physical ordering, field position or packing order, the integration-specific schema must represent that requirement explicitly inside `config`.
+## 14. Authored intent
 
-For example, a housekeeping packet schema may define explicit target-order metadata rather than relying on the incidental order in `sources`.
-
-This avoids hidden target semantics in a generic Core-governed array.
-
----
-
-## 14. Authored projection intent
-
-Allowed v0 `intent` values are:
+Allowed values are:
 
 ```text
 project
 do_not_project
 ```
 
-### `project`
+`project` means the Profile explicitly requests or configures projection of the referenced Core semantics.
 
-Means:
-
-```text
-the Profile explicitly requests/configures projection of the referenced Core semantics
-```
-
-`config` may be empty when adapter defaults are sufficient.
-
-### `do_not_project`
-
-Means:
-
-```text
-the Profile explicitly records intentional non-projection
-```
+`do_not_project` means the Profile explicitly records intentional non-projection.
 
 For `do_not_project`:
 
@@ -420,7 +316,7 @@ reason is required and non-empty
 config should be empty
 ```
 
-This distinction is required because:
+The distinction is mandatory:
 
 ```text
 no binding exists
@@ -428,252 +324,227 @@ no binding exists
 explicit do_not_project
 ```
 
----
-
 ## 15. Absence semantics
 
-If a Core entity is not referenced by any Profile binding, the generic meaning is:
+If a Core entity is not referenced by any binding, the generic meaning is only:
 
 ```text
 no authored Profile decision exists for that entity
 ```
 
-Absence does **not** mean:
+Absence does not mean unsupported, invalid, automatically projected or intentionally excluded.
 
-```text
-do not project
-unsupported
-project automatically
-invalid
-```
+The adapter may apply its documented default projection policy. The resolved outcome belongs in the Integration Result.
 
-The Integration Adapter may apply its documented default projection policy to unmentioned entities.
+## 16. Binding config
 
-The resolved outcome belongs in the Integration Result.
+`bindings[].config` is interpreted by the integration-specific schema.
 
-This rule preserves the distinction between authored state and adapter behavior.
-
----
-
-## 16. Integration-owned binding `config`
-
-`bindings[].config` is a JSON-compatible mapping interpreted by the integration-specific schema.
-
-It may contain target-specific authored values such as, depending on the integration:
+Depending on the integration, it may contain:
 
 ```text
 numeric allocations
-protocol service/subservice mapping
-target symbol override
-target database name override
-target type/encoding override
-housekeeping SID/allocation
-target grouping/materialization choices
+protocol service and subtype mappings
+target symbol overrides
+target database names
+target encoding or type overrides
+housekeeping grouping or SID allocation
+materialization choices
 verification-facing protocol expectations
 ```
 
-These examples are not generic Profile fields.
+These examples remain target-specific and do not become generic Profile fields.
 
-Core does not parse their meaning.
+Studio and other tooling must obtain target-specific schema information from the Integration Package, not from a second hard-coded copy.
 
-Studio obtains their schema/meaning from the installed integration package rather than from hard-coded Studio logic.
+## 17. Semantic authority and precedence
 
----
-
-## 17. Semantic-authority precedence
-
-The following precedence is frozen:
+The authority chain is:
 
 ```text
 1. Core semantic value
-       ↓ authoritative mission meaning
-
-2. Adapter deterministic projection/default
-       ↓ target representation derived from Core
-
-3. Profile-authored target choice/override
-       ↓ only where the integration schema explicitly allows it
-
-4. Integration Result
-       ↓ records resolved output and provenance
+2. Adapter deterministic target projection/default
+3. Profile-authored target choice or override where explicitly allowed
+4. Integration Result records the resolved value and origin
 ```
 
-A Profile may override **target representation**.
+A Profile may override target representation where the integration schema permits it.
 
-A Profile may not override **Core semantic meaning**.
+A Profile may not override Core semantic meaning.
 
-Examples:
+Allowed examples:
 
 ```text
-allowed:
-  explicit target numeric ID
-  target symbol override
-  target encoding override where schema permits
-  protocol mapping
-
-not allowed as semantic replacement:
-  redefining OrbitFabric unit
-  redefining command arguments
-  redefining event/fault trigger condition
-  redefining semantic severity
-  redefining Core relationship meaning
+explicit target numeric ID
+target symbol override
+target encoding override where supported
+protocol mapping
 ```
 
-If target representation cannot faithfully express Core semantics, the adapter reports an integration diagnostic instead of silently changing Core meaning.
+Forbidden semantic replacements include:
 
----
+```text
+redefining OrbitFabric unit
+redefining command arguments
+redefining event or fault trigger semantics
+redefining Core severity meaning
+redefining Core relationship meaning
+```
+
+If the target cannot faithfully represent Core semantics, the adapter must report an integration diagnostic rather than silently changing Core meaning.
 
 ## 18. Deterministic defaults
 
 Profiles should not repeat values that can be derived deterministically and safely by the adapter.
 
-Reference examples include:
-
-```text
-C symbol derived from Core ID + configured prefix
-SRDB name derived from Core ID
-C type derived from Core semantic type
-```
+Examples may include target symbols or types derived from Core identity and semantic type.
 
 Preferred behavior:
 
 ```text
-adapter default when deterministic
-profile override only when required
-Integration Result records resolved value and origin
+adapter deterministic default
+Profile override only when required
+Integration Result records the resolved value and origin
 ```
-
-This reduces duplicate authored state and drift.
-
----
 
 ## 19. Stable external allocations
 
-Identifiers with external persistence, compatibility or ABI significance require stronger discipline.
+Externally persistent numeric IDs or other ABI-significant values require stronger discipline.
 
-If a numeric allocation must remain stable across builds/releases, the preferred production posture is:
+If an allocation must remain stable across builds or releases, the preferred production posture is explicit version-controlled Profile state.
 
-```text
-explicit Profile-authored allocation
-```
-
-An integration may support deterministic allocation assistance, but production-significant allocation must not live only in hidden mutable adapter state.
-
-If an adapter auto-allocates and the value becomes externally significant, the value should be materialized into version-controlled Profile state before relying on it as a stable contract.
-
----
+An adapter may offer deterministic allocation assistance, but a production-significant value must not live only in hidden mutable adapter state.
 
 ## 20. Validation ownership
 
-Validation layers remain distinct.
+Validation layers remain distinct:
 
 ```text
 Core Integration Input validation
-    -> Core-owned
+  Core-owned
 
 Generic Profile envelope validation
-    -> shared contract helper and/or integration package
+  generic contract helper and/or Integration Package
 
 Integration-specific schema validation
-    -> Integration Adapter/package
+  Integration Package / Adapter
 
 Projection validation
-    -> Integration Adapter/package
+  Integration Package / Adapter
 ```
 
-No Profile/integration diagnostic is injected into Core lint output.
+Profile and adapter diagnostics are not injected into Core lint output.
 
-Examples of integration-owned diagnostics:
+Representative integration diagnostics include:
 
 ```text
 unknown Core source entity
 source domain mismatch
 duplicate binding ID
 unsupported integration schema version
-missing required numeric allocation
-numeric allocation collision
+missing required allocation
+allocation collision
 invalid protocol mapping
-unsupported target encoding override
+unsupported target encoding
 invalid target name
 ```
 
----
+## 21. Schema publication
 
-## 21. Profile storage and lifecycle
+The Integration Package publishes the detailed schema for `settings` and binding `config`.
 
-A concrete Profile instance is authored source configuration.
-
-It should normally live:
+The current supporting contract uses JSON Schema Draft 2020-12 and identifies the schema through:
 
 ```text
-with the mission/project source configuration
-or
-in another explicitly version-controlled integration configuration repository
+integration.id
+integration.schema_version
 ```
 
-The generic v0 contract does not mandate one filesystem layout.
+The same schema authority is intended for adapter CLI validation, CI, Studio-assisted editing and human-facing schema documentation.
 
-A future discovery convention may be defined separately.
+Core does not embed target-specific Profile keys.
 
-Studio must not make an opaque private database the authoritative Profile store.
+## 22. Storage and lifecycle
 
----
+A Profile instance is authored source configuration.
 
-## 22. Profile provenance and digest
+It should normally live with the mission/project source configuration or in another explicit version-controlled integration configuration repository.
 
-The Profile does not contain a self-digest.
+The generic contract does not require one filesystem discovery convention.
 
-The Integration Result later records at least:
+An opaque Studio-private database must not become the authoritative Profile store.
+
+## 23. Provenance and digest
+
+The Profile contains no self-digest.
+
+The Integration Result records at least:
 
 ```text
 profile.id
 profile.version
 integration.id
 integration.schema_version
-exact consumed Profile content/file SHA-256
+exact consumed Profile content SHA-256
 ```
 
-An exact-byte Profile digest intentionally changes for formatting/comments when the source bytes change.
+`profile.version` is authored lifecycle metadata. The digest records the exact bytes consumed.
 
 The v0 contract does not define semantic-equivalence fingerprinting for Profiles.
 
-`profile.version` remains authored lifecycle metadata; the exact digest records what bytes were actually consumed.
+## 24. Reference extraction principles
 
----
+The original PoC mapping model was useful evidence but is not the production schema.
 
-## 23. PoC extraction disposition
+Production extraction follows these rules:
 
-The current `orbitfabric_models/poc_slice.yaml` is a useful precursor but must not be copied as the production schema.
+```text
+local copied semantic entity names
+  -> Core {domain,id} references
 
-Initial production disposition is frozen as follows.
+Core semantic unit/type/command arguments/severity
+  -> remain Core-derived
 
-| Current PoC field/concept | v0 disposition |
+stable target numeric allocation
+  -> Profile-authored where external persistence requires it
+
+deterministic target symbol/name/type
+  -> adapter default where safe
+
+target protocol mapping and target grouping
+  -> integration-owned Profile config
+
+resolved target values
+  -> Integration Result with provenance
+```
+
+The detailed PoC-to-production disposition remains useful engineering context:
+
+| PoC field or concept | v0 disposition |
 |---|---|
-| `contract.name` | `profile.id` |
-| `contract.version` | `profile.version` |
+| `contract.name` | maps to `profile.id` |
+| `contract.version` | maps to `profile.version` |
 | `c_prefix` | integration-owned `settings` |
-| local entity `name` | replace with Core `{domain,id}` source reference |
+| local entity `name` | replaced by Core `{domain,id}` source reference |
 | `of_id` / `OF_*` symbol | deterministic adapter default where possible; explicit target-symbol override only when required |
 | `of_id_value` | Profile-authored target allocation when stable external identity is required |
 | `srdb_name` | deterministic Core-ID-derived default where valid; optional target override |
 | `c_type` | adapter-derived from Core type by default; explicit target override only where justified |
-| `unit` | remove; Core-derived semantic value |
+| `unit` | removed when duplicating Core semantic unit |
 | `pus_service` / `pus_subtype` | integration-specific binding `config` |
-| `hk_set` / `sid` | integration-specific Profile mapping/allocation; multi-source binding where appropriate |
-| `sample_rate_hz` | remove when duplicating Core timing; allow only explicitly target-specific override |
-| `collection_interval_s` | Core-derived unless integration schema defines it as a distinct target scheduling choice |
-| command `arguments` | remove; Core-derived command signature |
+| `hk_set` / `sid` | integration-specific mapping/allocation; multi-source binding where appropriate |
+| `sample_rate_hz` | removed when duplicating Core timing; allowed only when explicitly target-specific |
+| `collection_interval_s` | Core-derived unless the integration schema defines a distinct target scheduling choice |
+| command `arguments` | removed; Core-derived command signature |
 | `expected_responses` | integration/verification config only when required; not Core command semantics |
-| event `severity` | remove when duplicating Core semantic severity |
-| trigger parameter/condition/threshold | remove; Core-owned event/fault semantics |
+| event `severity` | removed when duplicating Core semantic severity |
+| trigger parameter/condition/threshold | removed; Core-owned event/fault semantics |
 
-The OpenOBSW/OpenSVF reference schema may refine target-specific key names after PoC PR #30 review, but it must preserve this authority split.
+This authority split has been exercised by the OpenOBSW/OpenSVF reference package and remains the reference behavior for the generic candidate contract.
 
----
+## 25. Example
 
-## 24. Example reference extraction
-
-Illustrative only; target-specific keys remain owned by the future reference integration schema.
+Illustrative target-specific keys remain integration-owned:
 
 ```yaml
 kind: orbitfabric.projection_profile
@@ -712,230 +583,79 @@ bindings:
       pus:
         service: 17
         subtype: 1
-
-  - id: hk.obc
-    intent: project
-    sources:
-      - domain: telemetry
-        id: eps.obc.bus_voltage_mv
-    config:
-      target_kind: housekeeping_set
-      sid: 1
 ```
 
-Notice what is deliberately absent:
+The example does not make `numeric_id`, `pus`, `c_prefix` or any OpenOBSW/OpenSVF concept generic Core semantics.
+
+## 26. Consumer rules
+
+A consumer of a Projection Profile must:
+
+1. validate the generic envelope;
+2. validate `integration.id` and `integration.schema_version` against the selected Integration Package;
+3. resolve every source through the Core Integration Input Set;
+4. validate integration-owned settings and config through the package-published schema;
+5. preserve the authority precedence described above;
+6. keep Core diagnostics and integration diagnostics distinct;
+7. produce resolved outcomes through the Integration Result rather than mutating the Profile silently.
+
+A consumer must not use raw Mission Model YAML as a semantic fallback when the stable Core Integration Input Set is required.
+
+## 27. Acceptance criteria
+
+The current `0.1-candidate` contract is considered design-frozen and reference-proven because the following points have been exercised and reviewed:
 
 ```text
-unit
-command argument list
-event trigger semantics
-semantic severity
-Core source YAML path
+generic envelope field set is explicit and bounded
+YAML authoring rules and no generic include/inheritance are explicit
+profile, integration and schema version identities are distinct
+Core source identity is always {domain,id}
+project and do_not_project intent are distinct
+one-to-many and many-to-one bindings are representable
+source ordering carries no hidden generic semantics
+settings and binding config remain integration-owned
+Core semantic authority cannot be overridden by Profile state
+deterministic defaults and stable external allocations have distinct roles
+validation ownership is split between Core and the Integration Package
+package-published JSON Schema remains the target-specific schema authority
+Studio-private state cannot become authoritative Profile state
+reference OpenOBSW/OpenSVF extraction has been reviewed against the PoC and exercised end to end
 ```
 
-Those remain Core-owned.
+These criteria describe the maturity reached by the candidate contract. They do not promote it to a stable Core Mission Data Contract surface.
 
----
+## 28. Non-goals
 
-## 25. Representativeness review
-
-The generic envelope has been reviewed against the architecture cases required by #227/#231.
-
-| Case | Representation |
-|---|---|
-| one-to-one projection | one binding, one source |
-| one Core entity -> multiple targets | multiple bindings referencing same Core source |
-| multiple Core entities -> one target construct | one binding with multiple sources |
-| explicit non-projection | `intent: do_not_project` + required reason |
-| no authored decision | no binding; adapter policy decides resolved outcome |
-| adapter deterministic default | `intent: project` with empty/partial `config` |
-| explicit target override | integration-owned key in `config` |
-| stable numeric allocation | explicit integration-owned value in `config` |
-| multi-parameter HK/group mapping | multi-source binding + explicit target ordering/config when needed |
-| command mapping | command Core source + integration-owned config |
-| telemetry mapping | telemetry Core source + integration-owned config |
-| event mapping | event Core source + integration-owned config |
-| fault-related mapping | fault Core source + integration-owned config |
-| target-wide policy | `settings` |
-| target does not support entity | adapter emits unsupported result; Profile may additionally record `do_not_project` only when intentionally authored |
-
-No OpenOBSW/OpenSVF/YAMCS-specific field is required by the generic envelope to represent these cases.
-
----
-
-## 26. Relationship to Integration Result
-
-The Profile records **authored intent**.
-
-It must not contain:
+The Projection Profile Contract does not introduce:
 
 ```text
-resolved generated target nodes
-generated artifact paths/digests
-projection coverage result
-integration diagnostics
-runtime evidence
-verification evidence
-staleness state
-```
-
-Those belong to the Integration Result.
-
-The later Integration Result contract should preserve resolution provenance conceptually such as:
-
-```text
-core
-adapter_default
-profile
-```
-
-so downstream tools can explain why a resolved projection value exists.
-
----
-
-## 27. Relationship to Studio
-
-Studio may expose a visual Profile editor, but the data authority remains the Profile file.
-
-Studio must:
-
-```text
-edit the same version-controlled Profile document
-resolve Core entity selectors from the Core Integration Input Set
-obtain target-specific settings/config schema from the integration package
-preserve generic Profile semantics
-```
-
-Studio must not:
-
-```text
-create a second hidden mapping database
-invent Core source IDs
-hard-code OpenOBSW/OpenSVF schema into generic Studio code
-infer target mappings from generated artifacts
-```
-
-The same Profile must remain usable in CLI-only, CI and Studio workflows.
-
----
-
-## 28. Relationship to integration package execution
-
-The Profile contract does not require Core to load or execute integration code.
-
-The first production execution boundary remains:
-
-```text
-OrbitFabric Core CLI
-    -> produces Core Integration Input Set
-
-external Integration Adapter/package
-    -> loads Input Set + Profile
-    -> validates generic/integration-specific Profile contract
-    -> produces Integration Result + target artifacts
-```
-
-This remains consistent with ADR-0015.
-
----
-
-## 29. Relationship to PoC PR #30
-
-The generic envelope is design-frozen independently of the remaining OpenOBSW/OpenSVF ownership review.
-
-Gonçalo's feedback remains important for the **reference integration-specific schema**, especially:
-
-```text
-SRDB -> XTCE ownership
-OpenOBSW contract-only boundary
-OpenSVF long-term integration surfaces
-YamcsBridge reuse
-external compatibility markers
-verification/campaign evidence interfaces
-```
-
-Those decisions may refine reference `settings`/`config` keys and adapter capabilities.
-
-They must not move OpenOBSW/OpenSVF semantics into the generic Profile envelope unless a genuinely ecosystem-independent requirement emerges.
-
----
-
-## 30. Design-freeze position
-
-The following Phase B.2 generic decisions are frozen for `0.1-candidate`:
-
-```text
-single YAML/JSON-compatible document
-no generic include/inheritance
-small generic envelope
-independent generic/Profile-instance/integration-schema versions
-settings as target-wide integration-owned config
-bindings as profile-local authored decisions
-Core source reference = {domain,id}
-minimum one source per binding
-source order has no generic semantic meaning
-binding intent = project | do_not_project
-reason required for do_not_project
-absence = no authored decision
-integration-owned binding config
-Core > adapter default > Profile target override authority precedence
-no duplication/redefinition of Core semantic fields
-no self-digest; exact Profile digest recorded by Integration Result
-no semantic Profile fingerprint in v0
-no Studio-private authoritative state
-```
-
-The remaining work under #231 is primarily:
-
-```text
-reference OpenOBSW/OpenSVF integration schema review
-adapter-provided schema publication mechanism
-implementation/schema-validation choice
-```
-
-Those items do not reopen the generic authored-state boundary unless review exposes a genuinely generic gap.
-
----
-
-## 31. Non-goals
-
-The v0 generic Profile contract does not define:
-
-```text
-Integration Result schema
-artifact manifest schema
-runtime orchestration
-verification execution
-Studio plugin lifecycle
-Core plugin discovery/loading/execution
-OpenOBSW/OpenSVF implementation changes
-integration-specific settings/config keys
-Profile inheritance/composition
-semantic-equivalence fingerprinting
-new Mission Model fields
 new Mission Model semantics
+new Core YAML fields
+target-specific semantics inside Core
+Profile execution inside Core
+plugin discovery or loading
+relationship inference
+runtime behavior
+ground behavior
+Studio-specific semantic authority
 ```
 
----
+## 29. Current maturity
 
-## 32. Final position
+The generic Profile envelope and authority rules are design-frozen and reference-proven.
 
-The design-frozen generic candidate is:
+The OpenOBSW/OpenSVF reference Integration Package has exercised the contract end to end with a real Core Integration Input Set and downstream Studio acceptance path.
+
+The contract nevertheless remains:
 
 ```text
-Core owns mission semantics and Core entity identity.
-
-Projection Profile owns only authored ecosystem-specific projection intent.
-
-Generic Profile bindings reference Core entities through {domain,id}.
-
-Integration-specific settings/config remain independently schema-versioned and adapter-owned.
-
-Adapter defaults may derive target representation without forcing duplicate Profile state.
-
-Profile overrides may alter target representation but never Core semantic meaning.
-
-Integration Result records what was actually resolved/generated and why.
-
-Studio edits the same version-controlled Profile rather than becoming another semantic authority.
+0.1-candidate
 ```
+
+It is an extension contract with its own maturity lifecycle. v1.2.0 stabilizes the Core input boundary, not every extension contract that consumes it.
+
+## 30. Final statement
+
+The Projection Profile records authored target-specific intent without becoming a second Mission Model.
+
+Core identity is always domain-qualified. Target-specific semantics remain integration-owned. Deterministic defaults are preferred over duplicated state. Stable external allocations are version-controlled when required. Resolved values and provenance belong in the Integration Result.

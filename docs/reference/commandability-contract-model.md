@@ -1,99 +1,53 @@
 # Commandability and Autonomy Contract Model
 
-Status: Implemented in OrbitFabric v0.5.0 and retained in the v0.7.0 baseline  
+Status: Implemented since v0.5.0 and part of the stable Mission Model contract from v1.0.0  
 Scope: Commandability and Autonomy Contract definition
-
----
 
 ## Purpose
 
-The Commandability and Autonomy Contract Model extends OrbitFabric with an optional model domain for declared commandability and autonomy assumptions.
+The Commandability and Autonomy Contract Model defines declared commandability, autonomy and recovery assumptions.
 
-Its purpose is to answer a contract-level question:
+It answers a contract-level question:
 
-> Given the declared commands, modes, contact/downlink assumptions, mission conditions and recovery expectations, is the intended use of commands and autonomous actions coherent?
+> Given the declared commands, modes, contact assumptions, mission conditions and recovery expectations, is the intended use of commands and autonomous actions coherent?
 
-The model does not execute commands.
-
-It does not authenticate operators.
-
-It does not authorize commands.
-
-It does not implement live uplink.
-
-It does not implement onboard autonomy.
-
-It does not implement a real FDIR system.
-
----
+The model does not execute commands, authenticate operators, authorize commands, implement live uplink, implement onboard autonomy or implement a real FDIR system.
 
 ## Relationship with Commands
 
-The existing Command model describes command identity and basic command definition.
+The Command model defines command identity and command-level behavior such as target, arguments, allowed modes, preconditions, acknowledgement intent, timeout, risk, emitted events and expected effects.
 
-A command may already define:
-
-```text
-command id
-target subsystem
-arguments
-allowed modes
-preconditions
-ack requirement
-timeout
-risk
-emitted events
-expected effects
-```
-
-The Commandability and Autonomy Contract Model describes the assumptions used to reason about how commands are intended to be dispatched, constrained and used in recovery or autonomous contexts.
-
-The relationship is:
+The Commandability and Autonomy Contract adds assumptions about how commands are intended to be sourced, constrained and used in autonomous or recovery contexts.
 
 ```text
 Command Definition
-        -> Command Source Assumption
-        -> Commandability Rule
-        -> Autonomous Action Assumption
-        -> Recovery Intent
+    -> Command Source Assumption
+    -> Commandability Rule
+    -> Autonomous Action Assumption
+    -> Recovery Intent
 ```
 
-This is declarative.
-
-It does not imply runtime dispatch, onboard scheduling, operator workflow or live command routing.
-
----
+This remains declarative. It does not imply runtime dispatch, onboard scheduling, operator workflow or live routing.
 
 ## Relationship with Contact and Downlink Contracts
 
-Contact and Downlink Contracts describe declared assumptions about contact opportunities and data delivery paths.
+A command source may reference contact assumptions when contract-level consistency requires it.
 
-Commandability Contracts may reference contact assumptions only where this is useful for contract-level consistency.
-
-For example, a ground command source may declare:
+For example:
 
 ```text
 requires_contact: true
 contact_profile: primary_ground_contact
 ```
 
-This means only that the command source depends on a declared contact assumption.
+This states that a ground command source depends on a declared contact assumption. It does not create an uplink runtime, contact scheduler or RF model.
 
-It does not create an uplink runtime.
+## What the model may describe
 
-It does not turn OrbitFabric into a contact scheduler.
-
-It does not require RF simulation.
-
----
-
-## What the Model May Describe
-
-A commandability/autonomy contract may describe:
+The model may describe:
 
 ```text
-command source identity
-command source type
+command source identity and type
 whether a source requires contact
 optional contact profile reference
 commandability rule identity
@@ -103,47 +57,34 @@ mode availability refinement
 confirmation intent
 autonomous trigger assumption
 autonomously dispatched command assumption
-expected event evidence
-expected telemetry or mode effects
+expected event or telemetry evidence
 recovery intent
 safing-oriented target mode assumption
 ```
 
-These fields exist to support validation, linting and generated documentation.
+## What the model does not describe
 
----
-
-## What the Model Must Not Describe
-
-A commandability/autonomy contract must not describe:
+The model does not implement:
 
 ```text
 real command authentication
 real command authorization
-operator accounts
-user roles
-cryptographic keys
-encryption
+operator accounts or roles
+cryptographic keys or encryption
 live uplink
 live command routing
-real command queue
-operator console
-mission control system
+real command queues
+operator consoles
+mission control services
 flight autonomy runtime
-onboard scheduler
-onboard command dispatcher
+onboard scheduling
+onboard command dispatch
 real FDIR implementation
 real safing logic
-Yamcs/OpenC3 runtime services
-runtime behavior
-ground export artifacts
+Yamcs or OpenC3 runtime services
 ```
 
-Those are intentionally outside the commandability/autonomy contract scope.
-
----
-
-## YAML Shape
+## YAML shape
 
 Commandability and autonomy assumptions are defined in the optional file:
 
@@ -151,7 +92,7 @@ Commandability and autonomy assumptions are defined in the optional file:
 mission/commandability.yaml
 ```
 
-Current shape:
+Representative shape:
 
 ```yaml
 commandability:
@@ -197,15 +138,13 @@ commandability:
       description: Declared recovery intent for payload activity during low battery conditions.
 ```
 
-This shape is intentionally minimal.
+This domain is part of the stable documented Mission Model contract from v1.0.0 onward. Its documented fields, meanings, controlled values, identifiers and cross-reference rules are compatibility-sensitive.
 
-OrbitFabric is still pre-1.0 and the schema may evolve before stabilization.
+Compatible additive evolution remains possible under the Mission Model Stability Contract. Existing documented meaning must not change silently.
 
----
+## Command sources
 
-## Command Sources
-
-A command source describes an abstract source class for command dispatch intent.
+A command source describes an abstract source class for command-dispatch intent.
 
 Examples:
 
@@ -216,25 +155,9 @@ scenario_driver
 maintenance_session
 ```
 
-A command source may define:
+A command source is not a user account, authorization role or transport endpoint.
 
-```text
-id
-type
-requires_contact
-optional contact profile reference
-description
-```
-
-A command source is not a user account.
-
-It is not an authorization role.
-
-It is not a transport endpoint.
-
----
-
-## Commandability Rules
+## Commandability rules
 
 A commandability rule describes when a command is intended to be usable under declared assumptions.
 
@@ -249,39 +172,19 @@ timeout expectation
 expected evidence
 ```
 
-This should complement, not replace, the existing command definition.
-
-If the existing command declares `allowed_modes`, the commandability rule should be consistent with that declaration.
-
----
+It complements the existing command definition. It must not silently contradict or replace command-level semantics.
 
 ## Autonomous Action Contracts
 
-An autonomous action contract describes a declared assumption that an event, fault, telemetry condition or mode context may lead to an autonomous command dispatch or recovery-oriented action.
+An autonomous action declares an expected relationship between an explicit trigger and an autonomous command or recovery-oriented action.
 
-It may reference:
+It may reference events, faults, telemetry items, dispatched commands, command sources and expected evidence.
 
-```text
-trigger event
-trigger fault
-trigger telemetry item
-dispatched command
-source
-expected events
-expected effects
-```
+This is contract-level intent, not autonomy software.
 
-This is not autonomy software.
+## Recovery intents
 
-It is contract-level documentation and lintable intent.
-
----
-
-## Recovery Intents
-
-A recovery intent describes a declared recovery or safing-oriented response.
-
-It may reference:
+A recovery intent describes a declared recovery or safing response and may reference:
 
 ```text
 fault
@@ -291,82 +194,74 @@ commands
 expected evidence
 ```
 
-A recovery intent is not FDIR implementation.
+A recovery intent is not runtime FDIR implementation.
 
-It exists to make recovery assumptions explicit before scenario evidence, runtime-facing contract bindings and future ground artifacts consume them.
+## Validation and linting
 
----
-
-## Implemented Lint Direction
-
-Current lint rules focus on reference integrity and obvious consistency issues.
-
-Implemented rule direction:
+Current validation and linting cover reference integrity and obvious consistency issues, including:
 
 ```text
-ERROR: commandability rule references an unknown command.
-ERROR: commandability rule references an unknown mode.
-ERROR: commandability rule references an unknown source.
-WARNING: ground command source requires contact but no contact profile is referenced.
-ERROR: ground command source references an unknown contact profile.
-ERROR: autonomous action dispatches an unknown command.
-ERROR: autonomous action references an unknown source.
-ERROR: autonomous action trigger references an unknown event, fault or telemetry item.
-ERROR: recovery intent references an unknown command.
-ERROR: recovery intent references an unknown fault, event or mode.
-WARNING: high-risk command lacks explicit confirmation intent.
-WARNING: autonomous recovery command lacks expected events or effects.
+unknown command references
+unknown mode references
+unknown command sources
+missing contact assumptions for ground sources
+unknown contact profiles
+unknown autonomous trigger references
+unknown recovery references
+high-risk command confirmation ambiguity
+autonomous recovery evidence ambiguity
 ```
 
-Warnings expose engineering ambiguity without pretending to solve command routing, scheduling or autonomy execution.
+Warnings expose engineering ambiguity without pretending to solve routing, scheduling or autonomy execution.
 
----
+## Relationship Manifest integration
 
-## Generated Documentation
+The commandability domain contributes explicit Core-owned relationship records when a relationship is directly declared by a loaded Mission Model field.
 
-When commandability/autonomy contracts are present, OrbitFabric generates Markdown documentation from the validated Mission Model.
+Examples include:
 
-Generated output:
+```text
+autonomous_action_dispatches_command
+autonomous_action_triggered_by_fault
+autonomous_action_uses_command_source
+commandability_rule_constrains_command
+recovery_intent_reacts_to_event
+recovery_intent_reacts_to_fault
+recovery_intent_includes_command
+recovery_intent_targets_mode
+```
+
+These relationships are declarative contract relationships. They do not prove that an action or command was observed during a run.
+
+## Generated documentation and scenario evidence
+
+When this domain is present, OrbitFabric generates:
 
 ```text
 generated/docs/commandability.md
 ```
 
-The generated page exposes:
+Scenario execution may exercise commandability, autonomy and recovery declarations as deterministic host-side evidence.
 
-```text
-command sources
-commandability rules
-autonomous action assumptions
-recovery intents
-referenced commands
-referenced modes
-referenced events, faults and telemetry
-```
+Generated documentation and scenario evidence remain derived outputs. They do not become command runtime or FDIR runtime.
 
-Generated documentation states that these are contract assumptions, not runtime behavior.
+## Current boundary
 
----
+The Commandability and Autonomy Contract Model is a stable declarative Mission Model domain.
 
-## Current Boundary
-
-The commandability/autonomy model remains narrow.
-
-It strengthens the Mission Data Chain without introducing command runtime or autonomy runtime behavior.
-
-The correct outcome is:
+The correct boundary is:
 
 ```text
 Command Definition
-        -> Commandability Contract
-        -> Autonomy/Recovery Contract Assumption
-        -> Lintable Consistency
-        -> Generated Documentation
-        -> Scenario Evidence
-        -> Runtime-Facing Contract Bindings
+    -> Commandability Contract
+    -> Autonomy and Recovery Intent
+    -> Core validation and lint
+    -> generated documentation
+    -> host-side scenario evidence
+    -> runtime-facing contract bindings
 ```
 
-The incorrect outcome is:
+The model must not drift into:
 
 ```text
 command uplink runtime
@@ -376,5 +271,3 @@ command dispatcher
 autonomy runtime
 real FDIR system
 ```
-
-That boundary is strict.

@@ -1,41 +1,39 @@
 # Data Product Contract Model
 
-Status: Implemented in OrbitFabric v0.3.0 and retained in the v0.7.0 baseline
+Status: Implemented since v0.3.0 and part of the stable Mission Model contract from v1.0.0  
 Scope: Data Product and Storage Contract definition
 
 ## Purpose
 
-The Data Product Contract Model extends OrbitFabric with an optional model domain for mission data objects produced by payloads or subsystems.
+The Data Product Contract Model defines mission data objects produced by payloads or subsystems.
 
-A data product contract describes what mission data object is expected to be produced, who produces it, how large it is expected to be, how important it is, how it should be retained and how it should be prepared for future downlink planning.
+A data product contract describes what mission data object is expected to be produced, who produces it, how large it is expected to be, how important it is, how it should be retained and how it is intended to enter the downlink path.
 
 The model is contract-level only.
 
-It does not implement onboard storage, payload processing, compression, contact windows, downlink execution or ground export.
+It does not implement onboard storage, payload processing, compression, contact scheduling, downlink execution or ground runtime.
 
-## Why Data Products Are Separate
+## Relationship to telemetry and packets
 
 OrbitFabric keeps telemetry, packets and data products distinct.
 
 ```text
 Telemetry
-    A state, measurement or status value exposed by the Mission Model.
+  A state, measurement or status value exposed by the Mission Model.
 
 Packet
-    A declared grouping or transport-oriented representation of mission data.
+  A declared grouping or transport-oriented representation of mission data.
 
 Data Product
-    A mission or payload output object that may require storage, retention,
-    prioritization and eventual downlink.
+  A mission or payload output object that may require storage, retention,
+  prioritization and eventual downlink.
 ```
 
-For example, a payload may expose telemetry indicating that acquisition is active while also producing a histogram, image, sample batch or diagnostic dump.
+A payload may expose telemetry showing that acquisition is active while also producing an image, histogram, sample batch or diagnostic dump.
 
-The telemetry describes operational state.
+Telemetry describes operational state. A data product describes the mission output object.
 
-The data product describes the mission output object.
-
-## What a Data Product Contract May Describe
+## What a Data Product Contract may describe
 
 A data product contract may describe:
 
@@ -51,33 +49,31 @@ A data product contract may describe:
 - overflow policy;
 - downlink intent.
 
-These fields make the first part of the Mission Data Chain explicit:
+These fields make part of the Mission Data Chain explicit:
 
 ```text
-Payload or subsystem activity
-        -> data product produced
-        -> storage intent declared
-        -> downlink intent declared
+payload or subsystem activity
+    -> data product produced
+    -> storage intent declared
+    -> downlink intent declared
 ```
 
-## What a Data Product Contract Does Not Describe
+## What it does not describe
 
-A data product contract does not describe:
+A Data Product Contract does not implement:
 
 - real onboard storage software;
-- file-system implementation;
+- file-system behavior;
 - compression engines;
 - payload data processing pipelines;
 - physical payload simulation;
 - contact scheduling;
 - RF link modeling;
 - downlink runtime;
-- ground segment implementation;
+- ground segment behavior;
 - flight runtime behavior.
 
-Those are intentionally outside the Data Product Contract scope.
-
-## YAML Shape
+## YAML shape
 
 Data products are defined in the optional file:
 
@@ -85,7 +81,7 @@ Data products are defined in the optional file:
 mission/data_products.yaml
 ```
 
-Current shape:
+Representative shape:
 
 ```yaml
 data_products:
@@ -103,7 +99,9 @@ data_products:
       policy: next_available_contact
 ```
 
-This shape is implemented, but OrbitFabric is still pre-1.0 and the schema may evolve.
+This domain is part of the stable documented Mission Model contract from v1.0.0 onward. Its documented field names, meanings, identifier and reference rules, controlled values and required/optional behavior are compatibility-sensitive.
+
+Compatible additive evolution remains possible under the Mission Model Stability Contract. Existing documented meaning must not change silently.
 
 ## Relationship with Payload Contracts
 
@@ -111,25 +109,21 @@ Payload Contracts describe expected payload behavior.
 
 Data Product Contracts describe mission data objects produced by that behavior.
 
-The relationship is:
-
 ```text
 Payload Contract
-        -> produced telemetry
-        -> accepted commands
-        -> generated events
-        -> possible faults
-        -> lifecycle behavior
-        -> Data Product Contracts
+    -> produced telemetry
+    -> accepted commands
+    -> generated events
+    -> possible faults
+    -> lifecycle behavior
+    -> Data Product Contracts
 ```
 
 A data product may reference a payload contract as its producer.
 
-The reference remains declarative.
+The relationship remains declarative. It does not imply payload runtime execution or data processing.
 
-It does not imply payload runtime execution or data processing.
-
-## Storage Intent
+## Storage intent
 
 Storage fields describe policy intent.
 
@@ -141,26 +135,21 @@ Examples include:
 
 They do not implement storage.
 
-They make it possible to validate that a produced mission object has a declared preservation strategy before contact/downlink contracts, runtime-facing bindings or ground artifacts consume it.
+Their purpose is to make preservation expectations explicit before later contract layers reason about data flow, runtime-facing bindings or ground-facing artifacts.
 
-## Downlink Intent
+## Downlink intent
 
-Downlink fields describe future delivery intent.
+Downlink fields describe delivery intent.
 
-Examples include:
+Examples include next available contact, priority-based downlink, deferred downlink or manual selection.
 
-- next available contact;
-- priority-based downlink;
-- deferred downlink;
-- manual or operator-selected downlink.
+They do not implement scheduling, queueing or transfer.
 
-The Data Product Contract slice does not implement contact scheduling or downlink simulation.
+Contact and Downlink Contracts provide the separate model domain for contact assumptions and downlink-flow intent.
 
-Contact and Downlink Contracts are modeled separately by the v0.4.0 reference model.
+## Validation and linting
 
-## Implemented Lint Rules
-
-Data Product Contracts are linted semantically.
+Data Product Contracts are structurally validated and semantically linted.
 
 Implemented rule families include:
 
@@ -172,11 +161,13 @@ OF-DP-007  storage intent should define overflow_policy
 OF-DP-008  high-priority data product should define downlink intent
 ```
 
-Structural validation also covers duplicate IDs, positive estimated size and known literal values for product type, storage class, overflow policy and downlink policy.
+Structural validation also covers duplicate IDs, positive estimated size and documented controlled values for product type, storage class, overflow policy and downlink policy.
 
-## Generated Documentation
+Diagnostic behavior is Core-owned. Downstream tools must not replace or privately reinterpret Core lint findings.
 
-When data products are present, OrbitFabric can generate data product documentation from the validated Mission Model.
+## Generated documentation
+
+When data products are present, OrbitFabric generates data product documentation from the validated Mission Model.
 
 Current generated output:
 
@@ -186,22 +177,40 @@ generated/docs/data_products.md
 
 The generated page exposes data product identity, producer, type, estimated size, priority, storage intent and downlink intent.
 
-## Relationship with Data Flow Evidence and Runtime Bindings
+Generated documentation is derived and reproducible. It is not the source of truth.
 
-Data Product Contracts are now consumed by later OrbitFabric layers.
+## Relationship with data-flow evidence and generated bindings
 
-The v0.6.0 Data Flow Evidence slice traces declared command effects to data products, storage intent, downlink intent, eligible downlink flows and matching contact windows.
+Data Product Contracts are consumed by later OrbitFabric layers.
 
-The v0.7.0 Runtime Contract Bindings slice exposes data products as software-facing identifiers and registry metadata.
+Data Flow Evidence can trace declared command effects through:
 
-Both uses remain contract-level.
+```text
+command
+    -> data product
+    -> storage intent
+    -> downlink intent
+    -> eligible downlink flow
+    -> contact window
+```
 
-They do not implement data product generation, storage, compression or downlink execution.
+Runtime-facing bindings expose data products as software-facing identifiers and registry metadata.
 
-## Current Status
+Ground-facing artifacts expose contract information for downstream integration and review.
 
-This page documents the implemented Data Product Contract Model.
+All of these uses remain contract-level. They do not implement data product generation, storage, compression or downlink execution.
 
-The model remains development-preview and pre-1.0.
+## Current boundary
 
-Future milestones may add ground-facing exports or additional generated artifacts that consume this contract, but the Data Product Contract itself remains a declarative Mission Data Contract layer.
+The Data Product Contract Model is a stable declarative Mission Model domain.
+
+Its stable status does not convert intent into runtime behavior.
+
+The boundary remains:
+
+```text
+Mission Model declares the data product and its intent.
+Core validates and exports that meaning.
+Generated and downstream artifacts consume the declared contract.
+Runtime storage, processing and downlink remain outside Core.
+```

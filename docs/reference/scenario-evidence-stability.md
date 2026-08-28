@@ -1,30 +1,14 @@
 # Scenario Evidence Stability
 
-Status: Active v1.1 reference  
-Scope: scenario and evidence compatibility classification  
-Applies to: OrbitFabric scenario inputs and scenario evidence from `v1.0.0 - Stable Mission Data Contract` onward
-
-This page classifies OrbitFabric scenario and evidence compatibility expectations after v1.1.0.
-
-It documents the stable v1.0.0 scenario evidence posture and the additive v1.1.0 structured expectation accounting in simulation JSON reports.
-
-It does not introduce new scenario fields, new scenario behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
-
----
-
-## 1. Purpose
+Status: Active v1.x reference through v1.2.0  
+Scope: scenario input and evidence compatibility  
+Applies to: OrbitFabric scenario workflows from v1.0.0 onward
 
 OrbitFabric scenarios provide deterministic host-side evidence for Mission Data Contract behavior.
 
-From v1.0.0 onward, documented scenario structure, validation behavior, expectation semantics, result values and machine-readable evidence outputs are part of the stable narrow Mission Data Contract surface.
+v1.2.0 introduces no new scenario YAML semantics and no change to stable scenario result meaning. The additive structured expectation accounting introduced in v1.1 remains candidate.
 
-v1.1.0 adds structured expectation accounting to simulation JSON reports as an additive machine-readable extension.
-
-This document defines how scenario inputs and generated evidence should evolve after v1.0.0.
-
----
-
-## 2. Source of truth
+## 1. Source of truth
 
 Scenario evidence is derived from:
 
@@ -33,272 +17,172 @@ Mission Model YAML
 scenario YAML
 ```
 
-The Mission Model defines the Mission Data Contract.
+The Mission Model defines mission semantics. Scenario YAML defines host-side scenario inputs and expectations.
 
-The scenario YAML defines host-side scenario inputs and expectations.
+Simulation JSON reports and plain-text logs are generated evidence outputs, not editable mission contract sources.
 
-Simulation JSON reports and plain-text logs are generated evidence outputs.
-
-They are not editable mission contract sources.
-
----
-
-## 3. Current classification
-
-Current scenario and evidence surfaces are classified as follows:
+## 2. Current classification
 
 | Surface | Classification | Notes |
 |---|---|---|
-| scenario YAML files | Stable contract | Host-side scenario input surface. |
-| scenario file path argument | Stable workflow surface | Used by `orbitfabric validate scenario` and `orbitfabric sim`. |
-| scenario loader diagnostics | Stable diagnostic policy | Uses `OF-SCN-*` diagnostics. |
-| scenario reference validation | Stable behavior | Validates references before execution. |
-| scenario execution result | Stable behavior | Deterministic host-side evidence result. |
-| simulation JSON report | Stable contract with additive v1.1 expectation accounting | Machine-readable scenario evidence. |
-| simulation JSON `failed_expectations` | Stable compatibility list | Legacy top-level failed expectation list. |
-| simulation JSON `expectations` object | Candidate additive v1.1 extension | Structured passed/failed expectation accounting. |
-| simulation plain-text log | Public preview, human-oriented | Reviewable timeline, not a machine contract. |
-| data-flow evidence records | Stable contract | Derived evidence for declared data-flow expectations. |
-| scenario runner internals | Internal implementation detail | Not a public compatibility surface. |
-| test helper structure | Internal validation asset | Not a public compatibility surface. |
+| scenario YAML | Stable | Host-side scenario input contract. |
+| scenario path argument | Stable workflow | Used by validation and simulation. |
+| scenario loader diagnostics | Stable policy | Core-owned diagnostic behavior. |
+| scenario reference validation | Stable behavior | References are checked before execution. |
+| scenario execution result | Stable behavior | Deterministic host-side evidence. |
+| simulation JSON report | Stable | Machine-readable scenario evidence. |
+| `failed_expectations` | Stable compatibility field | Legacy failed-expectation list. |
+| structured `expectations` object | Candidate additive v1.1 extension | Passed/failed structured accounting. |
+| data-flow evidence records | Stable | Contract-level data-flow evidence. |
+| plain-text simulation log | Human-oriented preview | Not a machine contract. |
+| scenario runner internals | Internal | Not a public compatibility surface. |
 
----
+## 3. Validation and execution
 
-## 4. Validation versus execution
-
-OrbitFabric separates scenario validation from scenario execution.
-
-Current validation command:
+Validation without execution:
 
 ```bash
 orbitfabric validate scenario <scenario_file>
 ```
 
-Current execution command:
+Deterministic execution:
 
 ```bash
 orbitfabric sim <scenario_file>
 ```
 
-Validation checks scenario loadability and references without executing scenario behavior.
+Simulation may emit JSON and plain-text evidence outputs. Changing the distinction between validation and execution is compatibility-sensitive.
 
-Execution runs the scenario deterministically against the referenced Mission Model and may produce JSON and plain-text evidence outputs.
+## 4. Scenario expectation stability
 
-Changing this boundary is compatibility-sensitive.
+Scenario expectations define what evidence a scenario asserts.
 
----
+Changing documented expectation meaning can change:
 
-## 5. Scenario expectation stability
+```text
+scenario pass/fail status
+simulation JSON reports
+plain-text evidence logs
+data-flow evidence
+CI behavior
+downstream inspection results
+```
 
-Scenario expectations are compatibility-sensitive because they define what evidence the scenario is asserting.
+Expectation semantics therefore remain compatibility-sensitive.
 
-Changing documented expectation semantics can affect:
+Scenario expectations remain declarative host-side checks. They must not silently become flight runtime behavior, ground automation, onboard scheduling, command-dispatch implementation or plugin execution.
 
-- scenario pass/fail results;
-- simulation JSON reports;
-- plain-text evidence logs;
-- data-flow evidence records;
-- CI workflows;
-- downstream inspection tools.
+## 5. Structured expectation accounting
 
-Scenario expectations should remain declarative host-side evidence checks.
+v1.1 added structured expectation accounting to simulation JSON reports.
 
-They should not silently become runtime execution behavior, onboard scheduling, command dispatch implementation, ground automation or plugin behavior.
+The addition is machine-readable and additive, but remains candidate after v1.2.
 
----
-
-## 6. v1.1.0 structured expectation accounting
-
-v1.1.0 adds structured expectation accounting inside simulation JSON reports.
-
-This extension is additive.
-
-The legacy top-level compatibility list remains available:
+The stable legacy field remains:
 
 ```text
 failed_expectations
 ```
 
-The additive structured accounting may include:
+Structured accounting may expose totals, passed/failed counts and records describing evaluated expectations.
 
-```text
-expectations
-passed_expectations
-failed_expectations
-```
+It does not change scenario YAML syntax or the stable overall scenario result meaning.
 
-This does not change scenario YAML expectation syntax.
+## 6. Data-flow evidence
 
-This does not introduce new scenario behavior.
-
-This does not promote the structured expectation accounting object to the original v1.0.0 stable compatibility class.
-
----
-
-## 7. Data-flow evidence stability
-
-Data-flow evidence links declared command effects to declared data product, storage, downlink and contact assumptions.
-
-The evidence chain remains:
+Data-flow evidence traces declared contract continuity such as:
 
 ```text
 command expected effect
-        -> data product
-        -> storage intent
-        -> downlink intent
-        -> eligible downlink flow
-        -> matching contact window
+    -> data product
+    -> storage intent
+    -> downlink intent
+    -> eligible downlink flow
+    -> contact window
 ```
 
-This is contract-level evidence.
+This is contract-level host-side evidence.
 
-It is not a runtime downlink queue, onboard storage implementation, contact scheduler, RF model, ground station workflow or mission operations system.
+It is not an onboard storage implementation, downlink queue, contact scheduler, RF model or ground operations record.
 
-Changing the meaning of this chain is compatibility-sensitive.
+## 7. Simulation JSON stability
 
----
+Compatibility-sensitive changes include:
 
-## 8. Simulation JSON report stability
-
-Simulation JSON reports are machine-readable stable evidence outputs.
-
-The following changes are compatibility-sensitive after v1.0.0:
-
-- removing a documented top-level simulation report field;
-- renaming a documented top-level simulation report field;
-- changing documented result values;
-- changing documented data-flow evidence field names;
+- removing or renaming stable documented top-level fields;
+- changing stable result tokens;
 - changing the meaning of data-flow evidence records;
-- changing whether a scenario expectation affects pass/fail status;
-- changing how failed expectations are represented;
-- changing documented machine-readable evidence representation.
+- changing whether a documented expectation affects pass/fail status;
+- changing stable failed-expectation representation;
+- changing documented machine-readable evidence meaning.
 
-Compatibility-sensitive does not mean forbidden.
+Compatibility-sensitive does not mean forbidden. It means the change must be explicit, reviewed and documented.
 
-It means the change must be explicit, reviewed and documented.
+## 8. Plain-text logs
 
----
+Plain-text logs are intended for human review, demonstrations and debugging.
 
-## 9. Plain-text log stability
+They are not a strict machine compatibility contract. Downstream tools should consume simulation JSON instead of parsing log wording or formatting.
 
-Plain-text simulation logs are human-reviewable evidence.
+## 9. Evolution rules
 
-They are useful for demonstrations, inspection and debugging.
+Scenario and evidence evolution should:
 
-They are not a strict machine compatibility contract.
+1. prefer additive changes;
+2. preserve existing documented expectation meaning;
+3. preserve deterministic execution for the same validated inputs;
+4. keep host-side evidence separate from operational runtime behavior;
+5. keep machine-readable evidence separate from human-oriented logs;
+6. document compatibility impact explicitly.
 
-Downstream tools should not parse plain-text simulation logs when a JSON report or Core-owned structured surface exists.
+## 10. Downstream consumer rule
 
-Formatting, wording and line layout may improve over time without becoming a v1.0 machine contract.
-
----
-
-## 10. Preferred evolution rules
-
-Scenario and evidence surfaces should evolve with these rules.
-
-### 10.1 Prefer additive changes
-
-Prefer adding optional scenario fields or optional report fields over renaming or removing existing documented fields.
-
-### 10.2 Preserve expectation meaning
-
-Do not change the meaning of a documented expectation without an explicit compatibility note.
-
-### 10.3 Preserve deterministic evidence
-
-Scenario execution should remain deterministic for the same validated inputs.
-
-### 10.4 Keep host-side evidence separate from runtime behavior
-
-Scenario evidence should remain host-side Mission Data Contract evidence.
-
-It should not become flight software behavior, ground software behavior or plugin execution behavior.
-
-### 10.5 Keep machine-readable evidence separate from human logs
-
-Downstream tools should consume simulation JSON reports, not plain-text logs.
-
----
-
-## 11. Downstream tool rule
-
-Downstream tools may consume scenario JSON reports for evidence inspection.
+Downstream tools may consume documented simulation JSON fields.
 
 They must not infer hidden semantics from:
 
 ```text
 plain-text log wording
 terminal formatting
-finding order
-scenario YAML comments
+scenario comments
 YAML ordering
-private runner implementation details
+private runner implementation
 private test helper names
 UI state
 ```
 
-For contract inspection, downstream tools should prefer Core-owned structured surfaces.
+For Mission Data Contract structure, consumers should use Core-owned structured surfaces. For scenario evidence, they should use the documented simulation JSON report.
 
-For scenario evidence, downstream tools should prefer documented simulation JSON report fields.
+## 11. Current non-goals
 
----
-
-## 12. Current non-goals
-
-This scenario evidence stability classification does not introduce:
+Scenario evidence does not introduce:
 
 ```text
-new scenario fields
-new scenario behavior
-new expectation types
-new CLI behavior
-new Mission Model semantics
-new lint diagnostics
-runtime execution behavior
-ground execution behavior
-contact scheduling runtime
+spacecraft dynamics simulation
+flight runtime behavior
+ground runtime behavior
+real contact scheduling
 RF or link-budget simulation
-onboard storage runtime
-command dispatcher behavior
+onboard storage execution
+live command dispatch
 plugin execution
-plugin discovery
-plugin loader
-relationship graph
-dependency graph
-Studio-specific API
+relationship inference
+Studio-specific semantic authority
 ```
 
----
+## 12. Relationship to other references
 
-## 13. Relationship to existing references
+This page complements:
 
-This page complements, but does not replace:
+- Data Flow Evidence;
+- JSON Reports and Core Structured Surfaces;
+- JSON Report Compatibility;
+- CLI Contract v1;
+- Mission Model Stability Contract;
+- Stability and Compatibility Contract.
 
-```text
-Data Flow Evidence
-JSON Reports v0.1
-CLI Contract v1 Preview
-Mission Model Stability Contract
-JSON Report Compatibility
-Lint Rule Code Stability
-Stability and Compatibility Contract
-```
+## 13. Final statement
 
-`Data Flow Evidence` remains the reference for the current data-flow evidence chain.
+The stable scenario contract remains the v1 host-side evidence mechanism.
 
-`JSON Reports v0.1` remains the reference for the current simulation JSON report structure.
-
-This page defines how those scenario and evidence surfaces should be treated as compatibility-sensitive after v1.0.0 and how the v1.1.0 additive structured expectation accounting should be classified.
-
----
-
-## 14. Final statement
-
-v1.1.0 is the current project release.
-
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-v1.0.0 stabilizes scenario evidence enough for CI and downstream inspection tools to rely on it, without turning OrbitFabric into a runtime simulator, flight software framework, ground segment, mission control system or plugin execution platform.
-
-v1.1.0 adds structured expectation accounting as an additive candidate extension in simulation JSON reports.
+v1.2.0 changes no scenario semantics. The v1.1 structured expectation object remains a candidate additive extension inside the stable simulation report family.

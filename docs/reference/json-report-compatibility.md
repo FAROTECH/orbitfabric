@@ -1,68 +1,45 @@
 # JSON Report Compatibility
 
-Status: Active v1.1 reference  
-Scope: JSON report compatibility classification across stable v1.0.0 and candidate v1.1.0 surfaces  
-Applies to: OrbitFabric JSON reports from `v1.0.0 - Stable Mission Data Contract` onward
+Status: Active v1.x reference through v1.2.0  
+Scope: compatibility classification for machine-readable Core reports and structured surfaces  
+Applies to: OrbitFabric JSON outputs from v1.0.0 onward
 
-This page classifies OrbitFabric JSON report compatibility expectations after v1.1.0.
+This page defines compatibility expectations for OrbitFabric machine-readable outputs.
 
-It documents existing stable and candidate report families. It does not introduce new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+It documents existing behavior. It does not introduce new CLI behavior, Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
----
+## 1. Source of truth
 
-## 1. Purpose
+JSON reports and structured surfaces are derived outputs.
 
-OrbitFabric JSON reports are machine-readable outputs used by CI, automated validation workflows, reproducible scenario evidence and downstream inspection tooling.
+The Mission Model remains the semantic source of truth. Scenario YAML remains the scenario-evidence input.
 
-From v1.0.0 onward, selected JSON report families are part of the stable narrow Mission Data Contract surface.
+Downstream tools may consume JSON surfaces for automation and inspection, but they must not treat those surfaces as editable replacements for the Mission Model.
 
-v1.1.0 consolidates additional Core-owned candidate integration surfaces without promoting them to the original v1.0.0 stable compatibility class.
+## 2. Current classification
 
----
-
-## 2. Source of truth
-
-JSON reports are derived outputs.
-
-They are not the source of truth.
-
-The source of truth remains:
-
-```text
-Mission Model YAML
-scenario YAML
-```
-
-JSON reports record OrbitFabric validation or scenario evidence derived from those sources.
-
-Downstream tools may consume JSON reports for automation, but must not treat them as editable mission contract inputs.
-
----
-
-## 3. Current report family classification
-
-Current JSON report families are classified as follows:
-
-| Report family | Classification | Notes |
+| Report or surface | Classification | Notes |
 |---|---|---|
-| lint JSON report | Stable contract | Machine-readable validation result. |
-| simulation JSON report | Stable contract with additive v1.1 expectation accounting | Machine-readable scenario evidence. |
-| `model_summary.json` | Stable v1.0.0 Core-owned surface | Domain-level inspection surface. |
-| `entity_index.json` | Stable v1.0.0 Core-owned surface | Entity-level inspection surface. |
-| `relationship_manifest.json` | Stable v1.0.0 for original admitted families; supports explicit additive family extensions | Relationship-level surface. |
-| `dashboard_summary.json` | Candidate v1.1.0 Core-owned integration surface | Dashboard-ready aggregation of existing Core facts. |
-| `scenario_run_index.json` | Candidate v1.1.0 Core-owned integration surface | Index of simulation JSON report runs. |
-| `coverage_summary.json` | Candidate v1.1.0 Core-owned integration surface | Limited coverage derived from Core structured outputs. |
-| `runtime_contract_manifest.json` | Public preview generated manifest | Runtime-facing contract manifest, not flight runtime. |
-| `ground_contract_manifest.json` | Public preview generated manifest | Ground-facing contract manifest, not ground runtime. |
+| lint JSON report | Stable | Machine-readable validation result. |
+| simulation JSON report | Stable | Machine-readable scenario evidence. |
+| simulation JSON `expectations` | Candidate additive v1.1 extension | Structured expectation accounting. |
+| `model_summary.json` | Stable | Domain-level Core inspection. |
+| `entity_index.json` | Stable | Entity-level Core inspection. |
+| `relationship_manifest.json` original v1 families | Stable | Original admitted relationship families. |
+| Relationship Manifest v1.2 FDIR families | Additive stable-compatible | Explicit additional relationship families. |
+| `mission_snapshot.json` | Stable from v1.2.0 | Complete loaded Mission Model inspection boundary. |
+| Core Integration Input Set | Stable from v1.2.0 | Coherent external integration input boundary. |
+| `dashboard_summary.json` | Candidate | v1.1 Core inspection surface. |
+| `scenario_run_index.json` | Candidate | v1.1 simulation report index. |
+| `coverage_summary.json` | Candidate | v1.1 limited coverage surface. |
+| `runtime_contract_manifest.json` | Public preview | Generated runtime-facing contract manifest. |
+| `ground_contract_manifest.json` | Public preview | Generated ground-facing contract manifest. |
 
----
+## 3. Report identity
 
-## 4. Report family rule
+A machine-readable family is identified by its documented purpose and identity fields, not by file naming convention alone.
 
-A report family is identified by its documented command, purpose and top-level identity fields.
-
-Examples include:
+Representative identities include:
 
 ```text
 orbitfabric-lint
@@ -70,36 +47,20 @@ orbitfabric-sim
 orbitfabric.model_summary
 orbitfabric.entity_index
 orbitfabric.relationship_manifest
+orbitfabric.mission_snapshot
+orbitfabric.integration_input_set
 orbitfabric.dashboard_summary
 orbitfabric.scenario_run_index
 orbitfabric.coverage_summary
 ```
 
-Renaming a documented report family, changing its purpose or changing the answer it provides is compatibility-sensitive.
+Renaming a stable documented identity or changing the question a stable surface answers is compatibility-sensitive.
 
-For stable v1.0.0 Core-owned inspection surfaces, the intended questions remain:
+## 4. Version fields
 
-```text
-model_summary.json          -> What contract domains are present?
-entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed mission contract entities related?
-```
+Version fields are not interchangeable.
 
-For candidate v1.1.0 integration surfaces, the intended questions are:
-
-```text
-dashboard_summary.json      -> What dashboard-ready Core facts are available?
-scenario_run_index.json     -> Which Core simulation JSON reports are present?
-coverage_summary.json       -> What limited coverage can Core derive from structured outputs?
-```
-
----
-
-## 5. Version field rule
-
-OrbitFabric JSON reports may contain different version fields with different meanings.
-
-Current documented examples include:
+Representative fields include:
 
 ```text
 version
@@ -108,35 +69,38 @@ orbitfabric_version
 summary_version
 index_version
 manifest_version
+snapshot_version
+input_set_version
 dashboard_version
 coverage_version
 ```
 
-These fields must not be treated as interchangeable.
+`version` may identify the producing OrbitFabric package. `model_version` identifies the mission contract version declared by a mission. Surface-specific fields identify report formats.
 
-Changing the meaning of a documented version field is compatibility-sensitive.
+A format identifier does not automatically encode release maturity.
 
-A format identifier does not necessarily encode the complete set of additive semantic record types emitted by every later minor release when the record and envelope format themselves remain unchanged.
+The stable v1.2 Mission Snapshot and Core Integration Input Set intentionally retain:
 
----
+```text
+snapshot_version = 0.1-candidate
+input_set_version = 0.1-candidate
+```
 
-## 6. Top-level field stability
+Changing those tokens only to reflect maturity would create needless incompatibility in an already reference-proven producer and consumer chain.
 
-Documented top-level JSON fields for stable report families are compatibility-sensitive after v1.0.0.
+## 5. Stable top-level fields
 
-Documented top-level JSON fields for candidate v1.1.0 surfaces are candidate compatibility points and must not be changed silently.
+Documented top-level fields for stable report families are compatibility-sensitive.
 
-Compatibility-sensitive does not mean forbidden.
+Removing, renaming or redefining them requires explicit compatibility review.
 
-It means the change must be explicit, reviewed and documented.
+Adding an optional field may be compatible when the relevant contract permits additive evolution and existing meaning is preserved.
 
----
+## 6. Result value stability
 
-## 7. Result value stability
+Machine-facing result tokens are compatibility-sensitive.
 
-Result values are machine-facing fields.
-
-Current documented result values include:
+Current lint values include:
 
 ```text
 passed
@@ -144,42 +108,71 @@ passed_with_warnings
 failed
 ```
 
-for lint reports, and:
+Current simulation values include:
 
 ```text
 passed
 failed
 ```
 
-for simulation reports.
+Adding, removing, renaming or changing the meaning of result values requires explicit review.
 
-Adding, removing, renaming or changing the meaning of a result value is compatibility-sensitive.
+## 7. Relationship Manifest evolution
 
----
+The original v1 admitted relationship families remain stable compatibility commitments.
 
-## 8. Stable Core-owned surface field stability
-
-The stable Core-owned structured surfaces in v1.0.0 are:
+v1.2 admits seven additive stable-compatible FDIR families:
 
 ```text
-model_summary.json
-entity_index.json
-relationship_manifest.json
+autonomous_action_triggered_by_fault
+autonomous_action_uses_command_source
+fault_observes_telemetry
+fault_recovery_dispatches_command
+fault_recovery_targets_mode
+recovery_intent_includes_command
+recovery_intent_targets_mode
 ```
 
-Their documented fields, `kind` values, format version fields and boundary flags are compatibility-sensitive.
+A later minor release may add another relationship type only through an explicit compatibility decision when the type is narrow, deterministic and derived from an explicit loaded Mission Model field.
 
-For `relationship_manifest.json`, the original v1 admitted relationship families remain stable compatibility commitments.
+Consumers of relationship collections must consume the types they understand and safely preserve or ignore unknown additive types according to their use case. They must never guess unknown semantics from names or endpoints.
 
-A later minor release may add a new relationship family as an explicitly documented additive stable-surface extension only when the family has a narrow meaning and is deterministically derived from an explicit loaded Mission Model field.
+A consumer that intentionally requires a closed relationship-type set must pin that expectation to the release contract it supports.
 
-Adding a relationship family must not rename, remove or change the meaning of an existing family.
+## 8. Mission Snapshot compatibility
 
----
+Mission Snapshot is stable from v1.2 for its documented envelope, structural-load failure behavior, boundary flags and role as the faithful serialization of the complete loaded Mission Model.
 
-## 9. Candidate Core-owned integration surface posture
+The stable promise does not freeze the entire nested `model` payload byte-for-byte. That payload follows the Mission Model Stability Contract and may evolve additively where the Mission Model rules permit it.
 
-The candidate Core-owned integration surfaces consolidated in v1.1.0 are:
+Consumers must not use a failed or incompatible Snapshot as permission to reconstruct a partial Mission Model from raw YAML.
+
+## 9. Core Integration Input Set compatibility
+
+The Core Integration Input Set is stable from v1.2 as the supported Core-to-integration input boundary.
+
+Compatibility-sensitive semantics include:
+
+```text
+required and companion role classification
+surface availability records
+load and lint state separation
+surface identity and format version
+per-surface SHA-256
+RFC 8785/JCS input_set_sha256
+manifest-last coherence
+required-surface compatibility gating
+Core diagnostic ownership
+no raw-YAML semantic fallback
+```
+
+An incompatible required surface blocks semantic projection.
+
+The input set does not make Projection Profile, Integration Result or Integration Package contracts stable Core surfaces.
+
+## 10. Candidate v1.1 surfaces
+
+The following remain candidate:
 
 ```text
 dashboard_summary.json
@@ -188,44 +181,30 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-These are Core-owned read-only structured outputs.
+They are Core-owned read-only outputs, but they are not silently promoted by v1.2.
 
-They are not part of the original v1.0.0 stable surface.
+Their changes must be explicit because downstream tools may already consume them, even though their compatibility commitment is weaker than the stable v1 surface.
 
-They may evolve before promotion, but changes must remain explicit and documented because downstream tools are expected to consume them.
-
----
-
-## 10. Additive evolution rule
+## 11. Additive evolution
 
 Additive JSON evolution is preferred.
 
-Adding an optional field is usually safer than renaming or removing an existing documented field.
-
-The v1.1.0 simulation JSON structured expectation accounting is additive. The legacy top-level `failed_expectations` compatibility list remains available.
-
-For typed record collections such as `relationship_manifest.relationships`, a documented new record type may also be additive when:
+A compatible additive change normally preserves:
 
 ```text
-the existing record shape remains valid
-the new type has explicit Core-owned semantics
-existing types keep their names and meanings
-the compatibility impact is documented
+existing documented fields
+existing result tokens
+existing identity meaning
+existing relationship meaning
+existing required-role semantics
+existing failure-state distinctions
 ```
 
-Consumers of such a collection should consume the types they explicitly understand and safely preserve or ignore an unknown additive type.
+New optional fields or new explicitly admitted typed records may be compatible when the underlying contract permits them.
 
-They must not guess the semantics of an unknown type from its name, endpoints or surrounding records.
+## 12. Downstream consumer rule
 
-A consumer that intentionally requires an exact closed set of relationship types should pin that expectation to the release contract it supports rather than assuming all later minor releases emit the same type set.
-
----
-
-## 11. Downstream tool rule
-
-Downstream tools should consume structured JSON fields and Core-owned structured surfaces.
-
-When possible, downstream tools should consume:
+Downstream tools should consume structured Core surfaces such as:
 
 ```text
 lint JSON report
@@ -233,43 +212,43 @@ simulation JSON report
 model_summary.json
 entity_index.json
 relationship_manifest.json
+mission_snapshot.json
+integration_input_manifest.json
 dashboard_summary.json
 scenario_run_index.json
 coverage_summary.json
 ```
 
-They should not parse human-oriented terminal text, plain-text logs, Markdown prose or generated formatting as machine contracts.
-
-For relationship records specifically, downstream tools must not infer missing relationship types or reinterpret unknown additive relationship types.
-
----
-
-## 12. Current non-goals
-
-This JSON report compatibility classification does not introduce:
+They must not reconstruct Core semantics from:
 
 ```text
-new CLI behavior
+terminal text
+plain-text logs
+Markdown prose
+file names
+timestamps
+ID naming conventions
+UI state
+raw YAML when the integration contract requires Core-owned surfaces
+```
+
+## 13. Current non-goals
+
+This compatibility classification does not introduce:
+
+```text
 new Mission Model semantics
 schema migration tooling
-JSON Schema publication
+JSON Schema publication for Core reports
 runtime behavior
 ground behavior
 plugin execution
-Studio-specific API
-OpenOBSW/OpenSVF-specific generation
+Studio-specific semantic authority
+OpenOBSW/OpenSVF-specific Core generation
 ```
 
----
+## 14. Final statement
 
-## 13. Final statement
+v1.2.0 extends the stable Core machine-readable boundary with Mission Snapshot and the coherent Integration Input Set while preserving the v1.0 stable report families and the v1.1 candidate inspection surfaces.
 
-v1.1.0 is the current project release.
-
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-v1.0.0 stabilizes selected machine-readable JSON report families and Core-owned structured surfaces.
-
-Later minor releases may extend stable surfaces additively when the extension preserves existing meaning and is explicit, reviewed and documented.
-
-v1.1.0 consolidates additional candidate Core-owned integration surfaces without making generated manifests, generated runtime bindings, generated ground dictionaries, terminal text, logs or Markdown prose stable machine contracts unless explicitly promoted by a later reviewed decision.
+Every compatibility decision remains explicit. No consumer should infer maturity from a format token alone or infer missing semantics from unstructured data.

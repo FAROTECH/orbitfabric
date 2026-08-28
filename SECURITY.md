@@ -1,25 +1,71 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-OrbitFabric is currently in pre-1.0 development.
+OrbitFabric has a stable v1 Mission Data Contract baseline.
 
-Only the latest public release and the current `main` branch are considered for security fixes.
+Security fixes are considered for:
 
-Older pre-1.0 snapshots are not maintained as security-supported baselines.
+```text
+the latest public OrbitFabric Core release
+the current main branch
+```
 
-## Reporting a Vulnerability
+Older releases may remain available for reproducibility and historical reference, but they are not maintained as security-supported baselines unless explicitly stated otherwise.
 
-Please do not report suspected security vulnerabilities through public issues.
+The current Core version is:
 
-Use GitHub private vulnerability reporting when available, or contact the maintainers privately through a non-public channel.
+```text
+v1.2.0 - Core Integration Input Consolidation
+```
 
-Do not include proprietary mission data, private spacecraft information, operational logs, credentials, tokens, export-controlled material or NDA-protected details in any report.
+## Reporting a vulnerability
 
-## Scope
+Do not report suspected security vulnerabilities through public issues, discussions or pull requests.
 
-OrbitFabric is a Mission Data Contract framework.
+Use GitHub private vulnerability reporting when available, or contact the maintainers through a private channel.
 
-It is not flight-ready onboard software, not a ground segment, not a command uplink service, not an authentication system and not an operational spacecraft control system.
+A useful report should describe:
 
-Security reports should focus on the OrbitFabric toolchain, model parsing, generated artifacts, dependency handling, repository workflows and documentation that could mislead users about operational readiness.
+- the affected OrbitFabric version or commit;
+- the affected component or workflow;
+- the observed behavior;
+- the security impact;
+- reproducible steps using synthetic or otherwise safe data;
+- any known mitigation.
+
+Do not include proprietary mission data, private spacecraft information, operational logs, credentials, tokens, export-controlled material, NDA-protected details or other confidential information in a vulnerability report.
+
+## Security scope
+
+OrbitFabric is a Mission Data Contract framework and engineering toolchain.
+
+Relevant security reports may include issues involving:
+
+- Mission Model and scenario parsing;
+- unsafe file handling or path handling;
+- generated artifact handling;
+- CLI behavior with security impact;
+- dependency handling;
+- repository and CI workflows;
+- documentation behavior that could create a material security misunderstanding;
+- Integration Input Set integrity or provenance handling;
+- external adapter execution boundaries documented by OrbitFabric when the issue concerns the generic contract or invocation boundary.
+
+OrbitFabric Core does not dynamically load or execute ecosystem-specific adapters in-process.
+
+## Operational boundary
+
+OrbitFabric is not flight-ready onboard software, a ground segment, command uplink service, authentication system, authorization service, cryptographic key manager or operational spacecraft control system.
+
+Generated runtime-facing bindings are contract artifacts, not flight software. Generated ground-facing artifacts are integration artifacts, not a ground segment.
+
+A security property demonstrated by the OrbitFabric host-side toolchain must not be interpreted as qualification of an operational spacecraft or ground system.
+
+## Clean-room and sensitive information
+
+Security reporting does not relax the OrbitFabric clean-room policy.
+
+Do not use a public or private vulnerability report as a channel for sharing material that you are not authorized to disclose.
+
+See [Clean-Room Policy](docs/CLEAN_ROOM_POLICY.md).

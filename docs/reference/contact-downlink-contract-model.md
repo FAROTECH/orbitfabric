@@ -1,83 +1,63 @@
 # Contact and Downlink Contract Model
 
-Status: Implemented in OrbitFabric v0.4.0
+Status: Implemented since v0.4.0 and part of the stable Mission Model contract from v1.0.0  
 Scope: Contact Windows and Downlink Flow Contract definition
-
----
 
 ## Purpose
 
-The Contact and Downlink Contract Model extends OrbitFabric with an optional model domain for declared contact and downlink assumptions.
+The Contact and Downlink Contract Model defines declared contact and downlink assumptions at Mission Data Contract level.
 
-Its purpose is to answer a contract-level question:
+Its purpose is to answer a contract question:
 
 > Given the declared data products, priorities, storage policies, downlink intent and contact assumptions, is the mission data flow coherent?
 
-The model does not execute downlink.
-
-It does not compute orbital passes.
-
-It does not simulate RF performance.
-
-It does not implement a ground segment.
-
----
+The model does not execute downlink, compute orbital passes, simulate RF performance or implement a ground segment.
 
 ## Relationship with Data Products
 
 The Data Product Contract Model describes mission data objects produced by payloads or subsystems.
 
-The Contact and Downlink Contract Model describes the assumptions used to reason about how those data products are expected to become eligible for downlink.
-
-The relationship is:
+The Contact and Downlink Contract Model describes assumptions used to reason about how those products are intended to become eligible for downlink.
 
 ```text
 Data Product Contract
-        -> Storage Intent
-        -> Downlink Intent
-        -> Contact Window Assumption
-        -> Downlink Flow Contract
+    -> Storage Intent
+    -> Downlink Intent
+    -> Contact Window Assumption
+    -> Downlink Flow Contract
 ```
 
-A data product may declare downlink intent.
+A data product may declare downlink intent. A downlink flow may declare which data products are eligible for a given abstract contact and link path.
 
-A downlink flow contract may declare which data products are eligible for a given abstract contact/link path.
+This remains declarative. It does not imply runtime queue execution or file transfer.
 
-This is declarative.
+## What the model describes
 
-It does not imply runtime queue execution or file transfer.
-
----
-
-## What the Model Describes
-
-A contact/downlink contract may describe:
+The model may describe:
 
 ```text
 contact profile identity
 abstract contact target
 link profile identity
-abstract downlink rate assumption
+abstract data-rate assumption
 contact window identity
 contact window start
 contact window duration
 declared downlink capacity
 downlink flow identity
-queue policy intent
+queue-policy intent
 eligible data products
 ```
 
-These fields exist to support validation, linting and generated documentation.
+These fields support validation, linting, scenario evidence and generated documentation.
 
----
+## What the model does not describe
 
-## What the Model Does Not Describe
-
-A contact/downlink contract does not describe:
+The model does not implement:
 
 ```text
 orbit propagation
-ground track computation
+ground-track computation
 TLE ingestion
 antenna pointing
 RF link budget
@@ -86,19 +66,13 @@ real contact scheduling
 real ground station operations
 live downlink execution
 onboard downlink queues
-file transfer protocols
-CCSDS/PUS/CFDP implementation
-Yamcs/OpenC3 runtime integration
+file-transfer protocols
+CCSDS, PUS or CFDP implementation
+Yamcs or OpenC3 runtime integration
 operator consoles
-runtime skeletons
-ground export artifacts
 ```
 
-Those are intentionally outside the v0.4.0 scope.
-
----
-
-## YAML Shape
+## YAML shape
 
 Contact and downlink assumptions are defined in the optional file:
 
@@ -106,7 +80,7 @@ Contact and downlink assumptions are defined in the optional file:
 mission/contacts.yaml
 ```
 
-Implemented shape:
+Representative shape:
 
 ```yaml
 contacts:
@@ -140,15 +114,13 @@ contacts:
       description: Synthetic science downlink flow used by the demo mission.
 ```
 
-This shape is intentionally minimal.
+This domain is part of the stable documented Mission Model contract from v1.0.0 onward. Its documented fields, meanings, controlled values, identifier rules and cross-reference behavior are compatibility-sensitive.
 
-OrbitFabric is still pre-1.0 and the schema may evolve before stabilization.
+Compatible additive evolution remains possible under the Mission Model Stability Contract. Existing documented meaning must not change silently.
 
----
+## Contact profiles
 
-## Contact Profiles
-
-A contact profile describes an abstract contact target or contact class.
+A contact profile describes an abstract contact target or class.
 
 Examples:
 
@@ -159,13 +131,9 @@ commercial_ground_network
 lab_emulated_contact
 ```
 
-A contact profile is not a real ground station configuration.
+A contact profile is not a real ground station configuration. It is a contract-level target referenced by windows and flows.
 
-It is a contract-level target used by contact windows and downlink flows.
-
----
-
-## Link Profiles
+## Link profiles
 
 A link profile describes an abstract link assumption.
 
@@ -177,19 +145,11 @@ s_band_downlink_nominal
 lab_downlink_emulated
 ```
 
-A link profile may include an assumed data rate.
+A link profile may include an assumed data rate used for contract reasoning. That value is not an RF budget or measured link performance.
 
-That rate is a declared assumption used for linting and documentation.
+## Contact windows
 
-It is not an RF budget.
-
----
-
-## Contact Windows
-
-A contact window describes an assumed contact opportunity.
-
-A contact window may reference:
+A contact window describes an assumed contact opportunity and may reference:
 
 ```text
 contact profile
@@ -199,28 +159,24 @@ duration
 declared capacity
 ```
 
-The declared capacity may be explicit or derived by a future model from declared rate and duration.
-
-In the v0.4.0 slice, explicit `assumed_capacity_bytes` is preferred because it avoids pretending to perform physical link simulation.
-
----
+Declared capacity is an engineering assumption used for validation and evidence. It does not imply orbital or physical link simulation.
 
 ## Downlink Flow Contracts
 
-A downlink flow contract describes how data products are intended to become eligible for downlink.
+A downlink flow describes how data products are intended to become eligible for downlink.
 
 It may reference:
 
 ```text
 contact profile
 link profile
-queue policy intent
+queue-policy intent
 eligible data products
 ```
 
-Queue policy is intent only.
+Queue policy is declarative intent only.
 
-Examples:
+Examples include:
 
 ```text
 priority_then_age
@@ -229,15 +185,13 @@ manual_selection
 critical_first
 ```
 
-The model does not implement a runtime queue.
+OrbitFabric does not implement a runtime queue from these declarations.
 
----
+## Validation and linting
 
-## Implemented Lint Rules
+Lint rules focus on reference integrity and obvious contract consistency.
 
-The v0.4.0 lint rules focus on reference integrity and obvious consistency issues.
-
-Implemented rules:
+Implemented rules include:
 
 ```text
 OF-CON-001  contact window references unknown contact profile
@@ -249,52 +203,37 @@ OF-DL-004   high-priority data product has downlink intent but no eligible downl
 OF-DL-005   estimated data product volume may exceed declared contact capacity
 ```
 
-Warnings expose engineering ambiguity without pretending to solve scheduling.
+Warnings expose engineering ambiguity without pretending to solve scheduling or RF behavior.
 
----
+## Generated documentation and evidence
 
-## Generated Documentation
-
-When contact/downlink contracts are present, OrbitFabric generates Markdown documentation from the validated Mission Model.
-
-Generated output:
+When contact and downlink contracts are present, OrbitFabric generates:
 
 ```text
 generated/docs/contacts.md
 ```
 
-The generated page exposes:
+The generated page exposes contact profiles, link profiles, windows, declared capacities, downlink flows and eligible data products.
 
-```text
-contact profiles
-link profiles
-contact windows
-declared capacities
-downlink flows
-eligible data products
-```
+Scenario Data Flow Evidence can also correlate declared command effects with data products, storage intent, downlink intent, eligible flows and matching contact windows.
 
-Generated documentation states that these are contract assumptions, not runtime behavior.
+This is contract evidence, not observed ground operations.
 
----
+## Current boundary
 
-## Current Boundary
+The Contact and Downlink Contract Model is a stable declarative Mission Model domain.
 
-The v0.4.0 model remains narrow.
-
-It strengthens the Mission Data Chain without introducing runtime behavior.
-
-The correct v0.4.0 outcome is:
+The correct boundary is:
 
 ```text
 Data Product Contract
-        -> Downlink Intent
-        -> Contact/Downlink Contract
-        -> Lintable consistency
-        -> Generated documentation
+    -> Downlink Intent
+    -> Contact and Downlink Contract
+    -> Core validation and lint
+    -> generated documentation and host-side evidence
 ```
 
-The incorrect v0.4.0 outcome is:
+The model must not drift into:
 
 ```text
 orbit simulator
@@ -303,5 +242,3 @@ ground segment
 downlink runtime
 contact scheduler
 ```
-
-That boundary is strict.

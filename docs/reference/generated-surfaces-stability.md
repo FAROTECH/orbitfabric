@@ -1,62 +1,53 @@
 # Generated Surfaces Stability
 
-Status: Active v1.1 classification  
-Scope: generated and exported surface compatibility classification  
-Applies to: OrbitFabric generated and exported surfaces from `v1.0.0 - Stable Mission Data Contract` onward
+Status: Active v1.x classification through v1.2.0  
+Scope: generated and exported surface compatibility  
+Applies to: OrbitFabric generated and exported surfaces from v1.0.0 onward
 
-This page classifies OrbitFabric generated and exported surfaces after v1.1.0.
+The Mission Model remains the semantic source of truth. Generated and exported surfaces are derived outputs with explicit maturity classifications.
 
-It documents stable v1.0.0 surfaces and candidate v1.1.0 surfaces. It does not introduce new CLI behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+## 1. Stable Core-owned machine-readable surfaces
 
----
-
-## 1. Purpose
-
-OrbitFabric generates and exports several surfaces derived from the validated Mission Model and from Core-generated structured evidence.
-
-The Mission Model remains the source of truth.
-
-This document separates:
-
-- stable v1.0.0 Core-owned inspection surfaces;
-- candidate v1.1.0 Core-owned integration surfaces;
-- machine-readable validation and evidence reports;
-- generated runtime-facing artifacts;
-- generated ground-facing artifacts;
-- generated Markdown documentation;
-- disposable outputs.
-
----
-
-## 2. Stable v1.0.0 Core-owned structured inspection surfaces
-
-The stable v1.0.0 surfaces are:
+The stable Core-owned surface set now includes:
 
 ```text
+lint JSON report
+simulation JSON report
 model_summary.json
 entity_index.json
-relationship_manifest.json
+relationship_manifest.json for admitted families
+mission_snapshot.json
+Core Integration Input Set
 ```
 
-They exist to prevent downstream tools from reconstructing Mission Data Contract semantics from raw YAML, generated files, textual CLI output or UI state.
-
-The stable Core-owned inspection chain is:
+The original v1 inspection chain remains:
 
 ```text
-model_summary.json          -> What contract domains are present?
-entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed mission contract entities related?
+model_summary.json          What contract domains are present?
+entity_index.json           What contract entities are defined?
+relationship_manifest.json  Which explicit admitted relationships connect them?
 ```
 
-These surfaces are intentionally narrow.
+v1.2 adds:
 
-`relationship_manifest.json` does not contain a graph engine, dependency graph, runtime routing table, ground routing table, plugin API or Studio-specific API.
+```text
+mission_snapshot.json       What complete Mission Model did Core actually load?
+Core Integration Input Set  What coherent Core-owned input can an external integration consume?
+```
 
----
+These surfaces are read-only and derived. They do not become editable sources of mission truth.
 
-## 3. Candidate v1.1.0 Core-owned integration surfaces
+## 2. Relationship Manifest additive families
 
-The candidate v1.1.0 surfaces are:
+The original v1 admitted relationship families remain stable.
+
+v1.2 adds seven additive stable-compatible FDIR families. They are derived deterministically from explicit loaded Mission Model fields and do not redefine original relationship meaning.
+
+Consumers must not treat the relationship-type set as permanently closed unless they intentionally pin to a specific release contract.
+
+## 3. Candidate Core-owned inspection surfaces
+
+The following v1.1 surfaces remain candidate after v1.2:
 
 ```text
 dashboard_summary.json
@@ -65,182 +56,140 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-They are Core-owned, but they are not part of the original v1.0.0 stable surface.
+They are Core-owned, read-only outputs, but they are not part of the stable Core compatibility class.
 
-They remain candidate until a later reviewed decision promotes selected fields or surfaces.
+They do not make Core a dashboard backend, coverage engine, Studio API or formal verification tool.
 
-The candidate integration chain is:
+## 4. Generated runtime-facing artifacts
 
-```text
-dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
-scenario_run_index.json     -> Index of Core simulation JSON report runs
-coverage_summary.json       -> Limited coverage derived from Core structured outputs
-simulation JSON expectations -> Additive structured expectation accounting
-```
-
-These surfaces are intentionally narrow.
-
-They are not dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
-
----
-
-## 4. Machine-readable validation and evidence reports
-
-These JSON report families are part of the narrow v1.0.0 stable surface:
-
-```text
-lint JSON report
-simulation JSON report
-```
-
-The v1.1.0 structured expectation accounting inside simulation JSON is additive.
-
-The legacy top-level `failed_expectations` compatibility list remains available.
-
----
-
-## 5. Generated artifacts
-
-Generated runtime-facing artifacts include:
+Generated runtime-facing outputs include:
 
 ```text
 runtime_contract_manifest.json
-generated C++17 runtime-facing bindings
-generated C++17 host-build smoke files
+C++17 identifiers and metadata registries
+command argument structures
+abstract adapter interfaces
+host-build smoke files
 ```
 
-They are not flight software and not a flight ABI guarantee.
+They remain public-preview generated artifacts unless explicitly promoted later.
 
-Generated ground-facing artifacts include:
+They are not flight software and do not promise a flight ABI, scheduler, driver layer, command dispatcher or telemetry runtime.
+
+## 5. Generated ground-facing artifacts
+
+Generated ground outputs include:
 
 ```text
 ground_contract_manifest.json
-generated JSON ground dictionaries
-generated CSV ground dictionaries
-generated human-reviewable ground Markdown artifacts
+JSON dictionaries
+CSV dictionaries
+human-reviewable Markdown artifacts
 ```
 
-They are not a ground segment runtime and not a mission control system.
+They remain public-preview generated artifacts unless explicitly promoted later.
 
-Generated Markdown documentation includes:
+They are not a telemetry archive, database, operator console, command uplink service or live ground segment.
 
-```text
-generated mission documentation
-generated data-flow documentation
-```
+## 6. Generated documentation and logs
 
-Generated artifacts remain public preview and disposable unless explicitly promoted later.
+Generated mission Markdown, data-flow Markdown and plain-text simulation logs are reproducible human-reviewable artifacts.
 
----
+They are not machine compatibility contracts unless a later explicit decision says otherwise.
 
-## 6. Current classification
+## 7. Current classification table
 
-| Surface | Classification | Source of truth | Notes |
+| Surface | Classification | Source | Notes |
 |---|---|---|---|
-| `model_summary.json` | Stable v1.0.0 contract | Mission Model | Core-owned domain-level inspection surface. |
-| `entity_index.json` | Stable v1.0.0 contract | Mission Model | Core-owned entity-level inspection surface. |
-| `relationship_manifest.json` | Stable v1.0.0 for admitted families | Mission Model | Core-owned relationship-level surface. |
-| lint JSON report | Stable v1.0.0 contract | Mission Model and lint rules | Machine-readable validation result. |
-| simulation JSON report | Stable v1.0.0 contract with additive v1.1 accounting | Mission Model and scenario YAML | Machine-readable scenario evidence. |
-| `dashboard_summary.json` | Candidate v1.1.0 surface | Mission Model and Core structured surfaces | Dashboard-ready aggregation of existing Core facts. |
-| `scenario_run_index.json` | Candidate v1.1.0 surface | Simulation JSON reports | Index of simulation report runs. |
-| `coverage_summary.json` | Candidate v1.1.0 surface | Core structured outputs | Limited coverage derived from Core outputs. |
-| generated runtime artifacts | Public preview disposable artifact | Mission Model | Contract-facing artifacts, not flight software. |
-| generated ground artifacts | Public preview disposable artifact | Mission Model | Integration artifacts, not ground runtime. |
-| generated Markdown docs | Public preview disposable artifact | Mission Model | Human-reviewable docs, not machine contract. |
+| lint JSON report | Stable | Mission Model and lint rules | Core validation result. |
+| simulation JSON report | Stable | Mission Model and scenario YAML | Host-side scenario evidence. |
+| `model_summary.json` | Stable | Mission Model | Domain-level inspection. |
+| `entity_index.json` | Stable | Mission Model | Entity-level inspection. |
+| `relationship_manifest.json` original families | Stable | Mission Model | Original admitted explicit relationships. |
+| Relationship Manifest v1.2 FDIR families | Additive stable-compatible | Mission Model | Additional explicit relationships. |
+| `mission_snapshot.json` | Stable from v1.2 | Mission Model | Complete loaded-model inspection. |
+| Core Integration Input Set | Stable from v1.2 | One Core load/lint operation | Coherent external integration input boundary. |
+| `dashboard_summary.json` | Candidate | Core facts | Dashboard-ready aggregation. |
+| `scenario_run_index.json` | Candidate | Simulation JSON reports | Run index. |
+| `coverage_summary.json` | Candidate | Core structured outputs | Limited coverage. |
+| simulation JSON `expectations` | Candidate additive extension | Scenario execution | Structured expectation accounting. |
+| generated runtime artifacts | Public preview | Mission Model | Contract-facing artifacts, not flight software. |
+| generated ground artifacts | Public preview | Mission Model | Integration artifacts, not ground runtime. |
+| generated Markdown | Human-oriented derived output | Mission Model | Documentation, not machine contract. |
+| plain-text simulation logs | Human-oriented derived output | Scenario execution | Reviewable log, not machine contract. |
 
----
+## 8. Core Integration Input Set
 
-## 7. Compatibility-sensitive surface changes
-
-The following changes are compatibility-sensitive after v1.0.0:
-
-- renaming a documented generated or exported file;
-- moving a documented default output path;
-- removing a documented top-level JSON field;
-- renaming a documented top-level JSON field;
-- changing the meaning of a documented field;
-- changing a documented `kind` value;
-- changing a documented format version field;
-- removing explicit boundary flags that downstream tools may inspect;
-- changing the answer represented by a Core-owned inspection or candidate integration surface;
-- changing generated artifact profile names such as `cpp17` or `generic`;
-- changing whether a generated artifact is disposable.
-
-Compatibility-sensitive does not mean forbidden.
-
-It means the change must be explicit, reviewed and documented.
-
----
-
-## 8. Downstream tool rule
-
-Downstream tools must consume Core-owned structured surfaces when they need Mission Data Contract inspection.
-
-They must not reconstruct Mission Data Contract semantics from:
+The stable v1.2 Integration Input Set is a coherent multi-file surface containing:
 
 ```text
-raw YAML files
-generated Markdown documentation
-generated runtime bindings
+integration_input_manifest.json
+mission_snapshot.json
+entity_index.json
+relationship_manifest.json
+lint_report.json
+model_summary.json
+```
+
+Its stability covers documented role classification, availability states, surface identity/version/digests, load and lint state separation, RFC 8785/JCS set fingerprinting, manifest-last coherence and no raw-YAML semantic fallback.
+
+The existing `input_set_version = 0.1-candidate` identifier is retained as a wire identifier and does not weaken the v1.2 stability classification.
+
+## 9. Compatibility-sensitive changes
+
+For stable surfaces, compatibility-sensitive changes include:
+
+- renaming a documented file or `kind` identity;
+- removing or renaming documented stable fields;
+- changing documented field meaning;
+- changing stable result tokens;
+- changing stable default output paths;
+- changing stable relationship meaning;
+- changing Integration Input Set required-role or coherence rules;
+- weakening explicit boundary flags;
+- changing whether an artifact is treated as source or derived output.
+
+Such changes must be explicit, reviewed and documented.
+
+Candidate and public-preview outputs may evolve more freely, but their changes must still be documented when downstream tools are expected to consume them.
+
+## 10. Downstream consumer rule
+
+Downstream tools must consume the strongest appropriate documented Core-owned surface.
+
+They must not reconstruct Mission Data Contract meaning from:
+
+```text
+raw YAML independently when a Core integration boundary is required
+generated Markdown
+generated runtime code
 generated ground dictionaries
-human-oriented CLI output
+terminal text
+plain-text logs
+file naming conventions
+timestamps
 UI state
 ```
 
-The Core loads, validates and owns Mission Data Contract semantics.
+Core loads and interprets the Mission Model. Derived consumers use explicit Core-owned facts.
 
-Generated and exported surfaces are derived from that Core-owned interpretation.
+## 11. Non-goals
 
----
-
-## 9. Current non-goals
-
-This generated surfaces stability classification does not introduce:
+This classification does not introduce:
 
 ```text
-new CLI behavior
 new Mission Model semantics
-relationship graph
-dependency graph
+relationship inference
+graph execution
 plugin execution
-plugin discovery
-plugin loader
 runtime behavior
 ground behavior
-Studio-specific API
-JSON Schema publication
 schema migration tooling
+Studio-specific semantic authority
 ```
 
----
+## 12. Final statement
 
-## 10. Relationship to existing reference pages
+v1.2.0 extends the stable generated/exported Core boundary with Mission Snapshot and the coherent Integration Input Set while preserving the original v1 surfaces and leaving the v1.1 inspection additions candidate.
 
-Detailed structure remains documented in the dedicated references:
-
-```text
-Contract Introspection Surface
-Entity Index Surface
-Relationship Manifest Surface
-Dashboard Summary Surface
-Scenario Run Index Surface
-Coverage Summary Surface
-JSON Reports v0.1
-Runtime Contract Bindings
-Ground Integration Artifacts
-```
-
-This page classifies their stability and compatibility expectations after v1.1.0.
-
----
-
-## 11. Final statement
-
-v1.1.0 is the current project release.
-
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-v1.0.0 stabilizes selected Mission Data Contract surfaces without turning generated artifacts into user-owned source files or runtime implementations.
-
-v1.1.0 consolidates candidate Core-owned integration surfaces without promoting them to the original v1.0.0 stable compatibility class.
+Generated runtime, ground and human-readable artifacts remain derived and disposable unless explicitly promoted by a later reviewed compatibility decision.

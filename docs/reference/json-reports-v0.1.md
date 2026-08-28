@@ -1,43 +1,37 @@
-# JSON Reports
+# JSON Reports and Core Structured Surfaces
 
-Status: Active v1.1 reference  
-Scope: JSON reports, stable v1.0.0 Core-owned structured JSON surfaces and candidate v1.1.0 Core-owned integration surfaces  
-Applies to: OrbitFabric `v1.1.0 - Candidate Integration Surface Consolidation`, while preserving the `v1.0.0 - Stable Mission Data Contract` baseline
+Status: Active v1.x reference through v1.2.0  
+Scope: machine-readable reports, Core-owned structured surfaces and integration input records  
+Applies to: OrbitFabric v1.x
 
-This page documents the JSON reports currently produced by OrbitFabric.
+This page documents the current machine-readable JSON families produced by OrbitFabric Core and classifies their maturity.
 
-Current project release:
-
-```text
-v1.1.0 - Candidate Integration Surface Consolidation
-```
-
-Stable Mission Data Contract baseline:
+Current Core version:
 
 ```text
-v1.0.0 - Stable Mission Data Contract
+v1.2.0 - Core Integration Input Consolidation
 ```
 
-OrbitFabric JSON reports are generated artifacts intended for:
+The Mission Model and scenario YAML inputs remain the sources from which these outputs are derived. JSON outputs are not editable replacements for those sources.
+
+## 1. Why JSON surfaces exist
+
+OrbitFabric JSON outputs support:
 
 - CI inspection;
-- automated validation workflows;
-- reproducible scenario evidence;
-- Core-owned contract introspection;
-- Core-owned entity indexing;
-- Core-owned relationship inspection;
-- candidate Core-owned dashboard, scenario-index and coverage inspection;
-- downstream integration tooling.
+- automated validation;
+- deterministic scenario evidence;
+- contract introspection;
+- entity and relationship navigation;
+- coherent external integration inputs;
+- downstream tools such as OrbitFabric Studio;
+- explicit provenance and compatibility checks.
 
-They are not the source of truth.
+Machine-readable consumers should use documented JSON fields and surface identities instead of parsing terminal text or generated Markdown.
 
-The source of truth remains the Mission Model YAML and scenario YAML.
+## 2. Current classification
 
----
-
-## Stability status
-
-The following JSON report families are part of the v1.0.0 stable surface:
+### Stable v1.x report and structured surface families
 
 ```text
 lint JSON report
@@ -45,9 +39,15 @@ simulation JSON report
 model_summary.json
 entity_index.json
 relationship_manifest.json for admitted families
+mission_snapshot.json
+Core Integration Input Set
 ```
 
-The following JSON report families are candidate Core-owned integration surfaces consolidated in v1.1.0:
+The Core Integration Input Set is a coherent multi-file boundary. Its machine-readable root record is `integration_input_manifest.json`.
+
+### Candidate Core-owned inspection surfaces
+
+The following v1.1 additions remain candidate after v1.2:
 
 ```text
 dashboard_summary.json
@@ -56,37 +56,46 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-The following JSON manifest families remain public preview generated artifacts unless explicitly promoted later:
+### Public-preview generated manifests
 
 ```text
 runtime_contract_manifest.json
 ground_contract_manifest.json
 ```
 
-Candidate v1.1.0 surfaces are Core-owned read-only structured outputs.
+These generated manifests remain derived artifacts unless explicitly promoted by a later compatibility decision.
 
-They are not promoted to the original v1.0.0 stable compatibility class.
+## 3. Version fields
 
----
+Different version fields have different meanings.
 
-## Version fields
+Representative fields include:
 
-OrbitFabric JSON reports include the OrbitFabric tool/package version where applicable.
+```text
+version
+model_version
+orbitfabric_version
+summary_version
+index_version
+manifest_version
+snapshot_version
+input_set_version
+dashboard_version
+coverage_version
+```
 
-Current lint report example:
+The OrbitFabric tool/package version identifies the producer release.
+
+For example, a v1.2 lint report may contain:
 
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
 ```
 
-This identifies the OrbitFabric tool version that produced the report.
-
-Mission Model version is represented separately.
-
-For lint reports, the Mission Model version is exposed as:
+The mission's own model version remains separate:
 
 ```json
 {
@@ -95,23 +104,9 @@ For lint reports, the Mission Model version is exposed as:
 }
 ```
 
-The top-level `version` and `model_version` fields have different meanings.
+A surface format token does not by itself state the release maturity class. In particular, stable v1.2 Mission Snapshot and Integration Input Set surfaces retain their existing `0.1-candidate` wire identifiers to avoid an artificial compatibility break.
 
-Core-owned structured surfaces use report-family format fields such as:
-
-```text
-summary_version
-index_version
-manifest_version
-dashboard_version
-coverage_version
-```
-
-These values are report format identifiers. They are not release-status labels by themselves.
-
----
-
-## Lint report
+## 4. Lint report
 
 Generated by:
 
@@ -126,20 +121,20 @@ Tool identifier:
 orbitfabric-lint
 ```
 
-Top-level fields:
+Documented top-level fields:
 
 | Field | Type | Meaning |
 |---|---:|---|
 | `tool` | string | Report producer. Current value: `orbitfabric-lint`. |
-| `version` | string | OrbitFabric tool/package version that produced the report. |
+| `version` | string | OrbitFabric package version that produced the report. |
 | `mission` | string | Mission ID loaded from the Mission Model. |
 | `model_version` | string | Mission Model version declared by the mission. |
 | `result` | string | Machine-readable lint result. |
-| `loaded` | object | Counts of loaded core Mission Model domains. |
+| `loaded` | object | Counts of loaded Mission Model domains. |
 | `summary` | object | Count of findings by severity. |
-| `findings` | array | List of lint findings. |
+| `findings` | array | Structured lint findings. |
 
-Current lint report `result` values:
+Current lint result values:
 
 | Value | Meaning |
 |---|---|
@@ -147,9 +142,9 @@ Current lint report `result` values:
 | `passed_with_warnings` | Warning findings exist, but no error findings exist. |
 | `failed` | At least one error finding exists. |
 
----
+Core owns the meaning of lint findings, diagnostic codes and severities.
 
-## Simulation report
+## 5. Simulation report
 
 Generated by:
 
@@ -164,12 +159,12 @@ Tool identifier:
 orbitfabric-sim
 ```
 
-Top-level fields:
+Documented top-level fields:
 
 | Field | Type | Meaning |
 |---|---:|---|
 | `tool` | string | Report producer. Current value: `orbitfabric-sim`. |
-| `version` | string | OrbitFabric tool/package version that produced the report. |
+| `version` | string | OrbitFabric package version that produced the report. |
 | `mission` | string | Mission ID. |
 | `scenario` | string | Scenario ID. |
 | `result` | string | Scenario execution result. |
@@ -179,26 +174,20 @@ Top-level fields:
 | `commands` | array | Executed commands. |
 | `mode_transitions` | array | Mode transitions. |
 | `data_flow_evidence` | array | Contract-level data-flow evidence records. |
-| `expectations` | object | Additive v1.1.0 structured scenario expectation accounting. |
+| `expectations` | object | Additive structured expectation accounting introduced in v1.1. |
 | `final_state` | object | Final simulator state. |
 | `failed_expectations` | array | Legacy compatibility list of failed expectation messages. |
 
-The `expectations` object is additive.
-
-The legacy `failed_expectations` array remains present for compatibility.
-
-Current simulation report `result` values:
+Current simulation result values:
 
 | Value | Meaning |
 |---|---|
 | `passed` | All scenario expectations passed. |
 | `failed` | One or more scenario expectations failed. |
 
----
+### Simulation summary object
 
-## Simulation summary object
-
-Current fields:
+Current summary fields include:
 
 | Field | Meaning |
 |---|---|
@@ -208,15 +197,11 @@ Current fields:
 | `data_flow_evidence` | Number of data-flow evidence records. |
 | `expectations` | Number of structured expectation records. |
 | `passed_expectations` | Number of structured expectation records with result `passed`. |
-| `failed_expectations` | Number of failed expectations. Preserved from the legacy failed expectation list. |
+| `failed_expectations` | Number of failed expectations, preserving compatibility with the legacy failed-expectation list. |
 
----
+### Structured expectation accounting
 
-## Structured expectation accounting
-
-The simulation report includes structured expectation accounting in the additive `expectations` object.
-
-Shape:
+The additive v1.1 `expectations` object has the conceptual shape:
 
 ```json
 {
@@ -241,12 +226,12 @@ result
 message
 ```
 
-Current expectation record result values:
+Current record result values are:
 
-| Value | Meaning |
-|---|---|
-| `passed` | The expectation was evaluated and passed. |
-| `failed` | The expectation was evaluated and failed. |
+```text
+passed
+failed
+```
 
 Current expectation types may include:
 
@@ -261,123 +246,223 @@ data_flow
 scenario_status
 ```
 
-Structured expectation accounting is scenario evidence metadata.
+Structured expectation accounting remains candidate after v1.2.0. It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
 
-It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
+### Legacy failed-expectation compatibility
 
----
+The top-level `failed_expectations` array remains present and retains the human-readable failed expectation messages used by existing consumers.
 
-## Legacy failed expectations compatibility
+New consumers that need passed and failed accounting should consume the structured `expectations` object while preserving compatibility with the legacy list where required.
 
-The top-level `failed_expectations` array remains present.
+## 6. Data-flow evidence
 
-It contains the same human-readable failed expectation messages as before.
-
-This field is retained for compatibility with existing consumers.
-
-New consumers that need passed and failed accounting should read the structured `expectations` object.
-
----
-
-## Data-flow evidence records
-
-A data-flow evidence record is created when an accepted command declares a data product in `expected_effects.data_products`.
-
-It traces:
+A data-flow evidence record traces declared Mission Data Contract continuity such as:
 
 ```text
-command -> data product -> storage intent -> downlink intent -> eligible downlink flows -> contact windows
+command expected effect
+    -> data product
+    -> storage intent
+    -> downlink intent
+    -> eligible downlink flow
+    -> contact window
 ```
 
-This is evidence about declared contract consistency.
+This is host-side contract evidence. It does not prove real payload file generation, onboard storage writes, contact execution, RF behavior or ground operations.
 
-It does not imply real payload file generation, onboard storage writes, downlink queue execution, contact scheduling, RF behavior or ground integration.
+## 7. Model Summary
 
----
+`model_summary.json` is a stable Core-owned structured surface.
 
-## Stable v1.0.0 Core-owned structured surfaces
-
-The stable Core-owned structured surfaces are documented in their dedicated references:
+It answers:
 
 ```text
-model_summary.json
+What contract domains are present?
+```
+
+It provides domain-level inventory and counts without replacing the complete Mission Model.
+
+## 8. Entity Index
+
+`entity_index.json` is a stable Core-owned structured surface.
+
+It answers:
+
+```text
+What contract entities are defined?
+```
+
+Entity identity is domain-qualified. Consumers must not assume that one textual identifier is globally unique across all Mission Model domains unless the relevant contract says so.
+
+## 9. Relationship Manifest
+
+`relationship_manifest.json` is a stable Core-owned structured surface for admitted relationship families.
+
+It answers:
+
+```text
+Which explicit admitted relationships connect indexed mission entities?
+```
+
+The original v1 families remain stable. v1.2 adds seven additive stable-compatible FDIR families:
+
+```text
+autonomous_action_triggered_by_fault
+autonomous_action_uses_command_source
+fault_observes_telemetry
+fault_recovery_dispatches_command
+fault_recovery_targets_mode
+recovery_intent_includes_command
+recovery_intent_targets_mode
+```
+
+Unknown additive relationship types must not receive guessed semantics from consumers.
+
+## 10. Mission Snapshot
+
+`mission_snapshot.json` is a stable Core-owned inspection and integration surface from v1.2.0.
+
+Generated by:
+
+```bash
+orbitfabric export mission-snapshot examples/demo-3u/mission/
+```
+
+It answers:
+
+```text
+What complete Mission Model did OrbitFabric Core actually load?
+```
+
+The documented stable commitment covers the envelope, structural-load failure behavior, boundary semantics and faithful complete-loaded-model role.
+
+The complete serialized `model` payload follows Mission Model compatibility rules rather than a byte-for-byte freeze of every future additive field.
+
+The current format identifier remains:
+
+```text
+snapshot_version = 0.1-candidate
+```
+
+## 11. Core Integration Input Set
+
+Generated by:
+
+```bash
+orbitfabric export integration-input-set examples/demo-3u/mission/
+```
+
+This stable v1.2 boundary is a coherent set, not a single JSON report.
+
+The set contains:
+
+```text
+integration_input_manifest.json
+mission_snapshot.json
 entity_index.json
 relationship_manifest.json
+lint_report.json
+model_summary.json
 ```
 
-They answer:
+`integration_input_manifest.json` records:
 
 ```text
-model_summary.json          -> What contract domains are present?
-entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed contract entities related?
+input-set identity
+OrbitFabric producer version
+Mission identity and model version
+load result
+lint result
+required and companion surface roles
+surface availability
+surface kind and format version
+relative path
+per-surface SHA-256
+RFC 8785/JCS input_set_sha256
 ```
 
-They are stable v1.0.0 surfaces.
+The manifest is published last so a consumer does not treat an incomplete directory as a coherent set.
 
----
-
-## Candidate v1.1.0 Core-owned integration surfaces
-
-The candidate Core-owned integration surfaces are documented in their dedicated references:
+The current format identifier remains:
 
 ```text
-dashboard_summary.json
-scenario_run_index.json
-coverage_summary.json
-simulation JSON structured expectation accounting
+input_set_version = 0.1-candidate
 ```
 
-They answer:
+External adapters must validate required surface compatibility and must not use raw-YAML semantic fallback.
+
+## 12. Candidate v1.1 inspection surfaces
+
+### Dashboard Summary
+
+`dashboard_summary.json` aggregates existing Core facts for downstream inspection.
+
+It remains candidate and does not define dashboard backend behavior.
+
+### Scenario Run Index
+
+`scenario_run_index.json` indexes Core simulation JSON reports.
+
+It remains candidate and does not execute scenarios or calculate operational readiness.
+
+### Coverage Summary
+
+`coverage_summary.json` derives limited coverage from Core structured outputs.
+
+It remains candidate and does not provide formal verification, mission health or flight-readiness scoring.
+
+### Structured expectation accounting
+
+The simulation JSON `expectations` object provides additive passed/failed expectation accounting.
+
+It remains candidate. The stable simulation result semantics and legacy `failed_expectations` compatibility list remain unchanged.
+
+## 13. Generated runtime and ground manifests
+
+`runtime_contract_manifest.json` and `ground_contract_manifest.json` are generated contract artifacts.
+
+They are useful for integration and review, but they remain public-preview generated surfaces unless a later explicit decision promotes them.
+
+A runtime manifest does not make generated code flight software. A ground manifest does not make generated dictionaries a ground segment.
+
+## 14. Compatibility rules
+
+Additive JSON evolution is preferred when it preserves existing meaning.
+
+For stable surfaces, removing, renaming or redefining a documented field is compatibility-sensitive.
+
+For typed collections such as Relationship Manifest records, new explicitly documented types may be additive when the envelope remains compatible and the new type has narrow Core-owned semantics.
+
+Consumers must:
+
+- check documented surface identity and format version;
+- tolerate additive fields where the relevant contract permits them;
+- tolerate unknown additive relationship types without guessing meaning;
+- keep Core diagnostics separate from integration diagnostics;
+- reject incompatible required Integration Input Set surfaces;
+- avoid parsing human-oriented terminal or Markdown output as a machine contract.
+
+Candidate surfaces may evolve before promotion, but their changes must still be explicit and documented.
+
+## 15. Explicit non-goals
+
+The JSON surface does not provide:
 
 ```text
-dashboard_summary.json      -> What dashboard-ready Core facts are available?
-scenario_run_index.json     -> Which Core simulation JSON reports are present?
-coverage_summary.json       -> What limited coverage can Core derive from structured outputs?
-```
-
-They are candidate v1.1.0 surfaces.
-
-They are Core-owned, read-only and intended for downstream inspection tools.
-
-They are not part of the original v1.0.0 stable surface.
-
----
-
-## Explicit non-goals
-
-The JSON report surface does not provide:
-
-```text
-JSON Schema publication
-schema migration tooling
-relationship graph behavior
-dependency graph behavior
+an editable second Mission Model
+relationship inference
+relationship graph execution
+dependency graph execution
 plugin execution
 runtime behavior
 ground behavior
-Studio-specific API
-OpenOBSW/OpenSVF-specific generation
+Studio-specific semantic authority
+OpenOBSW/OpenSVF-specific Core semantics
 ```
 
----
+## 16. Final statement
 
-## Compatibility notes
+v1.2.0 extends the stable machine-readable Core boundary with Mission Snapshot and the coherent Core Integration Input Set while preserving the original stable report families.
 
-Additive JSON evolution is preferred.
+The v1.1 dashboard, scenario-index, coverage and structured-expectation additions remain candidate.
 
-Removing, renaming or changing documented top-level fields is compatibility-sensitive.
-
-Candidate v1.1.0 surfaces may evolve before promotion, but changes must remain explicit and documented.
-
-Generated manifests, generated runtime bindings, generated ground dictionaries, terminal text, logs and Markdown prose are not stable machine contracts unless explicitly promoted by a later reviewed decision.
-
----
-
-## Final statement
-
-v1.1.0 is the current project release.
-
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-The JSON report family documents stable v1.0.0 report surfaces and candidate v1.1.0 Core-owned integration surfaces without turning OrbitFabric Core into a dashboard backend, ground segment, flight software framework, plugin system, Studio API or OpenOBSW/OpenSVF-specific generator.
+Every JSON surface remains derived from Core-owned semantics rather than becoming an independent source of Mission Data Contract meaning.

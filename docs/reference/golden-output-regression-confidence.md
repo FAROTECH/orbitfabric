@@ -1,121 +1,80 @@
 # Golden Output and Regression Confidence Policy
 
-Status: Active v1.0 policy  
+Status: Active v1.x policy through v1.2.0  
 Scope: regression confidence and selected golden-signature protection  
-Applies to: generated outputs, JSON reports, Core-owned structured surfaces and CI artifacts after `v1.0.0 - Stable Mission Data Contract`
+Applies to: stable and candidate structured surfaces, reports and generated artifacts after v1.0.0
 
-This page defines how OrbitFabric reasons about golden outputs and regression confidence after the v1.0.0 stable Mission Data Contract release.
-
-It is a policy document only.
-
-It does not introduce new generated surfaces, new JSON report fields, new CLI behavior, new Mission Model semantics, schema migration tooling, JSON Schema publication, runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution, metadata schema, metadata parser, metadata loader, metadata validator or Studio-specific APIs.
-
----
+OrbitFabric protects contract meaning selectively. Not every reproducible output should become a committed golden file.
 
 ## 1. Purpose
 
-OrbitFabric v1.0.0 includes selected golden signatures for Core-owned structured surfaces.
-
-The purpose of this policy is to separate:
+This policy separates:
 
 ```text
 CI-generated evidence
 committed golden signatures
-future golden-output candidates
+candidate future golden targets
 human-reviewable generated artifacts
 disposable generated artifacts
 internal test assets
 ```
 
-This distinction matters because not every reproducible output should become a committed golden baseline.
+A golden baseline is useful only when it protects a meaningful public compatibility surface.
 
-A golden output is useful only when it protects a public or stable contract surface from accidental drift.
-
-A golden output is harmful when it freezes incidental formatting, demo wording, implementation order or disposable artifact details too early.
-
----
+A golden baseline is harmful when it freezes incidental formatting, ordering, prose or implementation detail that is not part of the contract.
 
 ## 2. Current CI confidence baseline
 
-The current CI pipeline provides regression confidence by running the main project checks and regenerating representative outputs.
-
-The current CI baseline includes:
+The Core CI pipeline includes representative checks such as:
 
 ```text
 ruff check .
 pytest
-orbitfabric lint examples/demo-3u/mission/ --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/
 orbitfabric gen docs examples/demo-3u/mission/
-orbitfabric gen data-flow examples/demo-3u/mission/ --output-file generated/docs/data_flow.md
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml --json generated/reports/battery_low_during_payload_report.json --log generated/logs/battery_low_during_payload.log
-orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml --json generated/reports/payload_data_flow_evidence_report.json --log generated/logs/payload_data_flow_evidence.log
+orbitfabric gen data-flow examples/demo-3u/mission/
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 mkdocs build --strict
 ```
 
-The CI also uploads generated reports, logs and generated mission documentation as workflow artifacts.
+CI also regenerates and uploads representative reports, logs and generated documentation.
 
-This gives build-time confidence.
-
-It does not automatically make every uploaded artifact a committed golden-output baseline.
-
----
+These checks provide regression confidence. They do not make every generated artifact a golden compatibility baseline.
 
 ## 3. Terminology
 
-### 3.1 Generated evidence
+### Generated evidence
 
-Generated evidence is output produced during CI or local checks to demonstrate that the toolchain still works.
+Output produced during CI or local validation to demonstrate that the toolchain still behaves correctly.
 
-Examples include:
+Examples:
 
 ```text
-generated/reports/lint_report.json
-generated/reports/*_report.json
-generated/logs/*.log
-generated/docs/
+generated/reports/*.json
+generated/logs/*
+generated/docs/*
 ```
 
-Generated evidence may be uploaded as CI artifacts.
+### Golden output
 
-It is not automatically a golden baseline.
+A deliberately preserved expected output used for regression comparison because the output represents a meaningful public contract.
 
-### 3.2 Golden output
+### Golden signature
 
-A golden output is a deliberately selected expected output committed to the repository or otherwise preserved as a stable reference for regression comparison.
+A reduced selection of contract-significant fields from a larger output.
 
-A golden output must have an explicit purpose.
+This is OrbitFabric's preferred strategy when full-file equality would freeze unrelated formatting or additive data.
 
-It must protect a specific public or stable contract behavior.
+### Confidence anchor
 
-### 3.3 Golden signature
+A command, test or output that raises release confidence without necessarily being a committed golden baseline.
 
-A golden signature is a reduced, contract-significant subset of a larger generated output.
+`mkdocs build --strict` is a confidence anchor, not a golden output.
 
-It protects selected meaning without freezing incidental formatting or full-file structure.
+## 4. v1.0 golden signatures
 
-v1.0.0 uses this strategy for selected Core-owned structured surfaces.
-
-### 3.4 Snapshot test
-
-A snapshot test compares current output against a stored expected output.
-
-Snapshot tests are useful only when the stored output represents a meaningful public or stable contract surface.
-
-Snapshot tests should not freeze incidental ordering, whitespace or human-oriented wording unless those details are intentionally part of the contract.
-
-### 3.5 Confidence anchor
-
-A confidence anchor is an output, command or check that increases confidence in release stability.
-
-Not every confidence anchor is a golden output.
-
-For example, `mkdocs build --strict` is a confidence anchor, but not a golden output.
-
----
-
-## 4. Current v1.0 golden signatures
-
-v1.0.0 includes committed golden signatures for selected contract-significant fields of the demo-3u Core-owned structured surfaces:
+The original v1.0 stable Core surfaces are protected by selected golden signatures:
 
 ```text
 tests/golden/demo_3u_core_surfaces/model_summary_contract_signature.json
@@ -123,173 +82,187 @@ tests/golden/demo_3u_core_surfaces/entity_index_contract_signature.json
 tests/golden/demo_3u_core_surfaces/relationship_manifest_contract_signature.json
 ```
 
-The related regression tests are in:
+Regression tests:
 
 ```text
 tests/test_v1_golden_core_surfaces.py
 ```
 
-These signatures protect selected contract-significant fields such as:
+These signatures protect selected meaning such as surface identity, mission identity, boundary flags, domain counts, entity IDs, relationship families and selected records.
+
+They intentionally do not freeze full JSON files, absolute paths, terminal wording, Markdown prose, generated C++ formatting or generated ground dictionary formatting.
+
+## 5. v1.2 Mission Snapshot golden signature
+
+v1.2.0 adds a selected Mission Snapshot contract signature:
 
 ```text
-surface kind
-surface version
+tests/golden/demo_3u_core_surfaces/mission_snapshot_contract_signature.json
+```
+
+Regression test:
+
+```text
+tests/test_v12_mission_snapshot_golden.py
+```
+
+The Snapshot golden protects contract-significant semantics such as:
+
+```text
+snapshot identity and format token
+result and mission identity
+boundary flags
+required top-level Mission Model domains
+selected serialization invariants
+representative telemetry identities
+```
+
+It deliberately does not freeze the entire serialized `model` payload byte-for-byte.
+
+That distinction is essential. Mission Snapshot is stable for its documented envelope, boundary semantics and faithful complete-loaded-model role, while the nested Mission Model may evolve additively where the Mission Model Stability Contract permits it.
+
+## 6. Relationship Manifest regression strategy
+
+The original v1 Relationship Manifest golden remains unchanged.
+
+The seven FDIR relationship families admitted in v1.2 are protected by dedicated tests rather than by rewriting the historical original-v1 golden signature.
+
+This preserves two independent guarantees:
+
+```text
+original v1 relationship contract remains unchanged
+v1.2 additive relationship families remain tested explicitly
+```
+
+This is preferable to silently changing the historical golden and losing visibility into which compatibility layer changed.
+
+## 7. Core Integration Input Set regression protection
+
+The coherent Integration Input Set is protected primarily through behavioral tests rather than one committed full-directory golden.
+
+High-value properties include:
+
+```text
+one Core load and one lint operation
+required and companion roles
+availability and failure-state representation
+per-surface kind/version records
+per-surface SHA-256
+RFC 8785/JCS input_set_sha256
+manifest-last publication
+path portability through relative records
+no raw-YAML semantic fallback in the reference integration
+```
+
+A full generated input-set directory is not committed as a byte-for-byte golden because producer provenance and complete surface payloads can contain more detail than should be frozen by one release signature.
+
+## 8. Future golden candidates
+
+Potential future golden targets include:
+
+| Family | Current posture | Suitability |
+|---|---|---|
+| lint JSON report | Stable | Strong selective candidate. |
+| simulation JSON report | Stable | Strong selective candidate. |
+| candidate dashboard summary | Candidate | Review only after a clearer promotion decision. |
+| candidate scenario run index | Candidate | Review only after a clearer promotion decision. |
+| candidate coverage summary | Candidate | Review only after a clearer promotion decision. |
+| runtime contract manifest | Public preview | Possible selective candidate. |
+| ground contract manifest | Public preview | Possible selective candidate. |
+| generated Markdown | Human-oriented | Weak candidate. |
+| plain-text logs | Human-oriented | Weak candidate. |
+| generated C++17 bindings | Public preview | Selective fragments only. |
+| generated CSV dictionaries | Public preview | Selective fragments only. |
+
+A future PR should add a golden baseline only when the protected compatibility promise is clear.
+
+## 9. What deserves protection
+
+High-value targets include:
+
+```text
+surface kind and format identity
+stable result tokens
 mission identity
 boundary flags
-domain counts
-entity identifiers
-relationship family counts
-selected relationship records
+entity identities
+relationship identities and narrow semantics
+required role classification
+failure-state distinctions
+manifest compatibility records
+stable provenance algorithms
+scenario evidence meaning
 ```
 
-They do not freeze:
+Low-value targets include:
 
 ```text
-full generated JSON files
-absolute paths
-human-oriented terminal output
-Markdown wording
-generated runtime bindings
-generated ground dictionaries
-disposable artifact formatting
-```
-
----
-
-## 5. Future golden-output candidates
-
-The following families may be candidates for future golden-output review after v1.0.0.
-
-| Family | Current posture | Golden-output suitability | Reason |
-|---|---|---|---|
-| Lint JSON report | Stable selected surface | Strong candidate | Machine-readable validation reports matter for CI users. |
-| Simulation JSON report | Stable selected surface | Strong candidate | Scenario evidence is a stable selected surface. |
-| `model_summary.json` | Stable selected surface | Already protected by selected golden signature | Core-owned structured inspection surface. |
-| `entity_index.json` | Stable selected surface | Already protected by selected golden signature | Core-owned entity-level surface for downstream tools. |
-| `relationship_manifest.json` | Stable selected surface for admitted families | Already protected by selected golden signature | Core-owned relationship-level surface for downstream tools. |
-| `runtime_contract_manifest.json` | Public preview generated artifact | Possible candidate | Manifest fields may matter more than generated C++ formatting. |
-| `ground_contract_manifest.json` | Public preview generated artifact | Possible candidate | Manifest boundary claims may matter more than generated dictionary formatting. |
-| Generated Markdown docs | Disposable generated artifact | Weak candidate | Human-reviewable docs may change wording without changing contract semantics. |
-| Plain-text simulation logs | Human-oriented output | Weak candidate | Logs should remain human-readable, not machine contracts. |
-| Generated C++17 runtime bindings | Disposable generated artifact | Selective candidate only | Specific semantic fragments may matter, but formatting should not be frozen prematurely. |
-| Generated CSV ground dictionaries | Disposable generated artifact | Selective candidate only | Useful for review, but CSV formatting should not become stable accidentally. |
-
-A future PR may turn one or more of these into committed golden baselines only after the intended comparison scope is documented.
-
----
-
-## 6. What should be protected
-
-Golden-output review should prioritize outputs that represent stable or candidate contract meaning.
-
-High-value comparison targets include:
-
-```text
-top-level JSON fields
-kind values
-version fields
-result values
-diagnostic code records
-entity kind records
-entity identifier records
-relationship family records
-relationship endpoint records
-boundary flags
-manifest profile names
-manifest non-runtime and non-ground claims
-scenario evidence records
-```
-
-Low-value comparison targets include:
-
-```text
-human-oriented terminal wording
-Markdown prose wording
+human prose
 incidental whitespace
-implementation-dependent ordering that is not documented
-file formatting unrelated to machine-readable meaning
-plain-text logs intended for humans
-example narrative text
+undocumented ordering
+absolute paths
+terminal formatting
+plain-text logs
+example narrative wording
 ```
 
-The project should protect meaning first.
+Protect meaning first.
 
-It should freeze formatting only when formatting is part of the documented contract.
+## 10. Golden acceptance criteria
 
----
-
-## 7. Required golden-output acceptance criteria
-
-A future golden-output PR should answer these questions before adding committed baselines:
+Before adding or changing a committed golden, a PR should answer:
 
 ```text
-Which public or stable surface is protected?
-Which command produces the output?
-Which fixture or example mission is used?
+Which compatibility surface is protected?
+Which command produces the source output?
+Which fixture or mission is used?
 Which fields are contract-significant?
 Which fields are intentionally ignored?
 Is ordering contract-significant?
 Is formatting contract-significant?
-Is the output stable across supported Python versions?
-What compatibility class applies if the output changes?
-What migration or compatibility note is required if the output changes?
+Is the selection stable across supported Python versions?
+What compatibility class applies if the signature changes?
 ```
 
-A golden-output PR should not combine unrelated functional changes.
+A golden change must explain whether it is corrective, clarifying, additive, compatibility-sensitive or breaking.
 
-If a golden baseline changes, the PR must explain whether the change is:
+## 11. Downstream consumer rule
 
-```text
-corrective
-clarifying
-additive
-compatibility-sensitive
-breaking preview change
-internal-only
-```
+Downstream tools should rely on documented Core-owned structured surfaces, not on CI artifact locations or test fixture filenames.
 
----
-
-## 8. Downstream consumer rule
-
-Downstream tools should rely on documented Core-owned structured surfaces, not on CI artifact locations or human-oriented output.
-
-The preferred downstream inspection chain remains:
+For general inspection the preferred chain is:
 
 ```text
-model_summary.json
+mission_snapshot.json
 entity_index.json
 relationship_manifest.json
 ```
 
-If those surfaces are golden-signature protected, the protected meaning should match the documented downstream consumption boundary.
+For external integration the preferred boundary is:
 
-A downstream tool must not treat generated Markdown, generated C++ files, generated CSV files, plain-text logs or terminal output as stronger contracts than the Core-owned structured surfaces.
+```text
+Core Integration Input Set
+```
 
----
+Golden signatures protect selected meaning inside those contracts. They do not become a runtime API or source of mission truth.
 
-## 9. Non-goals
+## 12. Non-goals
 
 This policy does not introduce:
 
 ```text
-new generated surfaces
-new JSON report fields
 new Mission Model semantics
-new YAML fields
-new CLI behavior
-schema migration tooling
-JSON Schema publication
+new JSON report fields
+new generated surfaces
+plugin execution
 runtime behavior
 ground behavior
-plugin discovery
-plugin loading
-plugin execution
-metadata schema
-metadata parser
-metadata loader
-metadata validator
-Studio-specific API
+schema migration tooling
+Studio-specific semantic authority
 ```
 
-This policy defines how OrbitFabric decides what deserves golden-output protection after v1.0.0.
+## 13. Final statement
+
+OrbitFabric uses selective golden signatures when a narrow stable compatibility promise deserves explicit regression protection.
+
+v1.2.0 extends that strategy to Mission Snapshot while retaining the original v1 Core surface goldens unchanged and using dedicated tests for additive FDIR relationship families and Integration Input Set behavior.

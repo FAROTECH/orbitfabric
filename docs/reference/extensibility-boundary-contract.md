@@ -1,125 +1,118 @@
 # Extensibility Boundary Contract
 
-Status: Active governance contract with v1.1 candidate surface alignment  
-Scope: extensibility boundary classification, no execution  
-Applies to: future extension metadata, extension-owned outputs and downstream consumers from `v1.0.0 - Stable Mission Data Contract` onward
+Status: Active v1.x governance contract through v1.2.0  
+Scope: extensibility ownership and semantic boundary  
+Applies to: downstream consumers and extension-owned integration contracts from v1.0.0 onward
 
-This page documents the OrbitFabric extensibility boundary.
-
-It is a stable v1.0 governance surface, aligned with the candidate Core-owned integration surfaces consolidated in v1.1.0.
-
-It does not introduce plugin discovery, plugin loading, plugin execution, custom lint plugin execution, custom generator plugin execution, new Mission Model semantics, new YAML fields, JSON Schema publication, schema migration tooling, runtime behavior, ground behavior or Studio-specific APIs.
-
----
-
-## 1. Purpose
-
-OrbitFabric Core is a Mission Data Contract framework.
-
-Its extensibility model must preserve that identity.
-
-The purpose of this document is to make explicit how future extensions may relate to Core-owned semantics without becoming a second source of truth.
+OrbitFabric Core is a Mission Data Contract framework. Extensibility must preserve that identity.
 
 The central rule is:
 
 ```text
-Mission Model is the source of truth.
-Core owns Mission Data Contract semantics.
-Extensions may add value at the edges.
-Extensions must not redefine the contract.
+Mission Model is the semantic source of truth.
+Core owns Mission Data Contract interpretation.
+Extensions add value at the edges.
+Extensions must not redefine Core semantics.
 ```
 
-The accepted v1.0 posture is:
+## 1. Stable Core-owned boundary
+
+Stable Core-owned machine-readable surfaces include:
 
 ```text
-extensibility is descriptive before it is executable
+model_summary.json
+entity_index.json
+relationship_manifest.json for admitted families
+mission_snapshot.json
+Core Integration Input Set
+lint JSON report
+simulation JSON report
 ```
 
----
+The first three provide normalized inspection. Mission Snapshot provides the complete loaded-model view. The coherent Integration Input Set is the stable Core input boundary for external integrations from v1.2.0.
 
-## 2. Stable v1.0.0 Core-owned surface chain
+All remain derived, read-only Core outputs. The Mission Model remains the source of truth.
 
-OrbitFabric Core exposes these stable v1.0.0 Core-owned structured surfaces:
+## 2. Candidate Core inspection surfaces
+
+The following v1.1 Core-owned outputs remain candidate:
 
 ```text
-model_summary.json          -> What contract domains are present?
-entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed mission contract entities related?
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
 ```
 
-These surfaces are:
+They may be consumed by downstream tools but are not silently promoted into the stable Core surface by v1.2.
+
+## 3. Candidate extension integration contracts
+
+The generic Integration Framework defines three separately owned extension contracts:
 
 ```text
-Core-derived
-read-only
-deterministic
-machine-readable
-derived from the validated Mission Model
-safe for downstream inspection
-not the source of truth
+Projection Profile
+Integration Result
+Integration Package / Adapter Execution
 ```
 
-The Mission Model remains the source of truth.
+They remain `0.1-candidate` after v1.2.0.
 
-The Core owns the interpretation of that Mission Model.
+They are design-frozen and reference-proven, but they are not stable Core Mission Data Contract surfaces.
 
-Downstream tools and future extensions must consume Core-owned surfaces instead of reconstructing Mission Data Contract semantics from raw YAML, generated files, terminal output or UI state.
-
----
-
-## 3. Candidate v1.1.0 Core-owned integration surfaces
-
-OrbitFabric Core also exposes these candidate Core-owned integration surfaces consolidated in v1.1.0:
+Their ownership model is:
 
 ```text
-dashboard_summary.json      -> Dashboard-ready aggregation of existing Core facts
-scenario_run_index.json     -> Index of Core simulation JSON report runs
-coverage_summary.json       -> Limited coverage derived from Core structured outputs
-simulation JSON expectations -> Additive structured expectation accounting
+Projection Profile
+  authored target-specific projection intent
+
+Integration Package / Adapter
+  target-specific validation, defaults, allocation and generation
+
+Integration Result
+  explicit mappings, artifacts, diagnostics, coverage, evidence references and provenance
 ```
 
-These surfaces are Core-owned, read-only and intended for downstream inspection.
-
-They are not part of the original v1.0.0 stable compatibility class.
-
-They do not make OrbitFabric Core a dashboard backend, Studio API, OpenOBSW/OpenSVF-specific generator, graph engine, runtime framework, ground segment or plugin system.
-
----
+Core governance defines the generic boundary. The integration package owns target-specific semantics.
 
 ## 4. Core-owned semantics
 
-The following remain Core-owned:
+Core owns:
 
 ```text
 Mission Model loading
 structural validation
 semantic linting
-scenario validation
-scenario evidence semantics
-structured expectation accounting semantics
-runtime-facing contract binding semantics
+scenario validation and evidence semantics
+runtime-facing contract-binding semantics
 ground-facing artifact semantics
 model_summary.json semantics
 entity_index.json semantics
 relationship_manifest.json semantics
-dashboard_summary.json semantics
-scenario_run_index.json semantics
-coverage_summary.json semantics
+mission_snapshot.json semantics
+Core Integration Input Set semantics
+candidate Core inspection-surface semantics
 stability and compatibility classification
 release compatibility policy
 ```
 
-A future extension must not override, replace, mutate or privately reinterpret these semantics.
+An extension must not override, replace, mutate or privately reinterpret these semantics.
 
-A future extension may consume Core-owned outputs only after the Core has produced them from the validated Mission Model or from Core-generated structured reports.
+## 5. No raw-YAML semantic fallback
 
----
+The stable v1.2 Core Integration Input boundary exists specifically so external integration adapters do not need a second Mission Model parser.
 
-## 5. Extension-owned outputs
+For semantic projection, an adapter must consume the documented Core Integration Input Set and validate required surface compatibility.
 
-Future extension-owned outputs must be distinguishable from Core-owned outputs.
+If a required Core surface is missing, failed or incompatible, the adapter must stop semantic projection. It must not reparse raw Mission Model YAML to reconstruct the missing semantics.
 
-The following categories must remain separate:
+This rule prevents the integration ecosystem from developing parallel interpretations of the Mission Data Contract.
+
+## 6. Extension-owned outputs
+
+Extension-owned outputs must remain distinguishable from Core outputs.
+
+Relevant categories include:
 
 ```text
 Core output
@@ -130,89 +123,102 @@ extension metadata
 extension diagnostic
 extension-generated artifact
 extension compatibility declaration
+Integration Result record
+external verification evidence
 ```
 
-This distinction is mandatory.
+An extension output must not be presented as Core output unless OrbitFabric Core itself produces and documents that surface.
 
-A downstream consumer must be able to determine whether an artifact carries Core contract semantics or extension-specific interpretation.
+## 7. Provenance
 
-An extension-owned output must not be presented as a Core output unless it is generated by OrbitFabric Core and documented as a Core-owned surface.
-
----
-
-## 6. Provenance expectations
-
-Future extension metadata or extension-generated outputs should declare provenance clearly.
-
-At minimum, a future extension-owned artifact should be able to describe:
+Extension-owned outputs should record enough provenance to answer:
 
 ```text
-extension identity
-extension version
-compatible OrbitFabric surface or contract version
-input Core-owned surfaces consumed
-output artifact kind
-output ownership
-whether the output is diagnostic, descriptive or generated
-whether the output is safe for downstream inspection
+which extension produced this?
+which extension version produced it?
+which Core input set was consumed?
+which Profile was consumed?
+which operation was performed?
+which artifacts were generated?
+which values came from Core, Profile, defaults or adapter resolution?
+which external tools contributed evidence?
 ```
 
-These are descriptive expectations for future work.
+The Integration Result Contract defines the current candidate machine-readable boundary for this information.
 
-This document does not define a metadata schema.
+## 8. Semantic override ban
 
-It does not define field names, JSON structure, validation rules, a file path, parser, loader, registry or CLI command.
-
----
-
-## 7. Semantic override ban
-
-A future extension must not silently override Core semantics.
-
-Forbidden behaviors include:
+Forbidden extension behaviors include:
 
 ```text
 changing Mission Model meaning after Core loading
-reinterpreting raw YAML when Core already exposes loaded semantics
+reinterpreting raw YAML as an alternate semantic authority
 mutating Core-owned structured surfaces
-rewriting Core validation results
-reclassifying Core lint diagnostics as authoritative replacements
-adding relationship semantics as if they were Core-owned
-changing runtime-facing contract binding semantics
-changing ground-facing artifact semantics
+rewriting Core validation findings as authoritative replacements
+injecting extension relationships into Core relationship manifests
+changing Core runtime-facing or ground-facing contract meaning
 presenting extension output as Core output
+inventing missing relationship or causal semantics
 ```
 
-If a future extension detects a disagreement with Core output, it may report an extension diagnostic.
+If an extension disagrees with Core output, it may emit an extension diagnostic. It must not replace the Core result.
 
-It must not replace the Core result.
+## 9. Integration execution boundary
 
----
+Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
 
-## 8. Allowed descriptive extension categories
-
-Future milestones may consider descriptive extension categories such as:
+The generic execution model is:
 
 ```text
-extension metadata declarations
-extension capability declarations
-extension provenance reports
-extension-generated artifact manifests
-extension compatibility declarations
-extension diagnostics clearly marked as extension-owned
+OrbitFabric Core CLI
+    -> coherent Core Integration Input Set
+
+external Integration Package
+    -> static integration_package.json
+    -> package-owned Profile schema
+    -> external adapter executable
+
+adapter invocation
+    -> orbitfabric.adapter_cli.v0
+    -> Integration Result
+    -> native target artifacts
 ```
 
-These categories are allowed only if they remain derived from or anchored to Core-owned surfaces.
+This preserves trust separation and keeps third-party integration dependencies out of Core.
 
-They do not imply execution.
+## 10. Downstream consumers and Studio
 
-They do not imply a plugin runtime.
+Downstream tools, including OrbitFabric Studio, consume explicit Core and integration records.
 
----
+They may:
 
-## 9. Disallowed capabilities
+```text
+index
+filter
+group
+navigate
+visualize
+lay out
+present
+orchestrate gated actions
+```
 
-The extensibility boundary does not introduce:
+They must not:
+
+```text
+reconstruct Mission Model semantics privately
+invent relationships
+parse raw YAML as a replacement for Core
+turn target-specific integration rules into Core rules
+rewrite diagnostics
+infer provenance from timestamps alone
+```
+
+Studio-specific presentation requirements must not become Core semantic requirements.
+
+## 11. Plugin execution
+
+The Core extensibility contract does not introduce:
 
 ```text
 plugin discovery
@@ -220,109 +226,55 @@ plugin loading
 plugin execution
 custom lint plugin execution
 custom generator plugin execution
-dynamic extension runtime
-third-party code execution
+third-party code execution inside Core
 remote plugin registry
 plugin marketplace
-extension installation
 extension dependency resolution
-relationship graph
-dependency graph
-runtime behavior
-ground behavior
-Studio-specific API
+```
+
+Any future Core execution model requires a separate architecture decision.
+
+The existence of a target-aware Studio Integration Plugin API does not alter this Core rule. Studio plugin presentation and Core semantic authority remain separate concerns.
+
+## 12. Relationship semantics
+
+Extensions and downstream consumers must not silently add relationships to a Core-owned Relationship Manifest.
+
+A Core relationship family is admitted only when Core documents narrow semantics and derives records deterministically from explicit loaded Mission Model fields.
+
+An extension may emit extension-owned relationship-like information only when ownership is explicit and it does not masquerade as Core data.
+
+## 13. Compatibility-sensitive governance changes
+
+The following are compatibility-sensitive:
+
+- weakening Core semantic ownership;
+- allowing raw-YAML semantic fallback where the stable Core input boundary applies;
+- allowing extension output to masquerade as Core output;
+- changing extension ownership rules;
+- weakening provenance requirements;
+- changing the out-of-process adapter boundary;
+- introducing execution into Core without a separate accepted architecture decision;
+- treating extension diagnostics as Core diagnostics.
+
+## 14. Explicit non-goals
+
+This contract does not introduce:
+
+```text
 new Mission Model semantics
 new YAML fields
-new generated Core surface
-schema migration tooling
-JSON Schema publication
+relationship graph execution
+dependency graph execution
+runtime behavior
+ground behavior
+Core plugin execution
+Studio-specific semantic authority
+OpenOBSW/OpenSVF/YAMCS-specific Core semantics
 ```
 
-These items require separate architectural decisions and implementation PRs after the Mission Data Contract is sufficiently stable.
+## 15. Final statement
 
----
+v1.2.0 strengthens the extensibility boundary by stabilizing the coherent Core Integration Input Set while leaving target-specific Profile, Package and Result contracts external and candidate.
 
-## 10. Downstream consumer rule
-
-Downstream tools, including OrbitFabric Studio, must consume Core-owned structured surfaces.
-
-They must not reconstruct contract semantics from:
-
-```text
-raw YAML
-generated Markdown
-generated runtime files
-generated ground files
-stdout or stderr text
-file names
-ID naming conventions
-UI state
-private extension assumptions
-```
-
-A downstream tool may inspect extension-owned artifacts only if those artifacts are explicitly marked as extension-owned and do not claim Core authority.
-
-Studio-specific requirements must not become Core API requirements.
-
----
-
-## 11. Relationship to generated surface stability
-
-This document complements the Generated Surfaces Stability reference.
-
-Generated Surfaces Stability classifies current generated and exported surfaces.
-
-This document defines how future extension-owned outputs must remain distinguishable from those Core-owned surfaces.
-
-The relevant boundary is:
-
-```text
-Core-owned surface -> carries Core Mission Data Contract semantics
-extension-owned output -> carries extension-specific interpretation or diagnostics
-```
-
-An extension may consume a Core-owned surface.
-
-An extension must not promote its own output to Core-owned status.
-
----
-
-## 12. Compatibility-sensitive changes
-
-The following changes are compatibility-sensitive after v1.0.0:
-
-- changing Core ownership rules;
-- changing extension ownership rules;
-- weakening the semantic override ban;
-- allowing extension outputs to masquerade as Core outputs;
-- removing provenance expectations;
-- converting non-normative metadata guidance into a concrete schema without a separate architectural review;
-- adding execution semantics to the boundary;
-- adding Studio-specific API expectations to the Core boundary;
-- treating extension diagnostics as Core diagnostics;
-- allowing extensions to reconstruct semantics from raw YAML where Core-owned surfaces exist.
-
-Compatibility-sensitive does not mean forbidden.
-
-It means the change must be explicit, reviewed and documented.
-
----
-
-## 13. Final statement
-
-v1.1.0 is the current project release.
-
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-The extensibility boundary stabilizes these rules:
-
-```text
-Core remains semantic owner.
-Mission Model remains source of truth.
-Extensions consume Core-owned surfaces.
-Extension-owned outputs remain distinguishable from Core-owned outputs.
-Semantic override remains forbidden.
-Execution remains outside the stable v1.0 Core boundary unless separately designed and accepted.
-```
-
-v1.1.0 aligns the boundary with candidate Core-owned integration surfaces without turning OrbitFabric into a plugin execution platform.
+Core remains the semantic authority. Extensions remain explicit consumers and producers at the edges. No extension gets permission to create a second OrbitFabric semantic model.

@@ -1,6 +1,6 @@
 # Integration Result Contract
 
-Status: Architecture candidate — generic envelope design-frozen  
+Status: Candidate extension contract, design-frozen and reference-proven  
 Contract version: `0.1-candidate`  
 Scope: Extension-owned machine-readable result boundary for ecosystem integrations  
 Parent architecture issue: #227  
@@ -51,6 +51,8 @@ Integration Result
 ```
 
 The Integration Result exists so CLI tooling, CI and OrbitFabric Studio do not reconstruct integration meaning from generated filenames, directory conventions, target names, timestamps, stdout/stderr, private adapter state or Studio state.
+
+The generic contract is design-frozen and has been exercised by the OpenOBSW/OpenSVF reference Integration Package. It remains independently versioned `0.1-candidate` and is not promoted to a stable Core Mission Data Contract surface by v1.2.0.
 
 ---
 
@@ -355,7 +357,7 @@ commanding
 
 Capability IDs are unique within the array.
 
-A future Integration Package Manifest (#235) advertises the full capability set of an installed adapter before execution.
+The Integration Package Manifest defined by #235 advertises the full capability set of an installed adapter before execution.
 
 Unknown additive capability IDs must not receive guessed semantics.
 
@@ -1321,9 +1323,9 @@ When input provenance is unavailable, Studio renders that state explicitly rathe
 
 ## 37. Relationship to the OpenOBSW/OpenSVF reference integration
 
-The OpenOBSW/OpenSVF PoC is the first concrete evidence for the generic contract.
+The OpenOBSW/OpenSVF PoC supplied the first concrete evidence for the generic contract, and the extracted reference Integration Package is now the first real producer of a `0.1-candidate` Integration Result against a real Core Integration Input Set.
 
-Representative target namespaces may eventually include:
+Representative target namespaces include or may include, depending on the operation and artifact/evidence being represented:
 
 ```text
 openobsw
@@ -1333,13 +1335,13 @@ yamcs
 
 Representative artifact/evidence kinds and external-tool roles remain integration-owned and are deliberately not frozen here.
 
-PoC PR #30 should refine those reference-integration details.
+PoC PR #30 completed the ownership review for the reference integration. Its decisions constrain reference-specific namespaces, evidence ownership and runtime/verification boundaries without moving those semantics into the generic Result contract.
 
 ---
 
 ## 38. Regression and golden requirements
 
-Before implementation/release, protection should include at least:
+Regression protection should include at least:
 
 ```text
 clean succeeded Result
@@ -1370,9 +1372,9 @@ manifest-last/incomplete-bundle rejection
 relative-path portability
 ```
 
-Golden fixtures protect the generic envelope/representative records once the candidate schema is accepted for implementation.
+Generic fixtures should protect the envelope and representative records as the candidate contract evolves.
 
-Target-specific fixtures belong to the reference adapter package.
+Target-specific fixtures belong to the reference Integration Package rather than Core generic fixtures.
 
 ---
 
@@ -1380,7 +1382,7 @@ Target-specific fixtures belong to the reference adapter package.
 
 This contract does not require Core to execute adapters.
 
-The first production execution boundary remains:
+The production execution boundary remains:
 
 ```text
 OrbitFabric Core CLI
@@ -1395,7 +1397,7 @@ external Integration Adapter/package
 
 This remains consistent with ADR-0015.
 
-Integration Package discovery/advertised capabilities/out-of-process invocation are owned by #235 rather than duplicated here.
+Integration Package discovery, advertised capabilities and out-of-process invocation are owned by #235 rather than duplicated here.
 
 ---
 
@@ -1440,7 +1442,7 @@ no generic free-form semantic escape hatch
 Studio consumes the Result without reconstructing target semantics or missing provenance
 ```
 
-Remaining OpenOBSW/OpenSVF details may refine target namespaces/kinds, artifact/evidence kinds, external-tool roles and adapter capabilities, but do not reopen the generic envelope unless a genuinely ecosystem-independent requirement emerges.
+Remaining OpenOBSW/OpenSVF runtime and verification details may refine target namespaces/kinds, artifact/evidence kinds, external-tool roles and adapter capabilities, but do not reopen the generic envelope unless a genuinely ecosystem-independent requirement emerges.
 
 ---
 
@@ -1468,7 +1470,13 @@ semantic-equivalence fingerprinting
 
 ---
 
-## 42. Final position
+## 42. Current maturity and final position
+
+The generic envelope and invariants are design-frozen and reference-proven, while the contract remains independently versioned:
+
+```text
+0.1-candidate
+```
 
 ```text
 Core owns mission semantics and emits exact, coherent integration inputs.
