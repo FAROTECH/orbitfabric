@@ -2,163 +2,124 @@
 
 Thank you for your interest in OrbitFabric.
 
-OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
+OrbitFabric is a model-first Mission Data Fabric for small spacecraft. Contributions are welcome when they strengthen the Mission Data Contract while preserving the project's architectural boundaries, compatibility discipline and clean-room requirements.
 
-The project is currently in pre-1.0 development. Contributions should stay focused, small and aligned with the Mission Data Contract architecture.
+## Current project baseline
 
----
-
-## Current Project Focus
-
-The current public baseline is `v0.12.0 - v1.0 Release Candidate Hardening`.
-
-v0.12.0 hardens the release candidate path toward `v1.0.0 - Stable Mission Data Contract` without broadening OrbitFabric into flight software, ground software, visual modeling, plugin discovery, plugin loading or plugin execution.
-
-v0.11.0 remains the completed extensibility boundary baseline. It documented how future extension-owned outputs may relate to Core-owned Mission Data Contract semantics without introducing plugin discovery, plugin loading, plugin execution or a plugin runtime.
-
-The current development focus is to prepare `v1.0.0 - Stable Mission Data Contract` from the v0.12.0 hardening baseline.
-
-The active v0.12.0 hardening references are:
+Current Core version:
 
 ```text
-v1.0 Candidate Surface Inventory
-Golden Output and Regression Confidence Policy
-v1.0 Compatibility and Migration Notes
+v1.2.0 - Core Integration Input Consolidation
 ```
 
-These references support review and release candidate hardening.
-
-They are part of the v0.12.0 documentation baseline.
-
-They do not make any surface stable v1.0 by themselves.
-
-They do not introduce new Mission Model semantics, generated Core surfaces, JSON report fields, CLI behavior, golden files, snapshot tests, schema migration tooling, JSON Schema publication, plugin discovery, plugin loading, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
-
-The current baseline proves this Mission Data Chain:
+The stable Mission Data Contract commitment started with v1.0.0. v1.2.0 extends that stable boundary additively with:
 
 ```text
-Payload Contract
-  -> Data Product Contract
-  -> Storage Intent
-  -> Downlink Intent
-  -> Contact Window Assumption
-  -> Downlink Flow Contract
-  -> Commandability and Autonomy Contract
-  -> End-to-End Mission Data Flow Evidence
-  -> Runtime-Facing Contract Bindings
-  -> Ground-Facing Integration Artifacts
-  -> Contract Introspection Surface
-  -> Entity Index Surface
-  -> Relationship Manifest Surface
-  -> Stability and Compatibility Classification
-  -> Extensibility Boundary Contract
-  -> v1.0 Release Candidate Hardening References
+mission_snapshot.json
+Core Integration Input Set
+seven additive stable-compatible FDIR relationship families
 ```
 
-Do not add large integrations before the contract model, Core-owned structured surfaces, compatibility boundaries, extensibility boundary and release candidate hardening references are coherent.
+The following Core-owned inspection surfaces remain candidate:
 
-Out of scope for the current preview:
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
 
-- flight runtime;
-- hardware drivers;
-- RTOS integration;
-- real onboard storage runtime;
-- real downlink runtime;
-- real contact scheduling;
-- command uplink runtime;
-- flight autonomy runtime;
-- operator console;
-- command dispatch runtime;
-- command queues;
-- onboard scheduler;
-- HAL;
-- CCSDS/PUS/CFDP implementation;
-- Yamcs/OpenC3 full integration;
-- XTCE compliance;
-- binary packet decoders;
-- telemetry archive runtime;
-- ground database implementation;
-- Basilisk integration;
-- cFS/F Prime bridge;
-- web UI;
-- relationship graph export;
-- dependency graph export;
-- schema migration tooling;
-- JSON Schema publication;
-- stable v1.0 compatibility guarantee;
-- Mission Model security domain before v1.0.0;
-- security YAML fields before v1.0.0;
-- security enforcement semantics;
-- plugin API;
-- plugin discovery;
-- plugin loading;
-- plugin execution;
-- metadata schema;
-- metadata parser;
-- metadata loader;
-- metadata validator;
-- real spacecraft data.
+The following external integration contracts remain independently versioned `0.1-candidate` contracts:
 
-Runtime-facing contract bindings must remain generated, deterministic and disposable.
+```text
+Projection Profile
+Integration Result
+Integration Package / Adapter Execution
+```
 
-Ground-facing integration artifacts must remain generated, deterministic, tool-neutral and disposable.
+Do not treat candidate or generated surfaces as stable merely because they exist.
 
-Contract introspection reports must remain Core-owned, deterministic, read-only and disposable.
+## Architectural rules
 
-Entity index reports must remain Core-owned, deterministic, read-only and disposable.
+The Mission Model is the semantic source of truth.
 
-Relationship manifest reports must remain Core-owned, deterministic, read-only, explicitly bounded and disposable.
+Core owns Mission Data Contract interpretation. Generated artifacts, integration outputs and downstream visualizations must remain derived from explicit Core-owned semantics.
 
-Compatibility classification references must remain documentation contracts, not implementation behavior, schema migration tooling, plugin execution or a v1.0 stability guarantee.
+Contributions must preserve these rules:
 
-The Extensibility Boundary Contract must remain a boundary contract, not metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime.
+1. Do not create a second Mission Model interpretation in a generator, exporter, adapter or downstream tool.
+2. Do not parse raw Mission Model YAML independently when a validated Core-owned boundary exists for the required semantics.
+3. Keep Core diagnostics distinct from integration diagnostics and external runtime or verification evidence.
+4. Derive Core relationships only from explicit loaded Mission Model fields.
+5. Do not infer relationship semantics from identifier names, string similarity, file placement, ordering or scenario co-occurrence.
+6. Keep target-specific Projection Profile semantics outside Core.
+7. Keep ecosystem-specific adapter execution outside the Core process unless a separate architecture decision explicitly changes that rule.
+8. Do not introduce plugin discovery, plugin loading or plugin execution through an unrelated feature.
+9. Keep runtime-facing and ground-facing generated artifacts reproducible and disposable unless an explicit compatibility decision promotes a surface.
+10. Treat changes to stable public surfaces as compatibility-sensitive engineering changes.
 
-v0.12.0 hardening references must remain review and governance documentation, not new runtime behavior, new generated surfaces or a stable v1.0 claim.
+The generic integration ownership model is:
 
-User implementation code and downstream integration code must live outside `generated/`.
+```text
+OrbitFabric Core
+  Mission Data Contract semantics
+  coherent Core Integration Input Set
 
-Future plugin and extensibility work must not allow plugins to silently redefine Core Mission Data Contract semantics or bypass validation.
+Projection Profile
+  authored target-specific intent
 
----
+External Integration Package / Adapter
+  target validation, projection and generation
 
-## Clean-Room Requirement
+Integration Result
+  mappings, artifacts, diagnostics, coverage and provenance
+
+Studio and other downstream tools
+  consume and present explicit records
+```
+
+Core must not learn OpenOBSW, OpenSVF, YAMCS, PUS, cFS, F Prime or other ecosystem-specific semantics simply to support an integration.
+
+## Clean-room requirement
 
 OrbitFabric is developed as a clean-room open-source project.
 
 Do not contribute:
 
 - proprietary mission data;
-- private architecture details;
-- private packet formats;
-- real operational logs;
-- real anomaly timelines;
-- non-public payload details;
-- real bus maps;
-- real pinouts;
-- employer-owned code;
-- customer-owned code;
+- private spacecraft architecture details;
+- private packet or protocol definitions;
+- real operational logs or anomaly timelines;
+- private bus maps, pinouts or hardware mappings;
+- employer-owned or customer-owned code;
 - NDA-protected material;
-- export-controlled material.
+- export-controlled material;
+- credentials, tokens or private infrastructure details.
 
-All examples must be synthetic or based on public information.
+All examples must be synthetic or based only on material that can legally be used and redistributed.
 
-By contributing to OrbitFabric, you confirm that your contribution is your original work or is based only on material you have the legal right to contribute, and that it does not contain confidential, proprietary, export-controlled or NDA-protected information.
+By contributing to OrbitFabric, you confirm that the contribution is your original work or material you have the legal right to contribute.
 
-See:
+See [Clean-Room Policy](docs/CLEAN_ROOM_POLICY.md).
 
-```text
-docs/CLEAN_ROOM_POLICY.md
-```
+## Development setup
 
----
+OrbitFabric requires Python 3.11 or newer.
 
-## Development Setup
-
-Create a virtual environment:
+Create a virtual environment and install the development dependencies:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
@@ -170,17 +131,17 @@ orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current version:
+Expected version for the v1.2 baseline:
 
 ```text
-orbitfabric 0.12.0
+orbitfabric 1.2.0
 ```
 
----
+The generated C++17 host-build smoke target additionally requires CMake and a C++17-capable compiler.
 
-## Required Local Checks
+## Required local checks
 
-Before opening a pull request or committing significant changes, run:
+Before opening a pull request or committing a significant change, run:
 
 ```bash
 ruff check .
@@ -188,90 +149,73 @@ pytest
 mkdocs build --strict
 ```
 
-Then verify the demo vertical slice:
+The project CI validates Python 3.11 and Python 3.12.
+
+For changes affecting the main Mission Data Contract workflow, also exercise the demo as appropriate:
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json generated/reports/lint_report.json
+orbitfabric lint examples/demo-3u/mission/
+
+orbitfabric export mission-snapshot examples/demo-3u/mission/ \
+  --json examples/demo-3u/generated/reports/mission_snapshot.json
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json generated/reports/model_summary.json
+  --json examples/demo-3u/generated/reports/model_summary.json
 
 orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json generated/reports/entity_index.json
+  --json examples/demo-3u/generated/reports/entity_index.json
 
 orbitfabric export relationship-manifest examples/demo-3u/mission/ \
-  --json generated/reports/relationship_manifest.json
+  --json examples/demo-3u/generated/reports/relationship_manifest.json
+
+orbitfabric export integration-input-set examples/demo-3u/mission/ \
+  --output-dir examples/demo-3u/generated/reports/integration_input
 
 orbitfabric gen docs examples/demo-3u/mission/
-
-orbitfabric gen data-flow examples/demo-3u/mission/ \
-  --output-file generated/docs/data_flow.md
-
+orbitfabric gen data-flow examples/demo-3u/mission/
 orbitfabric gen runtime examples/demo-3u/mission/
-
-cmake -S generated/runtime/cpp17 -B generated/runtime/cpp17/build
-cmake --build generated/runtime/cpp17/build
-
 orbitfabric gen ground examples/demo-3u/mission/
 
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json generated/reports/battery_low_during_payload_report.json \
-  --log generated/logs/battery_low_during_payload.log
-
-orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
-  --json generated/reports/payload_data_flow_evidence_report.json \
-  --log generated/logs/payload_data_flow_evidence.log
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 ```
 
-Expected result:
+When runtime bindings are affected, validate the generated host-build smoke target:
 
-```text
-ruff check .                 -> All checks passed
-pytest                       -> passing
-mkdocs                       -> passing
-lint                         -> Result: PASSED
-export model-summary         -> Result: PASSED
-export entity-index          -> Result: PASSED
-export relationship-manifest -> Result: PASSED
-gen docs                     -> Result: PASSED
-gen data-flow                -> Result: PASSED
-gen runtime                  -> Result: PASSED
-cmake build                  -> passing
-gen ground                   -> Result: PASSED
-sim                          -> Result: PASSED
+```bash
+cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
+cmake --build examples/demo-3u/generated/runtime/cpp17/build
 ```
 
----
+## Coding style
 
-## Coding Style
+OrbitFabric uses Python 3.11+, Pydantic v2, Typer, PyYAML, pytest and Ruff.
 
-OrbitFabric uses:
+Prefer:
 
-- Python 3.11+;
-- Pydantic v2;
-- Typer;
-- PyYAML;
-- pytest;
-- ruff.
+- small focused modules;
+- explicit types and diagnostics;
+- deterministic behavior;
+- additive compatibility-safe evolution;
+- tests that protect contract meaning rather than incidental formatting;
+- clear ownership boundaries between Core and extensions;
+- documented failure behavior;
+- explicit machine-readable surfaces for downstream consumers.
 
-Rules:
+Avoid:
 
-- keep modules small;
-- keep the Mission Model as the source of truth;
-- do not parse YAML independently in generators, simulators, exporters or downstream tools;
-- consume validated model objects and Core-owned structured surfaces;
-- prefer explicit diagnostics;
-- write tests for new lint rules, generators, exporters and simulator behavior;
-- do not introduce heavy dependencies without a clear reason.
+- heavy dependencies without a clear architectural reason;
+- hidden semantics in naming conventions;
+- downstream reconstruction of Core semantics;
+- behavior hardcoded for `demo-3u`;
+- user implementation code inside generated files;
+- generated files committed without a deliberate reason.
 
----
+## Dependency direction
 
-## Architecture Rules
+The Model Layer remains the lowest semantic layer.
 
-The Model Layer is the lowest stable layer.
-
-Allowed dependency direction:
+Representative allowed directions are:
 
 ```text
 cli -> model
@@ -282,45 +226,67 @@ cli -> export
 
 lint -> model
 gen -> model
-gen -> RuntimeContract builder
-gen -> GroundContract builder
 export -> model
+sim -> model
 RuntimeContract builder -> model
 GroundContract builder -> model
-sim -> model
 ```
 
-Forbidden patterns:
+Forbidden examples include:
 
 ```text
 model -> cli
 model -> sim
 model -> gen
 model -> export
-lint -> sim
-gen -> sim
-sim -> gen
-RuntimeContract builder -> raw YAML files
-GroundContract builder -> raw YAML files
-profile-specific generator -> raw YAML files
-exporter -> raw YAML files
-extension output -> Core-owned semantics
-plugin output -> Core-owned relationship manifest
+RuntimeContract builder -> raw YAML parsing
+GroundContract builder -> raw YAML parsing
+external adapter -> raw YAML semantic fallback
+extension output -> Core-owned semantic override
+plugin output -> Core-owned relationship manifest mutation
 ```
 
-Do not hardcode behavior for `demo-3u` inside the framework core.
+## Compatibility review
 
-Relationship manifest records must remain derived from explicit loaded Mission Model fields and must reference indexed entities rather than synthetic downstream nodes.
+From v1.0.0 onward, changes to stable public surfaces are compatibility-sensitive.
 
-Compatibility classification references must not become a second source of Mission Data Contract semantics.
+A pull request must explicitly identify compatibility impact when it changes any documented stable element such as:
 
-The Extensibility Boundary Contract must not become a plugin execution surface without a separate architectural review.
+```text
+Mission Model files or fields
+field meanings or controlled values
+identifier or reference rules
+CLI commands or documented options
+JSON report fields or result tokens
+Core-owned surface kinds or version fields
+lint diagnostic codes or severities
+scenario expectation semantics
+generated default paths
+stable relationship families
+Core Integration Input Set behavior
+```
 
-v0.12.0 hardening references must not become a new source of Mission Data Contract semantics.
+Prefer additive changes where possible. A stable change that is not backward compatible requires explicit architectural justification, release notes and migration guidance.
 
----
+Candidate surfaces may evolve, but their changes must still be explicit because downstream tools may already consume them.
 
-## Commit Style
+See [Release Compatibility Policy](docs/reference/release-compatibility-policy.md).
+
+## Generated outputs
+
+Generated files are reproducible outputs and should normally not be committed.
+
+For the demo mission they live under:
+
+```text
+examples/demo-3u/generated/
+```
+
+User implementation code, integration implementation code and handwritten mission logic must live outside generated output directories.
+
+Selective golden signatures are an exception. They are committed only when they intentionally protect contract-significant fields of a stable surface.
+
+## Commit style
 
 Use short imperative commit messages.
 
@@ -329,34 +295,54 @@ Good examples:
 ```text
 Add contact downlink consistency rules
 Generate ground dictionaries
-Align public documentation with relationship manifest surface
+Clarify integration input compatibility
 Fix scenario command validation
 ```
 
-Avoid vague messages:
+Avoid vague messages such as `updates`, `stuff`, `fixes` or `misc`.
 
-```text
-updates
-stuff
-fixes
-misc
-```
-
----
-
-## Pull Request Expectations
+## Pull request expectations
 
 A good pull request should include:
 
 - a clear description of the change;
 - the affected project area or milestone;
 - explicit Mission Data Contract impact;
+- explicit compatibility impact for public surfaces;
 - an architectural boundary statement for non-trivial changes;
 - tests when behavior changes;
-- updated documentation when user-facing behavior changes;
-- confirmation that local checks pass;
-- no generated artifacts unless explicitly required.
+- documentation when user-facing behavior changes;
+- confirmation that required checks pass;
+- clean-room confirmation;
+- no unrelated generated artifacts.
 
-Generated outputs under `generated/` are reproducible artifacts and should normally not be committed.
+Do not combine a compatibility-sensitive contract change with unrelated cleanup if the combination makes review harder.
 
-Use the repository pull request template and keep the `Architectural Boundary`, `Clean-Room Confirmation` and `Validation` sections meaningful.
+## Documentation
+
+Documentation changes are engineering changes when they define public behavior, stability, ownership or compatibility.
+
+Keep these documents aligned when the relevant boundary changes:
+
+```text
+README.md
+docs/PROJECT_CHARTER.md
+docs/ARCHITECTURE.md
+docs/ROADMAP.md
+docs/QUICKSTART.md
+docs/DEVELOPMENT.md
+docs/reference/*
+docs/releases/*
+CHANGELOG.md
+```
+
+Historical release notes and ADRs should remain historically accurate. Current reference documents must describe the current supported baseline.
+
+## Community and security
+
+Please also read:
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+
+Do not report security vulnerabilities or protected mission information in a public issue.
