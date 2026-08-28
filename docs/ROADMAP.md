@@ -1,8 +1,8 @@
 # OrbitFabric - Roadmap
 
-Version: v1.1.0 public release baseline with unreleased post-v1.1 development  
-Status: Candidate Integration Surface Consolidation released; additive inspection development present on `main`  
-Scope: completed path to v1.0.0, v1.1.0 candidate surfaces, current unreleased Core additions and post-v1 direction
+Version: v1.2.0 Core Integration Input Consolidation  
+Status: v1.2.0 release baseline prepared from the reference-proven integration architecture  
+Scope: stable Mission Data Contract, candidate downstream inspection surfaces, stable Core integration input boundary and post-v1 direction
 
 ---
 
@@ -28,9 +28,9 @@ Every milestone must reinforce the core identity:
 
 The v1.0.0 release completed the first stable narrow Mission Data Contract baseline.
 
-The v1.1.0 release consolidates post-v1 Core-owned candidate integration surfaces without replacing that baseline.
+The v1.1.0 release consolidated post-v1 Core-owned candidate inspection surfaces without replacing that baseline.
 
-Current `main` contains additional additive candidate inspection development that remains unreleased until a separate release decision classifies it.
+The v1.2.0 release consolidates the Core-owned integration input boundary proven through the OpenOBSW/OpenSVF reference package and independent Studio consumption, without adding Mission Model semantics.
 
 ---
 
@@ -58,16 +58,16 @@ v0.12.0 v1.0 Release Candidate Hardening                         completed
 v1.0.0  Stable Mission Data Contract                             completed
 post-v1  Candidate Core-owned integration surfaces               completed
 v1.1.0  Candidate surface consolidation release                  completed
-post-v1.1 Mission Snapshot + additive FDIR relationships          implemented on main / unreleased
+post-v1.1 Mission Snapshot + additive FDIR relationships          completed / classified
+Phase B  Generic Integration Framework contracts                 completed / reference-proven
+v1.2.0  Core Integration Input Consolidation                     current release baseline
 ```
 
-The current public release is:
+The current public release baseline is:
 
 ```text
-v1.1.0 - Candidate Integration Surface Consolidation
+v1.2.0 - Core Integration Input Consolidation
 ```
-
-The current repository development baseline additionally contains the Mission Snapshot candidate surface and additive explicit FDIR relationship families.
 
 ---
 
@@ -139,7 +139,6 @@ ground_contract_manifest.json
 plugin execution
 relationship graph behavior
 schema migration tooling
-JSON Schema publication
 Studio-specific API
 ```
 
@@ -147,7 +146,7 @@ Studio-specific API
 
 ## 5. v1.1.0 Candidate Core-owned Integration Surfaces
 
-OrbitFabric Core v1.1.0 consolidates a narrow set of candidate Core-owned integration surfaces:
+OrbitFabric Core v1.1.0 consolidated a narrow set of candidate Core-owned inspection surfaces:
 
 ```text
 dashboard_summary.json
@@ -166,97 +165,108 @@ Studio and other downstream tools consume, navigate and render.
 Downstream tools must not invent private coverage, health or completeness semantics.
 ```
 
-These surfaces remain candidate until a later compatibility decision promotes selected fields or surfaces.
+These surfaces remain candidate after v1.2.0 unless a separate compatibility decision promotes them.
 
 They do not change the v1.0.0 stable Mission Data Contract.
 
-They do not introduce:
+---
+
+## 6. Integration Architecture Extraction — Completed
+
+The OpenOBSW/OpenSVF PoC was used as a forcing function to extract a generic production integration architecture rather than to add OpenOBSW-specific behavior to Core.
+
+The completed contract stack is:
 
 ```text
-new Mission Model semantics
-new YAML fields
-runtime behavior
-ground behavior
-mission health scoring
-model completeness scoring
-formal verification
-relationship graph behavior
-dependency graph behavior
-plugin execution
-Studio-specific APIs
-OpenOBSW/OpenSVF-specific generation
-Projection Profiles implementation
-OSRA/SAVOIR implementation
+Core Integration Input Contract
+        ↓
+Projection Profile Contract
+        ↓
+Integration Package / Adapter Execution Contract
+        ↓
+Integration Result Contract
+        ↓
+generic downstream consumer
 ```
+
+The reference package demonstrates real out-of-process adapter execution over the Core-owned input boundary. OrbitFabric Studio independently consumes the same generic package/result contracts.
+
+The ownership split is explicit:
+
+```text
+Core                    Mission semantics + coherent integration inputs
+Projection Profile      authored target-specific projection intent
+Integration Adapter     target validation/projection/generation
+Integration Result      explicit mappings/artifacts/diagnostics/provenance
+Studio                  generic visualization/orchestration
+```
+
+Core still does not dynamically load or execute ecosystem-specific adapters.
 
 ---
 
-## 6. v1.1.0 Consolidation Result
+## 7. v1.2.0 Core Integration Input Consolidation
 
-OrbitFabric Core v1.1.0 is a consolidation release, not a conceptual expansion release.
+v1.2.0 converts the proven Core input side of that architecture into a stable compatibility boundary.
 
-The completed v1.1.0 scope is:
+### Stable Mission Snapshot
+
+`mission_snapshot.json` is stable for its documented envelope, failure behavior and read-only complete-loaded-model role.
+
+The existing `snapshot_version = 0.1-candidate` identifier is retained. Stability classification and format-version text are separate concepts.
+
+The stable promise does not freeze the entire serialized `model` payload. That payload follows the Mission Model's own compatibility rules. A selected v1.2 golden signature protects contract-significant envelope and serialization invariants without blocking additive Mission Model evolution.
+
+### Stable coherent Integration Input Set
+
+The stable integration input workflow is:
 
 ```text
-document candidate Core-owned integration surfaces
-clarify stable vs candidate boundaries
-keep generated artifact defaults mission-workspace relative
-preserve explicit user-provided output paths
-publish release notes for the candidate surface consolidation
-avoid Projection Profiles implementation until a separate RFC/design decision
+orbitfabric export integration-input-set <mission_dir>
 ```
+
+It provides one coherent set containing required:
+
+```text
+mission_snapshot
+entity_index
+relationship_manifest
+lint_report
+```
+
+and companion:
+
+```text
+model_summary
+```
+
+with explicit roles, states, format versions, SHA-256 digests, RFC 8785/JCS input-set fingerprinting and manifest-last completeness.
+
+No raw-YAML semantic fallback is allowed for an incompatible required surface.
+
+The existing `input_set_version = 0.1-candidate` identifier is retained to preserve compatibility with the reference-proven producer/consumer chain.
+
+### Additive FDIR Relationship Manifest families
+
+Seven explicit FDIR families are admitted as additive stable-compatible Relationship Manifest extensions. The original v1 golden signature remains fixed; dedicated FDIR tests protect the added families.
+
+### Candidate extension contracts remain candidate
+
+The following remain `0.1-candidate` extension contracts rather than stable Core Mission Data Contract surfaces:
+
+```text
+Projection Profile
+Integration Result
+Integration Package / Adapter Execution
+```
+
+This prevents the stable Core input decision from silently widening Core ownership into ecosystem-specific semantics or executable extension behavior.
 
 ---
 
-## 7. Current Unreleased Development
+## 8. Post-v1 Direction
 
-After v1.1.0, two additive Core changes have been implemented on `main`:
-
-```text
-mission_snapshot.json
-seven explicit FDIR relationship families in relationship_manifest.json
-```
-
-### Mission Snapshot
-
-The Mission Snapshot is a candidate Core-owned read-only surface that answers:
-
-```text
-What complete Mission Model did Core actually load?
-```
-
-It exposes the loaded model in a versioned envelope with structured load diagnostics.
-
-It does not expose a YAML AST, source editing semantics, a partial semantic model after structural load failure, plugin execution or a Studio-specific API.
-
-### Additive FDIR relationships
-
-The Relationship Manifest now includes seven additional FDIR-oriented relationship families derived only from explicit Mission Model fields.
-
-The original v1 relationship families remain unchanged and protected by the original compatibility posture.
-
-The relationship-type set must therefore be treated as additively extensible rather than permanently closed unless a downstream consumer intentionally pins itself to a narrower release contract.
-
-### Release posture
-
-These additions are implemented but unreleased.
-
-They must not be described as part of v1.1.0.
-
-Before a future minor release, Core must explicitly decide:
-
-```text
-which surfaces remain candidate
-whether any compatibility promises are strengthened
-which additional golden or regression signatures are required
-whether a release should remain a consolidation slice rather than adding new Mission Model semantics
-```
-
----
-
-## 8. Post-v1.0 Direction
-
-Post-v1.0 work must preserve the same discipline:
+Post-v1 work must preserve the same discipline:
 
 ```text
 1. protect the Mission Model as source of truth
@@ -264,8 +274,9 @@ Post-v1.0 work must preserve the same discipline:
 3. keep generated artifacts reproducible and disposable unless explicitly promoted
 4. require compatibility or migration notes for stable-surface changes
 5. avoid tool-specific claims without implementation and tests
-6. avoid plugin execution until a separate design accepts that scope
-7. distinguish published release contents from unreleased main development
+6. keep ecosystem adapter execution outside Core unless a separate architecture explicitly changes that rule
+7. distinguish Core-owned stable surfaces from extension-owned candidate contracts
+8. promote surfaces only after real producer/consumer evidence and explicit regression protection
 ```
 
 Valid future work may include:
@@ -276,27 +287,26 @@ additional mission examples
 additional lint coverage
 post-v1 compatibility refinements
 additional coverage analysis beyond the v1.1.0 candidate coverage_summary.json surface
-JSON Schema publication, if separately designed
+JSON Schema publication where owned by an explicit contract
 schema migration tooling, if separately designed
-tool-specific exports, if implemented and tested
-extension metadata, if kept descriptive and non-executing
-plugin discovery/loading/execution, only after a separate architectural decision
-Projection Profiles, only after RFC/design closure and without moving ecosystem-specific semantics into Core
+tool-specific Integration Packages outside Core
+additional Studio integration contribution families after concrete forcing functions
+plugin discovery/loading/execution only after a separate architectural decision
 ```
 
 ---
 
 ## 9. Backlog Parking Lot
 
-These ideas are valid but are not part of the v1.0.0 stable release boundary, are not part of the v1.1.0 candidate surface consolidation and are not implied by the current unreleased Mission Snapshot/FDIR additions unless explicitly stated:
+These ideas remain outside the stable v1.2 Core boundary unless separately designed, implemented, tested and classified:
 
 ```text
-XTCE export
+XTCE export in Core
 CCSDS packet generator
-PUS service mapping
+PUS service mapping in Core
 CFDP metadata
-Yamcs integration
-OpenC3 integration
+Yamcs integration in Core
+OpenC3 integration in Core
 Basilisk bridge
 Space ROS bridge
 F Prime topology generator
@@ -305,7 +315,7 @@ web dashboard
 visual mission model editor
 SARIF lint export
 VS Code extension
-JSON Schema publication
+general Core JSON Schema registry
 schema migration tool
 simulation time acceleration
 fault tree visualization
@@ -323,24 +333,18 @@ second payload example
 payload lifecycle expansion
 additional runtime generation profiles
 example user implementation outside generated/
-plugin metadata manifest
-plugin capability manifest
-custom lint plugin support
-custom generator plugin support
-plugin discovery
-plugin loading
-plugin execution
+Core plugin discovery
+Core plugin loading
+Core plugin execution
 ```
 
 ---
 
 ## 10. Final Roadmap Statement
 
-OrbitFabric v1.1.0 is the current public project release.
+OrbitFabric v1.2.0 is the current release baseline.
 
-OrbitFabric v1.0.0 remains the stable Mission Data Contract baseline.
-
-Current `main` contains unreleased additive inspection development that must be classified explicitly before the next release.
+OrbitFabric v1.0.0 remains the origin of the stable Mission Data Contract commitment; v1.2.0 extends that stable boundary additively with the Core-owned integration input surfaces proven after v1.1.0.
 
 The stable statement is:
 
@@ -350,8 +354,10 @@ Validate it.
 Exercise scenario evidence.
 Generate review artifacts.
 Export Core-owned structured surfaces.
+Export one coherent Core Integration Input Set for external consumers.
 Protect selected stable surface fields with golden signatures.
 Keep the Mission Model as the source of truth.
+Keep target-specific semantics and execution outside Core.
 ```
 
 The narrowness of the roadmap is intentional.

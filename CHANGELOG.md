@@ -8,12 +8,14 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
+No unreleased changes are currently classified beyond the v1.2.0 release baseline.
+
+## [v1.2.0] - 2026-08-28
+
 ### Added
 
-- Added the candidate `mission_snapshot.json` Core-owned read-only inspection surface for the complete loaded Mission Model.
-- Added `orbitfabric export mission-snapshot <mission_dir> --json <path>`.
-- Added structured load-failure diagnostics to the Mission Snapshot envelope while preserving the rule that no partial semantic Mission Model is exposed when Core cannot load the contract.
-- Added Mission Snapshot reference documentation and regression tests for export and CLI behavior.
+- Added the Core-owned `mission_snapshot.json` read-only inspection surface for the complete loaded Mission Model.
+- Added `orbitfabric export mission-snapshot <mission_dir> --json <path>` with structured load-failure diagnostics and no partial semantic Mission Model on structural failure.
 - Added seven explicit FDIR-oriented relationship families to `relationship_manifest.json`:
   - `autonomous_action_triggered_by_fault`;
   - `autonomous_action_uses_command_source`;
@@ -22,24 +24,40 @@ This project follows a lightweight changelog style for the Mission Model, contra
   - `fault_recovery_targets_mode`;
   - `recovery_intent_includes_command`;
   - `recovery_intent_targets_mode`.
-- Added tests covering the additive FDIR relationship families while preserving the original v1 relationship-family golden contract.
+- Added the generic Core Integration Input Contract, Projection Profile Contract, Integration Result Contract and Integration Package / Adapter Execution Contract reference documents extracted from the OpenOBSW/OpenSVF PoC.
+- Added the coherent Core Integration Input Set producer and public `orbitfabric export integration-input-set <mission_dir> [--output-dir <dir>]` workflow.
+- Added `integration_input_manifest.json` with explicit required/companion roles, surface status, kind/version identity, SHA-256 digests, load/lint state and an RFC 8785/JCS-based coherent input-set fingerprint.
+- Added regression coverage for one-load/one-lint production, manifest-last completeness, structural/lint/generation failure states and deterministic input-set identity.
+- Added a selected Mission Snapshot golden signature protecting contract-significant envelope, boundary and representative serialization invariants without freezing the complete serialized Mission Model.
+- Added the accepted v1.2 Integration Input Stability Decision and v1.2.0 release notes.
 
 ### Changed
 
-- Documented that Relationship Manifest relationship types are extensible through reviewed additive families derived deterministically from explicit loaded Mission Model fields.
-- Aligned README, public documentation home, architecture, project charter, roadmap, quickstart and post-v1 candidate surface references with the actual post-v1.1 development state.
+- Updated package and CLI version to `1.2.0`.
+- Promoted `mission_snapshot.json` to a stable Core-owned integration/inspection surface for its documented envelope, failure behavior and serialization role.
+- Promoted the coherent Core Integration Input Set to the stable Core-to-external-integration input boundary.
+- Classified the seven FDIR relationship families as additive stable-compatible Relationship Manifest families derived deterministically from explicit Mission Model fields.
+- Kept the original v1 Relationship Manifest golden signature unchanged; dedicated FDIR tests protect the additive families.
+- Preserved existing Mission Snapshot and Integration Input Set format identifiers (`0.1-candidate`) because stability classification is independent from format-version text and changing the identifiers would create needless consumer incompatibility.
+- Aligned README, roadmap, release documentation and stability references with the v1.2.0 classification.
 
 ### Compatibility impact
 
-No Mission Data Contract semantic migration is introduced by these unreleased changes.
+No Mission Data Contract semantic migration is introduced by v1.2.0.
 
-`mission_snapshot.json` is an additive candidate Core-owned surface. It does not replace the Mission Model as source of truth, does not expose a YAML AST or source-editing model, and is not a Studio-specific API.
+No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or scenario expectation semantics are removed, renamed or redefined.
 
-The seven FDIR relationship families are additive relationship types derived from explicit existing Mission Model fields. They do not rename, remove or change the meaning of any original v1.0 relationship family.
+`mission_snapshot.json` is a stable additive Core-owned surface. Its `model` payload remains a faithful serialization of the loaded Mission Model and follows Mission Model compatibility rules; compatible consumers must tolerate additive fields where those rules permit them.
 
-The original v1 golden regression remains fixed on the original relationship-family contract. Compatible downstream consumers must tolerate unknown additive relationship types or explicitly pin themselves to a narrower supported release contract.
+The coherent Integration Input Set is now the stable supported Core input boundary for external Integration Packages. Required surface incompatibility blocks semantic projection; raw-YAML semantic fallback remains forbidden.
 
-These unreleased additions do not introduce plugin execution, runtime behavior, ground behavior, relationship graph behavior, dependency graph behavior or tool-specific integration behavior.
+The seven FDIR relationship families are additive. They do not rename, remove or change the meaning of original v1 relationship families. Compatible consumers must tolerate unknown additive relationship types and must not guess unknown semantics.
+
+The v1.1.0 dashboard summary, scenario run index, coverage summary and structured expectation additions remain candidate unless separately promoted.
+
+Projection Profile, Integration Result and Integration Package / Adapter Execution remain independently versioned `0.1-candidate` extension contracts. Their presence in the Core repository documentation does not make them stable Core Mission Data Contract surfaces.
+
+v1.2.0 does not introduce plugin execution, runtime behavior, ground behavior, relationship graph behavior, dependency graph behavior or OpenOBSW/OpenSVF/YAMCS-specific semantics into Core.
 
 ## [v1.1.0] - 2026-06-13
 
