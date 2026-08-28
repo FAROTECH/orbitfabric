@@ -4,322 +4,415 @@
 
 <br>
 
-<div align="center">
+<p align="center">
+  <strong>Define once. Validate. Simulate. Test. Document. Integrate.</strong>
+</p>
 
-**Model-first Mission Data Fabric for small spacecraft**
+# OrbitFabric
 
-Define mission data once. Validate it. Simulate it. Document it. Generate deterministic contract-facing artifacts from the same source of truth.
+OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
-</div>
+It provides a disciplined way to define a spacecraft Mission Data Contract once and reuse the same validated semantics across software integration, documentation, host-side scenario evidence, generated contract artifacts, machine-readable inspection surfaces and external ecosystem integrations.
 
----
+OrbitFabric is intentionally not a flight software framework, ground segment, mission control system or spacecraft simulator. Its job is narrower and more foundational: keep mission data semantics explicit, consistent, reviewable and reusable across the engineering lifecycle.
 
-## Overview
+## Why OrbitFabric exists
 
-OrbitFabric is a **model-first Mission Data Fabric** for small spacecraft.
-
-It lets teams define a Mission Data Contract once, using a structured Mission Model, and reuse that contract across validation, documentation, testing, scenario evidence, runtime-facing bindings, ground-facing integration artifacts and Core-owned structured surfaces.
-
-OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
-
-It is the contract layer between:
+Small spacecraft projects often repeat the same mission information in many places:
 
 ```text
-mission design
-onboard software
-simulation
-testing
+flight software structures
+ground dictionaries
+test fixtures
+simulation inputs
 documentation
-runtime-facing integration
-ground integration
-downstream inspection tools
-future extension-owned outputs
+payload integration notes
+fault handling logic
+storage and downlink assumptions
+operations procedures
+external tool configuration
 ```
 
-> Define once. Validate. Simulate. Test. Document. Integrate.
+Each independent copy can drift.
 
----
+OrbitFabric addresses that problem by making the Mission Data Contract explicit and machine-readable. Core loads that contract once, validates it, derives structured evidence and exports controlled surfaces that downstream tools can consume without rebuilding mission meaning for themselves.
 
-## Current Status
-
-OrbitFabric is currently released at:
+The central rule is:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+The Mission Model is the semantic source of truth.
+OrbitFabric Core owns Mission Data Contract interpretation.
+Derived artifacts remain derived.
+Downstream tools consume explicit Core-owned facts.
 ```
 
-v1.2.0 promotes the reference-proven Core Integration Input boundary to a stable compatibility commitment while preserving the deliberately narrow v1.0.0 Stable Mission Data Contract and introducing **no new Mission Model semantics**.
+## Mission Data Contract
 
-OrbitFabric v1.2.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
+The Mission Data Contract is expressed as a multi-file YAML Mission Model.
 
-The stable Core-owned structured surface baseline now includes:
+The current stable model covers:
 
 ```text
-model_summary.json          -> What contract domains are present?
-entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> Which admitted explicit relationships connect them?
-mission_snapshot.json       -> What complete Mission Model did Core actually load?
+spacecraft identity and mission metadata
+subsystems
+operational modes and mode transitions
+telemetry
+commands
+events
+faults
+packets
+policies
+payload contracts
+data products
+storage and retention intent
+contact and downlink assumptions
+commandability
+autonomy and recovery intent
 ```
 
-For ecosystem integrations, Core also provides the stable coherent input workflow:
+Operational scenarios are defined separately in YAML and exercise the contract as deterministic host-side evidence.
+
+Typical mission layout:
 
 ```text
-orbitfabric export integration-input-set <mission_dir>
-        ↓
-integration_input_manifest.json
-        + mission_snapshot.json
-        + entity_index.json
-        + relationship_manifest.json
-        + lint_report.json
-        + model_summary.json
+mission/
+  spacecraft.yaml
+  subsystems.yaml
+  modes.yaml
+  telemetry.yaml
+  commands.yaml
+  events.yaml
+  faults.yaml
+  packets.yaml
+  policies.yaml
+  payloads.yaml
+  data_products.yaml
+  contacts.yaml
+  commandability.yaml
+
+scenarios/
+  *.yaml
 ```
 
-The Integration Input Set is produced from one logical Core load/lint operation and records exact per-surface identities, format versions and digests plus an RFC 8785/JCS-based input-set fingerprint. Missing or incompatible required surfaces block semantic projection; adapters must not fall back to reparsing raw Mission Model YAML.
+Optional model domains remain optional where documented. Their documented field names, meanings, identifiers, references and controlled values are compatibility-sensitive from the stable v1 Mission Data Contract onward.
 
-The Mission Snapshot and Integration Input Set retain their already reference-proven format identifiers:
+## What Core does
 
-```text
-snapshot_version = 0.1-candidate
-input_set_version = 0.1-candidate
+OrbitFabric Core turns the Mission Model into a coherent engineering workflow.
+
+### Load, validate and lint
+
+Core performs structural validation and semantic linting, with stable diagnostic ownership and machine-readable lint reports.
+
+```bash
+orbitfabric inspect mission examples/demo-3u/mission/
+orbitfabric lint examples/demo-3u/mission/
 ```
 
-Stability classification and format-version text are intentionally independent. Retaining the identifiers avoids an artificial compatibility break.
+### Execute deterministic scenario evidence
 
-The seven post-v1.1 FDIR relationship families are admitted as additive stable-compatible Relationship Manifest families. They are derived deterministically from explicit Mission Model fields and do not rename, remove or redefine the original v1 relationship families.
+Scenarios provide host-side evidence for declared mission behavior and expectations.
 
-The post-v1 candidate Core-owned surfaces consolidated in v1.1.0 remain candidate unless separately promoted:
-
-```text
-dashboard_summary.json       -> Dashboard-ready aggregation of existing Core facts
-scenario_run_index.json      -> Index of Core simulation JSON report runs
-coverage_summary.json        -> Limited coverage derived from Core structured outputs
-simulation JSON expectations -> Additive structured expectation accounting
+```bash
+orbitfabric validate scenario examples/demo-3u/scenarios/battery_low_during_payload.yaml
+orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
 ```
 
-The broader Integration Framework is reference-proven, but its extension-owned contracts remain independently versioned candidates:
+Scenario evidence is not flight execution and not a spacecraft dynamics simulation.
 
-```text
-Projection Profile                 0.1-candidate
-Integration Result                 0.1-candidate
-Integration Package / Adapter      0.1-candidate
+### Generate mission documentation
+
+Core generates documentation directly from the validated Mission Model.
+
+```bash
+orbitfabric gen docs examples/demo-3u/mission/
+orbitfabric gen data-flow examples/demo-3u/mission/
 ```
 
-Those contracts do not become stable Core Mission Data Contract surfaces merely because the Core input boundary is stable.
+Generated Markdown is reviewable and reproducible, but it is not the source of truth.
 
-The ownership boundary is:
+### Generate runtime-facing contract bindings
 
-```text
-Mission Model remains the source of truth.
-Core defines, computes and emits Core-owned contract-significant surfaces.
-Projection Profiles own authored ecosystem-specific projection intent.
-External Integration Packages own target-specific validation, projection and artifacts.
-Studio and other downstream tools consume, link, navigate and render explicit contracts.
-No downstream consumer may invent private Mission Data Contract semantics.
+```bash
+orbitfabric gen runtime examples/demo-3u/mission/
 ```
 
-Generated artifact default paths are mission-workspace relative for mission-based commands.
+The current `cpp17` profile generates deterministic identifiers, metadata registries, command argument structures, abstract adapter interfaces and a C++17 host-build smoke target.
 
-For example:
+These outputs are contract bindings. They do not implement onboard scheduling, command dispatch, telemetry polling, drivers, RTOS behavior or flight logic.
+
+### Generate ground-facing contract artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
 ```
 
-writes to:
+The current generic ground profile generates reviewable JSON, CSV and Markdown contract artifacts.
+
+These outputs are integration artifacts. They do not implement a telemetry archive, database, operator console, command uplink service or live ground segment.
+
+## Core-owned machine-readable surfaces
+
+OrbitFabric exposes structured surfaces so downstream tools do not need to parse terminal text, generated Markdown or raw YAML independently.
+
+Stable Core-owned surfaces include:
 
 ```text
-examples/demo-3u/generated/ground/generic/
+lint JSON report
+simulation JSON report
+model_summary.json
+entity_index.json
+relationship_manifest.json for admitted families
+mission_snapshot.json
+Core Integration Input Set
 ```
 
-Explicit user-provided output paths are preserved unchanged.
-
-The stable compatibility posture is:
+They answer different questions:
 
 ```text
-Mission Model remains the source of truth.
-Core owns Mission Data Contract semantics.
-Core-owned structured surfaces are derived from the validated Mission Model.
-Downstream tools consume Core-owned structured surfaces.
-Generated runtime-facing and ground-facing artifacts remain reproducible and disposable unless explicitly classified otherwise.
-Core does not dynamically load or execute ecosystem adapters.
-Plugin execution remains out of scope.
+model_summary.json          What contract domains are present?
+entity_index.json           What contract entities are defined?
+relationship_manifest.json  Which explicit admitted relationships connect them?
+mission_snapshot.json       What complete Mission Model did Core actually load?
 ```
 
-Selected golden signatures protect contract-significant fields of stable Core-owned structured surfaces.
+The seven FDIR relationship families admitted in v1.2.0 are additive stable-compatible relationships derived from explicit Mission Model fields. Unknown relationship types must never receive guessed semantics from a consumer.
 
-They do not freeze complete generated JSON files, additive Mission Model evolution permitted by the Mission Model contract, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
+## Stable Core Integration Input boundary
 
-The demo evidence chain proves Mission Data Contract continuity from one validated Mission Model across scenario evidence, generated review artifacts and Core-owned structured surfaces. The post-v1 integration proof additionally demonstrates a coherent Core input set consumed by a real external reference adapter and by OrbitFabric Studio without raw-YAML semantic reconstruction.
+OrbitFabric v1.2.0 consolidates the production-facing Core input side of the generic Integration Framework.
 
-It does not prove flight readiness, ground readiness, protocol compliance or operational completeness.
+The supported workflow is:
 
----
+```bash
+orbitfabric export integration-input-set examples/demo-3u/mission/ \
+  --output-dir examples/demo-3u/generated/reports/integration_input
+```
 
-## What OrbitFabric Is
+The coherent set contains:
 
-OrbitFabric is a Mission Data Contract framework.
+```text
+integration_input_manifest.json
+mission_snapshot.json
+entity_index.json
+relationship_manifest.json
+lint_report.json
+model_summary.json
+```
 
-It models:
+Core produces the set from one logical load/lint operation. The manifest records required and companion roles, availability, surface kind and version, SHA-256 digests, load and lint state, and a deterministic RFC 8785/JCS-based `input_set_sha256` fingerprint. The manifest is published last.
 
-- telemetry;
-- commands;
-- events;
-- faults;
-- operational modes;
-- packets;
-- scenarios;
-- optional Payload / IOD Payload Contracts;
-- optional Data Product and Storage Contracts;
-- optional Contact Windows and Downlink Flow Contracts;
-- optional Commandability and Autonomy Contracts;
-- contract-level Mission Data Flow Evidence;
-- generated runtime-facing contract bindings;
-- generated ground-facing integration artifacts;
-- Core-owned contract introspection surfaces;
-- Core-owned entity index surfaces;
-- Core-owned relationship manifest surfaces;
-- a stable full loaded-Mission-Model Snapshot surface;
-- a stable coherent Core Integration Input Set boundary;
-- additive explicit FDIR relationship families;
-- Core-owned post-v1 candidate dashboard/coverage surfaces;
-- stability and compatibility classifications;
-- extensibility boundary rules;
-- separately versioned candidate integration-extension contracts.
+An external integration must reject an incompatible required surface. It must not reconstruct OrbitFabric semantics by reparsing Mission Model YAML as a fallback.
 
-The stable integration-facing Core chain is:
+The existing wire identifiers remain `0.1-candidate` for compatibility with the already reference-proven producer and consumer chain. Stability classification and format-version text are separate compatibility concepts.
+
+## Candidate Core inspection surfaces
+
+The following Core-owned surfaces introduced in v1.1.0 remain candidate after v1.2.0:
+
+```text
+dashboard_summary.json
+scenario_run_index.json
+coverage_summary.json
+simulation JSON structured expectation accounting
+```
+
+They are useful machine-readable inspection surfaces, but their existence does not turn Core into a dashboard backend, coverage product, Studio API or formal verification engine.
+
+## Generic Integration Framework
+
+OrbitFabric also defines a generic external integration architecture:
 
 ```text
 Mission Model
-        -> canonical loader / structural validation
-        -> semantic lint
-        -> validated MissionModel
-        -> mission_snapshot.json
-        -> model_summary.json
-        -> entity_index.json
-        -> relationship_manifest.json
-        -> lint_report.json
-        -> coherent integration_input_manifest.json
-        -> external consumers negotiate explicit surface compatibility
+    -> OrbitFabric Core
+    -> coherent Core Integration Input Set
+    -> Projection Profile
+    -> external Integration Package / Adapter
+    -> Integration Result
+    -> downstream consumer
 ```
 
-The v1.1.0 dashboard, scenario-run and coverage surfaces continue to extend downstream inspection evidence as candidate surfaces without changing the stable Mission Data Contract baseline.
+Ownership is explicit:
 
----
+```text
+OrbitFabric Core       Mission Data Contract semantics and coherent inputs
+Projection Profile     Authored target-specific projection intent
+Integration Adapter    Target validation, projection and artifact generation
+Integration Result     Mappings, artifacts, diagnostics, coverage and provenance
+Downstream tools       Navigation, presentation and orchestration of explicit records
+```
 
-## What OrbitFabric Is Not
+The Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain independently versioned `0.1-candidate` extension contracts. They are design-frozen and reference-proven, but they are not stable Core Mission Data Contract surfaces.
 
-OrbitFabric is not:
+Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
 
-- a flight-ready onboard runtime;
-- a replacement for cFS or F Prime;
-- a replacement for Yamcs or OpenC3;
-- a spacecraft physics simulator;
-- a CCSDS/PUS/CFDP implementation;
-- a hardware abstraction layer;
-- a ground segment;
-- a mission control system;
-- an operator console;
-- a telemetry archive;
-- a command uplink service;
-- a relationship graph;
-- a dependency graph;
-- a plugin execution layer;
-- a plugin loader;
-- a plugin discovery mechanism;
-- a Studio-specific backend API;
-- schema migration tooling;
-- a general JSON Schema registry;
-- a tool-specific integration layer.
+The OpenOBSW/OpenSVF reference integration has been used as a real forcing function for this architecture without moving OpenOBSW, OpenSVF, YAMCS, PUS or other target-specific semantics into Core.
 
-Generated Runtime Skeletons are runtime-facing contract bindings.
+## OrbitFabric ecosystem
 
-Ground Integration Artifacts are ground-facing contract exports.
+OrbitFabric Core is the semantic authority of a wider, deliberately separated ecosystem.
 
-Contract Introspection, Entity Index, Relationship Manifest and Mission Snapshot are Core-derived read-only structured surfaces. The Core Integration Input Set is the coherent Core-owned boundary for external integration consumption.
+### OrbitFabric Core
 
-Projection Profiles, Integration Results and Integration Package manifests remain extension contracts with explicit ownership boundaries; they do not move ecosystem-specific semantics into Core.
+This repository. It defines, validates, exercises and exports the Mission Data Contract and its Core-owned structured surfaces.
 
-None of these surfaces is flight software, ground software, plugin execution or a visual modeling tool.
+### OrbitFabric Studio
 
----
+[OrbitFabric Studio](https://github.com/FAROTECH/orbitfabric-studio) is a local-first engineering workbench for seeing and understanding OrbitFabric missions.
 
-## Demo Mission: `demo-3u`
+Studio consumes Core-owned facts and may organize, navigate and visualize them. It must not become a second Mission Model interpreter or invent missing semantics.
 
-The repository includes a synthetic clean-room demo mission:
+```text
+Core owns the fact.
+Studio makes the fact understandable.
+```
+
+### OrbitFabric Reference Mission
+
+[OrbitFabric Reference Mission](https://github.com/FAROTECH/orbitfabric-reference-mission) is a realistic, synthetic small-spacecraft engineering workspace used to demonstrate and validate the Core and Studio workflow.
+
+It is not flight software, not a real mission configuration and not a spacecraft simulator.
+
+## Current Core version and compatibility posture
+
+Current Core version:
+
+```text
+v1.2.0 - Core Integration Input Consolidation
+```
+
+The stable Mission Data Contract commitment started with `v1.0.0`. v1.2.0 extends that stable boundary additively with Mission Snapshot, the coherent Core Integration Input Set and seven explicit FDIR Relationship Manifest families. It introduces no new Mission Model semantics.
+
+The release classification is intentionally mixed rather than pretending every surface has the same maturity:
+
+```text
+Stable v1.x
+  Mission Model documented semantics
+  structural validation and semantic lint policy
+  scenario YAML evidence inputs
+  lint JSON report
+  simulation JSON report
+  model_summary.json
+  entity_index.json
+  relationship_manifest.json for admitted families
+  mission_snapshot.json
+  Core Integration Input Set
+  documented stable CLI workflows
+  compatibility and extensibility governance
+
+Candidate Core inspection surfaces
+  dashboard_summary.json
+  scenario_run_index.json
+  coverage_summary.json
+  simulation JSON structured expectation accounting
+
+Candidate extension contracts
+  Projection Profile
+  Integration Result
+  Integration Package / Adapter Execution
+
+Generated public-preview artifacts
+  C++17 runtime-facing bindings
+  runtime contract manifest
+  generic ground dictionaries and manifest
+  generated Markdown documentation
+  plain-text logs
+```
+
+See [v1.2.0 release notes](docs/releases/v1.2.0.md), [Stability and Compatibility Contract](docs/reference/stability-compatibility-contract.md), [v1.2 Integration Input Stability Decision](docs/reference/v1.2-integration-input-stability-decision.md) and [Release Compatibility Policy](docs/reference/release-compatibility-policy.md).
+
+## Demo mission
+
+The built-in synthetic demo lives under:
 
 ```text
 examples/demo-3u/
-├── mission/
-│   ├── spacecraft.yaml
-│   ├── subsystems.yaml
-│   ├── modes.yaml
-│   ├── telemetry.yaml
-│   ├── commands.yaml
-│   ├── events.yaml
-│   ├── faults.yaml
-│   ├── packets.yaml
-│   ├── policies.yaml
-│   ├── payloads.yaml
-│   ├── data_products.yaml
-│   ├── contacts.yaml
-│   └── commandability.yaml
-└── scenarios/
-    ├── battery_low_during_payload.yaml
-    ├── nominal_payload_acquisition.yaml
-    └── payload_data_flow_evidence.yaml
 ```
 
-The stable demo evidence chain focuses on:
+It demonstrates a compact Mission Data Chain including:
 
 ```text
 payload.start_acquisition
-        -> payload.acquisition_started
-        -> payload.radiation_histogram data product evidence
-        -> storage intent declared
-        -> downlink intent declared
-        -> science_next_available_contact downlink flow
-        -> demo_contact_001 contact window
-        -> scenario JSON evidence
-        -> runtime-facing contract bindings
-        -> ground-facing dictionaries
-        -> model_summary.json
-        -> entity_index.json
-        -> relationship_manifest.json
-        -> mission_snapshot.json
-        -> selected golden signatures protecting stable Core-owned surface fields
+    -> payload.acquisition_started
+    -> payload.radiation_histogram
+    -> storage intent
+    -> downlink intent
+    -> downlink flow
+    -> contact window
+    -> scenario evidence
+    -> runtime-facing bindings
+    -> ground-facing artifacts
+    -> Core-owned structured surfaces
+    -> coherent Integration Input Set
 ```
 
-The v1.1.0 candidate integration surfaces add dashboard-ready aggregation, scenario run indexing, limited coverage summary and structured expectation accounting on top of that evidence chain.
+The demo is deliberately synthetic and clean-room. It proves contract continuity, not flight readiness, protocol compliance or operational completeness.
 
-v1.2.0 additionally exposes the same loaded demo contract as one coherent Integration Input Set suitable for external adapter consumption.
+Other example slices include:
 
----
+```text
+examples/university-cubesat-minislice/
+examples/oresat-inspired-minislice/
+examples/finch-inspired-minislice/
+examples/spacelab-inspired-communications-minislice/
+```
 
-## Local Development
+The inspired examples use public material only as an external modeling boundary. They do not imply endorsement, adoption or validated integration by the referenced projects.
 
-Create and activate a Python virtual environment:
+## Quick start
+
+### Requirements
+
+```text
+Python 3.11 or newer
+Git
+```
+
+For the generated C++17 host-build smoke target you also need:
+
+```text
+CMake
+A C++17-capable compiler
+```
+
+OrbitFabric CI validates Python 3.11 and Python 3.12.
+
+### Install from source
 
 ```bash
+git clone https://github.com/FAROTECH/orbitfabric.git
+cd orbitfabric
+
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-Verify the CLI:
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+Verify:
 
 ```bash
 orbitfabric --version
 orbitfabric --help
 ```
 
-Expected current package version:
+Expected version for this baseline:
 
 ```text
 orbitfabric 1.2.0
 ```
 
-Run checks:
+### Run the main quality gates
 
 ```bash
 ruff check .
@@ -327,141 +420,96 @@ pytest
 mkdocs build --strict
 ```
 
----
-
-## Common Commands
-
-Mission-based commands write omitted generated artifact paths under the mission workspace.
-
-For `examples/demo-3u/mission/`, omitted report outputs resolve under:
-
-```text
-examples/demo-3u/generated/reports/
-```
-
-Pass `--json`, `--output-dir` or `--output-file` explicitly when a different destination is required. Explicit paths are preserved exactly as provided.
+### Exercise the demo
 
 ```bash
-orbitfabric lint examples/demo-3u/mission/ \
-  --json examples/demo-3u/generated/reports/lint_report.json
-
-orbitfabric export mission-snapshot examples/demo-3u/mission/ \
-  --json examples/demo-3u/generated/reports/mission_snapshot.json
-
-orbitfabric export integration-input-set examples/demo-3u/mission/ \
-  --output-dir examples/demo-3u/generated/reports/integration_input
-
-orbitfabric export model-summary examples/demo-3u/mission/ \
-  --json examples/demo-3u/generated/reports/model_summary.json
-
-orbitfabric export entity-index examples/demo-3u/mission/ \
-  --json examples/demo-3u/generated/reports/entity_index.json
-
-orbitfabric export relationship-manifest examples/demo-3u/mission/ \
-  --json examples/demo-3u/generated/reports/relationship_manifest.json
-
-orbitfabric export dashboard-summary examples/demo-3u/mission/
-
-orbitfabric export scenario-run-index \
-  --simulation-reports examples/demo-3u/generated/reports \
-  --json examples/demo-3u/generated/reports/scenario_run_index.json
-
-orbitfabric export coverage-summary examples/demo-3u/mission/
-
+orbitfabric lint examples/demo-3u/mission/
+orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml
 orbitfabric gen docs examples/demo-3u/mission/
-
-orbitfabric gen runtime examples/demo-3u/mission/
-cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
-cmake --build examples/demo-3u/generated/runtime/cpp17/build
-
-orbitfabric gen ground examples/demo-3u/mission/
-
-orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml \
-  --json examples/demo-3u/generated/reports/battery_low_during_payload_report.json \
-  --log examples/demo-3u/generated/logs/battery_low_during_payload.log
-
-orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
-  --json examples/demo-3u/generated/reports/payload_data_flow_evidence_report.json \
-  --log examples/demo-3u/generated/logs/payload_data_flow_evidence.log
+orbitfabric export mission-snapshot examples/demo-3u/mission/
+orbitfabric export integration-input-set examples/demo-3u/mission/
 ```
 
-Expected command result for the demo mission:
+For the complete walkthrough, use [Quickstart](docs/QUICKSTART.md) and [Demo Walkthrough](docs/DEMO_WALKTHROUGH.md).
+
+## Repository layout
 
 ```text
-Result: PASSED
+.
+├── src/orbitfabric/          Core implementation
+├── tests/                    Unit, contract and regression tests
+├── tests/golden/             Selected stable-surface golden signatures
+├── examples/                 Synthetic and public-inspired example missions
+├── docs/                     Architecture, reference, release and tutorial documentation
+├── generated/                Reproducible local/CI outputs, normally not source-controlled
+├── pyproject.toml            Package metadata and dependencies
+├── CHANGELOG.md              Release history and compatibility impact
+├── CONTRIBUTING.md           Contribution workflow and architecture rules
+├── SECURITY.md               Security support and reporting policy
+├── CODE_OF_CONDUCT.md        Community conduct expectations
+└── LICENSE                   Apache License 2.0
 ```
 
-Generated artifacts are reproducible outputs. They are not the source of truth.
+User implementation code and downstream integration code must live outside generated output directories.
 
-The source of truth remains:
+## Engineering rules
 
-```text
-examples/demo-3u/mission/*.yaml
-examples/demo-3u/scenarios/*.yaml
-```
+OrbitFabric development follows a few strict rules:
 
----
-
-## Example Mission Slices
-
-The repository includes public, clean-room example slices:
-
-- `examples/demo-3u/`, synthetic clean-room demo mission;
-- `examples/university-cubesat-minislice/`, generic university CubeSat minislice;
-- `examples/oresat-inspired-minislice/`, public-material-derived low-power, beacon and constrained-downlink minislice;
-- `examples/finch-inspired-minislice/`, public-material-derived imaging acquisition, ADCS readiness, compression and constrained-downlink minislice;
-- `examples/spacelab-inspired-communications-minislice/`, public-material-derived TT&C, OBDH, beacon, telecommanded data-request and decoder-evidence minislice.
-
-The `*-inspired-*` examples are conceptual public demos. They are not official models, not endorsed by the original project teams, and do not imply adoption of OrbitFabric by those teams.
-
----
+1. Keep the Mission Model as the semantic source of truth.
+2. Do not let generators, adapters or downstream tools create a parallel Mission Model interpretation.
+3. Prefer explicit diagnostics and explicit relationships over inference.
+4. Keep runtime and ground artifacts generated, deterministic and disposable unless explicitly classified otherwise.
+5. Treat stable surface changes as compatibility-sensitive engineering changes.
+6. Prefer additive evolution where it preserves existing meaning.
+7. Do not move target-specific integration semantics into Core.
+8. Do not add plugin execution or in-process third-party adapter execution without a separate architectural decision.
+9. Protect meaningful stable fields with selective regression signatures instead of freezing incidental formatting.
+10. Keep public examples synthetic or based only on material that can legally be used in an open-source project.
 
 ## Documentation
 
-Published documentation is available at:
+Public documentation:
 
-```text
 https://farotech.github.io/orbitfabric/
-```
 
-Useful entry points:
+Recommended reading paths:
 
-- `docs/PROJECT_CHARTER.md`
-- `docs/ARCHITECTURE.md`
-- `docs/ROADMAP.md`
-- `docs/DEVELOPMENT.md`
-- `docs/QUICKSTART.md`
-- `docs/DEMO_WALKTHROUGH.md`
-- `docs/reference/v1-stable-surface-decision.md`
-- `docs/reference/v1-demo-evidence-chain.md`
-- `docs/reference/v1-compatibility-migration-notes.md`
-- `docs/reference/v1.2-integration-input-stability-decision.md`
-- `docs/reference/golden-output-regression-confidence.md`
-- `docs/reference/extensibility-boundary-contract.md`
-- `docs/reference/core-integration-input-contract.md`
-- `docs/reference/mission-snapshot-surface.md`
-- `docs/reference/relationship-manifest-surface.md`
-- `docs/reference/post-v1-candidate-integration-surfaces.md`
-- `docs/reference/projection-profile-contract.md`
-- `docs/reference/integration-result-contract.md`
-- `docs/reference/integration-package-adapter-execution-contract.md`
-- `docs/reference/dashboard-summary-surface.md`
-- `docs/reference/scenario-run-index-surface.md`
-- `docs/reference/coverage-summary-surface.md`
-- `docs/releases/v1.2.0.md`
-- `docs/releases/v1.1.0.md`
-- `docs/releases/v1.0.0.md`
+- [Quickstart](docs/QUICKSTART.md) for running the project locally.
+- [Demo Walkthrough](docs/DEMO_WALKTHROUGH.md) for the end-to-end example.
+- [Project Charter](docs/PROJECT_CHARTER.md) for project purpose and scope.
+- [Architecture](docs/ARCHITECTURE.md) for ownership and boundary rules.
+- [Roadmap](docs/ROADMAP.md) for completed milestones and future direction.
+- [Mission Model Stability Contract](docs/reference/mission-model-stability-contract.md) for model compatibility.
+- [CLI Contract v1](docs/reference/cli-contract-v1.md) for public CLI compatibility.
+- [Generated Surfaces Stability](docs/reference/generated-surfaces-stability.md) for output classification.
+- [Core Integration Input Contract](docs/reference/core-integration-input-contract.md) for the stable external input boundary.
+- [Projection Profile Contract](docs/reference/projection-profile-contract.md) for the first extension-owned integration boundary.
 
-Build the documentation site locally:
-
-```bash
-mkdocs build --strict
-```
-
----
-
-## Clean-Room Policy
+## Clean-room development
 
 OrbitFabric is developed as a clean-room open-source project.
 
-Do not add private, confidential, proprietary, restricted or non-public mission material to this repository.
+Do not contribute confidential, proprietary, customer-owned, employer-owned, export-controlled or NDA-protected material. Do not publish private mission data, private packet formats, operational logs, private hardware mappings or proprietary source code.
+
+Examples must be synthetic or derived only from material that can legally be used and redistributed.
+
+See [Clean-Room Policy](docs/CLEAN_ROOM_POLICY.md).
+
+## Contributing, security and community
+
+Contributions are welcome when they preserve the Mission Data Contract architecture and clean-room boundary.
+
+Before contributing, read:
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+
+Security vulnerabilities should not be reported through public issues. Follow the private reporting guidance in `SECURITY.md`.
+
+## License
+
+OrbitFabric is released under the [Apache License 2.0](LICENSE).
+
+The project is independent open-source work. References to external projects, standards or ecosystems are for engineering interoperability, comparison or public-example purposes and do not imply endorsement or adoption.
