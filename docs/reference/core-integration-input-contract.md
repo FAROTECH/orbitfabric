@@ -1,11 +1,11 @@
 # Core Integration Input Contract
 
-Status: Architecture candidate — Phase B.1 design-frozen pending release gate  
+Status: **Stable Core-owned integration input contract from v1.2.0**  
 Contract version: `0.1-candidate`  
 Scope: Core-owned machine-readable input boundary for external ecosystem integrations  
 Parent architecture issue: #227  
 Design issue: #228  
-Release dependency: #224
+Release classification: v1.2.0 / #224
 
 ---
 
@@ -40,6 +40,8 @@ The Mission Model remains the source of truth.
 
 The Integration Input Set is derived, read-only and non-authoritative.
 
+From OrbitFabric v1.2.0, this documented Core input boundary is a stable v1.x compatibility commitment. The existing wire identifier remains `0.1-candidate`; OrbitFabric stability classification and format-version text are intentionally independent concepts.
+
 ---
 
 ## 2. Architectural constraints
@@ -64,21 +66,16 @@ It introduces no plugin discovery, plugin loading or in-process adapter executio
 
 ## 3. Why a coherent input set is required
 
-OrbitFabric already exposes multiple machine-readable surfaces.
+OrbitFabric exposes multiple machine-readable Core-owned surfaces.
 
-Stable Core-owned surfaces include:
-
-```text
-model_summary.json
-entity_index.json
-relationship_manifest.json
-lint JSON report
-```
-
-Current `main` additionally exposes the candidate:
+Stable Core-owned surfaces relevant to this boundary include:
 
 ```text
 mission_snapshot.json
+model_summary.json
+entity_index.json
+relationship_manifest.json for admitted families
+lint JSON report
 ```
 
 Independently generated files are not sufficient as a production integration contract because they may have been produced:
@@ -136,9 +133,9 @@ complete loaded Mission Model semantics
 
 The adapter consumes Mission Model fields from this surface instead of reading Mission Model YAML.
 
-This role remains conditional on the release/compatibility decision in #224.
+From v1.2.0, Mission Snapshot is a stable Core-owned integration/inspection surface for its documented envelope, failure behavior, boundary semantics and complete-loaded-model role. Its format identifier remains `0.1-candidate` for compatibility with the already reference-proven producer/consumer chain.
 
-Until #224 resolves Mission Snapshot classification sufficiently for production integration, this contract remains an architecture candidate.
+The stable Snapshot commitment does not freeze the complete serialized `model` object byte-for-byte. The `model` payload remains a faithful serialization of the loaded Mission Model and follows Mission Model compatibility rules.
 
 #### `entity_index`
 
@@ -161,6 +158,8 @@ canonical admitted Core relationship records
 The adapter must not reconstruct missing Core relationship semantics from Mission Snapshot fields, naming conventions or generated artifacts unless a future Core contract explicitly changes this boundary.
 
 Unknown additive relationship families must follow the Relationship Manifest compatibility rules. Their semantics must never be guessed.
+
+The seven FDIR relationship families classified in v1.2.0 are additive stable-compatible admitted families; they do not redefine the original v1 relationship contract.
 
 #### `lint_report`
 
@@ -224,7 +223,7 @@ The manifest is metadata/provenance only.
 
 It must not duplicate Mission Model semantic payloads.
 
-The v0 candidate envelope is:
+The stable v1.2 contract retains the already reference-proven v0 envelope and wire identifier:
 
 ```json
 {
@@ -318,7 +317,7 @@ unavailable_reason
 
 ### `requirement`
 
-Allowed v0 values:
+Allowed values:
 
 ```text
 required
@@ -338,7 +337,7 @@ companion
 
 ### `status`
 
-Allowed v0 values:
+Allowed values:
 
 ```text
 available
@@ -426,13 +425,13 @@ version
 
 is the OrbitFabric package version, not a report-schema identifier.
 
-For the Core Integration Input Contract, the lint JSON shape stabilized from the v1.0 Mission Data Contract baseline is therefore identified by the normalized compatibility label:
+For the Core Integration Input Contract, the lint JSON shape stabilized from the v1.0 Mission Data Contract baseline is identified by the normalized compatibility label:
 
 ```text
 v1
 ```
 
-Thus the frozen v0 role record is:
+Thus the role record is:
 
 ```json
 {
@@ -514,9 +513,9 @@ Implementation may use temporary files/directories and atomic replacement where 
 
 ---
 
-## 10. Frozen CLI boundary
+## 10. Stable CLI boundary
 
-The v0 candidate CLI shape is:
+The stable v1.2 CLI shape is:
 
 ```bash
 orbitfabric export integration-input-set <mission_dir> \
@@ -542,7 +541,7 @@ model_summary.json
 
 The command does not expose `--json` because the output is a coherent multi-file set.
 
-The v0 candidate does not expose `--warnings-as-errors`.
+The v1.2 command does not expose `--warnings-as-errors`.
 
 Warnings remain represented by:
 
@@ -552,7 +551,7 @@ lint_result = passed_with_warnings
 
 A stricter workflow policy may be imposed by a caller or adapter without changing the Core semantic lint result.
 
-This CLI remains candidate until implemented and classified through the normal Core CLI compatibility process.
+The command is implemented, reference-proven and classified as the stable Core integration-input workflow from v1.2.0.
 
 The adapter must not depend on OrbitFabric internal Python module APIs as a substitute for this public boundary.
 
@@ -598,7 +597,7 @@ not_run
 
 ## 12. Failure-state matrix
 
-The v0 candidate producer/consumer behavior is:
+The stable producer/consumer behavior is:
 
 | Condition | Manifest | Mission Snapshot | Entity Index | Relationship Manifest | Lint Report | Model Summary | CLI exit | Projection |
 |---|---|---|---|---|---|---|---|---|
@@ -722,7 +721,7 @@ corruption/change detection
 
 Because this is an exact-byte digest, independently regenerated surfaces may differ when their serialized provenance differs even if the underlying Mission Model semantics are equivalent.
 
-The v0 contract intentionally does not claim cross-generation semantic equivalence.
+The contract intentionally does not claim cross-generation semantic equivalence.
 
 Moving an already-generated input set without modifying its files does not invalidate these digests because manifest paths are relative to the manifest location.
 
@@ -788,9 +787,9 @@ This avoids a Python-specific or whitespace-sensitive manifest fingerprint and m
 
 ---
 
-## 16. No semantic Mission fingerprint in v0
+## 16. No semantic Mission fingerprint
 
-The v0 contract deliberately does **not** define a canonical Mission semantic fingerprint independent of serialized Core surfaces.
+The contract deliberately does **not** define a canonical Mission semantic fingerprint independent of serialized Core surfaces.
 
 A semantic fingerprint would require a compatibility-sensitive canonicalization policy for concepts such as:
 
@@ -806,7 +805,7 @@ future additive fields
 
 Incorrect canonicalization could create false semantic equivalence or false semantic difference.
 
-The first production contract therefore uses:
+The stable v1.2 contract therefore uses:
 
 ```text
 exact per-surface SHA-256
@@ -866,7 +865,7 @@ The boundary remains Core-owned.
 
 ## 18. Inputs deliberately excluded from the projection contract
 
-The first Core Integration Input Set does not require:
+The Core Integration Input Set does not require:
 
 ```text
 dashboard_summary.json
@@ -937,11 +936,13 @@ Integration Adapter
 Integration Result
 ```
 
+The Projection Profile contract remains independently versioned and extension-owned. Stabilizing the Core input boundary in v1.2.0 does not promote Profile target semantics into Core.
+
 ---
 
 ## 21. Relationship to Studio
 
-Studio may orchestrate generation of the Core Integration Input Set or inspect it through a future integration plugin.
+Studio may orchestrate generation of the Core Integration Input Set or inspect it through generic integration surfaces.
 
 Studio must not:
 
@@ -953,7 +954,9 @@ replace Core lint findings
 calculate integration provenance from timestamps alone
 ```
 
-The same input contract is usable from CLI-only workflows and Studio workflows.
+The same input contract is usable from CLI-only workflows, CI workflows and Studio workflows.
+
+Studio Phase 0B has independently exercised the real reference Integration Package against this Core boundary, demonstrating that a downstream consumer does not need private Core or raw-YAML semantics.
 
 ---
 
@@ -963,13 +966,13 @@ The Core Integration Input Contract contains no OpenOBSW, OpenSVF, YAMCS, PUS, S
 
 Target-specific mapping belongs to the Projection Profile and Integration Adapter.
 
-The OpenOBSW/OpenSVF PoC is evidence used to derive this architecture; it is not encoded into the Core contract.
+The OpenOBSW/OpenSVF PoC is evidence used to derive and reference-prove this architecture; it is not encoded into the Core contract.
 
 ---
 
-## 23. Frozen regression-protection requirements
+## 23. Regression-protection requirements
 
-Implementation of this candidate contract must add regression protection at three levels.
+The stable contract is protected at multiple levels.
 
 ### 23.1 Manifest contract fixture
 
@@ -1025,15 +1028,17 @@ same surface digests
 same input_set_sha256
 ```
 
-Existing regression protection for underlying stable surfaces remains authoritative for those surfaces and is not replaced by the new input-set tests.
+Existing regression protection for underlying stable surfaces remains authoritative for those surfaces and is not replaced by the input-set tests.
 
-Mission Snapshot regression/golden scope remains additionally governed by #224.
+From v1.2.0, Mission Snapshot additionally has a selected golden signature protecting contract-significant envelope/boundary fields and representative serialization invariants without freezing the complete Mission Model payload.
+
+The original v1 Relationship Manifest golden remains unchanged; dedicated FDIR extension tests protect the additive v1.2 families.
 
 ---
 
 ## 24. Implementation test matrix
 
-A future implementation must cover at least:
+The implementation must cover at least:
 
 ```text
 valid loaded mission + lint passed
@@ -1058,11 +1063,13 @@ RFC 8785 digest test vector
 no raw-YAML fallback in the reference adapter
 ```
 
+The current producer and reference-adapter handshake exercise these invariants through CI, and the v1.2 release gate requires the full Core CI matrix to remain green on the exact release head.
+
 ---
 
-## 25. Compatibility and release gate
+## 25. Compatibility and release classification
 
-The following Phase B.1 design points are frozen for the `0.1-candidate` contract:
+The following contract points are stable compatibility commitments from v1.2.0:
 
 ```text
 required surface roles
@@ -1074,21 +1081,22 @@ failure-surface availability behavior
 per-surface digest rule
 input_set_sha256 canonical algorithm
 CLI command/options/default path
+manifest-last coherence rule
+consumer no-raw-YAML fallback rule
 regression/golden strategy
 ```
 
-The remaining gate is release/governance classification:
+Release gate #224 is resolved by the v1.2 Integration Input Stability Decision.
+
+The existing contract identifier remains:
 
 ```text
-#224
-Mission Snapshot release/compatibility decision
+input_set_version = 0.1-candidate
 ```
 
-This document must not be described as a stable production contract until #224 resolves Mission Snapshot classification sufficiently for the semantic role defined here.
+This identifier is not a statement that the v1.2 stability classification is provisional. It is retained to preserve compatibility with the already implemented and reference-proven producer/consumer chain.
 
-The design freeze is sufficient for the dependent **Projection Profile Contract v0 architecture work** to proceed in parallel.
-
-It is not sufficient to claim a released production Integration Input Contract.
+Any future breaking change to the stable semantics above requires an explicit compatibility decision, release note and new format/version identity as appropriate.
 
 ---
 
@@ -1119,14 +1127,14 @@ semantic equivalence fingerprinting
 
 ## 27. Final position
 
-The design-frozen candidate boundary is:
+The stable v1.2 Core boundary is:
 
 ```text
 OrbitFabric Core owns mission semantics.
 
 Core emits one coherent, versioned, digest-addressable Integration Input Set.
 
-Mission Snapshot provides complete loaded semantics, subject to #224.
+Mission Snapshot provides complete loaded semantics through its stable v1.2 role.
 Entity Index provides canonical entity identity.
 Relationship Manifest provides admitted Core relationships.
 Lint Report provides Core semantic-validation state.
