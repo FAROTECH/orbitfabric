@@ -330,9 +330,47 @@ orbitfabric export relationship-manifest examples/demo-3u/mission \
 
 ## Demo coverage
 
-The `demo-3u` mission exercises most admitted relationship families, including the v1.2 FDIR additions.
+The `demo-3u` mission exercises most admitted relationship families, including all seven v1.2 FDIR additions.
 
-Some admitted families require richer examples and may not appear in the demo. A family remains valid because its semantics are documented and tested, not because one fixture happens to exercise it.
+For the v1.2 release baseline the demo contains 63 relationship records across 24 emitted relationship families:
+
+```json
+{
+  "total_relationships": 63,
+  "relationship_types": {
+    "autonomous_action_dispatches_command": 2,
+    "autonomous_action_triggered_by_fault": 2,
+    "autonomous_action_uses_command_source": 2,
+    "command_emits_event": 4,
+    "command_targets_subsystem": 4,
+    "commandability_rule_constrains_command": 1,
+    "data_product_produced_by_payload": 1,
+    "downlink_flow_includes_data_product": 1,
+    "event_sourced_from_subsystem": 8,
+    "fault_emits_event": 3,
+    "fault_observes_telemetry": 3,
+    "fault_recovery_dispatches_command": 3,
+    "fault_recovery_targets_mode": 3,
+    "fault_sourced_from_subsystem": 3,
+    "packet_includes_telemetry": 5,
+    "payload_accepts_command": 2,
+    "payload_belongs_to_subsystem": 1,
+    "payload_generates_event": 2,
+    "payload_may_raise_fault": 1,
+    "payload_produces_telemetry": 1,
+    "recovery_intent_includes_command": 2,
+    "recovery_intent_reacts_to_fault": 2,
+    "recovery_intent_targets_mode": 2,
+    "telemetry_sourced_from_subsystem": 5
+  }
+}
+```
+
+The admitted `data_product_produced_by_subsystem` family is exercised by richer examples such as `examples/spacelab-inspired-communications-minislice/mission`.
+
+The admitted `recovery_intent_reacts_to_event` family is not emitted by `demo-3u` because the demo recovery intents are fault-based.
+
+A family remains valid because its semantics are documented and tested, not because one fixture happens to exercise it.
 
 ## Regression protection
 
