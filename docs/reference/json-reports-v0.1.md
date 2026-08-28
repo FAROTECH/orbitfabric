@@ -121,28 +121,28 @@ Tool identifier:
 orbitfabric-lint
 ```
 
-Documented top-level concepts include:
+Documented top-level fields:
 
-```text
-tool
-version
-mission
-model_version
-result
-loaded
-summary
-findings
-```
+| Field | Type | Meaning |
+|---|---:|---|
+| `tool` | string | Report producer. Current value: `orbitfabric-lint`. |
+| `version` | string | OrbitFabric package version that produced the report. |
+| `mission` | string | Mission ID loaded from the Mission Model. |
+| `model_version` | string | Mission Model version declared by the mission. |
+| `result` | string | Machine-readable lint result. |
+| `loaded` | object | Counts of loaded Mission Model domains. |
+| `summary` | object | Count of findings by severity. |
+| `findings` | array | Structured lint findings. |
 
-Current lint result values are:
+Current lint result values:
 
-```text
-passed
-passed_with_warnings
-failed
-```
+| Value | Meaning |
+|---|---|
+| `passed` | No error or warning findings. |
+| `passed_with_warnings` | Warning findings exist, but no error findings exist. |
+| `failed` | At least one error finding exists. |
 
-Core owns the meaning of lint findings and severities.
+Core owns the meaning of lint findings, diagnostic codes and severities.
 
 ## 5. Simulation report
 
@@ -159,33 +159,100 @@ Tool identifier:
 orbitfabric-sim
 ```
 
-Documented report concepts include:
+Documented top-level fields:
 
-```text
-tool
-version
-mission
-scenario
-result
-summary
-timeline
-events
-commands
-mode_transitions
-data_flow_evidence
-expectations
-final_state
-failed_expectations
+| Field | Type | Meaning |
+|---|---:|---|
+| `tool` | string | Report producer. Current value: `orbitfabric-sim`. |
+| `version` | string | OrbitFabric package version that produced the report. |
+| `mission` | string | Mission ID. |
+| `scenario` | string | Scenario ID. |
+| `result` | string | Scenario execution result. |
+| `summary` | object | Counts of key execution outputs. |
+| `timeline` | array | Ordered timeline entries. |
+| `events` | array | Emitted events. |
+| `commands` | array | Executed commands. |
+| `mode_transitions` | array | Mode transitions. |
+| `data_flow_evidence` | array | Contract-level data-flow evidence records. |
+| `expectations` | object | Additive structured expectation accounting introduced in v1.1. |
+| `final_state` | object | Final simulator state. |
+| `failed_expectations` | array | Legacy compatibility list of failed expectation messages. |
+
+Current simulation result values:
+
+| Value | Meaning |
+|---|---|
+| `passed` | All scenario expectations passed. |
+| `failed` | One or more scenario expectations failed. |
+
+### Simulation summary object
+
+Current summary fields include:
+
+| Field | Meaning |
+|---|---|
+| `events` | Number of emitted events. |
+| `commands` | Number of executed or auto-dispatched commands. |
+| `mode_transitions` | Number of mode transitions. |
+| `data_flow_evidence` | Number of data-flow evidence records. |
+| `expectations` | Number of structured expectation records. |
+| `passed_expectations` | Number of structured expectation records with result `passed`. |
+| `failed_expectations` | Number of failed expectations, preserving compatibility with the legacy failed-expectation list. |
+
+### Structured expectation accounting
+
+The additive v1.1 `expectations` object has the conceptual shape:
+
+```json
+{
+  "expectations": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "records": []
+  }
+}
 ```
 
-Current result values are:
+Each expectation record includes:
+
+```text
+t
+expectation_type
+target
+expected
+actual
+result
+message
+```
+
+Current record result values are:
 
 ```text
 passed
 failed
 ```
 
-The structured `expectations` object was introduced additively in v1.1 and remains candidate. The legacy top-level `failed_expectations` compatibility list remains available.
+Current expectation types may include:
+
+```text
+mode
+event
+command
+command_status
+telemetry
+payload_lifecycle
+data_flow
+scenario_status
+```
+
+Structured expectation accounting remains candidate after v1.2.0. It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
+
+### Legacy failed-expectation compatibility
+
+The top-level `failed_expectations` array remains present and retains the human-readable failed expectation messages used by existing consumers.
+
+New consumers that need passed and failed accounting should consume the structured `expectations` object while preserving compatibility with the legacy list where required.
 
 ## 6. Data-flow evidence
 
