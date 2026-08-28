@@ -1,58 +1,28 @@
 # CLI Contract v1
 
-Status: Active v1 CLI contract with v1.1 candidate additions  
+Status: Active v1 CLI contract through v1.2.0  
 Scope: CLI compatibility classification for documented workflows  
-Applies to: OrbitFabric CLI from `v1.0.0 - Stable Mission Data Contract` onward, including `v1.1.0 - Candidate Integration Surface Consolidation`
+Applies to: OrbitFabric CLI from v1.0.0 onward
 
-This page classifies the current OrbitFabric CLI surface after v1.1.0.
+This page classifies the current OrbitFabric CLI surface.
 
-It is a documentation contract. It does not introduce new behavior, new Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
-
----
+It documents compatibility. It does not introduce new behavior, Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 ## 1. Purpose
 
 The OrbitFabric CLI is a public user-facing workflow surface.
 
-From v1.0.0 onward, documented command names, command groups, required arguments, documented options and documented machine-readable outputs for selected workflows are compatibility-sensitive.
+From v1.0.0 onward, documented command names, command groups, required arguments, documented options and selected machine-readable outputs are compatibility-sensitive.
 
-v1.1.0 adds documented candidate integration-surface exports. Those commands are Core-owned, but their emitted surfaces remain candidate until a later stability decision promotes them.
+The current Core version is:
 
-This page identifies the current CLI surface and separates:
+```text
+v1.2.0 - Core Integration Input Consolidation
+```
 
-- command names;
-- command groups;
-- required arguments;
-- documented options;
-- human-oriented output;
-- machine-readable output paths and report families;
-- stable v1.0.0 surfaces;
-- candidate v1.1.0 surfaces;
-- unsupported compatibility assumptions.
+The CLI contains a mixed maturity surface. Stable workflows and candidate report families are classified explicitly rather than treated as one undifferentiated API.
 
----
-
-## 2. Stability classification
-
-Current CLI classification:
-
-| CLI area | Classification | Notes |
-|---|---|---|
-| top-level command name `orbitfabric` | Stable contract | User-facing entry point. |
-| top-level command groups | Stable contract | `gen`, `validate`, `inspect`, `export`. |
-| top-level commands | Stable contract | `lint`, `sim`. |
-| documented options | Stable contract | Option names are compatibility-sensitive after v1.0.0. |
-| command required arguments | Stable contract | Required positional arguments are compatibility-sensitive. |
-| CLI textual output | Human-oriented public preview | Useful for users. Not a machine contract. |
-| JSON outputs produced via `--json` | Stable or candidate where documented | Classification depends on the report family. |
-| v1.0.0 structured exports | Stable Core-owned surface | `model_summary.json`, `entity_index.json`, `relationship_manifest.json`. |
-| v1.1.0 structured exports | Candidate Core-owned surface | `dashboard_summary.json`, `scenario_run_index.json`, `coverage_summary.json`. |
-| generated artifact paths | Public preview or stable depending on surface | Paths are compatibility-sensitive when documented. |
-| internal Python implementation | Internal implementation detail | Not a CLI contract. |
-
----
-
-## 3. Top-level CLI surface
+## 2. Top-level CLI surface
 
 Current top-level invocation:
 
@@ -61,7 +31,7 @@ orbitfabric --help
 orbitfabric --version
 ```
 
-Current top-level commands and groups:
+Current command groups and commands:
 
 ```text
 orbitfabric lint
@@ -72,298 +42,142 @@ orbitfabric inspect ...
 orbitfabric export ...
 ```
 
-`orbitfabric --version` reports the OrbitFabric tool/package version.
+`orbitfabric --version` reports the OrbitFabric package version. It is not the same as a mission's `model_version` or a JSON surface format version.
 
-The OrbitFabric tool/package version is not the same thing as the Mission Model version declared by a mission.
+## 3. Stability classification
 
----
+| CLI area | Classification | Notes |
+|---|---|---|
+| `orbitfabric` entry point | Stable | Public CLI entry point. |
+| `lint`, `sim`, `gen`, `validate`, `inspect`, `export` | Stable | Documented command surface. |
+| required positional arguments | Stable where documented | Compatibility-sensitive. |
+| documented options | Stable where documented | Compatibility-sensitive. |
+| human-oriented terminal text | Human-oriented | Not a machine contract. |
+| v1.0 structured exports | Stable | Model Summary, Entity Index, Relationship Manifest. |
+| v1.2 Mission Snapshot export | Stable | Complete loaded Mission Model inspection boundary. |
+| v1.2 Integration Input Set export | Stable | Coherent Core input boundary for external integrations. |
+| v1.1 dashboard, scenario-index and coverage exports | Candidate | Core-owned inspection surfaces. |
+| internal Python APIs | Internal | Not a public CLI contract. |
 
 ## 4. Output path rule
 
-Mission-based commands resolve omitted generated artifact paths under the mission workspace.
+Mission-based commands resolve omitted generated artifact paths under the mission workspace where documented.
 
-For this mission directory:
+For:
 
 ```text
 examples/demo-3u/mission/
 ```
 
-omitted generated outputs resolve under:
+representative defaults resolve under:
 
 ```text
 examples/demo-3u/generated/
 ```
 
-Examples:
+Explicit user-provided output paths remain explicit.
 
-```bash
-orbitfabric gen docs examples/demo-3u/mission/
-orbitfabric gen runtime examples/demo-3u/mission/
-orbitfabric gen ground examples/demo-3u/mission/
-orbitfabric export dashboard-summary examples/demo-3u/mission/
-orbitfabric export coverage-summary examples/demo-3u/mission/
-```
-
-Default outputs include:
-
-```text
-examples/demo-3u/generated/docs/
-examples/demo-3u/generated/runtime/cpp17/
-examples/demo-3u/generated/ground/generic/
-examples/demo-3u/generated/reports/dashboard_summary.json
-examples/demo-3u/generated/reports/coverage_summary.json
-```
-
-Explicit user-provided paths are preserved exactly as provided.
-
----
-
-## 5. Lint command
-
-Current command:
+## 5. Lint
 
 ```bash
 orbitfabric lint <mission_dir>
 ```
 
-Current documented options:
+Documented options:
 
 ```text
 --json <path>
 --warnings-as-errors
 ```
 
-Compatibility-sensitive behavior:
+The command performs structural validation and semantic linting. `--json` writes the machine-readable lint report. `--warnings-as-errors` changes the command success policy for warning-level findings.
 
-- the command validates and semantically lints a Mission Model directory;
-- the required argument is a readable mission directory;
-- `--json` writes a machine-readable lint report;
-- `--warnings-as-errors` makes warning-level findings fail the command.
+Core owns lint diagnostic meaning. Terminal wording is not a machine contract.
 
-Human-oriented terminal text is not a machine contract.
+## 6. Scenario validation and execution
 
-The lint JSON report structure is documented separately in `JSON Reports v0.1`.
+Validate without executing:
 
----
+```bash
+orbitfabric validate scenario <scenario_file>
+```
 
-## 6. Simulation command
-
-Current command:
+Execute deterministic host-side evidence:
 
 ```bash
 orbitfabric sim <scenario_file>
 ```
 
-Current documented options:
+Simulation options:
 
 ```text
 --json <path>
 --log <path>
 ```
 
-Compatibility-sensitive behavior:
+The simulation JSON report is machine-readable evidence. The plain-text log is human-reviewable output and must not be treated as a stable parsing contract.
 
-- the command executes a scenario YAML file against its referenced Mission Model;
-- the required argument is a readable scenario file;
-- `--json` writes a machine-readable simulation report;
-- `--log` writes a plain-text simulation timeline log.
+## 7. Generation commands
 
-The JSON simulation report is a machine-readable stable report family with additive v1.1.0 structured expectation accounting.
-
-The plain-text log is human-reviewable evidence and should not be treated as a machine contract.
-
----
-
-## 7. Generation command group
-
-Current command group:
+### Mission documentation
 
 ```bash
-orbitfabric gen ...
+orbitfabric gen docs <mission_dir> [--output-dir <path>]
 ```
 
-Current generation commands:
-
-```text
-orbitfabric gen docs
-orbitfabric gen data-flow
-orbitfabric gen runtime
-orbitfabric gen ground
-```
-
-These commands generate artifacts derived from the validated Mission Model.
-
-Generated artifacts are disposable outputs unless explicitly classified otherwise. They must not become the source of truth.
-
----
-
-## 8. Documentation generation
-
-Current command:
-
-```bash
-orbitfabric gen docs <mission_dir>
-```
-
-Current documented option:
-
-```text
---output-dir <path>
-```
-
-Default output directory for omitted output paths:
+Default output:
 
 ```text
 <mission_workspace>/generated/docs
 ```
 
-For `examples/demo-3u/mission/`, this resolves to:
-
-```text
-examples/demo-3u/generated/docs
-```
-
-Compatibility-sensitive behavior:
-
-- generates Markdown documentation from the Mission Model;
-- aborts when lint errors exist;
-- writes human-reviewable generated documentation.
-
-Generated Markdown documentation is not the Mission Data Contract source of truth.
-
----
-
-## 9. Data-flow documentation generation
-
-Current command:
+### Data-flow documentation
 
 ```bash
-orbitfabric gen data-flow <mission_dir>
+orbitfabric gen data-flow <mission_dir> [--output-file <path>]
 ```
 
-Current documented option:
-
-```text
---output-file <path>
-```
-
-Default output file for omitted output paths:
+Default output:
 
 ```text
 <mission_workspace>/generated/docs/data_flow.md
 ```
 
-For `examples/demo-3u/mission/`, this resolves to:
-
-```text
-examples/demo-3u/generated/docs/data_flow.md
-```
-
-Compatibility-sensitive behavior:
-
-- generates Markdown data-flow documentation from the Mission Model;
-- aborts when lint errors exist;
-- writes a human-reviewable data-flow documentation artifact.
-
----
-
-## 10. Runtime-facing generation
-
-Current command:
+### Runtime-facing contract bindings
 
 ```bash
-orbitfabric gen runtime <mission_dir>
+orbitfabric gen runtime <mission_dir> [--output-dir <path>] [--profile <profile>]
 ```
 
-Current documented options:
-
-```text
---output-dir <path>
---profile <profile>
-```
-
-Default output directory for omitted output paths:
-
-```text
-<mission_workspace>/generated/runtime
-```
-
-For `examples/demo-3u/mission/`, this resolves to:
-
-```text
-examples/demo-3u/generated/runtime
-```
-
-Current supported profile:
+Current profile:
 
 ```text
 cpp17
 ```
 
-Compatibility-sensitive behavior:
+This command generates contract bindings and a host-build smoke target. It does not generate flight software, scheduling, command dispatch, telemetry polling, drivers or RTOS integration.
 
-- generates runtime-facing contract artifacts from the Mission Model;
-- aborts when lint errors exist;
-- rejects unsupported runtime generation profiles;
-- writes a runtime contract manifest and generated C++17 binding artifacts.
-
-This command does not generate flight software, scheduler behavior, command dispatch runtime, telemetry polling runtime, drivers, RTOS integration or protected user-code regions.
-
----
-
-## 11. Ground-facing generation
-
-Current command:
+### Ground-facing contract artifacts
 
 ```bash
-orbitfabric gen ground <mission_dir>
+orbitfabric gen ground <mission_dir> [--output-dir <path>] [--profile <profile>]
 ```
 
-Current documented options:
-
-```text
---output-dir <path>
---profile <profile>
-```
-
-Default output directory for omitted output paths:
-
-```text
-<mission_workspace>/generated/ground
-```
-
-For `examples/demo-3u/mission/`, this resolves to:
-
-```text
-examples/demo-3u/generated/ground
-```
-
-Current supported profile:
+Current profile:
 
 ```text
 generic
 ```
 
-Compatibility-sensitive behavior:
+This command generates ground-facing contract artifacts. It does not generate a live ground segment, telemetry archive, database, operator console or command uplink service.
 
-- generates ground-facing contract artifacts from the Mission Model;
-- aborts when lint errors exist;
-- rejects unsupported ground generation profiles;
-- writes a ground contract manifest, JSON dictionaries, CSV dictionaries and human-reviewable Markdown artifacts.
+Generated runtime and ground artifacts remain public-preview/disposable outputs unless explicitly classified otherwise.
 
-This command does not generate a live ground segment, database, command uplink service, operator console, telemetry archive, transport layer or station automation.
+## 8. Export command group
 
----
+Current exports are classified by surface maturity.
 
-## 12. Export command group
-
-Current command group:
-
-```bash
-orbitfabric export ...
-```
-
-Stable v1.0.0 export commands:
+### Stable v1.0 exports
 
 ```text
 orbitfabric export model-summary
@@ -371,7 +185,14 @@ orbitfabric export entity-index
 orbitfabric export relationship-manifest
 ```
 
-Candidate v1.1.0 export commands:
+### Stable v1.2 exports
+
+```text
+orbitfabric export mission-snapshot
+orbitfabric export integration-input-set
+```
+
+### Candidate v1.1 inspection exports
 
 ```text
 orbitfabric export dashboard-summary
@@ -379,336 +200,247 @@ orbitfabric export scenario-run-index
 orbitfabric export coverage-summary
 ```
 
-These commands export Core-owned read-only machine-readable inspection surfaces.
+Downstream tooling should consume documented machine-readable outputs instead of parsing terminal text, generated Markdown or raw YAML independently.
 
-They are the supported downstream inspection boundary.
-
-Downstream tools must consume these surfaces instead of reconstructing Mission Data Contract semantics from raw YAML, generated artifacts, textual CLI output or UI state.
-
----
-
-## 13. Model summary export
-
-Current command:
+## 9. Model Summary
 
 ```bash
-orbitfabric export model-summary <mission_dir>
+orbitfabric export model-summary <mission_dir> [--json <path>]
 ```
 
-Current documented option:
-
-```text
---json <path>
-```
-
-Default output file for omitted output paths:
+Default output:
 
 ```text
 <mission_workspace>/generated/reports/model_summary.json
 ```
 
-Compatibility-sensitive behavior:
-
-- exports the Core-owned model summary surface;
-- answers what contract domains are present;
-- writes a machine-readable JSON report.
-
-Classification:
+Purpose:
 
 ```text
-v1.0.0 stable Core-owned surface
+What contract domains are present?
 ```
 
----
+Classification: stable Core-owned surface.
 
-## 14. Entity index export
-
-Current command:
+## 10. Entity Index
 
 ```bash
-orbitfabric export entity-index <mission_dir>
+orbitfabric export entity-index <mission_dir> [--json <path>]
 ```
 
-Current documented option:
-
-```text
---json <path>
-```
-
-Default output file for omitted output paths:
+Default output:
 
 ```text
 <mission_workspace>/generated/reports/entity_index.json
 ```
 
-Compatibility-sensitive behavior:
-
-- exports the Core-owned entity index surface;
-- answers what contract entities are defined;
-- writes a machine-readable JSON report.
-
-Classification:
+Purpose:
 
 ```text
-v1.0.0 stable Core-owned surface
+What contract entities are defined?
 ```
 
----
+Classification: stable Core-owned surface.
 
-## 15. Relationship manifest export
-
-Current command:
+## 11. Relationship Manifest
 
 ```bash
-orbitfabric export relationship-manifest <mission_dir>
+orbitfabric export relationship-manifest <mission_dir> [--json <path>]
 ```
 
-Current documented option:
-
-```text
---json <path>
-```
-
-Default output file for omitted output paths:
+Default output:
 
 ```text
 <mission_workspace>/generated/reports/relationship_manifest.json
 ```
 
-Compatibility-sensitive behavior:
-
-- exports the stable Core-owned relationship manifest surface for admitted families;
-- answers how indexed mission contract entities are related;
-- writes a machine-readable JSON report.
-
-Classification:
+Purpose:
 
 ```text
-v1.0.0 stable Core-owned surface
+Which admitted explicit relationships connect indexed mission entities?
 ```
 
-This command does not expose a relationship graph, dependency graph, plugin API, runtime routing table, ground routing table or Studio-specific API.
+The original v1 relationship families are stable. The seven FDIR families admitted in v1.2 are additive stable-compatible families. Unknown additive types must not receive guessed semantics.
 
----
+The command does not expose a graph engine, dependency graph, runtime routing table, ground routing table or plugin API.
 
-## 16. Dashboard summary export
-
-Current command:
+## 12. Mission Snapshot
 
 ```bash
-orbitfabric export dashboard-summary <mission_dir>
+orbitfabric export mission-snapshot <mission_dir> [--json <path>]
 ```
 
-Current documented option:
+Default output:
 
 ```text
---json <path>
+<mission_workspace>/generated/reports/mission_snapshot.json
 ```
 
-Default output file for omitted output paths:
+Purpose:
 
 ```text
-<mission_workspace>/generated/reports/dashboard_summary.json
+What complete Mission Model did OrbitFabric Core actually load?
 ```
 
-Compatibility-sensitive behavior:
+Classification: stable Core-owned integration and inspection surface from v1.2.0.
 
-- exports a dashboard-ready aggregation of existing Core facts;
-- derives from validated Mission Model and Core-owned structured outputs;
-- writes a machine-readable JSON report.
-
-Classification:
+The existing format identifier remains:
 
 ```text
-v1.1.0 candidate Core-owned integration surface
+snapshot_version = 0.1-candidate
 ```
 
-This command does not make OrbitFabric Core a dashboard backend or Studio API.
+That token is a wire-format identifier, not the release maturity class.
 
----
+Structural load failure is represented explicitly. Core must not expose a fabricated partial semantic Mission Model after structural failure.
 
-## 17. Scenario run index export
-
-Current command:
+## 13. Core Integration Input Set
 
 ```bash
-orbitfabric export scenario-run-index
+orbitfabric export integration-input-set <mission_dir> [--output-dir <dir>]
 ```
 
-Current documented options:
+Default output directory:
 
 ```text
---simulation-reports <path>
---json <path>
+<mission_workspace>/generated/reports/integration_input
 ```
 
-Compatibility-sensitive behavior:
-
-- indexes Core simulation JSON report runs;
-- writes a machine-readable JSON index;
-- does not execute scenarios;
-- does not compute runtime health or mission readiness.
-
-Classification:
+The command writes a coherent multi-file set rather than one `--json` output:
 
 ```text
-v1.1.0 candidate Core-owned integration surface
+integration_input_manifest.json
+mission_snapshot.json
+entity_index.json
+relationship_manifest.json
+lint_report.json
+model_summary.json
 ```
 
----
+Classification: stable Core-to-external-integration input workflow from v1.2.0.
 
-## 18. Coverage summary export
+The command preserves:
 
-Current command:
+```text
+one logical Core load/lint operation
+required and companion role classification
+explicit availability and failure state
+per-surface kind and format version
+per-surface SHA-256
+RFC 8785/JCS input_set_sha256
+manifest-last coherence
+Core diagnostic ownership
+no raw-YAML semantic fallback
+```
+
+The existing identifier remains:
+
+```text
+input_set_version = 0.1-candidate
+```
+
+Stability classification and format-version text are intentionally separate.
+
+## 14. Dashboard Summary
 
 ```bash
-orbitfabric export coverage-summary <mission_dir>
+orbitfabric export dashboard-summary <mission_dir> [--json <path>]
 ```
 
-Current documented options:
+Purpose: dashboard-ready aggregation of existing Core facts.
 
-```text
---scenario-index <path>
---json <path>
-```
+Classification: candidate Core-owned inspection surface introduced in v1.1.0.
 
-Default output file for omitted output paths:
+It does not make Core a dashboard backend or Studio API.
 
-```text
-<mission_workspace>/generated/reports/coverage_summary.json
-```
-
-Compatibility-sensitive behavior:
-
-- exports limited coverage derived from Core structured outputs;
-- consumes Mission Model facts and scenario evidence summaries;
-- writes a machine-readable JSON report.
-
-Classification:
-
-```text
-v1.1.0 candidate Core-owned integration surface
-```
-
-This command does not introduce mission health scoring, model completeness scoring, flight readiness scoring or formal verification.
-
----
-
-## 19. Inspect command group
-
-Current command group:
+## 15. Scenario Run Index
 
 ```bash
-orbitfabric inspect ...
+orbitfabric export scenario-run-index \
+  --simulation-reports <path> \
+  [--json <path>]
 ```
 
-Current inspect command:
+Purpose: index Core simulation JSON report runs.
 
-```text
-orbitfabric inspect mission
+Classification: candidate Core-owned inspection surface introduced in v1.1.0.
+
+It does not execute scenarios or compute mission readiness.
+
+## 16. Coverage Summary
+
+```bash
+orbitfabric export coverage-summary <mission_dir> \
+  [--entity-index <path>] \
+  [--relationship-manifest <path>] \
+  [--scenario-run-index <path>] \
+  [--json <path>]
 ```
 
-Current command:
+Purpose: limited coverage derived from Core-owned structured outputs.
+
+Classification: candidate Core-owned inspection surface introduced in v1.1.0.
+
+It does not provide mission health scoring, model completeness scoring, flight readiness scoring or formal verification.
+
+## 17. Inspect Mission
 
 ```bash
 orbitfabric inspect mission <mission_dir>
 ```
 
-Compatibility-sensitive behavior:
+The command loads and displays a human-oriented mission summary.
 
-- loads and inspects a Mission Model directory;
-- prints a human-oriented loaded model summary;
-- does not lint, generate artifacts or export machine-readable reports.
+It does not lint, generate artifacts or provide a machine-readable compatibility surface.
 
-The terminal output is human-oriented and must not be treated as a machine contract.
+## 18. Machine-readable output rule
 
----
-
-## 20. Validate command group
-
-Current command group:
-
-```bash
-orbitfabric validate ...
-```
-
-Current validate command:
+Machine consumers should prefer documented structured surfaces such as:
 
 ```text
-orbitfabric validate scenario
-```
-
-Current command:
-
-```bash
-orbitfabric validate scenario <scenario_file>
-```
-
-Compatibility-sensitive behavior:
-
-- validates a scenario YAML file without executing it;
-- loads the referenced Mission Model;
-- reports human-oriented scenario summary information.
-
-This command does not execute scenario behavior, generate evidence reports or mutate Mission Model data.
-
----
-
-## 21. Machine-readable versus human-oriented output
-
-Only explicitly documented JSON reports and Core-owned structured surfaces should be treated as machine-readable stable or candidate outputs according to their classification.
-
-Human-oriented terminal output is useful for users, demonstrations and diagnostics, but it is not a machine compatibility contract.
-
-Scripts and downstream tools should prefer:
-
-```text
---json outputs
+lint JSON report
+simulation JSON report
 model_summary.json
 entity_index.json
 relationship_manifest.json
+mission_snapshot.json
+integration_input_manifest.json
 dashboard_summary.json
 scenario_run_index.json
 coverage_summary.json
-generated manifests
+generated manifests where their own references permit it
 ```
 
-over parsing terminal text.
+Classification still matters. A candidate surface does not become stable because a script consumes it.
 
----
+Consumers must not parse human terminal wording when a structured surface exists.
 
-## 22. Compatibility-sensitive CLI changes
+## 19. Compatibility-sensitive CLI changes
 
-The following changes are compatibility-sensitive after v1.0.0:
+After v1.0.0, the following are compatibility-sensitive where documented as stable:
 
-- renaming a documented command;
-- removing a documented command;
-- moving a documented command to another group;
-- renaming a documented option;
-- removing a documented option;
+- renaming or removing a command;
+- moving a command to a different group;
+- renaming or removing a documented option;
 - changing a required positional argument;
-- changing the default output path of a documented generated artifact;
-- changing supported profile names;
-- changing documented command failure behavior;
-- changing the machine-readable report family produced by a command.
+- changing a documented default output path;
+- changing a supported profile name;
+- changing documented failure behavior;
+- changing the machine-readable report family produced by a command;
+- changing stable Integration Input Set role or coherence semantics.
 
-Compatibility-sensitive does not mean forbidden.
+Compatibility-sensitive does not mean forbidden. It means the change must be explicit, reviewed and documented.
 
-It means the change must be explicit, reviewed and documented.
+Candidate report families may evolve, but changes must not be silent.
 
-Candidate v1.1.0 surfaces may still evolve, but changes must not be silent because downstream tools are expected to consume them as Core-owned structured surfaces.
-
----
-
-## 23. Current CLI non-goals
+## 20. Current non-goals
 
 The CLI contract does not introduce or promise:
 
 ```text
-shell completion compatibility
 terminal text parsing compatibility
 plugin command discovery
-plugin command execution
+plugin execution
 remote execution
 background jobs
 watch mode
@@ -717,15 +449,13 @@ flight runtime behavior
 ground runtime behavior
 operator console behavior
 Studio-specific API behavior
-OpenOBSW/OpenSVF-specific generation
+OpenOBSW/OpenSVF-specific Core generation
 ```
 
----
+## 21. Final statement
 
-## 24. Final statement
+v1.2.0 is the current Core release baseline.
 
-v1.1.0 is the current project release.
+The CLI provides stable user and CI workflows for documented v1 Mission Data Contract operations, including the v1.2 Mission Snapshot and coherent Integration Input Set exports.
 
-v1.0.0 remains the stable Mission Data Contract baseline.
-
-The CLI is stable enough for users and CI workflows to rely on documented command names, command groups, required arguments, documented options and machine-readable outputs according to their explicit stability classification, without freezing human-oriented terminal prose.
+Candidate v1.1 inspection exports remain candidate. Human-oriented terminal prose remains outside the machine compatibility contract.
