@@ -30,8 +30,9 @@ nav:
       - v1.0 Demo Evidence Chain: reference/v1-demo-evidence-chain.md
       - Golden Output and Regression Confidence Policy: reference/golden-output-regression-confidence.md
       - v1.0 Compatibility and Migration Notes: reference/v1-compatibility-migration-notes.md
+      - v1.2 Integration Input Stability Decision: reference/v1.2-integration-input-stability-decision.md
       - Dashboard and Coverage Foundation: reference/dashboard-coverage-foundation.md
-      - Post-v1 Candidate Integration Surfaces: reference/post-v1-candidate-integration-surfaces.md
+      - Post-v1 Integration Surface Classification: reference/post-v1-candidate-integration-surfaces.md
       - Dashboard Summary Surface: reference/dashboard-summary-surface.md
       - Scenario Run Index Surface: reference/scenario-run-index-surface.md
       - Coverage Summary Surface: reference/coverage-summary-surface.md
@@ -76,6 +77,7 @@ nav:
       - v0.12.0 v1.0 Release Candidate Hardening: releases/v0.12.0.md
       - v1.0.0 Stable Mission Data Contract: releases/v1.0.0.md
       - v1.1.0 Candidate Integration Surface Consolidation: releases/v1.1.0.md
+      - v1.2.0 Core Integration Input Consolidation: releases/v1.2.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 
@@ -87,7 +89,7 @@ nav:
       - ADR-0005 Lint as Core Feature: adr/ADR-0005-lint-as-core-feature.md
       - ADR-0006 Payload Contract Model: adr/ADR-0006-payload-contract-model.md
       - ADR-0007 Mission Data Chain Before Runtime: adr/ADR-0007-mission-data-chain-before-runtime.md
-      - ADR-0008 Data Product and Storage Contracts: adr/ADR-0008-data-product-and-storage-contracts.md
+      - ADR-0008 Data Product and Storage Contracts: adr/ADR-0008-data-product-storage-contracts.md
       - ADR-0009 Contact Windows and Downlink Flow Contracts: adr/ADR-0009-contact-windows-and-downlink-flow-contracts.md
       - ADR-0010 Commandability and Autonomy Contracts: adr/ADR-0010-commandability-and-autonomy-contracts.md
       - ADR-0011 Generated Runtime Skeleton Boundary: adr/ADR-0011-generated-runtime-skeleton-boundary.md
