@@ -1,0 +1,52 @@
+{
+  "expected": {
+    "snapshot_version": "0.1-candidate",
+    "kind": "orbitfabric.mission_snapshot",
+    "result": "loaded",
+    "mission": {
+      "id": "demo-3u",
+      "name": "Demo 3U Spacecraft",
+      "model_version": "0.1.0"
+    },
+    "boundaries": {
+      "source_of_truth": "mission_model",
+      "core_derived_report": true,
+      "read_only": true,
+      "contains_full_loaded_model": true,
+      "contains_structured_diagnostics": true,
+      "contains_yaml_ast": false,
+      "contains_source_locations": false,
+      "contains_plugin_api": false,
+      "contains_studio_api": false,
+      "contains_runtime_behavior": false,
+      "contains_ground_behavior": false
+    },
+    "model_contract": {
+      "required_top_level_fields_present": [
+        "commandability",
+        "commands",
+        "contacts",
+        "data_products",
+        "events",
+        "faults",
+        "mode_transitions",
+        "modes",
+        "packets",
+        "payloads",
+        "policies",
+        "spacecraft",
+        "subsystems",
+        "telemetry"
+      ],
+      "spacecraft_class_alias": {
+        "class_present": true,
+        "spacecraft_class_absent": true
+      },
+      "selected_telemetry_ids": [
+        "eps.battery.voltage",
+        "obc.mode",
+        "payload.acquisition.active"
+      ]
+    }
+  }
+}
