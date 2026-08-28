@@ -45,24 +45,49 @@ future extension-owned outputs
 OrbitFabric is currently released at:
 
 ```text
-v1.1.0 - Candidate Integration Surface Consolidation
+v1.2.0 - Core Integration Input Consolidation
 ```
 
-v1.1.0 consolidates the post-v1 candidate Core-owned integration surfaces while preserving the deliberately narrow v1.0.0 Stable Mission Data Contract.
+v1.2.0 promotes the reference-proven Core Integration Input boundary to a stable compatibility commitment while preserving the deliberately narrow v1.0.0 Stable Mission Data Contract and introducing **no new Mission Model semantics**.
 
-The stable surface is intentionally limited.
+OrbitFabric v1.2.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
 
-OrbitFabric v1.1.0 is not a flight software framework, not a ground segment, not a mission control system, not a spacecraft dynamics simulator, not a plugin execution platform and not a tool-specific integration layer.
-
-The stable Core-owned structured surface chain is:
+The stable Core-owned structured surface baseline now includes:
 
 ```text
 model_summary.json          -> What contract domains are present?
 entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed contract entities related?
+relationship_manifest.json  -> Which admitted explicit relationships connect them?
+mission_snapshot.json       -> What complete Mission Model did Core actually load?
 ```
 
-The post-v1 candidate Core-owned integration surface chain consolidated in v1.1.0 is:
+For ecosystem integrations, Core also provides the stable coherent input workflow:
+
+```text
+orbitfabric export integration-input-set <mission_dir>
+        ↓
+integration_input_manifest.json
+        + mission_snapshot.json
+        + entity_index.json
+        + relationship_manifest.json
+        + lint_report.json
+        + model_summary.json
+```
+
+The Integration Input Set is produced from one logical Core load/lint operation and records exact per-surface identities, format versions and digests plus an RFC 8785/JCS-based input-set fingerprint. Missing or incompatible required surfaces block semantic projection; adapters must not fall back to reparsing raw Mission Model YAML.
+
+The Mission Snapshot and Integration Input Set retain their already reference-proven format identifiers:
+
+```text
+snapshot_version = 0.1-candidate
+input_set_version = 0.1-candidate
+```
+
+Stability classification and format-version text are intentionally independent. Retaining the identifiers avoids an artificial compatibility break.
+
+The seven post-v1.1 FDIR relationship families are admitted as additive stable-compatible Relationship Manifest families. They are derived deterministically from explicit Mission Model fields and do not rename, remove or redefine the original v1 relationship families.
+
+The post-v1 candidate Core-owned surfaces consolidated in v1.1.0 remain candidate unless separately promoted:
 
 ```text
 dashboard_summary.json       -> Dashboard-ready aggregation of existing Core facts
@@ -71,31 +96,25 @@ coverage_summary.json        -> Limited coverage derived from Core structured ou
 simulation JSON expectations -> Additive structured expectation accounting
 ```
 
-These post-v1 surfaces are **candidate**, not part of the original v1.0.0 stable surface.
-
-They are Core-owned read-only structured outputs intended for downstream inspection tools.
-
-Current `main` also contains unreleased additive development after v1.1.0:
+The broader Integration Framework is reference-proven, but its extension-owned contracts remain independently versioned candidates:
 
 ```text
-mission_snapshot.json        -> Complete loaded Mission Model in a versioned read-only envelope
-relationship_manifest.json   -> Seven additive explicit FDIR relationship families
+Projection Profile                 0.1-candidate
+Integration Result                 0.1-candidate
+Integration Package / Adapter      0.1-candidate
 ```
 
-`mission_snapshot.json` is a candidate Core-owned inspection surface. It exposes the complete model actually loaded by Core, including structured load diagnostics, without creating a second semantic authority or a Studio-specific API.
-
-The additive FDIR relationship families extend the existing Relationship Manifest from explicit Mission Model fields. They do not rename, remove or change the meaning of the original v1.0 relationship families.
-
-These unreleased additions are development-state capabilities on `main`; they are not retroactively part of the v1.1.0 release.
-
-They do not make OrbitFabric Core a dashboard backend, flight software framework, ground segment, runtime framework, graph engine, Studio API or OpenOBSW/OpenSVF-specific generator.
+Those contracts do not become stable Core Mission Data Contract surfaces merely because the Core input boundary is stable.
 
 The ownership boundary is:
 
 ```text
-Core defines, computes and emits contract-significant structured surfaces.
-Studio and other downstream tools consume, link, navigate and render them.
-Downstream tools must not invent private coverage, health or completeness semantics.
+Mission Model remains the source of truth.
+Core defines, computes and emits Core-owned contract-significant surfaces.
+Projection Profiles own authored ecosystem-specific projection intent.
+External Integration Packages own target-specific validation, projection and artifacts.
+Studio and other downstream tools consume, link, navigate and render explicit contracts.
+No downstream consumer may invent private Mission Data Contract semantics.
 ```
 
 Generated artifact default paths are mission-workspace relative for mission-based commands.
@@ -114,7 +133,7 @@ examples/demo-3u/generated/ground/generic/
 
 Explicit user-provided output paths are preserved unchanged.
 
-The stable v1.0 posture is:
+The stable compatibility posture is:
 
 ```text
 Mission Model remains the source of truth.
@@ -122,16 +141,17 @@ Core owns Mission Data Contract semantics.
 Core-owned structured surfaces are derived from the validated Mission Model.
 Downstream tools consume Core-owned structured surfaces.
 Generated runtime-facing and ground-facing artifacts remain reproducible and disposable unless explicitly classified otherwise.
+Core does not dynamically load or execute ecosystem adapters.
 Plugin execution remains out of scope.
 ```
 
-The v1.0 golden signatures protect selected contract-significant fields of existing Core-owned structured surfaces.
+Selected golden signatures protect contract-significant fields of stable Core-owned structured surfaces.
 
-They do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
+They do not freeze complete generated JSON files, additive Mission Model evolution permitted by the Mission Model contract, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
 
-The v1.0 demo evidence chain proves Mission Data Contract continuity from one validated Mission Model across scenario evidence, generated review artifacts and Core-owned structured surfaces.
+The demo evidence chain proves Mission Data Contract continuity from one validated Mission Model across scenario evidence, generated review artifacts and Core-owned structured surfaces. The post-v1 integration proof additionally demonstrates a coherent Core input set consumed by a real external reference adapter and by OrbitFabric Studio without raw-YAML semantic reconstruction.
 
-It does not prove flight readiness, ground readiness, protocol compliance, tool-specific integration or operational completeness.
+It does not prove flight readiness, ground readiness, protocol compliance or operational completeness.
 
 ---
 
@@ -158,28 +178,31 @@ It models:
 - Core-owned contract introspection surfaces;
 - Core-owned entity index surfaces;
 - Core-owned relationship manifest surfaces;
-- Core-owned post-v1 candidate integration surfaces;
-- a candidate full Mission Model snapshot surface on current `main`;
-- additive explicit FDIR relationship families on current `main`;
+- a stable full loaded-Mission-Model Snapshot surface;
+- a stable coherent Core Integration Input Set boundary;
+- additive explicit FDIR relationship families;
+- Core-owned post-v1 candidate dashboard/coverage surfaces;
 - stability and compatibility classifications;
 - extensibility boundary rules;
-- v1.0 stable Mission Data Contract governance references.
+- separately versioned candidate integration-extension contracts.
 
-The stable structured surface chain is:
+The stable integration-facing Core chain is:
 
 ```text
 Mission Model
-        -> canonical loader
+        -> canonical loader / structural validation
+        -> semantic lint
         -> validated MissionModel
+        -> mission_snapshot.json
         -> model_summary.json
         -> entity_index.json
         -> relationship_manifest.json
-        -> downstream tools and future extensions consume Core-owned structured surfaces
+        -> lint_report.json
+        -> coherent integration_input_manifest.json
+        -> external consumers negotiate explicit surface compatibility
 ```
 
-The v1.1.0 candidate integration surface chain extends downstream inspection evidence without changing the stable Mission Data Contract baseline.
-
-Current unreleased development additionally exposes the complete loaded Mission Model through `mission_snapshot.json` and extends the Relationship Manifest with explicit additive FDIR relationships.
+The v1.1.0 dashboard, scenario-run and coverage surfaces continue to extend downstream inspection evidence as candidate surfaces without changing the stable Mission Data Contract baseline.
 
 ---
 
@@ -203,22 +226,20 @@ OrbitFabric is not:
 - a plugin execution layer;
 - a plugin loader;
 - a plugin discovery mechanism;
-- a plugin API;
-- a metadata schema;
 - a Studio-specific backend API;
 - schema migration tooling;
-- a JSON Schema publication layer;
+- a general JSON Schema registry;
 - a tool-specific integration layer.
 
 Generated Runtime Skeletons are runtime-facing contract bindings.
 
 Ground Integration Artifacts are ground-facing contract exports.
 
-Contract Introspection, Entity Index, Relationship Manifest, Mission Snapshot and post-v1 candidate integration surfaces are Core-derived read-only structured surfaces.
+Contract Introspection, Entity Index, Relationship Manifest and Mission Snapshot are Core-derived read-only structured surfaces. The Core Integration Input Set is the coherent Core-owned boundary for external integration consumption.
 
-Stability, compatibility, extensibility and v1.0 references are governance and documentation surfaces.
+Projection Profiles, Integration Results and Integration Package manifests remain extension contracts with explicit ownership boundaries; they do not move ecosystem-specific semantics into Core.
 
-None of them is flight software, ground software, plugin execution or a visual modeling tool.
+None of these surfaces is flight software, ground software, plugin execution or a visual modeling tool.
 
 ---
 
@@ -248,7 +269,7 @@ examples/demo-3u/
     └── payload_data_flow_evidence.yaml
 ```
 
-The v1.0 demo evidence chain focuses on:
+The stable demo evidence chain focuses on:
 
 ```text
 payload.start_acquisition
@@ -264,12 +285,13 @@ payload.start_acquisition
         -> model_summary.json
         -> entity_index.json
         -> relationship_manifest.json
-        -> golden signatures protecting selected Core-owned surface fields
+        -> mission_snapshot.json
+        -> selected golden signatures protecting stable Core-owned surface fields
 ```
 
 The v1.1.0 candidate integration surfaces add dashboard-ready aggregation, scenario run indexing, limited coverage summary and structured expectation accounting on top of that evidence chain.
 
-Current unreleased development can additionally export the complete loaded demo contract through `mission_snapshot.json` and expose explicit FDIR relationships through the Relationship Manifest.
+v1.2.0 additionally exposes the same loaded demo contract as one coherent Integration Input Set suitable for external adapter consumption.
 
 ---
 
@@ -294,7 +316,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 1.1.0
+orbitfabric 1.2.0
 ```
 
 Run checks:
@@ -325,6 +347,9 @@ orbitfabric lint examples/demo-3u/mission/ \
 
 orbitfabric export mission-snapshot examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/mission_snapshot.json
+
+orbitfabric export integration-input-set examples/demo-3u/mission/ \
+  --output-dir examples/demo-3u/generated/reports/integration_input
 
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/model_summary.json
@@ -410,14 +435,20 @@ Useful entry points:
 - `docs/reference/v1-stable-surface-decision.md`
 - `docs/reference/v1-demo-evidence-chain.md`
 - `docs/reference/v1-compatibility-migration-notes.md`
+- `docs/reference/v1.2-integration-input-stability-decision.md`
 - `docs/reference/golden-output-regression-confidence.md`
 - `docs/reference/extensibility-boundary-contract.md`
-- `docs/reference/post-v1-candidate-integration-surfaces.md`
+- `docs/reference/core-integration-input-contract.md`
 - `docs/reference/mission-snapshot-surface.md`
 - `docs/reference/relationship-manifest-surface.md`
+- `docs/reference/post-v1-candidate-integration-surfaces.md`
+- `docs/reference/projection-profile-contract.md`
+- `docs/reference/integration-result-contract.md`
+- `docs/reference/integration-package-adapter-execution-contract.md`
 - `docs/reference/dashboard-summary-surface.md`
 - `docs/reference/scenario-run-index-surface.md`
 - `docs/reference/coverage-summary-surface.md`
+- `docs/releases/v1.2.0.md`
 - `docs/releases/v1.1.0.md`
 - `docs/releases/v1.0.0.md`
 

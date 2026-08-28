@@ -6,20 +6,20 @@ OrbitFabric distinguishes between:
 
 - the OrbitFabric tool/package version;
 - the Mission Model version declared by a mission;
-- the version fields written into generated JSON reports;
-- the generated runtime contract manifest context;
-- the generated ground contract manifest context;
-- the Core-owned structured surface format versions;
-- the extensibility boundary documentation context;
-- the v1.0 stable Mission Data Contract governance context.
+- generated JSON report producer versions;
+- Core-owned structured-surface format versions;
+- the Core Integration Input Set version;
+- extension-owned Projection Profile / Integration Result / Integration Package contract versions;
+- runtime/ground generated manifest context;
+- stability and compatibility classification.
 
-These versions and contexts are related, but they are not the same thing.
+These versions and classifications are related, but they are not interchangeable.
 
 ---
 
 ## OrbitFabric tool/package version
 
-The OrbitFabric tool/package version identifies the version of the Python package and CLI.
+The OrbitFabric tool/package version identifies the Python package and CLI release.
 
 It is defined in:
 
@@ -34,33 +34,27 @@ It is shown by:
 orbitfabric --version
 ```
 
-Current example:
+Current release:
 
 ```text
-orbitfabric 1.0.0
+orbitfabric 1.2.0
 ```
 
-This version answers the question:
+This version answers:
 
 ```text
-Which version of the OrbitFabric tool generated, validated or executed this artifact?
+Which OrbitFabric tool release generated, validated or executed this artifact?
 ```
 
-Generated JSON reports and generated manifests record this tool context where applicable.
+It is provenance/support information. It is not the sole compatibility key for structured surfaces.
 
 ---
 
 ## Mission Model version
 
-The Mission Model version is declared inside the mission YAML.
+The Mission Model version is declared inside the mission YAML, currently under `spacecraft.yaml`.
 
-For the current multi-file Mission Model, it is stored in:
-
-```text
-spacecraft.yaml
-```
-
-Current demo example:
+Demo example:
 
 ```yaml
 spacecraft:
@@ -69,52 +63,121 @@ spacecraft:
   model_version: 0.1.0
 ```
 
-This version answers the question:
+This version answers:
 
 ```text
 Which Mission Model contract version does this mission declare?
 ```
 
-It is part of the mission data contract.
-
-It is not the same as the OrbitFabric Python package version.
+It is part of the mission data contract and is independent from the OrbitFabric package version.
 
 ---
 
-## Generated JSON report version
+## Generated JSON report producer version
 
-Generated JSON reports include the OrbitFabric tool/package version.
+Generated JSON reports may include the OrbitFabric package version that produced them.
 
-Current lint report example:
+Conceptual lint example:
 
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "mission": "demo-3u",
   "model_version": "0.1.0"
 }
 ```
 
-The top-level `version` identifies the OrbitFabric tool that produced the report.
+The top-level producer `version` and the mission's `model_version` answer different questions.
 
-The `model_version` identifies the Mission Model version declared by the mission.
+For compatibility-sensitive machine-readable surfaces, consumers must use the documented surface/report compatibility identifier rather than package version alone.
+
+---
+
+## Core-owned structured-surface format versions
+
+Stable Core-owned surfaces may retain format-version identifiers that predate their stability promotion.
+
+Current relevant identifiers are:
+
+| Surface | Format version field | Current value | v1.2 classification |
+|---|---|---|---|
+| `model_summary.json` | `summary_version` | `0.1` | Stable |
+| `entity_index.json` | `index_version` | `0.1` | Stable |
+| `relationship_manifest.json` | `manifest_version` | `0.1-candidate` | Stable for admitted families |
+| `mission_snapshot.json` | `snapshot_version` | `0.1-candidate` | Stable from v1.2.0 |
+| Core Integration Input Set | `input_set_version` | `0.1-candidate` | Stable from v1.2.0 |
+
+This is intentional:
+
+```text
+stability classification != format-version text
+```
+
+Changing a proven wire identifier merely to remove the word `candidate` would create avoidable consumer incompatibility without changing semantics.
+
+A breaking change to a stable contract requires an explicit compatibility decision and a new identifier/version when appropriate.
+
+---
+
+## Core Integration Input Set version
+
+The coherent input set uses:
+
+```text
+kind = orbitfabric.integration_input_set
+input_set_version = 0.1-candidate
+```
+
+From v1.2.0, the documented input-set semantics are stable even though this identifier remains unchanged.
+
+An external adapter must negotiate at least:
+
+```text
+input-set kind/version
+surface role
+surface kind
+surface format version
+supported typed records where applicable
+```
+
+`orbitfabric_version` alone is insufficient.
+
+---
+
+## Extension-owned integration contract versions
+
+The generic Integration Framework also defines independently versioned extension contracts:
+
+```text
+Projection Profile
+Integration Result
+Integration Package / Adapter Execution
+```
+
+At the v1.2.0 Core release they remain:
+
+```text
+0.1-candidate
+```
+
+They are not stable Core Mission Data Contract surfaces.
+
+The stable Core Integration Input Set can therefore be consumed by extension contracts whose own compatibility classification remains candidate.
+
+This separation lets the Core input boundary stabilize without prematurely freezing ecosystem-specific projection or adapter-execution contracts.
 
 ---
 
 ## Runtime contract manifest context
 
-v0.7.0 introduced runtime-facing contract bindings.
-
-The generated runtime manifest is written to:
+Generated runtime-facing contract bindings include a runtime manifest under:
 
 ```text
 generated/runtime/cpp17/runtime_contract_manifest.json
 ```
 
-It records the software-facing contract surface generated from the Mission Model.
-
-It also records generation metadata such as:
+It records generation context and boundary flags such as:
 
 ```text
 generation profile
@@ -122,30 +185,21 @@ contains_flight_runtime = false
 generated_artifacts_are_disposable = true
 ```
 
-The runtime manifest is generated from the current OrbitFabric tool and the declared Mission Model.
-
-It remains a public preview generated manifest in v1.0.0.
-
-It is not a separate stable schema version promise and is not flight runtime behavior.
+It is a generated contract artifact, not flight runtime behavior and not automatically a stable schema merely because the OrbitFabric package is stable.
 
 ---
 
 ## Ground contract manifest context
 
-v0.8.0 introduced ground-facing contract exports.
-
-The generated ground manifest is written to:
+Generated ground-facing artifacts include:
 
 ```text
 generated/ground/generic/ground_contract_manifest.json
 ```
 
-It records the generated ground-facing package, artifact paths and architectural boundary flags.
-
-It also records generation metadata such as:
+It records package/artifact generation context and boundary flags such as:
 
 ```text
-generation profile
 generated_artifacts_are_disposable = true
 contains_ground_runtime = false
 contains_operator_console = false
@@ -156,70 +210,31 @@ claims_openc3_compatibility = false
 claims_xtce_compliance = false
 ```
 
-The ground manifest is generated from the current OrbitFabric tool and the declared Mission Model.
-
-It remains a public preview generated manifest in v1.0.0.
-
 It is not a ground segment schema, mission database compatibility promise or tool-specific integration guarantee.
-
----
-
-## Core-owned structured surface context
-
-v1.0.0 stabilizes these Core-owned structured surfaces:
-
-```text
-model_summary.json
-entity_index.json
-relationship_manifest.json for admitted families
-```
-
-Their format version fields remain distinct from the OrbitFabric tool/package version:
-
-| Surface | Format version field | Current value |
-|---|---|---|
-| `model_summary.json` | `summary_version` | `0.1` |
-| `entity_index.json` | `index_version` | `0.1` |
-| `relationship_manifest.json` | `manifest_version` | `0.1-candidate` |
-
-These values identify the report format version for each surface.
-
-They do not replace the OrbitFabric package version.
-
-They do not replace the Mission Model version declared by the mission.
 
 ---
 
 ## Stability and compatibility context
 
-v1.0.0 establishes the first stable narrow Mission Data Contract surface.
+`v1.0.0` established the first stable narrow Mission Data Contract.
 
-The stable surface includes:
+`v1.2.0` additively extends that stable boundary with:
 
 ```text
-Mission Model documented contract semantics
-Core structural validation
-Core semantic lint diagnostic policy
-scenario YAML evidence inputs
-lint JSON report
-simulation JSON report
-model_summary.json
-entity_index.json
-relationship_manifest.json for admitted families
-CLI command interface for documented workflows
-release compatibility policy
-extensibility boundary contract
+mission_snapshot.json
+Core Integration Input Set
+seven admitted additive FDIR Relationship Manifest families
 ```
 
-The stability and compatibility references classify stable, preview, disposable, internal and out-of-scope surfaces.
+The v1.1.0 dashboard summary, scenario run index, coverage summary and structured expectation additions remain candidate unless separately promoted.
 
-They do not introduce schema migration tooling, JSON Schema publication, plugin execution, runtime behavior, ground behavior or tool-specific integrations.
+Stability classification is governed by explicit reviewed decisions, not by the mere existence of a file or version token.
 
 ---
 
 ## Extensibility boundary context
 
-The Extensibility Boundary Contract is a stable v1.0 governance surface.
+The Extensibility Boundary Contract remains a stable governance surface.
 
 It records expectations such as:
 
@@ -229,94 +244,30 @@ Mission Model remains source of truth
 extensions consume Core-owned surfaces
 extension-owned outputs remain distinguishable from Core-owned outputs
 semantic override remains forbidden
-execution remains out of scope
+Core in-process ecosystem execution remains out of scope
 ```
 
-This boundary does not introduce a metadata schema, JSON shape, metadata manifest format, parser, loader, validator, registry, CLI command, plugin discovery, plugin loading or plugin execution.
+The stable v1.2 Integration Input Set reinforces that boundary: Core exports the coherent machine-readable input; external packages execute target-specific integration logic outside Core.
 
 ---
 
 ## Why the versions differ
 
-OrbitFabric tool/package version and Mission Model version intentionally differ.
-
-For example:
+A valid v1.2 configuration may therefore contain:
 
 ```text
-OrbitFabric tool/package version: 1.0.0
-Mission Model version:           0.1.0
+OrbitFabric package version:             1.2.0
+Mission Model version:                   0.1.0
+Mission Snapshot format version:         0.1-candidate
+Integration Input Set format version:    0.1-candidate
+Projection Profile contract version:     0.1-candidate
+Integration Result contract version:     0.1-candidate
 ```
 
-This is valid.
+There is no contradiction.
 
-It means:
+Each version identifies a different compatibility/provenance dimension.
 
-- the tool has reached the v1.0.0 stable Mission Data Contract release;
-- the demo mission still declares the v0.1 Mission Model contract;
-- generated artifacts record the relevant tool and model context;
-- generated surface format versions remain independent from the tool/package version.
+The engineering rule is:
 
----
-
-## Current v1.0.0 rule
-
-For the current stable release:
-
-| Version field | Meaning |
-|---|---|
-| `orbitfabric --version` | OrbitFabric CLI/package version, currently `1.0.0`. |
-| JSON report top-level `version` | OrbitFabric tool version that produced the report, where used. |
-| `spacecraft.model_version` | Mission Model contract version declared by the mission. |
-| JSON report `model_version` | Mission Model version copied from mission YAML, where used. |
-| Runtime manifest `generation.profile` | Runtime generation profile, currently `cpp17`. |
-| Runtime manifest `contains_flight_runtime` | Explicit boundary flag, currently `false`. |
-| Ground manifest `generation.profile` | Ground generation profile, currently `generic`. |
-| Ground manifest `contains_ground_runtime` | Explicit boundary flag, currently `false`. |
-| Ground manifest `claims_*` compatibility fields | Explicit tool-specific claim flags, currently `false`. |
-| Model summary `summary_version` | Contract introspection report format version, currently `0.1`. |
-| Model summary `kind` | Contract introspection report kind, currently `orbitfabric.model_summary`. |
-| Entity index `index_version` | Entity index report format version, currently `0.1`. |
-| Entity index `kind` | Entity index report kind, currently `orbitfabric.entity_index`. |
-| Relationship manifest `manifest_version` | Relationship manifest report format version, currently `0.1-candidate`. |
-| Relationship manifest `kind` | Relationship manifest report kind, currently `orbitfabric.relationship_manifest`. |
-| Extensibility Boundary Contract | Stable documentation boundary for future extension-owned outputs, not an execution version. |
-| v1.0 governance references | Stable documentation and review context for compatibility, migration notes and future evolution. |
-
----
-
-## What not to assume
-
-Do not assume that:
-
-- the OrbitFabric package version and Mission Model version are always identical;
-- a Mission Model version bump always requires a Python package major/minor bump;
-- a Python package patch version always changes the Mission Model contract;
-- generated artifacts are valid without checking both tool version and mission model version;
-- generated runtime-facing bindings are flight protocol IDs or flight software ABI guarantees;
-- generated ground-facing artifacts imply ground runtime behavior or tool-specific compatibility;
-- model summary reports imply entity-level indexing, relationship graphs or plugin APIs;
-- entity index reports imply relationship graphs, dependency graphs or plugin APIs;
-- relationship manifest reports imply graph engines, runtime behavior, ground behavior, plugin APIs or Studio-specific APIs;
-- stability and compatibility references imply schema migration tooling, JSON Schema publication or plugin execution;
-- Extensibility Boundary Contract implies metadata schema, plugin discovery, plugin loading, plugin execution or a plugin runtime.
-
----
-
-## Future direction
-
-Future versions may introduce a more explicit schema versioning mechanism.
-
-Possible future additions include:
-
-- a dedicated Mission Model schema version field;
-- a dedicated RuntimeContract schema version;
-- a dedicated GroundContract schema version;
-- a dedicated Entity Index schema version;
-- a dedicated Relationship Manifest schema version;
-- schema migration helpers;
-- compatibility checks between tool version and Mission Model version;
-- JSON Schema export for Mission Model validation;
-- compatibility checks for generated artifact profiles;
-- a separately reviewed metadata format for future extension-owned outputs.
-
-These are not part of the v1.0.0 stable release boundary.
+> negotiate the contract you consume; do not infer compatibility from one unrelated version number.

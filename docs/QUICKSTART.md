@@ -7,18 +7,18 @@ OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 The current public release is:
 
 ```text
-v1.1.0 - Candidate Integration Surface Consolidation
+v1.2.0 - Core Integration Input Consolidation
 ```
 
-The stable Mission Data Contract baseline remains:
+The stable Mission Data Contract commitment originated with:
 
 ```text
 v1.0.0 - Stable Mission Data Contract
 ```
 
-v1.1.0 consolidates post-v1 Core-owned candidate integration surfaces while preserving the deliberately narrow v1.0.0 stable surface around the Mission Model, validation, linting, scenario evidence, machine-readable JSON reports, Core-owned structured surfaces, release compatibility governance and the extensibility boundary.
+v1.2.0 extends that stable boundary additively with the Mission Snapshot and coherent Core Integration Input Set, without changing Mission Model semantics.
 
-Current `main` additionally includes unreleased candidate Mission Snapshot export and additive explicit FDIR Relationship Manifest families.
+The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate unless separately promoted.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -94,10 +94,8 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 1.1.0
+orbitfabric 1.2.0
 ```
-
-The package version remains `1.1.0` while current `main` contains unreleased post-v1.1 development.
 
 ---
 
@@ -165,9 +163,9 @@ The explicit path is preserved exactly as provided.
 
 ---
 
-## 10. Export the current unreleased Mission Snapshot surface
+## 10. Export the stable Mission Snapshot
 
-Current `main` can export the complete loaded Mission Model through the candidate Mission Snapshot surface:
+Export the complete loaded Mission Model through the v1.2 stable Mission Snapshot surface:
 
 ```bash
 orbitfabric export mission-snapshot examples/demo-3u/mission/ \
@@ -186,15 +184,13 @@ The Mission Snapshot answers:
 What complete Mission Model did Core actually load?
 ```
 
-It is Core-owned, read-only and versioned.
+It is Core-owned, read-only and versioned. It does not replace the Mission Model as source of truth, expose a YAML AST, provide source editing semantics, expose a partial semantic model after structural load failure or define a Studio-specific API.
 
-It does not replace the Mission Model as source of truth, expose a YAML AST, provide source editing semantics, expose a partial semantic model after structural load failure or define a Studio-specific API.
-
-This surface is implemented on current `main` but is not part of the published v1.1.0 release.
+Its existing `snapshot_version = 0.1-candidate` format identifier is intentionally retained; v1.2 stability classification and format-version text are separate compatibility concepts.
 
 ---
 
-## 11. Export v1.0 stable Core-owned structured surfaces
+## 11. Export stable Core-owned structured surfaces
 
 ```bash
 orbitfabric export model-summary examples/demo-3u/mission/ \
@@ -220,20 +216,44 @@ These surfaces answer:
 ```text
 model_summary.json          -> What contract domains are present?
 entity_index.json           -> What contract entities are defined?
-relationship_manifest.json  -> How are indexed contract entities related?
+relationship_manifest.json  -> Which admitted explicit relationships connect them?
 ```
 
-The original v1 Relationship Manifest compatibility commitments remain stable. Current `main` additionally emits seven explicit FDIR-oriented relationship families derived from existing Mission Model fields.
-
-Compatible consumers must not guess semantics for unknown additive relationship types.
-
-These surfaces are Core-owned, read-only and derived from the validated Mission Model.
-
-They do not expose plugin execution, graph engines, Studio-specific APIs, runtime behavior or ground behavior.
+The seven FDIR-oriented relationship families admitted in v1.2 are additive stable-compatible families derived from explicit Mission Model fields. Compatible consumers must not guess semantics for unknown additive relationship types.
 
 ---
 
-## 12. Export v1.1 candidate Core-owned integration surfaces
+## 12. Export the stable coherent Core Integration Input Set
+
+For external ecosystem integration, use the single coherent export operation:
+
+```bash
+orbitfabric export integration-input-set examples/demo-3u/mission/ \
+  --output-dir examples/demo-3u/generated/reports/integration_input
+```
+
+The output directory contains:
+
+```text
+integration_input_manifest.json
+mission_snapshot.json
+entity_index.json
+relationship_manifest.json
+lint_report.json
+model_summary.json
+```
+
+Core performs one logical load/lint operation, writes exact surface digests, computes the RFC 8785/JCS-based `input_set_sha256` and publishes the manifest last.
+
+A directory without a valid Integration Input Manifest is not a coherent Integration Input Set.
+
+External adapters must reject incompatible required surfaces and must not fall back to reparsing Mission Model YAML.
+
+The existing `input_set_version = 0.1-candidate` identifier is retained for compatibility with the reference-proven producer/consumer chain.
+
+---
+
+## 13. Export v1.1 candidate Core-owned inspection surfaces
 
 ```bash
 orbitfabric export dashboard-summary examples/demo-3u/mission/
@@ -254,43 +274,42 @@ examples/demo-3u/generated/reports/coverage_summary.json
 
 `scenario_run_index.json` is emitted to the explicit `--json` path shown above.
 
-These v1.1.0 surfaces are Core-owned candidate integration surfaces. They are not promoted to the original v1.0.0 stable compatibility class.
+These v1.1.0 surfaces remain Core-owned candidate inspection surfaces after v1.2.0.
 
 ---
 
-## 13. Review stable, candidate and unreleased references
+## 14. Review stable and candidate references
 
 Key references include:
 
 ```text
 Stability and Compatibility Contract
 Mission Model Stability Contract
-CLI Contract v1 Preview
-Generated Surfaces Stability
-Extensibility Boundary Contract
+Release Compatibility Policy
 v1.0 Stable Surface Decision
 v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
-Post-v1 Candidate Integration Surfaces
+v1.2 Integration Input Stability Decision
+Post-v1 Integration Surface Classification
 Mission Snapshot Surface
+Core Integration Input Contract
 Relationship Manifest Surface
+Projection Profile Contract
+Integration Result Contract
+Integration Package and Adapter Execution Contract
 Dashboard Summary Surface
 Scenario Run Index Surface
 Coverage Summary Surface
-Lint Rule Code Stability
-JSON Report Compatibility
-Scenario Evidence Stability
-Release Compatibility Policy
 ```
 
-These references classify stable, candidate and current unreleased surfaces, define the extensibility boundary, record the v1.0 stable posture and explain what is stable, candidate, preview, disposable, internal or out of scope.
+These references separate stable Core-owned contracts from candidate Core inspection surfaces and candidate extension-owned integration contracts.
 
-They do not introduce runtime behavior, ground behavior, plugin discovery, plugin loading, plugin execution or tool-specific integrations.
+They do not introduce runtime behavior, ground behavior or Core plugin execution.
 
 ---
 
-## 14. Generate mission documentation
+## 15. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -309,21 +328,19 @@ Do not edit generated files manually.
 
 ---
 
-## 15. Generate runtime-facing contract bindings
+## 16. Generate runtime-facing contract bindings
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
 ```
 
-The generated C++17 files are runtime-facing contract bindings.
-
-They expose IDs, metadata, command argument structs, abstract adapter interfaces and a host-build smoke target.
+The generated C++17 files are runtime-facing contract bindings. They expose IDs, metadata, command argument structs, abstract adapter interfaces and a host-build smoke target.
 
 They do not implement onboard behavior.
 
 ---
 
-## 16. Validate the generated C++17 host-build smoke target
+## 17. Validate the generated C++17 host-build smoke target
 
 ```bash
 cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
@@ -336,27 +353,23 @@ Expected result:
 build passed
 ```
 
-This confirms that the generated contract-binding surface is syntactically valid and buildable as C++17 on the host.
-
-It does not validate flight behavior.
+This confirms that the generated contract-binding surface is syntactically valid and buildable as C++17 on the host. It does not validate flight behavior.
 
 ---
 
-## 17. Generate ground integration artifacts
+## 18. Generate ground integration artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
 ```
 
-The generated ground files are ground-facing contract exports.
-
-They are intended for engineering review, scripts and downstream integration work.
+The generated ground files are ground-facing contract exports. They are intended for engineering review, scripts and downstream integration work.
 
 They do not implement a live ground segment, decoder, telemetry archive, database, operator console or command uplink service.
 
 ---
 
-## 18. Run demo scenarios
+## 19. Run demo scenarios
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -387,11 +400,11 @@ The data-flow evidence report traces the declared contract path:
 command -> data product -> storage intent -> downlink intent -> downlink flow -> contact window
 ```
 
-The v1.1.0 simulation JSON structured expectation accounting is additive. The legacy top-level `failed_expectations` compatibility list remains available.
+The v1.1.0 simulation JSON structured expectation accounting remains additive and candidate. The legacy top-level `failed_expectations` compatibility list remains available.
 
 ---
 
-## 19. What this proves
+## 20. What this proves
 
 The current repository baseline proves that OrbitFabric can:
 
@@ -399,11 +412,10 @@ The current repository baseline proves that OrbitFabric can:
 - validate Mission Model structure;
 - run semantic lint rules;
 - generate documentation;
-- inspect a Mission Model summary;
-- export the candidate full Mission Model snapshot on current `main`;
-- export v1.0 stable Core-owned structured surfaces;
-- emit additive explicit FDIR relationship families on current `main`;
-- export v1.1 candidate Core-owned integration surfaces;
+- export stable Mission Snapshot, Model Summary, Entity Index and Relationship Manifest surfaces;
+- emit additive stable-compatible FDIR relationship families;
+- export one coherent stable Core Integration Input Set;
+- export candidate dashboard/scenario-run/coverage inspection surfaces;
 - validate scenarios without executing them;
 - execute deterministic host-side scenario evidence;
 - record contract-level data-flow evidence;
@@ -412,37 +424,30 @@ The current repository baseline proves that OrbitFabric can:
 - generate ground-facing contract artifacts;
 - protect selected Core-owned structured surface fields with golden signatures.
 
+The broader Integration Framework is also reference-proven through an external OpenOBSW/OpenSVF Integration Package and an independent Studio consumer, while target-specific contracts remain extension-owned.
+
 ---
 
-## 20. What this does not prove
+## 21. What this does not prove
 
 The current demo does not prove:
 
 - flight readiness;
 - real-time behavior;
 - hardware integration;
-- real onboard storage execution;
-- real downlink execution;
+- real onboard storage or downlink execution;
 - real contact scheduling;
 - orbit propagation;
 - RF link budget simulation;
 - CCSDS, PUS or CFDP compliance;
-- compatibility with cFS, F Prime, Yamcs or OpenC3;
+- generic compatibility with cFS, F Prime, Yamcs or OpenC3;
 - XTCE compliance;
-- binary decoder behavior;
+- binary decoder or encoder behavior;
 - command uplink behavior;
-- telemetry archive behavior;
-- database behavior;
-- operator console behavior;
-- command dispatch runtime behavior;
-- telemetry polling runtime behavior;
+- telemetry archive/database/operator-console behavior;
 - HAL or RTOS integration;
-- relationship graph behavior;
-- dependency graph behavior;
-- plugin API behavior;
-- plugin discovery behavior;
-- plugin loading behavior;
-- plugin execution behavior;
+- relationship or dependency graph behavior;
+- Core plugin discovery/loading/execution;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current scope.
+Those are intentionally outside the current Core scope.

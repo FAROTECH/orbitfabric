@@ -5,16 +5,12 @@ This document explains how to work on OrbitFabric locally.
 OrbitFabric is currently released at:
 
 ```text
-v1.1.0 - Candidate Integration Surface Consolidation
+v1.2.0 - Core Integration Input Consolidation
 ```
 
-The stable Mission Data Contract baseline remains:
+The stable Mission Data Contract commitment originated with `v1.0.0`; v1.2.0 extends it additively with the stable Core integration input boundary and no new Mission Model semantics.
 
-```text
-v1.0.0 - Stable Mission Data Contract
-```
-
-Development work after v1.0.0 must preserve the narrow Mission Data Contract scope and follow the release compatibility policy. v1.1.0 candidate integration surfaces are Core-owned, but they are not promoted to the original v1.0.0 stable compatibility class.
+The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate. Projection Profile, Integration Result and Integration Package / Adapter Execution remain independently versioned candidate extension contracts.
 
 ---
 
@@ -64,7 +60,7 @@ orbitfabric --help
 Expected current package version:
 
 ```text
-orbitfabric 1.1.0
+orbitfabric 1.2.0
 ```
 
 ---
@@ -89,7 +85,7 @@ mkdocs build --strict -> passing
 
 ---
 
-## Verify the v1.0 Stable State
+## Verify the stable Core state
 
 Run mission lint:
 
@@ -98,9 +94,12 @@ orbitfabric lint examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/lint_report.json
 ```
 
-Export the v1.0 stable Core-owned structured surfaces:
+Export stable Core-owned structured surfaces:
 
 ```bash
+orbitfabric export mission-snapshot examples/demo-3u/mission/ \
+  --json examples/demo-3u/generated/reports/mission_snapshot.json
+
 orbitfabric export model-summary examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/model_summary.json
 
@@ -111,14 +110,26 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
   --json examples/demo-3u/generated/reports/relationship_manifest.json
 ```
 
-Review the v1.0 references:
+Export the stable coherent integration input boundary:
+
+```bash
+orbitfabric export integration-input-set examples/demo-3u/mission/ \
+  --output-dir examples/demo-3u/generated/reports/integration_input
+```
+
+The Integration Input Set must preserve one-load/one-lint generation, explicit required/companion roles, exact surface digests, RFC 8785/JCS set fingerprinting, manifest-last completeness and no raw-YAML semantic fallback for external adapters.
+
+Review the stability references:
 
 ```text
 v1.0 Stable Surface Decision
 v1.0 Demo Evidence Chain
 Golden Output and Regression Confidence Policy
 v1.0 Compatibility and Migration Notes
+v1.2 Integration Input Stability Decision
 Release Compatibility Policy
+Stability and Compatibility Contract
+Core Integration Input Contract
 Extensibility Boundary Contract
 ```
 
@@ -165,6 +176,8 @@ Expected results:
 
 ```text
 lint                         -> Result: PASSED
+export mission-snapshot      -> Result: PASSED
+export integration-input-set -> Result: PASSED
 export model-summary         -> Result: PASSED
 export entity-index          -> Result: PASSED
 export relationship-manifest -> Result: PASSED
@@ -178,9 +191,9 @@ sim                          -> Result: PASSED
 
 ---
 
-## Verify the v1.1 Candidate Integration Surfaces
+## Verify the v1.1 candidate inspection surfaces
 
-Export the post-v1 candidate Core-owned integration surfaces:
+Export the candidate Core-owned inspection surfaces:
 
 ```bash
 orbitfabric export dashboard-summary examples/demo-3u/mission/
@@ -192,16 +205,7 @@ orbitfabric export scenario-run-index \
 orbitfabric export coverage-summary examples/demo-3u/mission/
 ```
 
-With omitted output paths, mission-based commands write under the mission workspace:
-
-```text
-examples/demo-3u/generated/reports/dashboard_summary.json
-examples/demo-3u/generated/reports/coverage_summary.json
-```
-
-These surfaces are Core-owned candidate outputs consolidated in v1.1.0.
-
-They must not be treated as dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
+These surfaces remain candidate after v1.2.0 and must not be treated as dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
 
 ---
 
@@ -220,9 +224,7 @@ examples/demo-3u/generated/
 
 Explicit user-provided output paths are preserved exactly as provided.
 
-These files are reproducible outputs.
-
-They are not the source of truth and should normally not be committed.
+Generated files are reproducible outputs. They are not the source of truth and should normally not be committed.
 
 The source of truth is:
 
@@ -231,25 +233,19 @@ examples/demo-3u/mission/*.yaml
 examples/demo-3u/scenarios/*.yaml
 ```
 
-Generated runtime-facing contract bindings are disposable unless explicitly classified otherwise.
+Generated runtime-facing contract bindings, ground-facing integration artifacts, Markdown documentation and plain-text logs remain disposable unless explicitly classified otherwise.
 
-Generated ground-facing integration artifacts are disposable unless explicitly classified otherwise.
-
-Generated Markdown documentation is disposable.
-
-Plain-text logs are human-oriented and non-contractual.
-
-Core-owned structured surfaces are derived from the validated Mission Model or from Core-generated structured outputs.
-
-The stable v1.0.0 Core-owned structured surfaces are:
+Stable Core-owned machine-readable surfaces now include:
 
 ```text
+mission_snapshot.json
 model_summary.json
 entity_index.json
-relationship_manifest.json
+relationship_manifest.json for admitted families
+Core Integration Input Set
 ```
 
-The v1.1.0 candidate Core-owned integration surfaces are:
+Candidate Core-owned inspection surfaces remain:
 
 ```text
 dashboard_summary.json
@@ -258,9 +254,7 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-The v1.0 golden signatures protect selected contract-significant fields of the stable surfaces.
-
-They do not freeze full generated JSON files, absolute paths, human-oriented output, Markdown wording, generated runtime bindings, generated ground dictionaries or disposable artifact formatting.
+Selected golden signatures protect contract-significant fields of stable surfaces. They do not freeze complete generated JSON, absolute paths, human-oriented output or disposable artifact formatting.
 
 User implementation code and downstream integration code must live outside `generated/`.
 
@@ -271,12 +265,13 @@ User implementation code and downstream integration code must live outside `gene
 For new behavior, follow this order:
 
 ```text
-1. update or define the Mission Model semantics
-2. add or update lint rules
+1. update or define Mission Model semantics only when the feature is genuinely Core semantic scope
+2. add or update lint rules where required
 3. add tests
-4. update generated docs or reports if needed
-5. update runtime-facing, ground-facing, introspection, entity-index, relationship or candidate-surface exporters if needed
-6. update user-facing documentation
+4. update Core-owned structured surfaces only through documented ownership boundaries
+5. update generated docs/reports/runtime/ground bindings where needed
+6. update compatibility classification when a stable surface changes
+7. update user-facing documentation
 ```
 
 After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
@@ -287,15 +282,17 @@ Do not add generated artifacts that bypass validation.
 
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
-Do not add plugin execution mechanisms before Core-owned structured surfaces and plugin boundaries are explicitly defined.
+Do not dynamically load ecosystem Integration Adapters inside Core; the stable v1.2 boundary is out-of-process execution over the coherent Core Integration Input Set.
 
-Do not turn the Extensibility Boundary Contract into metadata schema, plugin discovery, plugin loading or plugin execution without a separate architectural review.
+Do not turn the Extensibility Boundary Contract into plugin discovery/loading/execution without a separate architectural review.
 
 Do not put user code inside generated runtime bindings.
 
 Do not present generated ground artifacts as live ground behavior.
 
-Do not present Core-owned structured surfaces as relationship graphs, dependency graphs, plugin APIs, runtime behavior, ground behavior or Studio-specific APIs.
+Do not present Core-owned structured surfaces as relationship graphs, dependency graphs, runtime behavior, ground behavior or Studio-specific APIs.
+
+Do not copy target-specific Projection Profile semantics into Core.
 
 ---
 
