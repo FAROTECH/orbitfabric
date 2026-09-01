@@ -7,6 +7,8 @@ Parent architecture issue: #227
 Design issue: #233  
 Depends on: #228, #231
 
+> A subsequent operation-input lane is defined by [Integration Operation-Input Contract v1](integration-contract-v1.md) and the [compatibility matrix](integration-contract-compatibility-matrix.md). This document remains the frozen v0 contract.
+
 ---
 
 ## 1. Purpose

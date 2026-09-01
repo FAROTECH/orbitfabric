@@ -7,6 +7,8 @@ Parent architecture issue: #227
 Design issue: #235  
 Depends on: #228, #231, #233, ADR-0015
 
+> A subsequent operation-input lane is defined by [Integration Operation-Input Contract v1](integration-contract-v1.md) and the [compatibility matrix](integration-contract-compatibility-matrix.md). This document remains the frozen v0 contract.
+
 ## 1. Purpose
 
 This contract defines the generic package and execution boundary used to make an OrbitFabric ecosystem integration inspectable, compatibility-checkable and externally executable without importing third-party adapter code into Core.

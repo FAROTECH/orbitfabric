@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orbitfabric.dev/contracts/integration-package-manifest-0.2-candidate.schema.json",
+  "title": "OrbitFabric Integration Package Manifest 0.2-candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind", "manifest_version", "integration", "adapter",
+    "core_input_compatibility", "profile_compatibility", "result_compatibility",
+    "capabilities", "operations", "profile_schemas", "execution"
+  ],
+  "properties": {
+    "kind": {"const": "orbitfabric.integration_package"},
+    "manifest_version": {"const": "0.2-candidate"},
+    "integration": {"$ref": "#/$defs/identity"},
+    "adapter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      }
+    },
+    "core_input_compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["input_set_versions", "surfaces", "relationship_families"],
+      "properties": {
+        "input_set_versions": {"$ref": "#/$defs/nonEmptyUniqueStrings"},
+        "surfaces": {
+          "type": "array", "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["role", "kind", "format_versions"],
+            "properties": {
+              "role": {"type": "string", "minLength": 1},
+              "kind": {"type": "string", "minLength": 1},
+              "format_versions": {"$ref": "#/$defs/nonEmptyUniqueStrings"}
+            }
+          }
+        },
+        "relationship_families": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "profile_compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["profile_versions"],
+      "properties": {"profile_versions": {"$ref": "#/$defs/nonEmptyUniqueStrings"}}
+    },
+    "result_compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["result_versions", "default_result_version"],
+      "properties": {
+        "result_versions": {
+          "type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true,
+          "items": {"const": "0.2-candidate"}
+        },
+        "default_result_version": {"const": "0.2-candidate"}
+      }
+    },
+    "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "operations": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "capabilities", "input_requirements"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "input_requirements": {
+            "type": "array", "maxItems": 1,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["role"],
+              "properties": {"role": {"const": "scenario"}}
+            }
+          }
+        }
+      }
+    },
+    "profile_schemas": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["schema_version", "format", "path", "sha256"],
+        "properties": {
+          "schema_version": {"type": "string", "minLength": 1},
+          "format": {"const": "json-schema-2020-12"},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "argv_prefix"],
+      "properties": {
+        "protocol": {"const": "orbitfabric.adapter_cli.v1"},
+        "argv_prefix": {"$ref": "#/$defs/nonEmptyUniqueStrings"}
+      }
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id"], "properties": {"id": {"type": "string", "minLength": 1}}
+    },
+    "nonEmptyUniqueStrings": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
+

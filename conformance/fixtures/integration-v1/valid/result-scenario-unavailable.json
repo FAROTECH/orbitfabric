@@ -1,0 +1,20 @@
+{
+  "kind": "orbitfabric.integration_result",
+  "result_version": "0.2-candidate",
+  "result": "failed",
+  "integration": {"id": "fixture-scenario", "schema_version": null},
+  "adapter": {"id": "fixture-scenario", "version": "1.0.0"},
+  "operation": {"id": "verification_projection"},
+  "mission": {"status": "unavailable", "id": null, "model_version": null, "reason": "not loaded"},
+  "inputs": {
+    "core_input_set": {"status": "unavailable", "kind": null, "version": null, "sha256": null, "reason": "not loaded"},
+    "profile": {"status": "unavailable", "kind": null, "profile_version": null, "id": null, "version": null, "sha256": null, "reason": "not loaded"},
+    "operation_inputs": [
+      {"role": "scenario", "status": "unavailable", "id": null, "sha256": null, "reason": "missing binding"}
+    ]
+  },
+  "capabilities": [], "artifacts": [], "mappings": [], "resolutions": [],
+  "diagnostics": [], "coverage": {"status": "unavailable"},
+  "evidence": [], "external_tools": []
+}
+
