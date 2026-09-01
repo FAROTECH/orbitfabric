@@ -243,7 +243,17 @@ Integration Result     Mappings, artifacts, diagnostics, coverage and provenance
 Downstream tools       Navigation, presentation and orchestration of explicit records
 ```
 
-The Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain independently versioned `0.1-candidate` extension contracts. They are design-frozen and reference-proven, but they are not stable Core Mission Data Contract surfaces.
+The original Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain available as the frozen `0.1-candidate` / `orbitfabric.adapter_cli.v0` lane.
+
+OrbitFabric also publishes a candidate operation-input lane for external integration conformance:
+
+```text
+Manifest 0.2-candidate
+orbitfabric.adapter_cli.v1
+Result 0.2-candidate
+```
+
+The v1 lane keeps IISS and Projection Profile as common context and allows zero or one required file-backed operation input. The first contract-defined role is `scenario`. Core publishes JSON Schemas, positive/negative fixtures and a reusable conformance checker. This remains an extension contract and does not move adapter execution or target semantics into Core.
 
 Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
 

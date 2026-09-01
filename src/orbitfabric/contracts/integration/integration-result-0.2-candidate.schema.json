@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orbitfabric.dev/contracts/integration-result-0.2-candidate.schema.json",
+  "title": "OrbitFabric Integration Result 0.2-candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind", "result_version", "result", "integration", "adapter", "operation",
+    "mission", "inputs", "capabilities", "artifacts", "mappings", "resolutions",
+    "diagnostics", "coverage", "evidence", "external_tools"
+  ],
+  "properties": {
+    "kind": {"const": "orbitfabric.integration_result"},
+    "result_version": {"const": "0.2-candidate"},
+    "result": {"enum": ["succeeded", "failed"]},
+    "integration": {"$ref": "#/$defs/integration"},
+    "adapter": {"$ref": "#/$defs/adapter"},
+    "operation": {"$ref": "#/$defs/operation"},
+    "mission": {"$ref": "#/$defs/mission"},
+    "inputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["core_input_set", "profile", "operation_inputs"],
+      "properties": {
+        "core_input_set": {"$ref": "#/$defs/coreInput"},
+        "profile": {"$ref": "#/$defs/profileInput"},
+        "operation_inputs": {
+          "type": "array", "maxItems": 1,
+          "items": {"$ref": "#/$defs/operationInput"}
+        }
+      }
+    },
+    "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "artifacts": {"type": "array", "items": {"type": "object"}},
+    "mappings": {"type": "array", "items": {"type": "object"}},
+    "resolutions": {"type": "array", "items": {"type": "object"}},
+    "diagnostics": {"type": "array", "items": {"type": "object"}},
+    "coverage": {"type": "object"},
+    "evidence": {"type": "array", "items": {"type": "object"}},
+    "external_tools": {"type": "array", "items": {"type": "object"}}
+  },
+  "$defs": {
+    "nullableString": {"type": ["string", "null"]},
+    "sha256OrNull": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "integration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "schema_version"],
+      "properties": {"id": {"type": "string", "minLength": 1}, "schema_version": {"$ref": "#/$defs/nullableString"}}
+    },
+    "adapter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {"id": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}}
+    },
+    "operation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id"], "properties": {"id": {"type": "string", "minLength": 1}}
+    },
+    "mission": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "id", "model_version", "reason"],
+      "properties": {
+        "status": {"enum": ["available", "unavailable"]},
+        "id": {"$ref": "#/$defs/nullableString"},
+        "model_version": {"$ref": "#/$defs/nullableString"},
+        "reason": {"$ref": "#/$defs/nullableString"}
+      }
+    },
+    "coreInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "kind", "version", "sha256", "reason"],
+      "properties": {
+        "status": {"enum": ["available", "unavailable"]},
+        "kind": {"$ref": "#/$defs/nullableString"},
+        "version": {"$ref": "#/$defs/nullableString"},
+        "sha256": {"$ref": "#/$defs/sha256OrNull"},
+        "reason": {"$ref": "#/$defs/nullableString"}
+      }
+    },
+    "profileInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "kind", "profile_version", "id", "version", "sha256", "reason"],
+      "properties": {
+        "status": {"enum": ["available", "unavailable"]},
+        "kind": {"$ref": "#/$defs/nullableString"},
+        "profile_version": {"$ref": "#/$defs/nullableString"},
+        "id": {"$ref": "#/$defs/nullableString"},
+        "version": {"$ref": "#/$defs/nullableString"},
+        "sha256": {"$ref": "#/$defs/sha256OrNull"},
+        "reason": {"$ref": "#/$defs/nullableString"}
+      }
+    },
+    "operationInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "status", "id", "sha256", "reason"],
+      "properties": {
+        "role": {"const": "scenario"},
+        "status": {"enum": ["available", "unavailable"]},
+        "id": {"$ref": "#/$defs/nullableString"},
+        "sha256": {"$ref": "#/$defs/sha256OrNull"},
+        "reason": {"$ref": "#/$defs/nullableString"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "available"}}},
+          "then": {
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "reason": {"type": "null"}
+            }
+          },
+          "else": {
+            "properties": {
+              "id": {"type": "null"},
+              "sha256": {"type": "null"},
+              "reason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+

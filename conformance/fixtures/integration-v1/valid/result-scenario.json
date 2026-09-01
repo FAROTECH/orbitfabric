@@ -1,0 +1,35 @@
+{
+  "kind": "orbitfabric.integration_result",
+  "result_version": "0.2-candidate",
+  "result": "succeeded",
+  "integration": {"id": "fixture-scenario", "schema_version": "0.1"},
+  "adapter": {"id": "fixture-scenario", "version": "1.0.0"},
+  "operation": {"id": "verification_projection"},
+  "mission": {"status": "available", "id": "demo", "model_version": "1.0", "reason": null},
+  "inputs": {
+    "core_input_set": {
+      "status": "available", "kind": "orbitfabric.integration_input_set",
+      "version": "0.1-candidate",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "reason": null
+    },
+    "profile": {
+      "status": "available", "kind": "orbitfabric.projection_profile",
+      "profile_version": "0.1-candidate", "id": "demo-profile", "version": "1.0",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "reason": null
+    },
+    "operation_inputs": [
+      {
+        "role": "scenario", "status": "available", "id": "demo-scenario",
+        "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "reason": null
+      }
+    ]
+  },
+  "capabilities": ["projection"],
+  "artifacts": [], "mappings": [], "resolutions": [], "diagnostics": [],
+  "coverage": {"status": "unavailable"},
+  "evidence": [], "external_tools": []
+}
+

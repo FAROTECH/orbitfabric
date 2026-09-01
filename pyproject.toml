@@ -41,10 +41,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+conformance = [
+  "jsonschema>=4.23"
+]
 dev = [
   "pytest>=8.0",
   "ruff>=0.5",
-  "mkdocs-material>=9.5"
+  "mkdocs-material>=9.5",
+  "jsonschema>=4.23"
 ]
 
 [project.scripts]

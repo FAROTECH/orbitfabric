@@ -1,0 +1,37 @@
+{
+  "kind": "orbitfabric.integration_package",
+  "manifest_version": "0.2-candidate",
+  "integration": {"id": "fixture-scenario"},
+  "adapter": {"id": "fixture-scenario", "version": "1.0.0"},
+  "core_input_compatibility": {
+    "input_set_versions": ["0.1-candidate"],
+    "surfaces": [],
+    "relationship_families": []
+  },
+  "profile_compatibility": {"profile_versions": ["0.1-candidate"]},
+  "result_compatibility": {
+    "result_versions": ["0.2-candidate"],
+    "default_result_version": "0.2-candidate"
+  },
+  "capabilities": ["projection"],
+  "operations": [
+    {
+      "id": "verification_projection",
+      "capabilities": ["projection"],
+      "input_requirements": [{"role": "scenario"}]
+    }
+  ],
+  "profile_schemas": [
+    {
+      "schema_version": "0.1-candidate",
+      "format": "json-schema-2020-12",
+      "path": "schemas/profile.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "execution": {
+    "protocol": "orbitfabric.adapter_cli.v1",
+    "argv_prefix": ["fixture-adapter"]
+  }
+}
+

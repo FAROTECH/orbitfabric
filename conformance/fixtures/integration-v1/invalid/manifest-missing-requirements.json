@@ -1,0 +1,14 @@
+{
+  "kind": "orbitfabric.integration_package",
+  "manifest_version": "0.2-candidate",
+  "integration": {"id": "invalid"},
+  "adapter": {"id": "invalid", "version": "1.0.0"},
+  "core_input_compatibility": {"input_set_versions": ["0.1-candidate"], "surfaces": [], "relationship_families": []},
+  "profile_compatibility": {"profile_versions": ["0.1-candidate"]},
+  "result_compatibility": {"result_versions": ["0.2-candidate"], "default_result_version": "0.2-candidate"},
+  "capabilities": [],
+  "operations": [{"id": "project", "capabilities": []}],
+  "profile_schemas": [{"schema_version": "0.1", "format": "json-schema-2020-12", "path": "schema.json", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
+  "execution": {"protocol": "orbitfabric.adapter_cli.v1", "argv_prefix": ["invalid"]}
+}
+
