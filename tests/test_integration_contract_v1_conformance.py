@@ -13,7 +13,6 @@ from orbitfabric.conformance.integration_contracts import (
     validate_result,
 )
 
-
 FIXTURES = Path(__file__).parents[1] / "conformance" / "fixtures" / "integration-v1"
 
 

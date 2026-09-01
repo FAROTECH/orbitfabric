@@ -8,7 +8,6 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-
 MANIFEST_VERSION = "0.2-candidate"
 PROTOCOL = "orbitfabric.adapter_cli.v1"
 RESULT_VERSION = "0.2-candidate"
