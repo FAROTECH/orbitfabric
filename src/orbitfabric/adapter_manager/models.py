@@ -94,6 +94,7 @@ class InstalledAdapterRecord(StrictModel):
     instance_id: str = Field(min_length=1)
     source_coordinate: AdapterSourceCoordinate
     release_version: str = Field(min_length=1)
+    release_descriptor_path: Path
     release_descriptor_sha256: Sha256
     artifact_id: str = Field(min_length=1)
     artifact_sha256: Sha256
@@ -113,7 +114,8 @@ class VerificationDimension(StrictModel):
 
 class AdapterVerificationReport(StrictModel):
     instance_id: str
-    descriptor_integrity: VerificationDimension
+    release_descriptor_integrity: VerificationDimension
+    manifest_integrity: VerificationDimension
     manifest_conformance: VerificationDimension
     execution_binding: VerificationDimension
     backend_materialization: VerificationDimension
@@ -123,7 +125,8 @@ class AdapterVerificationReport(StrictModel):
         return all(
             dimension.status == "PASS"
             for dimension in (
-                self.descriptor_integrity,
+                self.release_descriptor_integrity,
+                self.manifest_integrity,
                 self.manifest_conformance,
                 self.execution_binding,
                 self.backend_materialization,
