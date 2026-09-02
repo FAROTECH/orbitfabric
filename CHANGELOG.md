@@ -8,7 +8,32 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
-No unreleased changes are currently classified beyond the v1.2.0 release baseline.
+### Added
+
+- Added the Core-owned Adapter Manager M0 candidate lifecycle for exact adapter installation, inspection, verification, execution and removal.
+- Added `orbitfabric adapter install`, `list`, `inspect`, `verify`, `execute` and `remove`.
+- Added the Adapter Release Descriptor `0.1-candidate` JSON Schema and Core conformance validation.
+- Added the explicit exact-release source lane and SHA-256 artifact verification.
+- Added the first Python wheel installation backend using a dedicated managed Python environment and an absolute environment-local adapter endpoint.
+- Added a user-scoped Core-owned Installed Adapter Inventory with install-record publication last and removal-record deletion last.
+- Added ADR-0017 and the Adapter Manager M0 reference documentation.
+- Added regression coverage for Release Descriptor conformance, lifecycle transaction ordering, installed-state drift detection and generic `orbitfabric.adapter_cli.v1` execution.
+
+### Changed
+
+- Moved `jsonschema` into the base runtime dependencies because integration and Adapter Release conformance are required by Adapter Manager lifecycle operations.
+
+### Compatibility impact
+
+Adapter Manager M0 is an additive Core product capability and does not introduce a Mission Model semantic migration.
+
+No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or scenario expectation semantics are removed, renamed or redefined.
+
+The existing Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1` and Integration Result `0.2-candidate` execution lane is reused unchanged. Adapter Manager does not introduce a second runtime adapter protocol.
+
+The Adapter Release Descriptor `0.1-candidate` and the `orbitfabric adapter` lifecycle CLI remain candidate surfaces. Raw Installed Adapter Inventory persistence, local instance identifiers, managed-environment layout and backend receipts remain implementation-private.
+
+M0 does not introduce public registry discovery, Adapter Project Lock IO, automatic updates, publisher administration, non-Python backends or Studio lifecycle UX.
 
 ## [v1.2.0] - 2026-08-28
 

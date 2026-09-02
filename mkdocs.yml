@@ -62,6 +62,7 @@ nav:
       - Integration Package and Adapter Execution Contract v0: reference/integration-package-adapter-execution-contract.md
       - Integration Operation-Input Contract v1: reference/integration-contract-v1.md
       - Integration Contract Compatibility Matrix: reference/integration-contract-compatibility-matrix.md
+      - Adapter Manager M0: reference/adapter-manager-m0.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
@@ -100,6 +101,7 @@ nav:
       - ADR-0014 v0.9 Plugin and Relationship Surface Boundaries: adr/ADR-0014-v0-9-plugin-and-relationship-surface-boundaries.md
       - ADR-0015 Extensibility Boundary Contract, No Execution: adr/ADR-0015-extensibility-boundary-contract-no-execution.md
       - ADR-0016 Versioned Operation-Input Contract Lane: adr/ADR-0016-operation-input-contract-v1.md
+      - ADR-0017 Adapter Manager M0 Lifecycle Boundary: adr/ADR-0017-adapter-manager-m0-lifecycle-boundary.md
 
 markdown_extensions:
   - admonition
