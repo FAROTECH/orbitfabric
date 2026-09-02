@@ -88,7 +88,7 @@ v1.2.0 does not introduce plugin execution, runtime behavior, ground behavior, r
 
 ### Changed
 
-- Consolidated post-v1 candidate integration surface documentation across README, active reference contracts, contribution/security guidance and release documentation with the merged v1.2 baseline while preserving stable/candidate ownership boundaries and historical records.
+- Consolidated post-v1 candidate integration surface documentation across README, documentation home, roadmap and reference pages.
 - Added a dedicated post-v1 candidate integration surfaces index page to keep stable, candidate, Core-owned and downstream-owned boundaries explicit.
 - Reclassified the Dashboard and Coverage Foundation reference from a proposed future boundary to the implemented post-v1 candidate surface boundary.
 
@@ -146,7 +146,6 @@ The coverage summary does not read plain-text logs, scan raw YAML, compute missi
 - Added the v1.0 Stable Surface Decision reference.
 - Added the v1.0 Stable Surface Decision page to the MkDocs Reference navigation.
 - Added explicit v1.0 classification for stable surfaces, public preview surfaces, generated disposable artifacts, internal implementation details and out-of-scope topics.
-- Added explicit documentation that the v1.0 stable surface is narrow and deliberately excludes candidate preview surfaces unless separately promoted.
 - Added the selected v1.0 demonstration use-case boundary for Mission Data Contract continuity.
 - Added contract-significant golden signatures for the demo-3u Core-owned structured surfaces: `model_summary.json`, `entity_index.json` and `relationship_manifest.json`.
 - Added regression tests comparing generated Core-owned structured surfaces against those golden signatures.
