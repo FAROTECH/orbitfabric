@@ -1,0 +1,42 @@
+{
+  "kind": "orbitfabric.adapter_project_lock",
+  "lock_version": "0.1-candidate",
+  "adapters": [
+    {
+      "source_coordinate": {
+        "authority": "test.local",
+        "publisher": "fixture",
+        "name": "adapter-a"
+      },
+      "release_version": "1.0.0",
+      "release_descriptor": {
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "artifact": {
+        "id": "python-wheel",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "installation_backend": {
+        "id": "python-wheel-managed-env"
+      }
+    },
+    {
+      "source_coordinate": {
+        "authority": "test.local",
+        "publisher": "fixture",
+        "name": "adapter-a"
+      },
+      "release_version": "2.0.0",
+      "release_descriptor": {
+        "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "artifact": {
+        "id": "python-wheel",
+        "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "installation_backend": {
+        "id": "python-wheel-managed-env"
+      }
+    }
+  ]
+}
