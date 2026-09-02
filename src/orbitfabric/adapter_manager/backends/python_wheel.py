@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import venv
+from pathlib import Path
 
 from orbitfabric.conformance.integration_contracts import ContractError, validate_manifest
 
