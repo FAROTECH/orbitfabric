@@ -18,22 +18,31 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added a user-scoped Core-owned Installed Adapter Inventory with install-record publication last and removal-record deletion last.
 - Added ADR-0017 and the Adapter Manager M0 reference documentation.
 - Added regression coverage for Release Descriptor conformance, lifecycle transaction ordering, installed-state drift detection and generic `orbitfabric.adapter_cli.v1` execution.
+- Added the Adapter Project Lock `0.1-candidate` JSON Schema and schema-authoritative Core conformance validation.
+- Added project-scoped exact desired adapter state with Source Coordinate, exact release version, Release Descriptor SHA-256, artifact id/SHA-256 and installation backend id.
+- Added `orbitfabric adapter lock validate PATH` and `orbitfabric adapter lock check PATH`, including JSON output.
+- Added lock-to-inventory comparison with per-adapter `MATCH`, `MISSING` and `MISMATCH` states plus exact mismatch dimensions.
+- Added overall project adapter state as `MATCH` or `NOT_SATISFIED` while preserving Installed Adapter Inventory as separate user-scoped actual state.
+- Added ADR-0018 and the Adapter Project Lock M1 reference documentation.
+- Added positive and negative Project Lock fixtures plus regression coverage for exact match, missing state, mismatch dimensions, extra installed releases, multiple exact local instances and M0-to-M1 installed-state continuity.
 
 ### Changed
 
-- Moved `jsonschema` into the base runtime dependencies because integration and Adapter Release conformance are required by Adapter Manager lifecycle operations.
+- Moved `jsonschema` into the base runtime dependencies because integration, Adapter Release and Adapter Project Lock conformance are required by Adapter Manager lifecycle operations.
 
 ### Compatibility impact
 
-Adapter Manager M0 is an additive Core product capability and does not introduce a Mission Model semantic migration.
+Adapter Manager M0 and Adapter Project Lock M1 are additive Core product capabilities and do not introduce a Mission Model semantic migration.
 
 No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or scenario expectation semantics are removed, renamed or redefined.
 
 The existing Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1` and Integration Result `0.2-candidate` execution lane is reused unchanged. Adapter Manager does not introduce a second runtime adapter protocol.
 
-The Adapter Release Descriptor `0.1-candidate` and the `orbitfabric adapter` lifecycle CLI remain candidate surfaces. Raw Installed Adapter Inventory persistence, local instance identifiers, managed-environment layout and backend receipts remain implementation-private.
+The Adapter Release Descriptor `0.1-candidate`, Adapter Project Lock `0.1-candidate` and `orbitfabric adapter` CLI remain candidate surfaces. Raw Installed Adapter Inventory persistence, local instance identifiers, managed-environment layout and backend receipts remain implementation-private.
 
-M0 does not introduce public registry discovery, Adapter Project Lock IO, automatic updates, publisher administration, non-Python backends or Studio lifecycle UX.
+Adapter Project Lock represents project-scoped desired exact state. Installed Adapter Inventory remains user-scoped actual state. M1 validation and comparison do not require a remote registry and do not store local instance ids, installation paths, executable paths or mutable artifact locators in the lock.
+
+M1 does not introduce lock authoring/update UX, install-from-lock, backend-resolution material verification, remote registry/source discovery, project execution selection by lock, automatic updates, publisher administration, non-Python backends or Studio lifecycle UX.
 
 ## [v1.2.0] - 2026-08-28
 

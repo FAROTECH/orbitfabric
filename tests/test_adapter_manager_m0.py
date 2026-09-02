@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from orbitfabric.adapter_manager import AdapterManager
+from orbitfabric.adapter_manager import AdapterManager, ProjectLockService
 from orbitfabric.adapter_manager.errors import InstallationError, ReleaseResolutionError
 from orbitfabric.adapter_manager.hashing import sha256_file
 from orbitfabric.adapter_manager.models import (
@@ -160,6 +160,41 @@ def test_m0_install_verify_execute_remove_lifecycle(tmp_path: Path) -> None:
     assert removed.instance_id == record.instance_id
     assert manager.list() == []
     assert not Path(record.install_root).exists()
+
+
+def test_m0_installed_record_satisfies_exact_m1_project_lock(tmp_path: Path) -> None:
+    manager = _manager(tmp_path)
+    descriptor_path, artifact = _write_release(tmp_path)
+    record = manager.install(descriptor_path, artifact)
+
+    lock_payload = {
+        "kind": "orbitfabric.adapter_project_lock",
+        "lock_version": "0.1-candidate",
+        "adapters": [
+            {
+                "source_coordinate": record.source_coordinate.model_dump(),
+                "release_version": record.release_version,
+                "release_descriptor": {
+                    "sha256": record.release_descriptor_sha256,
+                },
+                "artifact": {
+                    "id": record.artifact_id,
+                    "sha256": record.artifact_sha256,
+                },
+                "installation_backend": {
+                    "id": record.backend_id,
+                },
+            }
+        ],
+    }
+    lock_path = tmp_path / "adapter-project-lock.json"
+    lock_path.write_text(json.dumps(lock_payload, indent=2) + "\n", encoding="utf-8")
+
+    report = ProjectLockService().check(lock_path, manager.list())
+
+    assert report.status == "MATCH"
+    assert report.adapters[0].status == "MATCH"
+    assert report.adapters[0].matching_instance_ids == [record.instance_id]
 
 
 def test_verify_detects_installed_manifest_drift(tmp_path: Path) -> None:

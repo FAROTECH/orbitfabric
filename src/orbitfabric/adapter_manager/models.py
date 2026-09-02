@@ -7,6 +7,15 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 Sha256 = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 EvidenceStatus = Literal["PASS", "FAIL", "UNKNOWN"]
+ProjectAdapterState = Literal["MATCH", "MISSING", "MISMATCH"]
+ProjectOverallState = Literal["MATCH", "NOT_SATISFIED"]
+ProjectMismatchDimension = Literal[
+    "release_version",
+    "release_descriptor_sha256",
+    "artifact_id",
+    "artifact_sha256",
+    "backend_id",
+]
 
 
 class StrictModel(BaseModel):
@@ -105,6 +114,79 @@ class InstalledAdapterRecord(StrictModel):
     execution_argv_prefix: list[str] = Field(min_length=1)
     acceptance_policy: str = Field(min_length=1)
     acceptance_warnings: list[str] = Field(default_factory=list)
+
+
+class ProjectLockDigestBinding(StrictModel):
+    sha256: Sha256
+
+
+class ProjectLockArtifactBinding(StrictModel):
+    id: str = Field(min_length=1)
+    sha256: Sha256
+
+
+class ProjectLockInstallationBackend(StrictModel):
+    id: str = Field(min_length=1)
+
+
+class BackendResolutionBinding(StrictModel):
+    kind: str = Field(min_length=1)
+    reference: str = Field(min_length=1)
+    sha256: Sha256
+
+
+class AdapterProjectLockEntry(StrictModel):
+    source_coordinate: AdapterSourceCoordinate
+    release_version: str = Field(min_length=1)
+    release_descriptor: ProjectLockDigestBinding
+    artifact: ProjectLockArtifactBinding
+    installation_backend: ProjectLockInstallationBackend
+    backend_resolution: BackendResolutionBinding | None = None
+
+
+class AdapterProjectLock(StrictModel):
+    kind: Literal["orbitfabric.adapter_project_lock"]
+    lock_version: Literal["0.1-candidate"]
+    adapters: list[AdapterProjectLockEntry] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_source_coordinates(self) -> AdapterProjectLock:
+        coordinates = [
+            (
+                entry.source_coordinate.authority,
+                entry.source_coordinate.publisher,
+                entry.source_coordinate.name,
+            )
+            for entry in self.adapters
+        ]
+        if len(coordinates) != len(set(coordinates)):
+            raise ValueError("Adapter Project Lock Source Coordinates must be unique")
+        return self
+
+
+class ProjectLockCandidateMismatch(StrictModel):
+    instance_id: str = Field(min_length=1)
+    dimensions: list[ProjectMismatchDimension] = Field(min_length=1)
+
+
+class ProjectAdapterStateReport(StrictModel):
+    source_coordinate: AdapterSourceCoordinate
+    release_version: str = Field(min_length=1)
+    status: ProjectAdapterState
+    matching_instance_ids: list[str] = Field(default_factory=list)
+    candidate_instance_ids: list[str] = Field(default_factory=list)
+    candidate_mismatches: list[ProjectLockCandidateMismatch] = Field(default_factory=list)
+
+
+class ProjectLockCheckReport(StrictModel):
+    lock_path: Path
+    lock_version: str = Field(min_length=1)
+    status: ProjectOverallState
+    adapters: list[ProjectAdapterStateReport] = Field(min_length=1)
+
+    @property
+    def passed(self) -> bool:
+        return self.status == "MATCH"
 
 
 class VerificationDimension(StrictModel):

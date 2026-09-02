@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orbitfabric.dev/contracts/adapter-project-lock-0.1-candidate.schema.json",
+  "title": "OrbitFabric Adapter Project Lock 0.1-candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "lock_version", "adapters"],
+  "properties": {
+    "kind": {"const": "orbitfabric.adapter_project_lock"},
+    "lock_version": {"const": "0.1-candidate"},
+    "adapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/adapterSelection"}
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sourceCoordinate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "publisher", "name"],
+      "properties": {
+        "authority": {"type": "string", "minLength": 1},
+        "publisher": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1}
+      }
+    },
+    "releaseDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "installationBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1}
+      }
+    },
+    "backendResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "reference": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "adapterSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_coordinate",
+        "release_version",
+        "release_descriptor",
+        "artifact",
+        "installation_backend"
+      ],
+      "properties": {
+        "source_coordinate": {"$ref": "#/$defs/sourceCoordinate"},
+        "release_version": {"type": "string", "minLength": 1},
+        "release_descriptor": {"$ref": "#/$defs/releaseDescriptor"},
+        "artifact": {"$ref": "#/$defs/artifact"},
+        "installation_backend": {"$ref": "#/$defs/installationBackend"},
+        "backend_resolution": {"$ref": "#/$defs/backendResolution"}
+      }
+    }
+  }
+}
