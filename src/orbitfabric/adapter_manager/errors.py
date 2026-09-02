@@ -27,3 +27,7 @@ class VerificationError(AdapterManagerError):
 
 class ExecutionError(AdapterManagerError):
     """Raised when an installed adapter cannot be executed through the generic protocol."""
+
+
+class ProjectLockError(AdapterManagerError):
+    """Raised when an Adapter Project Lock cannot be loaded or evaluated."""
