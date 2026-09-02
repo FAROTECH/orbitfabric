@@ -1,0 +1,24 @@
+{
+  "kind": "orbitfabric.adapter_project_lock",
+  "lock_version": "0.1-candidate",
+  "adapters": [
+    {
+      "source_coordinate": {
+        "authority": "test.local",
+        "publisher": "fixture",
+        "name": "adapter-a"
+      },
+      "release_version": "1.0.0",
+      "release_descriptor": {
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "artifact": {
+        "id": "python-wheel",
+        "sha256": "not-a-sha256"
+      },
+      "installation_backend": {
+        "id": "python-wheel-managed-env"
+      }
+    }
+  ]
+}
