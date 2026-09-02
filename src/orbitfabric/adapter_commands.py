@@ -6,12 +6,21 @@ from typing import Annotated, Any
 
 import typer
 
-from orbitfabric.adapter_manager import AdapterManager, AdapterManagerError
+from orbitfabric.adapter_manager import (
+    AdapterManager,
+    AdapterManagerError,
+    ProjectLockService,
+)
 
 adapter_app = typer.Typer(
     help="Manage installed OrbitFabric adapters.",
     no_args_is_help=True,
 )
+lock_app = typer.Typer(
+    help="Validate and compare project-scoped exact adapter state.",
+    no_args_is_help=True,
+)
+adapter_app.add_typer(lock_app, name="lock")
 
 
 def _manager() -> AdapterManager:
@@ -273,6 +282,87 @@ def remove_adapter(
         _json_echo(record)
         return
     typer.echo(f"Removed adapter instance: {record.instance_id}")
+
+
+@lock_app.command("validate")
+def validate_adapter_project_lock(
+    lock_path: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Adapter Project Lock JSON file.",
+        ),
+    ],
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Write the conformant project lock as JSON."),
+    ] = False,
+) -> None:
+    """Validate an Adapter Project Lock against the Core candidate contract."""
+    try:
+        lock = ProjectLockService().load(lock_path)
+    except AdapterManagerError as exc:
+        _fail(exc)
+        return
+
+    if json_output:
+        _json_echo(lock)
+        return
+    typer.echo(f"Adapter Project Lock: {lock_path}")
+    typer.echo(f"Version: {lock.lock_version}")
+    typer.echo(f"Adapters: {len(lock.adapters)}")
+    typer.echo("Result: CONFORMANT")
+
+
+@lock_app.command("check")
+def check_adapter_project_lock(
+    lock_path: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Adapter Project Lock JSON file.",
+        ),
+    ],
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Write the project adapter-state report as JSON."),
+    ] = False,
+) -> None:
+    """Compare exact project-required adapter state with the installed inventory."""
+    try:
+        manager = _manager()
+        report = ProjectLockService().check(lock_path, manager.list())
+    except AdapterManagerError as exc:
+        _fail(exc)
+        return
+
+    if json_output:
+        _json_echo(report)
+    else:
+        typer.echo(f"Adapter Project Lock: {report.lock_path}")
+        for adapter in report.adapters:
+            label = (
+                f"{adapter.source_coordinate.display()}@{adapter.release_version}"
+            )
+            typer.echo(f"{label}: {adapter.status}")
+            if adapter.matching_instance_ids:
+                typer.echo(
+                    "  matching instances: " + ", ".join(adapter.matching_instance_ids)
+                )
+            for mismatch in adapter.candidate_mismatches:
+                typer.echo(
+                    f"  {mismatch.instance_id}: mismatch "
+                    + ", ".join(mismatch.dimensions)
+                )
+        typer.echo(f"Project state: {report.status}")
+    if not report.passed:
+        raise typer.Exit(code=1)
 
 
 def _parse_operation_inputs(values: list[str]) -> dict[str, Path]:
