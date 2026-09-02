@@ -34,6 +34,7 @@ from .models import (
     AdapterVerificationReport,
     BackendInstallReceipt,
     InstalledAdapterRecord,
+    ResolvedAdapterRelease,
     VerificationDimension,
 )
 from .sources import ExplicitReleaseSource
@@ -41,7 +42,7 @@ from .state import default_state_root
 
 
 class AdapterManager:
-    """Core-owned Adapter Manager M0 lifecycle orchestrator."""
+    """Core-owned Adapter Manager lifecycle orchestrator."""
 
     def __init__(
         self,
@@ -71,6 +72,15 @@ class AdapterManager:
             artifact_id=artifact_id,
             expected_descriptor_sha256=expected_descriptor_sha256,
         )
+        return self.install_resolved(release)
+
+    def install_resolved(
+        self,
+        release: ResolvedAdapterRelease,
+        *,
+        expected_backend_id: str | None = None,
+    ) -> InstalledAdapterRecord:
+        """Install one already-resolved exact release through the shared lifecycle transaction."""
         acceptance = evaluate_development_explicit_source(release.trust_evidence)
         if not acceptance.accepted:
             raise AcceptanceError(
@@ -79,6 +89,12 @@ class AdapterManager:
             )
 
         backend = self._select_backend(release.artifact.artifact_type)
+        if expected_backend_id is not None and backend.backend_id != expected_backend_id:
+            raise InstallationError(
+                "Selected installation backend does not satisfy expected backend id: "
+                f"expected {expected_backend_id!r}, selected {backend.backend_id!r}"
+            )
+
         instance_id = uuid.uuid4().hex
         receipt = backend.install(release, instance_id, self.instances_root)
         descriptor_copy = receipt.install_root / "release_descriptor.json"
