@@ -4,6 +4,11 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from orbitfabric.conformance.adapter_release import (
+    AdapterReleaseContractError,
+    load_release_descriptor,
+)
+
 from ..errors import ReleaseResolutionError
 from ..hashing import sha256_bytes, sha256_file
 from ..models import (
@@ -38,8 +43,9 @@ class ExplicitReleaseSource:
             ) from exc
 
         try:
-            descriptor = AdapterReleaseDescriptor.model_validate_json(descriptor_bytes)
-        except ValidationError as exc:
+            descriptor_payload = load_release_descriptor(descriptor_file)
+            descriptor = AdapterReleaseDescriptor.model_validate(descriptor_payload)
+        except (AdapterReleaseContractError, ValidationError) as exc:
             raise ReleaseResolutionError(
                 f"Adapter Release Descriptor is invalid: {exc}"
             ) from exc
