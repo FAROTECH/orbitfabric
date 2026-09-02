@@ -61,16 +61,16 @@ def _build_namespaced_wheel(tmp_path: Path) -> Path:
             "\n"
         ).encode(),
         f"{dist_info}/WHEEL": (
-            "Wheel-Version: 1.0\n"
-            "Generator: orbitfabric-test\n"
-            "Root-Is-Purelib: true\n"
-            "Tag: py3-none-any\n"
-            "\n"
-        ).encode(),
+            b"Wheel-Version: 1.0\n"
+            b"Generator: orbitfabric-test\n"
+            b"Root-Is-Purelib: true\n"
+            b"Tag: py3-none-any\n"
+            b"\n"
+        ),
         f"{dist_info}/entry_points.txt": (
-            "[console_scripts]\n"
-            "fixture-adapter = namespaced_dummy_adapter.cli:main\n"
-        ).encode(),
+            b"[console_scripts]\n"
+            b"fixture-adapter = namespaced_dummy_adapter.cli:main\n"
+        ),
     }
     record_path = f"{dist_info}/RECORD"
     files[record_path] = _record_bytes(list(files), record_path)
@@ -139,7 +139,13 @@ def test_python_backend_discovers_namespaced_manifest_from_distribution(tmp_path
     assert manager.list() == []
 
 
-@pytest.mark.parametrize("stdout", ["", "/tmp/one/integration_package.json\n/tmp/two/integration_package.json\n"])
+@pytest.mark.parametrize(
+    "stdout",
+    [
+        "",
+        "/tmp/one/integration_package.json\n/tmp/two/integration_package.json\n",
+    ],
+)
 def test_python_backend_rejects_non_unique_distribution_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -152,7 +158,10 @@ def test_python_backend_rejects_non_unique_distribution_manifest(
 
     monkeypatch.setattr(backend, "_run", fake_run)
 
-    with pytest.raises(InstallationError, match="must contain exactly one integration_package.json"):
+    with pytest.raises(
+        InstallationError,
+        match="must contain exactly one integration_package.json",
+    ):
         backend._installed_manifest_path(
             tmp_path / "python",
             tmp_path,
