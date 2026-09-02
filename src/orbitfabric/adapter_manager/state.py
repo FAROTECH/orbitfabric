@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 STATE_DIR_ENV = "ORBITFABRIC_STATE_DIR"
 
