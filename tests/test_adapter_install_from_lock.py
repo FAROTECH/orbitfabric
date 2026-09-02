@@ -10,7 +10,11 @@ from typer.testing import CliRunner
 
 import orbitfabric.adapter_commands as adapter_commands
 from orbitfabric.adapter_manager import AdapterManager, ProjectLockInstallService
-from orbitfabric.adapter_manager.errors import InstallationError, ProjectLockError, ReleaseResolutionError
+from orbitfabric.adapter_manager.errors import (
+    InstallationError,
+    ProjectLockError,
+    ReleaseResolutionError,
+)
 from orbitfabric.adapter_manager.hashing import sha256_file
 from orbitfabric.adapter_manager.models import (
     AdapterSourceCoordinate,
