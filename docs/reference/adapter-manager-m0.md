@@ -217,6 +217,43 @@ No global `active`, `current` or `default` adapter version exists in M0.
 Selection is through an exact installed instance reference. A future Project
 Lock will provide project-scoped desired resolution.
 
+## Python wheel manifest discovery
+
+For the `python-wheel-managed-env` backend, the Integration Package Manifest is
+located from the exact adapter distribution that was installed from the selected
+wheel.
+
+The backend:
+
+```text
+reads the wheel distribution Name from .dist-info/METADATA
+    -> installs the exact wheel
+    -> inspects files owned by that installed distribution
+    -> requires exactly one integration_package.json
+    -> verifies the descriptor-bound manifest SHA-256
+    -> validates Integration Package conformance
+```
+
+The manifest may therefore live inside the adapter's own namespaced Python
+package, for example:
+
+```text
+src/orbitfabric_example_adapter/
+    integration_package.json
+```
+
+A top-level import package literally named `integration_package` is not required.
+The backend does not import adapter implementation code merely to discover the
+manifest.
+
+The filename and discovery mechanics above are Python-backend implementation
+policy. The manifest contents remain governed by the Core-owned Integration
+Package contract, while exact manifest bytes remain bound by the Adapter Release
+Descriptor.
+
+Zero or multiple `integration_package.json` files owned by the installed adapter
+distribution are rejected as ambiguous/non-conformant backend materialization.
+
 ## Runtime dependencies and backend closure
 
 Adapter artifact identity and Python environment identity are distinct:
