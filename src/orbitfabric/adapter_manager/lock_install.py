@@ -103,8 +103,8 @@ class ProjectLockInstallService:
         ]
         if len(matches) != 1:
             raise ProjectLockError(
-                "Adapter Project Lock does not contain exactly one requested Source Coordinate: "
-                f"{source_coordinate.display()}"
+                "Adapter Project Lock does not contain exactly one requested "
+                f"Source Coordinate: {source_coordinate.display()}"
             )
         return matches[0]
 
@@ -118,8 +118,8 @@ class ProjectLockInstallService:
         ]
         if len(matches) != 1:
             raise ProjectLockError(
-                "Project Lock check report does not contain exactly one requested Source Coordinate: "
-                f"{source_coordinate.display()}"
+                "Project Lock check report does not contain exactly one requested "
+                f"Source Coordinate: {source_coordinate.display()}"
             )
         return matches[0]
 
