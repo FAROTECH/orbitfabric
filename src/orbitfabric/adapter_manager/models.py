@@ -45,7 +45,7 @@ class AdapterReleaseDescriptor(StrictModel):
     integration_package: IntegrationPackageBinding
 
     @model_validator(mode="after")
-    def validate_artifact_ids(self) -> "AdapterReleaseDescriptor":
+    def validate_artifact_ids(self) -> AdapterReleaseDescriptor:
         ids = [artifact.id for artifact in self.artifacts]
         if len(ids) != len(set(ids)):
             raise ValueError("Adapter Release artifact ids must be unique")
