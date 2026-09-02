@@ -42,7 +42,11 @@ class ProjectLockService:
         lock = self.load(path)
         records = sorted(installed_records, key=lambda item: item.instance_id)
         reports = [self._check_entry(entry, records) for entry in lock.adapters]
-        overall = "MATCH" if all(report.status == "MATCH" for report in reports) else "NOT_SATISFIED"
+        overall = (
+            "MATCH"
+            if all(report.status == "MATCH" for report in reports)
+            else "NOT_SATISFIED"
+        )
         return ProjectLockCheckReport(
             lock_path=path,
             lock_version=lock.lock_version,
