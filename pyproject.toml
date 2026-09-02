@@ -37,7 +37,8 @@ dependencies = [
   "pydantic>=2.7",
   "typer>=0.12",
   "PyYAML>=6.0",
-  "rfc8785>=0.1.4"
+  "rfc8785>=0.1.4",
+  "jsonschema>=4.23"
 ]
 
 [project.optional-dependencies]
