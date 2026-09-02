@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
-from typing import Mapping
 import uuid
+from collections.abc import Mapping
+from pathlib import Path
 
 from orbitfabric.conformance.integration_contracts import (
     ContractError,
@@ -30,6 +30,7 @@ from .inventory import InstalledAdapterInventory
 from .models import (
     AdapterExecutionReport,
     AdapterReleaseDescriptor,
+    AdapterSourceCoordinate,
     AdapterVerificationReport,
     BackendInstallReceipt,
     InstalledAdapterRecord,
@@ -97,7 +98,9 @@ class AdapterManager:
         try:
             shutil.copyfile(release.descriptor_path, descriptor_copy)
             if sha256_file(descriptor_copy) != release.descriptor_sha256:
-                raise InstallationError("Installed release descriptor copy failed integrity verification")
+                raise InstallationError(
+                    "Installed release descriptor copy failed integrity verification"
+                )
 
             report = self._verify_record(record)
             if not report.passed:
@@ -192,7 +195,9 @@ class AdapterManager:
             result = load_json(result_path)
             validate_result(manifest, result)
         except ContractError as exc:
-            raise ExecutionError(f"Adapter produced a non-conformant Integration Result: {exc}") from exc
+            raise ExecutionError(
+                f"Adapter produced a non-conformant Integration Result: {exc}"
+            ) from exc
 
         return AdapterExecutionReport(
             instance_id=instance_id,
@@ -328,7 +333,7 @@ class AdapterManager:
         instance_id: str,
         receipt: BackendInstallReceipt,
         descriptor_copy: Path,
-        source_coordinate: object,
+        source_coordinate: AdapterSourceCoordinate,
         release_version: str,
         descriptor_sha256: str,
         artifact_id: str,
