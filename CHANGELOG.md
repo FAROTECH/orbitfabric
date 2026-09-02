@@ -25,14 +25,21 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added overall project adapter state as `MATCH` or `NOT_SATISFIED` while preserving Installed Adapter Inventory as separate user-scoped actual state.
 - Added ADR-0018 and the Adapter Project Lock M1 reference documentation.
 - Added positive and negative Project Lock fixtures plus regression coverage for exact match, missing state, mismatch dimensions, extra installed releases, multiple exact local instances and M0-to-M1 installed-state continuity.
+- Added the candidate single-entry explicit-source install-from-lock lane for moving one Project Lock entry from `MISSING` or `MISMATCH` to `MATCH` through exact Release Descriptor and artifact inputs.
+- Added `orbitfabric adapter lock install LOCK_PATH --source-coordinate AUTHORITY:PUBLISHER/NAME --release-descriptor PATH --artifact PATH`, including structured JSON output.
+- Added pre-materialization verification of locked Source Coordinate, release version, Release Descriptor SHA-256, artifact id/SHA-256 and selected installation backend id.
+- Added non-destructive `MISMATCH` handling by installing the exact locked release side-by-side while retaining existing mismatching releases.
+- Added install-from-lock regression controls for idempotent `MATCH -> NOOP`, `MISSING -> INSTALLED -> MATCH`, side-by-side `MISMATCH -> INSTALLED -> MATCH`, identity failures before materialization and backend-failure inventory coherence.
+- Added ADR-0019 and the explicit-source install-from-lock reference documentation.
 
 ### Changed
 
 - Moved `jsonschema` into the base runtime dependencies because integration, Adapter Release and Adapter Project Lock conformance are required by Adapter Manager lifecycle operations.
+- Refactored Adapter Manager explicit installation so resolved releases converge on one shared post-resolution installation transaction used by both direct install and install-from-lock.
 
 ### Compatibility impact
 
-Adapter Manager M0 and Adapter Project Lock M1 are additive Core product capabilities and do not introduce a Mission Model semantic migration.
+Adapter Manager M0, Adapter Project Lock M1 and the explicit-source install-from-lock lane are additive Core product capabilities and do not introduce a Mission Model semantic migration.
 
 No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or scenario expectation semantics are removed, renamed or redefined.
 
@@ -40,9 +47,11 @@ The existing Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_
 
 The Adapter Release Descriptor `0.1-candidate`, Adapter Project Lock `0.1-candidate` and `orbitfabric adapter` CLI remain candidate surfaces. Raw Installed Adapter Inventory persistence, local instance identifiers, managed-environment layout and backend receipts remain implementation-private.
 
-Adapter Project Lock represents project-scoped desired exact state. Installed Adapter Inventory remains user-scoped actual state. M1 validation and comparison do not require a remote registry and do not store local instance ids, installation paths, executable paths or mutable artifact locators in the lock.
+Adapter Project Lock represents project-scoped desired exact state. Installed Adapter Inventory remains user-scoped actual state. Lock validation, comparison and explicit-source installation do not require a remote registry and do not store local instance ids, installation paths, executable paths or mutable artifact locators in the lock.
 
-M1 does not introduce lock authoring/update UX, install-from-lock, backend-resolution material verification, remote registry/source discovery, project execution selection by lock, automatic updates, publisher administration, non-Python backends or Studio lifecycle UX.
+Install-from-lock reuses the M0 lifecycle transaction, verifies exact lock identity before backend materialization and treats an already matching lock entry as an idempotent no-op. A mismatching installed release is not implicitly removed or replaced.
+
+This lane does not introduce lock authoring/update UX, backend-resolution material verification, remote registry/source discovery, project-wide reconcile, project execution selection by lock, automatic destructive updates, publisher administration, non-Python backends or Studio lifecycle UX.
 
 ## [v1.2.0] - 2026-08-28
 
@@ -264,7 +273,7 @@ They do not freeze full generated JSON files, absolute paths, human-oriented out
 - Marked `v1.0.0 - Stable Mission Data Contract` as the next milestone.
 - Aligned README with the v0.12.0 release baseline.
 - Aligned the public documentation homepage with the v0.12.0 release baseline.
-- Aligned Quickstart, Development Guide, Contributing Guide and Versioning Model with the v0.12.0 release baseline.
+- Aligned Quickstart, Development Guide, Contributing Guide and Versioning Model with the v0.12.0 release candidate hardening baseline.
 - Aligned Architecture and Project Charter headers with the v0.12.0 release candidate hardening baseline.
 - Clarified the release candidate hardening path before v1.0.0.
 - Clarified that current CI artifacts are not committed golden-output baselines.

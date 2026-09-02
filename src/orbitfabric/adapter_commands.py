@@ -9,15 +9,17 @@ import typer
 from orbitfabric.adapter_manager import (
     AdapterManager,
     AdapterManagerError,
+    ProjectLockInstallService,
     ProjectLockService,
 )
+from orbitfabric.adapter_manager.models import AdapterSourceCoordinate
 
 adapter_app = typer.Typer(
     help="Manage installed OrbitFabric adapters.",
     no_args_is_help=True,
 )
 lock_app = typer.Typer(
-    help="Validate and compare project-scoped exact adapter state.",
+    help="Validate, compare and satisfy project-scoped exact adapter state.",
     no_args_is_help=True,
 )
 adapter_app.add_typer(lock_app, name="lock")
@@ -80,7 +82,7 @@ def install_adapter(
         typer.Option("--json", help="Write the installed record as JSON."),
     ] = False,
 ) -> None:
-    """Install one exact adapter release through the M0 explicit-source lane."""
+    """Install one exact adapter release through the explicit-source lane."""
     try:
         record = _manager().install(
             release_descriptor,
@@ -347,9 +349,7 @@ def check_adapter_project_lock(
     else:
         typer.echo(f"Adapter Project Lock: {report.lock_path}")
         for adapter in report.adapters:
-            label = (
-                f"{adapter.source_coordinate.display()}@{adapter.release_version}"
-            )
+            label = f"{adapter.source_coordinate.display()}@{adapter.release_version}"
             typer.echo(f"{label}: {adapter.status}")
             if adapter.matching_instance_ids:
                 typer.echo(
@@ -365,6 +365,78 @@ def check_adapter_project_lock(
         raise typer.Exit(code=1)
 
 
+@lock_app.command("install")
+def install_adapter_project_lock_entry(
+    lock_path: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Adapter Project Lock JSON file.",
+        ),
+    ],
+    source_coordinate: Annotated[
+        str,
+        typer.Option(
+            "--source-coordinate",
+            help="Exact lock entry as AUTHORITY:PUBLISHER/NAME.",
+        ),
+    ],
+    release_descriptor: Annotated[
+        Path,
+        typer.Option(
+            "--release-descriptor",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Exact Adapter Release Descriptor supplied by the explicit source.",
+        ),
+    ],
+    artifact: Annotated[
+        Path,
+        typer.Option(
+            "--artifact",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Exact adapter artifact supplied by the explicit source.",
+        ),
+    ],
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Write the install-from-lock report as JSON."),
+    ] = False,
+) -> None:
+    """Satisfy one Project Lock entry through explicit exact source material."""
+    try:
+        coordinate = _parse_source_coordinate(source_coordinate)
+        manager = _manager()
+        report = ProjectLockInstallService(manager).install_entry(
+            lock_path,
+            coordinate,
+            release_descriptor,
+            artifact,
+        )
+    except (AdapterManagerError, ValueError) as exc:
+        _fail(exc)
+        return
+
+    if json_output:
+        _json_echo(report)
+        return
+    typer.echo(f"Adapter Project Lock: {report.lock_path}")
+    typer.echo(f"Adapter: {report.source_coordinate.display()}")
+    typer.echo(f"Before: {report.before_status}")
+    typer.echo(f"Action: {report.action}")
+    if report.installed_instance_id:
+        typer.echo(f"Installed instance: {report.installed_instance_id}")
+    typer.echo(f"After: {report.after_status}")
+
+
 def _parse_operation_inputs(values: list[str]) -> dict[str, Path]:
     bindings: dict[str, Path] = {}
     for value in values:
@@ -377,6 +449,24 @@ def _parse_operation_inputs(values: list[str]) -> dict[str, Path]:
             raise ValueError(f"Operation input role is bound more than once: {role}")
         bindings[role] = Path(path_value)
     return bindings
+
+
+def _parse_source_coordinate(value: str) -> AdapterSourceCoordinate:
+    authority, authority_separator, logical = value.partition(":")
+    publisher, publisher_separator, name = logical.partition("/")
+    if (
+        not authority_separator
+        or not publisher_separator
+        or not authority.strip()
+        or not publisher.strip()
+        or not name.strip()
+    ):
+        raise ValueError("Source Coordinate must use AUTHORITY:PUBLISHER/NAME syntax")
+    return AdapterSourceCoordinate(
+        authority=authority.strip(),
+        publisher=publisher.strip(),
+        name=name.strip(),
+    )
 
 
 __all__ = ["adapter_app"]

@@ -64,6 +64,7 @@ nav:
       - Integration Contract Compatibility Matrix: reference/integration-contract-compatibility-matrix.md
       - Adapter Manager M0: reference/adapter-manager-m0.md
       - Adapter Project Lock M1: reference/adapter-project-lock-m1.md
+      - Explicit-Source Install from Adapter Project Lock: reference/adapter-install-from-lock-explicit-source.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
       - v0.3.0 Data Product and Storage Contracts: releases/v0.3.0.md
@@ -104,6 +105,7 @@ nav:
       - ADR-0016 Versioned Operation-Input Contract Lane: adr/ADR-0016-operation-input-contract-v1.md
       - ADR-0017 Adapter Manager M0 Lifecycle Boundary: adr/ADR-0017-adapter-manager-m0-lifecycle-boundary.md
       - ADR-0018 Adapter Project Lock M1: adr/ADR-0018-adapter-project-lock-m1.md
+      - ADR-0019 Explicit-Source Install-from-Lock Boundary: adr/ADR-0019-explicit-source-install-from-lock-boundary.md
 
 markdown_extensions:
   - admonition

@@ -9,6 +9,7 @@ Sha256 = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 EvidenceStatus = Literal["PASS", "FAIL", "UNKNOWN"]
 ProjectAdapterState = Literal["MATCH", "MISSING", "MISMATCH"]
 ProjectOverallState = Literal["MATCH", "NOT_SATISFIED"]
+ProjectInstallAction = Literal["NOOP", "INSTALLED"]
 ProjectMismatchDimension = Literal[
     "release_version",
     "release_descriptor_sha256",
@@ -187,6 +188,16 @@ class ProjectLockCheckReport(StrictModel):
     @property
     def passed(self) -> bool:
         return self.status == "MATCH"
+
+
+class ProjectLockInstallReport(StrictModel):
+    lock_path: Path
+    source_coordinate: AdapterSourceCoordinate
+    before_status: ProjectAdapterState
+    action: ProjectInstallAction
+    installed_instance_id: str | None = None
+    after_status: ProjectAdapterState
+    matching_instance_ids: list[str] = Field(default_factory=list)
 
 
 class VerificationDimension(StrictModel):
