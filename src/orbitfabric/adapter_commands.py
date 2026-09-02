@@ -54,7 +54,10 @@ def install_adapter(
     ],
     artifact_id: Annotated[
         str | None,
-        typer.Option("--artifact-id", help="Release-local artifact id when multiple artifacts exist."),
+        typer.Option(
+            "--artifact-id",
+            help="Release-local artifact id when multiple artifacts exist.",
+        ),
     ] = None,
     descriptor_sha256: Annotated[
         str | None,
@@ -84,10 +87,7 @@ def install_adapter(
         _json_echo(record)
         return
     typer.echo(f"Installed adapter instance: {record.instance_id}")
-    typer.echo(
-        "Release: "
-        f"{record.source_coordinate.display()}@{record.release_version}"
-    )
+    typer.echo("Release: " f"{record.source_coordinate.display()}@{record.release_version}")
     typer.echo(f"Backend: {record.backend_id}")
     if record.acceptance_warnings:
         typer.echo("Acceptance warnings:")
