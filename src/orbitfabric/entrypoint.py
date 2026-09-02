@@ -7,8 +7,11 @@ from typing import Annotated
 import typer
 
 from orbitfabric import __version__
+from orbitfabric.adapter_commands import adapter_app
 from orbitfabric.cli import _mission_workspace_default_path, app, export_app
 from orbitfabric.export.integration_input_set import write_integration_input_set
+
+app.add_typer(adapter_app, name="adapter")
 
 
 @export_app.command("integration-input-set")
