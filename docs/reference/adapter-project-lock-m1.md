@@ -84,7 +84,11 @@ Optional backend-owned exact resolution material may be bound with:
 }
 ```
 
-The generic lock does not interpret the backend dependency graph.
+The generic lock does not interpret the backend dependency graph. The first M1
+`lock check` validates this optional binding structurally but does not yet verify
+or compare the referenced backend-resolution material against installed state.
+That verification belongs to the later backend/project-install reproducibility
+lane.
 
 ## Exact identity
 
@@ -196,6 +200,7 @@ This keeps project reproducibility independent from the choice of GitHub Release
 default lock filesystem location
 lock authoring/update workflow
 install from lock
+backend-resolution material verification
 remote registry/source discovery
 project execution selection by lock
 multi-platform lock policy
