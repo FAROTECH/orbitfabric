@@ -18,7 +18,7 @@ from .sources import ExplicitReleaseSource
 
 
 class ProjectLockInstallService:
-    """Install one exact Project Lock entry through an explicit Release Source."""
+    """Satisfy one exact Project Lock entry through a resolved adapter release."""
 
     def __init__(
         self,
@@ -38,23 +38,10 @@ class ProjectLockInstallService:
         descriptor_path: str | Path,
         artifact_path: str | Path,
     ) -> ProjectLockInstallReport:
-        """Satisfy one lock entry without removing other installed releases."""
-        path = Path(lock_path).expanduser().resolve()
-        lock = self.project_locks.load(path)
-        entry = self._find_entry(lock, source_coordinate)
-        before = self._find_report(
-            self.project_locks.check(path, self.manager.list()), source_coordinate
-        )
-
+        """Satisfy one lock entry through the existing explicit Release Source."""
+        path, entry, before = self._prepare_entry(lock_path, source_coordinate)
         if before.status == "MATCH":
-            return ProjectLockInstallReport(
-                lock_path=path,
-                source_coordinate=source_coordinate,
-                before_status=before.status,
-                action="NOOP",
-                after_status="MATCH",
-                matching_instance_ids=before.matching_instance_ids,
-            )
+            return self._noop_report(path, source_coordinate, before)
 
         release = self.source.resolve(
             descriptor_path,
@@ -62,6 +49,54 @@ class ProjectLockInstallService:
             artifact_id=entry.artifact.id,
             expected_descriptor_sha256=entry.release_descriptor.sha256,
         )
+        return self._install_selected_entry(
+            path,
+            source_coordinate,
+            entry,
+            before,
+            release,
+        )
+
+    def install_resolved_entry(
+        self,
+        lock_path: str | Path,
+        source_coordinate: AdapterSourceCoordinate,
+        release: ResolvedAdapterRelease,
+    ) -> ProjectLockInstallReport:
+        """Satisfy one lock entry from an already-resolved exact release."""
+        path, entry, before = self._prepare_entry(lock_path, source_coordinate)
+        if before.status == "MATCH":
+            return self._noop_report(path, source_coordinate, before)
+
+        return self._install_selected_entry(
+            path,
+            source_coordinate,
+            entry,
+            before,
+            release,
+        )
+
+    def _prepare_entry(
+        self,
+        lock_path: str | Path,
+        source_coordinate: AdapterSourceCoordinate,
+    ) -> tuple[Path, AdapterProjectLockEntry, ProjectAdapterStateReport]:
+        path = Path(lock_path).expanduser().resolve()
+        lock = self.project_locks.load(path)
+        entry = self._find_entry(lock, source_coordinate)
+        before = self._find_report(
+            self.project_locks.check(path, self.manager.list()), source_coordinate
+        )
+        return path, entry, before
+
+    def _install_selected_entry(
+        self,
+        path: Path,
+        source_coordinate: AdapterSourceCoordinate,
+        entry: AdapterProjectLockEntry,
+        before: ProjectAdapterStateReport,
+        release: ResolvedAdapterRelease,
+    ) -> ProjectLockInstallReport:
         self._verify_release_satisfies_entry(entry, release)
 
         record = self.manager.install_resolved(
@@ -92,6 +127,21 @@ class ProjectLockInstallService:
             except AdapterManagerError:
                 pass
             raise
+
+    @staticmethod
+    def _noop_report(
+        path: Path,
+        source_coordinate: AdapterSourceCoordinate,
+        before: ProjectAdapterStateReport,
+    ) -> ProjectLockInstallReport:
+        return ProjectLockInstallReport(
+            lock_path=path,
+            source_coordinate=source_coordinate,
+            before_status=before.status,
+            action="NOOP",
+            after_status="MATCH",
+            matching_instance_ids=before.matching_instance_ids,
+        )
 
     @staticmethod
     def _find_entry(
