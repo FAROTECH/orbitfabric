@@ -84,6 +84,7 @@ nav:
       - v1.0.0 Stable Mission Data Contract: releases/v1.0.0.md
       - v1.1.0 Candidate Integration Surface Consolidation: releases/v1.1.0.md
       - v1.2.0 Core Integration Input Consolidation: releases/v1.2.0.md
+      - v1.3.0 Adapter Management Foundation: releases/v1.3.0.md
   - Communication:
       - Payload Contract Model Announcement: comms/payload-contract-model-announcement.md
 
