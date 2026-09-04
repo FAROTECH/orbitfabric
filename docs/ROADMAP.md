@@ -1,8 +1,8 @@
 # OrbitFabric - Roadmap
 
-Version: v1.2.0 Core Integration Input Consolidation  
-Status: v1.2.0 release baseline prepared from the reference-proven integration architecture  
-Scope: stable Mission Data Contract, candidate downstream inspection surfaces, stable Core integration input boundary and post-v1 direction
+Version: v1.3.0 Adapter Management Foundation  
+Status: v1.3.0 release baseline under final readiness review  
+Scope: stable Mission Data Contract, stable Core integration input boundary, candidate Integration Framework contracts and candidate Adapter Management foundation
 
 ---
 
@@ -20,17 +20,20 @@ The project must not try to become, at the same time:
 - a hardware abstraction layer;
 - a CubeSat tutorial;
 - a payload runtime framework;
-- a plugin execution platform.
+- an in-process plugin execution platform;
+- a provider-specific package manager.
 
 Every milestone must reinforce the core identity:
 
-> OrbitFabric is a Mission Data Contract framework.
+> OrbitFabric is a Mission Data Contract framework with explicit external integration and adapter lifecycle boundaries.
 
 The v1.0.0 release completed the first stable narrow Mission Data Contract baseline.
 
 The v1.1.0 release consolidated post-v1 Core-owned candidate inspection surfaces without replacing that baseline.
 
-The v1.2.0 release consolidates the Core-owned integration input boundary proven through the OpenOBSW/OpenSVF reference package and independent Studio consumption, without adding Mission Model semantics.
+The v1.2.0 release consolidated the Core-owned integration input boundary proven through external reference adapters and independent Studio consumption, without adding Mission Model semantics.
+
+The v1.3.0 release adds the first provider-neutral Adapter Management foundation while preserving those stable semantics and keeping provider-specific acquisition outside Core.
 
 ---
 
@@ -60,13 +63,15 @@ post-v1  Candidate Core-owned integration surfaces               completed
 v1.1.0  Candidate surface consolidation release                  completed
 post-v1.1 Mission Snapshot + additive FDIR relationships          completed / classified
 Phase B  Generic Integration Framework contracts                 completed / reference-proven
-v1.2.0  Core Integration Input Consolidation                     current release baseline
+v1.2.0  Core Integration Input Consolidation                     completed
+post-v1.2 Adapter Manager / Lock / Release Source / Catalog       completed / candidate productized
+v1.3.0  Adapter Management Foundation                            release readiness
 ```
 
-The current public release baseline is:
+The release candidate baseline is:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
 ---
@@ -136,7 +141,7 @@ generated C++17 runtime-facing bindings
 generated ground-facing dictionaries
 runtime_contract_manifest.json
 ground_contract_manifest.json
-plugin execution
+in-process plugin execution
 relationship graph behavior
 schema migration tooling
 Studio-specific API
@@ -165,15 +170,15 @@ Studio and other downstream tools consume, navigate and render.
 Downstream tools must not invent private coverage, health or completeness semantics.
 ```
 
-These surfaces remain candidate after v1.2.0 unless a separate compatibility decision promotes them.
+These surfaces remain candidate after v1.3.0 unless a separate compatibility decision promotes them.
 
 They do not change the v1.0.0 stable Mission Data Contract.
 
 ---
 
-## 6. Integration Architecture Extraction — Completed
+## 6. Generic Integration Architecture Extraction - Completed
 
-The OpenOBSW/OpenSVF PoC was used as a forcing function to extract a generic production integration architecture rather than to add OpenOBSW-specific behavior to Core.
+The OpenOBSW/OpenSVF PoC was used as an early forcing function to extract a generic production integration architecture rather than to add OpenOBSW-specific behavior to Core.
 
 The completed contract stack is:
 
@@ -189,7 +194,7 @@ Integration Result Contract
 generic downstream consumer
 ```
 
-The reference package demonstrates real out-of-process adapter execution over the Core-owned input boundary. OrbitFabric Studio independently consumes the same generic package/result contracts.
+The reference package demonstrated real out-of-process adapter execution over the Core-owned input boundary. OrbitFabric Studio independently consumed the same generic package/result contracts.
 
 The ownership split is explicit:
 
@@ -201,13 +206,13 @@ Integration Result      explicit mappings/artifacts/diagnostics/provenance
 Studio                  generic visualization/orchestration
 ```
 
-Core still does not dynamically load or execute ecosystem-specific adapters.
+Core does not import ecosystem-specific adapter implementation code in-process.
 
 ---
 
 ## 7. v1.2.0 Core Integration Input Consolidation
 
-v1.2.0 converts the proven Core input side of that architecture into a stable compatibility boundary.
+v1.2.0 converted the proven Core input side of that architecture into a stable compatibility boundary.
 
 ### Stable Mission Snapshot
 
@@ -252,19 +257,141 @@ Seven explicit FDIR families are admitted as additive stable-compatible Relation
 
 ### Candidate extension contracts remain candidate
 
-The following remain `0.1-candidate` extension contracts rather than stable Core Mission Data Contract surfaces:
+The Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain independently versioned candidate extension contracts rather than stable Core Mission Data Contract surfaces.
 
-```text
-Projection Profile
-Integration Result
-Integration Package / Adapter Execution
-```
-
-This prevents the stable Core input decision from silently widening Core ownership into ecosystem-specific semantics or executable extension behavior.
+This prevents the stable Core input decision from silently widening Core ownership into ecosystem-specific semantics.
 
 ---
 
-## 8. Post-v1 Direction
+## 8. Post-v1.2 Operation-Input Contract Lane
+
+The first versioned operation-input lane extends the external Integration Package contract without changing Core scenario semantics.
+
+The candidate lane is:
+
+```text
+Integration Package Manifest 0.2-candidate
+orbitfabric.adapter_cli.v1
+Integration Result 0.2-candidate
+```
+
+It preserves the coherent Core Integration Input Set and Projection Profile as common context and allows zero or one required file-backed operation input.
+
+The first contract-defined role is:
+
+```text
+scenario
+```
+
+Core owns the generic role/transport contract and conformance schemas. Target-specific scenario realization remains adapter-owned.
+
+---
+
+## 9. v1.3.0 Adapter Management Foundation
+
+v1.3.0 adds the first candidate Core-owned lifecycle for exact external adapter releases.
+
+### Adapter Manager M0
+
+Core owns exact installation, inventory, inspection, verification, execution and removal semantics.
+
+The first backend is:
+
+```text
+python-wheel-managed-env
+```
+
+Adapter code remains installed in a dedicated managed environment rather than imported into the Core process.
+
+### Adapter Project Lock M1
+
+Project Lock records exact desired adapter identity:
+
+```text
+Source Coordinate
+exact release version
+Release Descriptor SHA-256
+artifact id
+artifact SHA-256
+installation backend id
+```
+
+Installed Adapter State remains separate user-scoped actual state.
+
+### Explicit-source install-from-lock
+
+An exact lock entry can be satisfied from already-available descriptor/artifact bytes through the same Core installation transaction.
+
+`MATCH -> NOOP` is idempotent. Mismatching installed releases are not silently destroyed.
+
+### Source-neutral Release Source attachment
+
+Provider-specific acquisition is separated from Core lifecycle by:
+
+```text
+provider-specific Release Source
+    -> verified local release bytes
+    -> ResolvedAdapterRelease
+    -> Core Project Lock lifecycle
+```
+
+GitHub/provider behavior remains outside Core.
+
+### Provider-neutral Adapter Catalog
+
+Core owns a minimal exact Catalog model and exact selector anchored by:
+
+```text
+Source Coordinate
++ exact release version
++ expected Release Descriptor SHA-256
+```
+
+The local Core CLI provides:
+
+```text
+orbitfabric adapter catalog validate
+orbitfabric adapter catalog list
+orbitfabric adapter catalog select
+```
+
+The Catalog does not introduce version ranges, `latest`, automatic updates or provider dispatch.
+
+### Supported provider-explicit path
+
+The accepted public consumer path is:
+
+```text
+Core Catalog CLI
+    -> provider-specific Release Source
+    -> ResolvedAdapterRelease
+    -> Core Project Lock lifecycle
+    -> Installed Adapter State
+```
+
+The first provider product is the separate GitHub Release Source. It depends on Core `>=1.3,<2` and remains outside Core.
+
+The absence of a single provider-neutral install-from-Catalog command is deliberate. A universal provider registration/dispatch protocol is deferred until more than one materially different provider can justify the abstraction.
+
+### Maturity
+
+The v1.3 Adapter Management surfaces remain candidate unless separately promoted:
+
+```text
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral resolved-release attachment
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+A `1.3.0` package release does not make these surfaces part of the stable Mission Data Contract.
+
+---
+
+## 10. Post-v1.3 Direction
 
 Post-v1 work must preserve the same discipline:
 
@@ -274,9 +401,11 @@ Post-v1 work must preserve the same discipline:
 3. keep generated artifacts reproducible and disposable unless explicitly promoted
 4. require compatibility or migration notes for stable-surface changes
 5. avoid tool-specific claims without implementation and tests
-6. keep ecosystem adapter execution outside Core unless a separate architecture explicitly changes that rule
-7. distinguish Core-owned stable surfaces from extension-owned candidate contracts
-8. promote surfaces only after real producer/consumer evidence and explicit regression protection
+6. keep provider-specific acquisition outside Core
+7. keep ecosystem adapter implementation outside the Core process
+8. distinguish Core-owned stable surfaces from candidate integration/lifecycle surfaces
+9. promote surfaces only after real producer/consumer evidence and explicit regression protection
+10. generalize provider dispatch only after materially different provider evidence exists
 ```
 
 Valid future work may include:
@@ -287,30 +416,30 @@ additional mission examples
 additional lint coverage
 post-v1 compatibility refinements
 additional coverage analysis beyond the v1.1.0 candidate coverage_summary.json surface
-JSON Schema publication where owned by an explicit contract
 schema migration tooling, if separately designed
 tool-specific Integration Packages outside Core
+additional provider-specific Release Sources
+provider-neutral dispatch only after a second materially different provider
 additional Studio integration contribution families after concrete forcing functions
-plugin discovery/loading/execution only after a separate architectural decision
 ```
 
 ---
 
-## 9. Backlog Parking Lot
+## 11. Backlog Parking Lot
 
-These ideas remain outside the stable v1.2 Core boundary unless separately designed, implemented, tested and classified:
+These ideas remain outside the stable Core boundary unless separately designed, implemented, tested and classified:
 
 ```text
 XTCE export in Core
 CCSDS packet generator
 PUS service mapping in Core
 CFDP metadata
-Yamcs integration in Core
-OpenC3 integration in Core
+Yamcs-specific semantics in Core
+OpenC3-specific semantics in Core
 Basilisk bridge
 Space ROS bridge
-F Prime topology generator
-cFS table/app generator
+F Prime-specific topology generation in Core
+cFS-specific table/app generation in Core
 web dashboard
 visual mission model editor
 SARIF lint export
@@ -333,20 +462,21 @@ second payload example
 payload lifecycle expansion
 additional runtime generation profiles
 example user implementation outside generated/
-Core plugin discovery
-Core plugin loading
-Core plugin execution
+Core in-process plugin discovery/loading/execution
+provider-specific remote acquisition inside Core
+latest/stable/range version solving
+automatic adapter upgrades
 ```
 
 ---
 
-## 10. Final Roadmap Statement
+## 12. Final Roadmap Statement
 
-OrbitFabric v1.2.0 is the current release baseline.
+OrbitFabric v1.3.0 is the current release candidate baseline.
 
-OrbitFabric v1.0.0 remains the origin of the stable Mission Data Contract commitment; v1.2.0 extends that stable boundary additively with the Core-owned integration input surfaces proven after v1.1.0.
+OrbitFabric v1.0.0 remains the origin of the stable Mission Data Contract commitment. v1.2.0 extended that stable boundary with the Core-owned integration input surfaces. v1.3.0 adds a candidate external adapter lifecycle without changing those stable semantics.
 
-The stable statement is:
+The architectural statement is:
 
 ```text
 Define the contract once.
@@ -355,9 +485,10 @@ Exercise scenario evidence.
 Generate review artifacts.
 Export Core-owned structured surfaces.
 Export one coherent Core Integration Input Set for external consumers.
+Manage exact adapter desired/actual state through provider-neutral Core contracts.
+Keep provider-specific acquisition and target-specific semantics outside Core.
 Protect selected stable surface fields with golden signatures.
 Keep the Mission Model as the source of truth.
-Keep target-specific semantics and execution outside Core.
 ```
 
 The narrowness of the roadmap is intentional.
