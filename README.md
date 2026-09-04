@@ -180,7 +180,7 @@ The seven FDIR relationship families admitted in v1.2.0 are additive stable-comp
 
 ## Stable Core Integration Input boundary
 
-OrbitFabric v1.2.0 consolidates the production-facing Core input side of the generic Integration Framework.
+OrbitFabric v1.2.0 consolidated the production-facing Core input side of the generic Integration Framework as a stable compatibility boundary.
 
 The supported workflow is:
 
@@ -208,7 +208,7 @@ The existing wire identifiers remain `0.1-candidate` for compatibility with the 
 
 ## Candidate Core inspection surfaces
 
-The following Core-owned surfaces introduced in v1.1.0 remain candidate after v1.2.0:
+The following Core-owned surfaces introduced in v1.1.0 remain candidate after v1.3.0:
 
 ```text
 dashboard_summary.json
@@ -255,9 +255,61 @@ Result 0.2-candidate
 
 The v1 lane keeps IISS and Projection Profile as common context and allows zero or one required file-backed operation input. The first contract-defined role is `scenario`. Core publishes JSON Schemas, positive/negative fixtures and a reusable conformance checker. This remains an extension contract and does not move adapter execution or target semantics into Core.
 
-Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
+Core does not import ecosystem-specific adapter code in-process. Adapter execution, when requested through Adapter Manager, uses the documented external adapter execution contract and an installed environment-local entrypoint.
 
-The OpenOBSW/OpenSVF reference integration has been used as a real forcing function for this architecture without moving OpenOBSW, OpenSVF, YAMCS, PUS or other target-specific semantics into Core.
+The OpenOBSW/OpenSVF reference integration was used as an early forcing function for this architecture without moving OpenOBSW, OpenSVF, YAMCS, PUS or other target-specific semantics into Core.
+
+## Adapter Management foundation
+
+OrbitFabric v1.3.0 adds the first candidate Core-owned lifecycle for exact external adapter releases.
+
+The Core side is deliberately provider-neutral:
+
+```text
+Adapter Project Lock
+    -> exact Adapter Catalog selection
+    -> provider-specific Release Source outside Core
+    -> ResolvedAdapterRelease
+    -> Core Adapter Manager lifecycle
+    -> Installed Adapter State
+    -> verify / execute / remove
+```
+
+Core owns:
+
+```text
+exact Source Coordinate and release identity
+Adapter Release Descriptor conformance
+project-scoped desired state through Adapter Project Lock
+user-scoped Installed Adapter State
+installation transaction and backend verification
+provider-neutral Catalog model and exact selection
+```
+
+Core does **not** own provider-specific acquisition. GitHub Releases, future registries or other providers remain external Release Sources that resolve exact bytes and hand a verified `ResolvedAdapterRelease` into Core.
+
+The candidate Core CLI includes:
+
+```text
+orbitfabric adapter install
+orbitfabric adapter list
+orbitfabric adapter inspect
+orbitfabric adapter verify
+orbitfabric adapter execute
+orbitfabric adapter remove
+
+orbitfabric adapter lock validate
+orbitfabric adapter lock check
+orbitfabric adapter lock install
+
+orbitfabric adapter catalog validate
+orbitfabric adapter catalog list
+orbitfabric adapter catalog select
+```
+
+There is intentionally no unified provider-neutral `orbitfabric adapter install <logical-adapter> --version ...` command yet. Defining provider registration/dispatch from one provider would generalize too early.
+
+See [Adapter Manager M0](docs/reference/adapter-manager-m0.md), [Adapter Project Lock M1](docs/reference/adapter-project-lock-m1.md), [Explicit-Source Install from Adapter Project Lock](docs/reference/adapter-install-from-lock-explicit-source.md) and [Adapter Catalog CLI](docs/reference/adapter-catalog-cli.md).
 
 ## OrbitFabric ecosystem
 
@@ -265,7 +317,7 @@ OrbitFabric Core is the semantic authority of a wider, deliberately separated ec
 
 ### OrbitFabric Core
 
-This repository. It defines, validates, exercises and exports the Mission Data Contract and its Core-owned structured surfaces.
+This repository. It defines, validates, exercises and exports the Mission Data Contract and owns the provider-neutral Adapter Management lifecycle boundaries.
 
 ### OrbitFabric Studio
 
@@ -284,15 +336,29 @@ Studio makes the fact understandable.
 
 It is not flight software, not a real mission configuration and not a spacecraft simulator.
 
+### OrbitFabric Adapter Catalog
+
+[OrbitFabric Adapter Catalog](https://github.com/FAROTECH/orbitfabric-adapter-catalog) is the public data product that records available exact adapter releases and their source bindings using the Core-owned Catalog format.
+
+Catalog membership is not by itself a trust or endorsement statement.
+
+### GitHub Release Source
+
+[OrbitFabric GitHub Release Source](https://github.com/FAROTECH/orbitfabric-github-release-source) is the first provider-specific Release Source product. It resolves exact Catalog-selected releases through GitHub Releases and hands verified release material into the Core lifecycle.
+
+It remains outside Core so GitHub-specific acquisition does not become a Core dependency or semantic boundary.
+
 ## Current Core version and compatibility posture
 
 Current Core version:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-The stable Mission Data Contract commitment started with `v1.0.0`. v1.2.0 extends that stable boundary additively with Mission Snapshot, the coherent Core Integration Input Set and seven explicit FDIR Relationship Manifest families. It introduces no new Mission Model semantics.
+The stable Mission Data Contract commitment started with `v1.0.0`. v1.2.0 extended that stable boundary additively with Mission Snapshot, the coherent Core Integration Input Set and seven explicit FDIR Relationship Manifest families. v1.3.0 preserves those stable semantics and adds candidate operation-input and Adapter Management product capabilities.
+
+No new Mission Model semantics are introduced by v1.3.0.
 
 The release classification is intentionally mixed rather than pretending every surface has the same maturity:
 
@@ -317,10 +383,17 @@ Candidate Core inspection surfaces
   coverage_summary.json
   simulation JSON structured expectation accounting
 
-Candidate extension contracts
+Candidate integration / Adapter Management surfaces
   Projection Profile
   Integration Result
   Integration Package / Adapter Execution
+  operation-input v1 contract lane
+  Adapter Release Descriptor
+  Adapter Project Lock
+  Adapter Manager lifecycle
+  explicit-source install-from-lock
+  source-neutral resolved-release attachment
+  Adapter Catalog model and CLI
 
 Generated public-preview artifacts
   C++17 runtime-facing bindings
@@ -330,7 +403,7 @@ Generated public-preview artifacts
   plain-text logs
 ```
 
-See [v1.2.0 release notes](docs/releases/v1.2.0.md), [Stability and Compatibility Contract](docs/reference/stability-compatibility-contract.md), [v1.2 Integration Input Stability Decision](docs/reference/v1.2-integration-input-stability-decision.md) and [Release Compatibility Policy](docs/reference/release-compatibility-policy.md).
+See [v1.3.0 release notes](docs/releases/v1.3.0.md), [Stability and Compatibility Contract](docs/reference/stability-compatibility-contract.md), [v1.2 Integration Input Stability Decision](docs/reference/v1.2-integration-input-stability-decision.md) and [Release Compatibility Policy](docs/reference/release-compatibility-policy.md).
 
 ## Demo mission
 
@@ -414,12 +487,13 @@ Verify:
 ```bash
 orbitfabric --version
 orbitfabric --help
+orbitfabric adapter --help
 ```
 
 Expected version for this baseline:
 
 ```text
-orbitfabric 1.2.0
+orbitfabric 1.3.0
 ```
 
 ### Run the main quality gates
@@ -473,7 +547,7 @@ OrbitFabric development follows a few strict rules:
 5. Treat stable surface changes as compatibility-sensitive engineering changes.
 6. Prefer additive evolution where it preserves existing meaning.
 7. Do not move target-specific integration semantics into Core.
-8. Do not add plugin execution or in-process third-party adapter execution without a separate architectural decision.
+8. Keep ecosystem adapter code and provider-specific acquisition outside Core; external execution must use documented contracts and lifecycle boundaries rather than in-process loading.
 9. Protect meaningful stable fields with selective regression signatures instead of freezing incidental formatting.
 10. Keep public examples synthetic or based only on material that can legally be used in an open-source project.
 
@@ -495,6 +569,9 @@ Recommended reading paths:
 - [Generated Surfaces Stability](docs/reference/generated-surfaces-stability.md) for output classification.
 - [Core Integration Input Contract](docs/reference/core-integration-input-contract.md) for the stable external input boundary.
 - [Projection Profile Contract](docs/reference/projection-profile-contract.md) for the first extension-owned integration boundary.
+- [Adapter Manager M0](docs/reference/adapter-manager-m0.md) for installed adapter lifecycle ownership.
+- [Adapter Project Lock M1](docs/reference/adapter-project-lock-m1.md) for project-scoped exact desired adapter state.
+- [Adapter Catalog CLI](docs/reference/adapter-catalog-cli.md) for provider-neutral local Catalog selection.
 
 ## Clean-room development
 
