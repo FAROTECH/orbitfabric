@@ -35,25 +35,28 @@ From the validated Mission Model, Core can:
 - generate C++17 runtime-facing contract bindings;
 - generate generic ground-facing contract artifacts;
 - export machine-readable Core-owned inspection surfaces;
-- produce one coherent Integration Input Set for external ecosystem integrations.
+- produce one coherent Integration Input Set for external ecosystem integrations;
+- manage exact installed external adapter releases through a provider-neutral candidate lifecycle.
 
 Generated runtime and ground artifacts are contract-facing outputs, not flight software or a ground segment.
 
 ## Current Core version
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
 The stable Mission Data Contract commitment started with v1.0.0.
 
-v1.2.0 adds no Mission Model semantics. It extends the stable Core boundary with:
+v1.2.0 extended the stable Core boundary with:
 
 ```text
 mission_snapshot.json
 Core Integration Input Set
 seven additive stable-compatible FDIR Relationship Manifest families
 ```
+
+v1.3.0 preserves those stable semantics and adds candidate operation-input and Adapter Management capabilities. It introduces no new Mission Model semantics.
 
 The coherent Integration Input Set is generated from one logical Core load/lint operation and includes:
 
@@ -99,17 +102,24 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-### Candidate extension contracts
+### Candidate integration and Adapter Management surfaces
 
-The generic Integration Framework also defines:
+The generic Integration Framework and v1.3 Adapter Management foundation include candidate contracts and product surfaces:
 
 ```text
 Projection Profile
 Integration Result
 Integration Package / Adapter Execution
+operation-input v1 contract lane
+Adapter Release Descriptor
+Adapter Project Lock
+Adapter Manager lifecycle
+explicit-source install-from-lock
+source-neutral resolved-release attachment
+Adapter Catalog model and CLI
 ```
 
-These contracts remain independently versioned `0.1-candidate`. They are external integration contracts, not stable Core Mission Data Contract surfaces.
+These remain independently versioned or explicitly classified candidate surfaces. They are not automatically part of the stable Mission Data Contract merely because the Core package version is 1.3.0.
 
 ## Architecture in one view
 
@@ -129,17 +139,30 @@ Mission Model
             -> Studio / CI / other consumers
 ```
 
+Adapter lifecycle ownership is separate but connected:
+
+```text
+Adapter Project Lock
+    -> exact Adapter Catalog selection
+    -> provider-specific Release Source outside Core
+    -> ResolvedAdapterRelease
+    -> Core Adapter Manager
+    -> Installed Adapter State
+```
+
 Ownership remains explicit:
 
 ```text
 Core owns mission semantics.
+Core owns exact adapter identity, desired/actual state and lifecycle semantics.
 Projection Profiles own authored target-specific intent.
 External adapters own target-specific validation and generation.
+Provider-specific Release Sources own provider acquisition.
 Integration Results own explicit integration outputs and provenance.
 Downstream tools consume and present explicit records.
 ```
 
-Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
+Core does not import ecosystem-specific adapter code in-process and does not contain provider-specific acquisition logic.
 
 ## Start here
 
@@ -185,9 +208,23 @@ Read:
 - [Projection Profile Contract](reference/projection-profile-contract.md)
 - [Projection Profile Integration Schema Publication](reference/projection-profile-schema-publication.md)
 - [Integration Package and Adapter Execution Contract](reference/integration-package-adapter-execution-contract.md)
+- [Integration Operation-Input Contract v1](reference/integration-contract-v1.md)
 - [Integration Result Contract](reference/integration-result-contract.md)
 
-The Core input boundary is stable in v1.2. The Profile, Package and Result contracts remain candidate extension contracts.
+The Core input boundary is stable from v1.2. The Profile, Package, operation-input and Result contracts remain candidate extension contracts.
+
+### I want the Adapter Management boundary
+
+Read:
+
+- [Adapter Manager M0](reference/adapter-manager-m0.md)
+- [Adapter Project Lock M1](reference/adapter-project-lock-m1.md)
+- [Explicit-Source Install from Adapter Project Lock](reference/adapter-install-from-lock-explicit-source.md)
+- [Adapter Catalog CLI](reference/adapter-catalog-cli.md)
+- [ADR-0020 Source-Neutral Release Attachment Seam](adr/ADR-0020-source-neutral-release-attachment-seam.md)
+- [ADR-0021 Adapter Catalog Exact Selection Boundary](adr/ADR-0021-adapter-catalog-exact-selection-boundary.md)
+
+The Core boundary is provider-neutral. Provider-specific Release Sources remain external products and hand verified exact releases into Core through `ResolvedAdapterRelease`.
 
 ### I want to contribute
 
@@ -207,11 +244,12 @@ a spacecraft dynamics simulator
 a hardware abstraction layer
 a CCSDS/PUS/CFDP implementation
 a relationship or dependency graph engine
-a Core plugin execution platform
+a Core in-process plugin execution platform
+a provider-specific package registry client
 a Studio-specific backend
 ```
 
-Those boundaries are deliberate. OrbitFabric is valuable because it provides a narrow, explicit contract layer that other engineering systems can consume.
+Those boundaries are deliberate. OrbitFabric is valuable because it provides a narrow, explicit contract and lifecycle layer that other engineering systems can consume.
 
 ## Quality and reproducibility
 
@@ -237,6 +275,6 @@ See [Clean-Room Policy](CLEAN_ROOM_POLICY.md).
 
 ## Release notes
 
-The current release notes are in [v1.2.0 Core Integration Input Consolidation](releases/v1.2.0.md).
+The current release notes are in [v1.3.0 Adapter Management Foundation](releases/v1.3.0.md).
 
 The complete release history is available under the **Releases** section of this documentation site and in the repository `CHANGELOG.md`.
