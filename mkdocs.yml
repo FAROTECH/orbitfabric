@@ -107,6 +107,7 @@ nav:
       - ADR-0018 Adapter Project Lock M1: adr/ADR-0018-adapter-project-lock-m1.md
       - ADR-0019 Explicit-Source Install-from-Lock Boundary: adr/ADR-0019-explicit-source-install-from-lock-boundary.md
       - ADR-0020 Source-Neutral Release Attachment Seam: adr/ADR-0020-source-neutral-release-attachment-seam.md
+      - ADR-0021 Adapter Catalog Exact Selection Boundary: adr/ADR-0021-adapter-catalog-exact-selection-boundary.md
 
 markdown_extensions:
   - admonition
