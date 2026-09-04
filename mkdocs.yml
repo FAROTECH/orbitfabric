@@ -64,6 +64,7 @@ nav:
       - Integration Contract Compatibility Matrix: reference/integration-contract-compatibility-matrix.md
       - Adapter Manager M0: reference/adapter-manager-m0.md
       - Adapter Project Lock M1: reference/adapter-project-lock-m1.md
+      - Adapter Catalog CLI: reference/adapter-catalog-cli.md
       - Explicit-Source Install from Adapter Project Lock: reference/adapter-install-from-lock-explicit-source.md
   - Releases:
       - v0.2.2 Payload Contract Release Alignment: releases/v0.2.2.md
