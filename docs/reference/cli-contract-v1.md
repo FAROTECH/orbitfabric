@@ -1,26 +1,26 @@
 # CLI Contract v1
 
-Status: Active v1 CLI contract through v1.2.0  
+Status: Active v1 CLI contract through v1.3.0  
 Scope: CLI compatibility classification for documented workflows  
 Applies to: OrbitFabric CLI from v1.0.0 onward
 
 This page classifies the current OrbitFabric CLI surface.
 
-It documents compatibility. It does not introduce new behavior, Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+It documents compatibility. It does not introduce new behavior, Mission Model semantics, provider-specific acquisition, flight runtime behavior, ground behavior or Studio-specific APIs.
 
 ## 1. Purpose
 
 The OrbitFabric CLI is a public user-facing workflow surface.
 
-From v1.0.0 onward, documented command names, command groups, required arguments, documented options and selected machine-readable outputs are compatibility-sensitive.
+From v1.0.0 onward, documented command names, command groups, required arguments, documented options and selected machine-readable outputs are compatibility-sensitive according to their documented maturity class.
 
 The current Core version is:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-The CLI contains a mixed maturity surface. Stable workflows and candidate report families are classified explicitly rather than treated as one undifferentiated API.
+The CLI contains a mixed maturity surface. Stable workflows and candidate inspection, integration and Adapter Management families are classified explicitly rather than treated as one undifferentiated API.
 
 ## 2. Top-level CLI surface
 
@@ -31,7 +31,7 @@ orbitfabric --help
 orbitfabric --version
 ```
 
-Current command groups and commands:
+Stable v1 command groups and commands include:
 
 ```text
 orbitfabric lint
@@ -42,22 +42,33 @@ orbitfabric inspect ...
 orbitfabric export ...
 ```
 
-`orbitfabric --version` reports the OrbitFabric package version. It is not the same as a mission's `model_version` or a JSON surface format version.
+v1.3.0 also exposes the candidate Adapter Management command group:
+
+```text
+orbitfabric adapter ...
+```
+
+`orbitfabric --version` reports the OrbitFabric package version. It is not the same as a mission's `model_version`, a JSON surface format version, an Adapter Release version or an Adapter Catalog format version.
 
 ## 3. Stability classification
 
 | CLI area | Classification | Notes |
 |---|---|---|
 | `orbitfabric` entry point | Stable | Public CLI entry point. |
-| `lint`, `sim`, `gen`, `validate`, `inspect`, `export` | Stable | Documented command surface. |
-| required positional arguments | Stable where documented | Compatibility-sensitive. |
-| documented options | Stable where documented | Compatibility-sensitive. |
+| `lint`, `sim`, `gen`, `validate`, `inspect`, `export` | Stable | Documented v1 command surface. |
+| required positional arguments | Stable where documented for stable workflows | Compatibility-sensitive. |
+| documented options | Stable where documented for stable workflows | Compatibility-sensitive. |
 | human-oriented terminal text | Human-oriented | Not a machine contract. |
 | v1.0 structured exports | Stable | Model Summary, Entity Index, Relationship Manifest. |
 | v1.2 Mission Snapshot export | Stable | Complete loaded Mission Model inspection boundary. |
 | v1.2 Integration Input Set export | Stable | Coherent Core input boundary for external integrations. |
 | v1.1 dashboard, scenario-index and coverage exports | Candidate | Core-owned inspection surfaces. |
-| internal Python APIs | Internal | Not a public CLI contract. |
+| `orbitfabric adapter ...` | Candidate | v1.3 provider-neutral Adapter Management lifecycle surface. |
+| `orbitfabric adapter lock ...` | Candidate | v1.3 exact desired-state workflow. |
+| `orbitfabric adapter catalog ...` | Candidate | v1.3 local provider-neutral Catalog inspection/selection. |
+| internal Python APIs | Internal unless separately documented | Not automatically a public CLI contract. |
+
+A candidate command may evolve under explicit review. Shipping in Core `1.3.0` does not promote it to the stable Mission Data Contract CLI surface.
 
 ## 4. Output path rule
 
@@ -76,6 +87,8 @@ examples/demo-3u/generated/
 ```
 
 Explicit user-provided output paths remain explicit.
+
+Adapter Manager state uses its separately documented state model and must not be inferred from mission-workspace generated-output rules.
 
 ## 5. Lint
 
@@ -393,7 +406,77 @@ The command loads and displays a human-oriented mission summary.
 
 It does not lint, generate artifacts or provide a machine-readable compatibility surface.
 
-## 18. Machine-readable output rule
+## 18. Adapter Management command group
+
+v1.3.0 adds the candidate provider-neutral Adapter Management command family:
+
+```bash
+orbitfabric adapter --help
+```
+
+Candidate lifecycle commands include:
+
+```text
+orbitfabric adapter install
+orbitfabric adapter list
+orbitfabric adapter inspect
+orbitfabric adapter verify
+orbitfabric adapter execute
+orbitfabric adapter remove
+```
+
+These commands operate on exact adapter releases and Core-owned Installed Adapter State. The first installation backend is `python-wheel-managed-env`.
+
+`execute` launches the installed external adapter entrypoint according to the documented adapter execution contract. It does not import the adapter implementation into the Core process and does not imply flight or ground runtime execution.
+
+Human-oriented adapter CLI prose is not a machine contract unless a separate structured output is explicitly documented.
+
+## 19. Adapter Project Lock commands
+
+Candidate Project Lock commands include:
+
+```text
+orbitfabric adapter lock validate <lock.json>
+orbitfabric adapter lock check <lock.json>
+orbitfabric adapter lock install <lock.json> ...
+```
+
+Adapter Project Lock is project-scoped exact desired state. Installed Adapter State is separate user-scoped actual state.
+
+Lock identity includes exact Source Coordinate, release version, Release Descriptor digest, artifact id/digest and installation backend id. It must not depend on machine-local instance ids, install paths, executable paths or mutable provider locators.
+
+`lock install` is the explicit-source lane. It consumes already-available exact Release Descriptor/artifact bytes and does not discover or contact a remote provider.
+
+An already satisfied exact entry produces an idempotent `MATCH -> NOOP` lifecycle result.
+
+## 20. Adapter Catalog commands
+
+Candidate local Catalog commands include:
+
+```text
+orbitfabric adapter catalog validate <catalog.json>
+orbitfabric adapter catalog list <catalog.json>
+orbitfabric adapter catalog select <catalog.json> <SOURCE_COORDINATE> --version <EXACT_VERSION>
+```
+
+Core Catalog selection is exact and provider-neutral.
+
+The CLI does not:
+
+```text
+fetch a default remote Catalog
+contact GitHub or another provider
+dispatch provider implementations
+select latest/stable channels
+solve version ranges
+perform automatic upgrades
+```
+
+Provider-specific acquisition remains in external Release Source products.
+
+There is intentionally no Core one-command install-from-Catalog/provider-dispatch workflow in v1.3.0.
+
+## 21. Machine-readable output rule
 
 Machine consumers should prefer documented structured surfaces such as:
 
@@ -408,6 +491,9 @@ integration_input_manifest.json
 dashboard_summary.json
 scenario_run_index.json
 coverage_summary.json
+Adapter Project Lock
+Adapter Release Descriptor
+Adapter Catalog
 generated manifests where their own references permit it
 ```
 
@@ -415,7 +501,7 @@ Classification still matters. A candidate surface does not become stable because
 
 Consumers must not parse human terminal wording when a structured surface exists.
 
-## 19. Compatibility-sensitive CLI changes
+## 22. Compatibility-sensitive CLI changes
 
 After v1.0.0, the following are compatibility-sensitive where documented as stable:
 
@@ -431,16 +517,20 @@ After v1.0.0, the following are compatibility-sensitive where documented as stab
 
 Compatibility-sensitive does not mean forbidden. It means the change must be explicit, reviewed and documented.
 
-Candidate report families may evolve, but changes must not be silent.
+Candidate CLI and report families may evolve, but changes must not be silent. In particular, changes to Adapter Manager, Project Lock or Catalog CLI identity/failure behavior require explicit candidate-surface review because external tooling may already consume them.
 
-## 20. Current non-goals
+## 23. Current non-goals
 
 The CLI contract does not introduce or promise:
 
 ```text
 terminal text parsing compatibility
-plugin command discovery
-plugin execution
+in-process plugin command discovery/loading/execution
+provider-specific acquisition inside Core
+provider registration/dispatch
+remote Catalog default/fetch policy
+latest/stable/range version solving
+automatic adapter upgrades
 remote execution
 background jobs
 watch mode
@@ -449,13 +539,13 @@ flight runtime behavior
 ground runtime behavior
 operator console behavior
 Studio-specific API behavior
-OpenOBSW/OpenSVF-specific Core generation
+downstream-specific Core generation
 ```
 
-## 21. Final statement
+## 24. Final statement
 
-v1.2.0 is the current Core release baseline.
+v1.3.0 is the current Core release baseline.
 
-The CLI provides stable user and CI workflows for documented v1 Mission Data Contract operations, including the v1.2 Mission Snapshot and coherent Integration Input Set exports.
+The CLI provides stable user and CI workflows for the documented v1 Mission Data Contract operations, including the v1.2 Mission Snapshot and coherent Integration Input Set exports.
 
-Candidate v1.1 inspection exports remain candidate. Human-oriented terminal prose remains outside the machine compatibility contract.
+Candidate v1.1 inspection exports remain candidate. v1.3 adds a separate candidate Adapter Management command family with provider-neutral exact identity and lifecycle boundaries. Human-oriented terminal prose remains outside the machine compatibility contract.
