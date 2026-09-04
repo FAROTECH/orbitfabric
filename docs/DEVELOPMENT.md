@@ -5,12 +5,12 @@ This document explains how to work on OrbitFabric locally.
 OrbitFabric is currently released at:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-The stable Mission Data Contract commitment originated with `v1.0.0`; v1.2.0 extends it additively with the stable Core integration input boundary and no new Mission Model semantics.
+The stable Mission Data Contract commitment originated with `v1.0.0`; v1.2.0 extended it additively with the stable Core integration input boundary and no new Mission Model semantics. v1.3.0 preserves those stable semantics and adds candidate operation-input and provider-neutral Adapter Management capabilities.
 
-The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate. Projection Profile, Integration Result and Integration Package / Adapter Execution remain independently versioned candidate extension contracts.
+The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate. Projection Profile, Integration Result, Integration Package / Adapter Execution, operation-input v1 and the v1.3 Adapter Management surfaces remain independently classified candidate contracts/product surfaces unless separately promoted.
 
 ---
 
@@ -55,12 +55,13 @@ Verify installation:
 ```bash
 orbitfabric --version
 orbitfabric --help
+orbitfabric adapter --help
 ```
 
 Expected current package version:
 
 ```text
-orbitfabric 1.2.0
+orbitfabric 1.3.0
 ```
 
 ---
@@ -205,7 +206,54 @@ orbitfabric export scenario-run-index \
 orbitfabric export coverage-summary examples/demo-3u/mission/
 ```
 
-These surfaces remain candidate after v1.2.0 and must not be treated as dashboard backend behavior, Studio API behavior, OpenOBSW/OpenSVF-specific generation, graph behavior, runtime behavior or ground behavior.
+These surfaces remain candidate after v1.3.0 and must not be treated as dashboard backend behavior, Studio API behavior, downstream-specific generation, graph behavior, runtime behavior or ground behavior.
+
+---
+
+## Verify the v1.3 candidate Adapter Management surface
+
+Inspect the Core-owned command groups:
+
+```bash
+orbitfabric adapter --help
+orbitfabric adapter lock --help
+orbitfabric adapter catalog --help
+```
+
+Relevant Core reference surfaces are:
+
+```text
+Adapter Manager M0
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral ResolvedAdapterRelease attachment
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+The ownership boundary is:
+
+```text
+Core
+  exact adapter identity
+  Project Lock desired state
+  Installed Adapter State
+  lifecycle transaction
+  backend verification
+  provider-neutral Catalog exact selection
+
+external Release Source
+  provider-specific acquisition
+  verified descriptor/artifact materialization
+  ResolvedAdapterRelease handoff
+```
+
+Do not add GitHub, registry or other provider-specific acquisition behavior to Core merely to simplify the CLI.
+
+Do not infer a universal provider registration/dispatch protocol from the first provider implementation. That abstraction remains deferred until materially different provider evidence exists.
+
+When adding Adapter Management behavior, preserve fail-closed exact identity checks and keep Project Lock free from local paths, instance ids and mutable provider locators.
 
 ---
 
@@ -235,7 +283,7 @@ examples/demo-3u/scenarios/*.yaml
 
 Generated runtime-facing contract bindings, ground-facing integration artifacts, Markdown documentation and plain-text logs remain disposable unless explicitly classified otherwise.
 
-Stable Core-owned machine-readable surfaces now include:
+Stable Core-owned machine-readable surfaces include:
 
 ```text
 mission_snapshot.json
@@ -254,6 +302,8 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
+Candidate Integration/Adapter Management contracts remain separately classified and are not promoted by the Core package version alone.
+
 Selected golden signatures protect contract-significant fields of stable surfaces. They do not freeze complete generated JSON, absolute paths, human-oriented output or disposable artifact formatting.
 
 User implementation code and downstream integration code must live outside `generated/`.
@@ -270,8 +320,9 @@ For new behavior, follow this order:
 3. add tests
 4. update Core-owned structured surfaces only through documented ownership boundaries
 5. update generated docs/reports/runtime/ground bindings where needed
-6. update compatibility classification when a stable surface changes
+6. update compatibility classification when a stable or candidate public surface changes
 7. update user-facing documentation
+8. add cross-repository evidence when a boundary depends on external adapters/providers
 ```
 
 After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
@@ -282,9 +333,11 @@ Do not add generated artifacts that bypass validation.
 
 Do not add runtime or ground integration artifacts before the relevant contract layer exists.
 
-Do not dynamically load ecosystem Integration Adapters inside Core; the stable v1.2 boundary is out-of-process execution over the coherent Core Integration Input Set.
+Do not import ecosystem Integration Adapter implementation code inside Core. Adapter Manager execution uses an installed external entrypoint through the documented adapter execution contract.
 
-Do not turn the Extensibility Boundary Contract into plugin discovery/loading/execution without a separate architectural review.
+Do not add provider-specific Release Source acquisition to Core. Provider-specific products must resolve exact bytes externally and hand a verified `ResolvedAdapterRelease` into the Core lifecycle.
+
+Do not turn the Extensibility Boundary Contract into in-process plugin discovery/loading/execution without a separate architectural review.
 
 Do not put user code inside generated runtime bindings.
 
