@@ -8,8 +8,13 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
+No unreleased changes are currently classified beyond the v1.3.0 release baseline.
+
+## [v1.3.0] - 2026-09-04
+
 ### Added
 
+- Added the candidate operation-input integration contract lane with Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1`, Integration Result `0.2-candidate`, JSON Schemas, positive/negative fixtures, conformance checking and a compatibility matrix.
 - Added the Core-owned Adapter Manager M0 candidate lifecycle for exact adapter installation, inspection, verification, execution and removal.
 - Added `orbitfabric adapter install`, `list`, `inspect`, `verify`, `execute` and `remove`.
 - Added the Adapter Release Descriptor `0.1-candidate` JSON Schema and Core conformance validation.
@@ -31,27 +36,40 @@ This project follows a lightweight changelog style for the Mission Model, contra
 - Added non-destructive `MISMATCH` handling by installing the exact locked release side-by-side while retaining existing mismatching releases.
 - Added install-from-lock regression controls for idempotent `MATCH -> NOOP`, `MISSING -> INSTALLED -> MATCH`, side-by-side `MISMATCH -> INSTALLED -> MATCH`, identity failures before materialization and backend-failure inventory coherence.
 - Added ADR-0019 and the explicit-source install-from-lock reference documentation.
+- Added the source-neutral `ResolvedAdapterRelease` attachment seam so provider-specific Release Sources can acquire and verify exact release bytes outside Core before handing them to the existing Project Lock lifecycle.
+- Added trust-evidence dimensions that keep provider acquisition facts separate from Core acceptance semantics.
+- Added ADR-0020 and source-neutral remote-release attachment regression coverage.
+- Added provider-neutral Adapter Catalog `0.1-candidate` models and exact Source Coordinate + release version selection anchored by the expected Release Descriptor SHA-256.
+- Added exact selection fail-closed controls for missing or ambiguous adapters, releases and source bindings while keeping provider configuration and release references opaque to Core.
+- Added `orbitfabric adapter catalog validate`, `list` and `select` for local provider-neutral Catalog inspection and exact selection.
+- Added ADR-0021, Adapter Catalog CLI reference documentation and regression coverage.
+- Added v1.3.0 release notes.
 
 ### Changed
 
+- Updated package and CLI version to `1.3.0`.
 - Moved `jsonschema` into the base runtime dependencies because integration, Adapter Release and Adapter Project Lock conformance are required by Adapter Manager lifecycle operations.
-- Refactored Adapter Manager explicit installation so resolved releases converge on one shared post-resolution installation transaction used by both direct install and install-from-lock.
+- Refactored Adapter Manager explicit installation so resolved releases converge on one shared post-resolution installation transaction used by direct install, install-from-lock and source-neutral resolved-release handoff.
+- Changed Python wheel manifest discovery to locate exactly one `integration_package.json` owned by the exact installed wheel distribution instead of assuming a fixed top-level import package.
+- Preserved provider neutrality by keeping GitHub/provider acquisition, network access, provider registration and provider dispatch outside Core.
 
 ### Compatibility impact
 
-Adapter Manager M0, Adapter Project Lock M1 and the explicit-source install-from-lock lane are additive Core product capabilities and do not introduce a Mission Model semantic migration.
+v1.3.0 is an additive Core product release and does not introduce a Mission Data Contract semantic migration.
 
-No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or scenario expectation semantics are removed, renamed or redefined.
+No Mission Model fields, domains, controlled values, identifier rules, reference meanings, lint diagnostic semantics or Core scenario expectation semantics are removed, renamed or redefined.
 
-The existing Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1` and Integration Result `0.2-candidate` execution lane is reused unchanged. Adapter Manager does not introduce a second runtime adapter protocol.
+The stable v1.2 Mission Snapshot and coherent Core Integration Input Set remain unchanged. Existing stable Core-owned structured surfaces require no migration.
 
-The Adapter Release Descriptor `0.1-candidate`, Adapter Project Lock `0.1-candidate` and `orbitfabric adapter` CLI remain candidate surfaces. Raw Installed Adapter Inventory persistence, local instance identifiers, managed-environment layout and backend receipts remain implementation-private.
+The operation-input integration lane, Adapter Manager lifecycle, Adapter Release Descriptor `0.1-candidate`, Adapter Project Lock `0.1-candidate`, explicit-source install-from-lock lane, source-neutral Release Source attachment seam, Adapter Catalog `0.1-candidate` and Adapter Catalog CLI are candidate surfaces. Publishing Core v1.3.0 does not automatically promote them into the stable Mission Data Contract.
 
-Adapter Project Lock represents project-scoped desired exact state. Installed Adapter Inventory remains user-scoped actual state. Lock validation, comparison and explicit-source installation do not require a remote registry and do not store local instance ids, installation paths, executable paths or mutable artifact locators in the lock.
+Adapter Project Lock represents project-scoped desired exact state. Installed Adapter Inventory remains user-scoped actual state. Locks do not store local instance ids, installation paths, executable paths or mutable provider locators.
 
-Install-from-lock reuses the M0 lifecycle transaction, verifies exact lock identity before backend materialization and treats an already matching lock entry as an idempotent no-op. A mismatching installed release is not implicitly removed or replaced.
+Install-from-lock and resolved-release attachment reuse the same Core lifecycle transaction, verify exact identity before backend materialization and treat an already matching lock entry as an idempotent no-op. A mismatching installed release is not implicitly removed or replaced.
 
-This lane does not introduce lock authoring/update UX, backend-resolution material verification, remote registry/source discovery, project-wide reconcile, project execution selection by lock, automatic destructive updates, publisher administration, non-Python backends or Studio lifecycle UX.
+Adapter Catalog selection is provider-neutral and local. Core does not fetch a remote Catalog, contact GitHub, dispatch provider implementations, solve version ranges, select `latest`, perform automatic upgrades or define a universal provider plugin protocol.
+
+The existing Integration Package Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1` and Integration Result `0.2-candidate` lane is the single candidate operation-input execution contract; Adapter Manager does not introduce a second runtime adapter protocol.
 
 ## [v1.2.0] - 2026-08-28
 
