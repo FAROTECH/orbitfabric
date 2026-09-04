@@ -11,7 +11,7 @@ The demo is synthetic and clean-room.
 Current project release:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
 The stable Mission Data Contract commitment originated with:
@@ -20,7 +20,7 @@ The stable Mission Data Contract commitment originated with:
 v1.0.0 - Stable Mission Data Contract
 ```
 
-v1.2.0 extends the stable Core boundary additively without changing Mission Model semantics.
+v1.2.0 extended the stable Core boundary additively without changing Mission Model semantics. v1.3.0 preserves those semantics and adds candidate operation-input and Adapter Management product capabilities.
 
 ---
 
@@ -35,6 +35,8 @@ Define once. Validate. Simulate. Test. Document. Integrate.
 The goal is not to model a real CubeSat.
 
 The goal is to show how one Mission Data Contract can be reused across linting, documentation, deterministic scenario execution, runtime-facing contract bindings, ground-facing integration artifacts, stable Core-owned structured surfaces, a coherent external-integration input set, candidate inspection surfaces, golden signatures and compatibility governance.
+
+The built-in demo is not an Adapter Catalog or provider acquisition demo. Adapter Management acceptance uses separate external adapter/release fixtures and is documented in the v1.3 release and Adapter Management references.
 
 ---
 
@@ -130,7 +132,7 @@ orbitfabric sim examples/demo-3u/scenarios/payload_data_flow_evidence.yaml \
   --log examples/demo-3u/generated/logs/payload_data_flow_evidence.log
 ```
 
-The simulation JSON reports include additive v1.1.0 structured expectation accounting while preserving the legacy top-level `failed_expectations` compatibility list. Those additions remain candidate after v1.2.0.
+The simulation JSON reports include additive v1.1.0 structured expectation accounting while preserving the legacy top-level `failed_expectations` compatibility list. Those additions remain candidate after v1.3.0.
 
 ---
 
@@ -163,7 +165,7 @@ orbitfabric export relationship-manifest examples/demo-3u/mission/ \
 
 The seven FDIR relationship families admitted in v1.2.0 are additive stable-compatible families derived from explicit Mission Model fields. Unknown additive family semantics must never be guessed.
 
-These reports are read-only Core-owned structured surfaces. They do not expose graph behavior, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+These reports are read-only Core-owned structured surfaces. They do not expose graph behavior, flight runtime behavior, ground behavior or Studio-specific APIs.
 
 ---
 
@@ -218,7 +220,7 @@ orbitfabric export scenario-run-index \
 orbitfabric export coverage-summary examples/demo-3u/mission/
 ```
 
-These surfaces remain candidate after v1.2.0. They do not make OrbitFabric Core a dashboard backend, Studio API, graph engine, runtime framework or ground segment.
+These surfaces remain candidate after v1.3.0. They do not make OrbitFabric Core a dashboard backend, Studio API, graph engine, flight runtime framework or ground segment.
 
 ---
 
@@ -282,7 +284,7 @@ Generated documentation describes the contract; it does not implement runtime be
 
 ---
 
-## 11. Review stability and compatibility references
+## 11. Review stability, integration and Adapter Management references
 
 The current classification is documented through:
 
@@ -302,15 +304,24 @@ Relationship Manifest Surface
 Projection Profile Contract
 Integration Result Contract
 Integration Package and Adapter Execution Contract
+Integration Operation-Input Contract v1
+Adapter Manager M0
+Adapter Project Lock M1
+Explicit-Source Install from Adapter Project Lock
+Adapter Catalog CLI
 ```
 
-The Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain extension-owned `0.1-candidate` contracts after v1.2.0.
+Projection Profile, Integration Result, Integration Package / Adapter Execution and operation-input v1 remain candidate integration-extension surfaces after v1.3.0.
+
+The Adapter Manager lifecycle, Adapter Release Descriptor, Adapter Project Lock, source-neutral release attachment and Adapter Catalog surfaces also remain candidate after v1.3.0.
+
+Provider-specific Release Sources remain outside Core.
 
 ---
 
-## 12. What this proves
+## 12. What this demo proves
 
-The demo proves that OrbitFabric can:
+The built-in demo proves that OrbitFabric Core can:
 
 - load and structurally validate a multi-file YAML Mission Model;
 - run semantic lint rules;
@@ -325,13 +336,15 @@ The demo proves that OrbitFabric can:
 - generate ground-facing contract artifacts;
 - protect selected stable surface fields with golden signatures.
 
-The wider project additionally reference-proves the Core input boundary through an external OpenOBSW/OpenSVF Integration Package and independent OrbitFabric Studio consumption.
+The wider project additionally reference-proves the Core input boundary through external Integration Packages and independent OrbitFabric Studio consumption.
+
+Separate v1.3 Adapter Management acceptance proves a real public adapter release through exact Catalog selection, provider-specific resolution, Project Lock installation, Core verification, acquisition cleanup and idempotent `MATCH -> NOOP` behavior. That evidence is intentionally not inferred from `demo-3u`.
 
 ---
 
-## 13. What this does not prove
+## 13. What this demo does not prove
 
-The demo does not prove:
+The built-in demo does not itself prove:
 
 - flight readiness or real-time behavior;
 - hardware integration;
@@ -339,13 +352,14 @@ The demo does not prove:
 - real contact scheduling;
 - orbit propagation or RF link budget simulation;
 - CCSDS/PUS/CFDP compliance;
-- generic compatibility with cFS, F Prime, Yamcs or OpenC3;
+- compatibility with any particular downstream framework solely from the Core demo;
 - XTCE compliance;
 - binary decoder/encoder behavior;
 - command uplink, telemetry archive, database or operator-console behavior;
 - HAL or RTOS integration;
 - relationship/dependency graph behavior;
-- Core plugin discovery/loading/execution;
+- Core in-process third-party adapter discovery/loading/execution;
+- provider-neutral provider dispatch, version-range solving or automatic adapter upgrades;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current Core scope.
+Downstream-specific integration evidence lives in the corresponding external adapter repositories. Provider-specific acquisition evidence lives in the corresponding Release Source products.

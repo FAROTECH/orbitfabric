@@ -9,16 +9,18 @@ OrbitFabric is a model-first Mission Data Fabric for small spacecraft. Contribut
 Current Core version:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-The stable Mission Data Contract commitment started with v1.0.0. v1.2.0 extends that stable boundary additively with:
+The stable Mission Data Contract commitment started with v1.0.0. v1.2.0 extended that stable boundary additively with:
 
 ```text
 mission_snapshot.json
 Core Integration Input Set
 seven additive stable-compatible FDIR relationship families
 ```
+
+v1.3.0 preserves those stable semantics and adds candidate operation-input and provider-neutral Adapter Management product surfaces.
 
 The following Core-owned inspection surfaces remain candidate:
 
@@ -29,15 +31,28 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-The following external integration contracts remain independently versioned `0.1-candidate` contracts:
+The following integration contracts remain candidate:
 
 ```text
 Projection Profile
 Integration Result
 Integration Package / Adapter Execution
+operation-input v1 contract lane
 ```
 
-Do not treat candidate or generated surfaces as stable merely because they exist.
+The v1.3 Adapter Management foundation also remains candidate:
+
+```text
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral ResolvedAdapterRelease attachment
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+Do not treat candidate or generated surfaces as stable merely because they exist in a `1.x` Core release.
 
 ## Architectural rules
 
@@ -53,10 +68,12 @@ Contributions must preserve these rules:
 4. Derive Core relationships only from explicit loaded Mission Model fields.
 5. Do not infer relationship semantics from identifier names, string similarity, file placement, ordering or scenario co-occurrence.
 6. Keep target-specific Projection Profile semantics outside Core.
-7. Keep ecosystem-specific adapter execution outside the Core process unless a separate architecture decision explicitly changes that rule.
-8. Do not introduce plugin discovery, plugin loading or plugin execution through an unrelated feature.
-9. Keep runtime-facing and ground-facing generated artifacts reproducible and disposable unless an explicit compatibility decision promotes a surface.
-10. Treat changes to stable public surfaces as compatibility-sensitive engineering changes.
+7. Keep ecosystem-specific adapter implementation code outside the Core process. Adapter Manager may execute an installed external adapter only through the documented execution contract and environment-local entrypoint.
+8. Keep provider-specific Release Source acquisition outside Core. GitHub, registries and future providers must hand verified exact material into Core through `ResolvedAdapterRelease`.
+9. Do not introduce a universal provider registration/dispatch protocol from one provider implementation.
+10. Keep runtime-facing and ground-facing generated artifacts reproducible and disposable unless an explicit compatibility decision promotes a surface.
+11. Treat changes to stable public surfaces as compatibility-sensitive engineering changes.
+12. Treat changes to candidate public machine-readable or CLI surfaces as explicit compatibility review items even when breaking preview evolution is allowed.
 
 The generic integration ownership model is:
 
@@ -78,7 +95,24 @@ Studio and other downstream tools
   consume and present explicit records
 ```
 
-Core must not learn OpenOBSW, OpenSVF, YAMCS, PUS, cFS, F Prime or other ecosystem-specific semantics simply to support an integration.
+The Adapter Management ownership model is:
+
+```text
+OrbitFabric Core
+  exact Source Coordinate semantics
+  Adapter Release Descriptor conformance
+  Adapter Project Lock desired state
+  Installed Adapter State
+  installation / verification / execution / removal lifecycle
+  provider-neutral Catalog model and exact selection
+
+Provider-specific Release Source
+  provider lookup/authentication/acquisition
+  exact descriptor/artifact materialization
+  ResolvedAdapterRelease handoff
+```
+
+Core must not learn OpenOBSW, OpenSVF, YAMCS, PUS, cFS, F Prime, GitHub or other ecosystem/provider-specific semantics simply to support an integration or release source.
 
 ## Clean-room requirement
 
@@ -129,12 +163,13 @@ Verify the CLI:
 ```bash
 orbitfabric --version
 orbitfabric --help
+orbitfabric adapter --help
 ```
 
-Expected version for the v1.2 baseline:
+Expected version for the v1.3 baseline:
 
 ```text
-orbitfabric 1.2.0
+orbitfabric 1.3.0
 ```
 
 The generated C++17 host-build smoke target additionally requires CMake and a C++17-capable compiler.
@@ -187,6 +222,8 @@ cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/
 cmake --build examples/demo-3u/generated/runtime/cpp17/build
 ```
 
+When Adapter Management behavior is affected, at minimum run the relevant adapter-manager, Project Lock, release-source-attachment and Catalog tests. If the change affects a cross-repository boundary, include or update external acceptance evidence instead of relying only on synthetic Core fixtures.
+
 ## Coding style
 
 OrbitFabric uses Python 3.11+, Pydantic v2, Typer, PyYAML, pytest and Ruff.
@@ -198,15 +235,17 @@ Prefer:
 - deterministic behavior;
 - additive compatibility-safe evolution;
 - tests that protect contract meaning rather than incidental formatting;
-- clear ownership boundaries between Core and extensions;
+- clear ownership boundaries between Core and extensions/providers;
 - documented failure behavior;
-- explicit machine-readable surfaces for downstream consumers.
+- explicit machine-readable surfaces for downstream consumers;
+- fail-closed exact identity checks for Adapter Management.
 
 Avoid:
 
 - heavy dependencies without a clear architectural reason;
 - hidden semantics in naming conventions;
 - downstream reconstruction of Core semantics;
+- provider-specific dependencies in Core;
 - behavior hardcoded for `demo-3u`;
 - user implementation code inside generated files;
 - generated files committed without a deliberate reason.
@@ -223,6 +262,7 @@ cli -> lint
 cli -> gen
 cli -> sim
 cli -> export
+cli -> adapter_manager
 
 lint -> model
 gen -> model
@@ -230,6 +270,7 @@ export -> model
 sim -> model
 RuntimeContract builder -> model
 GroundContract builder -> model
+adapter_manager -> Core integration/conformance contracts
 ```
 
 Forbidden examples include:
@@ -243,6 +284,8 @@ RuntimeContract builder -> raw YAML parsing
 GroundContract builder -> raw YAML parsing
 external adapter -> raw YAML semantic fallback
 extension output -> Core-owned semantic override
+provider-specific Release Source -> Project Lock identity rewrite
+adapter_manager -> GitHub-specific acquisition
 plugin output -> Core-owned relationship manifest mutation
 ```
 
@@ -264,6 +307,17 @@ scenario expectation semantics
 generated default paths
 stable relationship families
 Core Integration Input Set behavior
+```
+
+Candidate public surfaces also require explicit review, including:
+
+```text
+Integration Package Manifest / Result candidate contracts
+Adapter Release Descriptor
+Adapter Project Lock
+Adapter Catalog
+Adapter Manager CLI behavior
+provider-neutral Release Source handoff semantics
 ```
 
 Prefer additive changes where possible. A stable change that is not backward compatible requires explicit architectural justification, release notes and migration guidance.
@@ -308,9 +362,10 @@ A good pull request should include:
 - a clear description of the change;
 - the affected project area or milestone;
 - explicit Mission Data Contract impact;
-- explicit compatibility impact for public surfaces;
+- explicit compatibility impact for stable and candidate public surfaces;
 - an architectural boundary statement for non-trivial changes;
 - tests when behavior changes;
+- cross-repository evidence when an external boundary changes;
 - documentation when user-facing behavior changes;
 - confirmation that required checks pass;
 - clean-room confirmation;
@@ -336,7 +391,7 @@ docs/releases/*
 CHANGELOG.md
 ```
 
-Historical release notes and ADRs should remain historically accurate. Current reference documents must describe the current supported baseline.
+Historical release notes and ADRs should remain historically accurate. Current reference documents must describe the current supported baseline. Do not mechanically replace historical version references during release preparation.
 
 ## Community and security
 

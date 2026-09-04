@@ -1,8 +1,8 @@
 # Extensibility Boundary Contract
 
-Status: Active v1.x governance contract through v1.2.0  
-Scope: extensibility ownership and semantic boundary  
-Applies to: downstream consumers and extension-owned integration contracts from v1.0.0 onward
+Status: Active v1.x governance contract through v1.3.0  
+Scope: extensibility ownership, semantic boundary and provider-neutral adapter lifecycle boundary  
+Applies to: downstream consumers, extension-owned integration contracts and external Release Sources from v1.0.0 onward
 
 OrbitFabric Core is a Mission Data Contract framework. Extensibility must preserve that identity.
 
@@ -13,6 +13,7 @@ Mission Model is the semantic source of truth.
 Core owns Mission Data Contract interpretation.
 Extensions add value at the edges.
 Extensions must not redefine Core semantics.
+Provider-specific acquisition stays outside Core.
 ```
 
 ## 1. Stable Core-owned boundary
@@ -44,21 +45,27 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-They may be consumed by downstream tools but are not silently promoted into the stable Core surface by v1.2.
+They may be consumed by downstream tools but are not silently promoted into the stable Core surface by v1.3.
 
 ## 3. Candidate extension integration contracts
 
-The generic Integration Framework defines three separately owned extension contracts:
+The generic Integration Framework defines separately owned extension contracts:
 
 ```text
 Projection Profile
-Integration Result
 Integration Package / Adapter Execution
+Integration Result
 ```
 
-They remain `0.1-candidate` after v1.2.0.
+The original candidate execution/result lane remains available, and v1.3.0 also includes the candidate operation-input lane:
 
-They are design-frozen and reference-proven, but they are not stable Core Mission Data Contract surfaces.
+```text
+Integration Package Manifest 0.2-candidate
+orbitfabric.adapter_cli.v1
+Integration Result 0.2-candidate
+```
+
+These contracts are reference-proven, but they are not stable Core Mission Data Contract surfaces.
 
 Their ownership model is:
 
@@ -75,7 +82,42 @@ Integration Result
 
 Core governance defines the generic boundary. The integration package owns target-specific semantics.
 
-## 4. Core-owned semantics
+## 4. Candidate Adapter Management boundary
+
+v1.3.0 adds candidate Core-owned lifecycle contracts for exact external adapter releases:
+
+```text
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+Adapter Manager lifecycle
+source-neutral ResolvedAdapterRelease handoff
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+This does not transfer target-specific adapter semantics or provider-specific acquisition into Core.
+
+The ownership model is:
+
+```text
+Core
+  exact Source Coordinate semantics
+  Release Descriptor conformance
+  Project Lock desired state
+  Installed Adapter State
+  installation / verification / execution / removal lifecycle
+  provider-neutral Catalog model and exact selection
+
+provider-specific Release Source
+  provider lookup/authentication where applicable
+  acquisition of exact descriptor/artifact bytes
+  provider facts
+  ResolvedAdapterRelease materialization
+```
+
+Project Lock identity must not be rewritten from provider URLs, tags, cache locations or machine-local installation state.
+
+## 5. Core-owned semantics
 
 Core owns:
 
@@ -92,13 +134,16 @@ relationship_manifest.json semantics
 mission_snapshot.json semantics
 Core Integration Input Set semantics
 candidate Core inspection-surface semantics
+generic integration invocation/result contract boundaries
+candidate adapter identity / desired-state / installed-state semantics
+provider-neutral Catalog exact-selection semantics
 stability and compatibility classification
 release compatibility policy
 ```
 
-An extension must not override, replace, mutate or privately reinterpret these semantics.
+An extension or provider must not override, replace, mutate or privately reinterpret these semantics.
 
-## 5. No raw-YAML semantic fallback
+## 6. No raw-YAML semantic fallback
 
 The stable v1.2 Core Integration Input boundary exists specifically so external integration adapters do not need a second Mission Model parser.
 
@@ -108,7 +153,7 @@ If a required Core surface is missing, failed or incompatible, the adapter must 
 
 This rule prevents the integration ecosystem from developing parallel interpretations of the Mission Data Contract.
 
-## 6. Extension-owned outputs
+## 7. Extension-owned outputs
 
 Extension-owned outputs must remain distinguishable from Core outputs.
 
@@ -125,11 +170,14 @@ extension-generated artifact
 extension compatibility declaration
 Integration Result record
 external verification evidence
+provider acquisition fact
 ```
 
 An extension output must not be presented as Core output unless OrbitFabric Core itself produces and documents that surface.
 
-## 7. Provenance
+Provider facts must not be presented as stronger Core trust evidence than they actually support.
+
+## 8. Provenance
 
 Extension-owned outputs should record enough provenance to answer:
 
@@ -146,9 +194,11 @@ which external tools contributed evidence?
 
 The Integration Result Contract defines the current candidate machine-readable boundary for this information.
 
-## 8. Semantic override ban
+Adapter release lifecycle evidence should separately preserve exact release identity and artifact digests without conflating them with mutable provider transport metadata.
 
-Forbidden extension behaviors include:
+## 9. Semantic override ban
+
+Forbidden extension/provider behaviors include:
 
 ```text
 changing Mission Model meaning after Core loading
@@ -159,18 +209,20 @@ injecting extension relationships into Core relationship manifests
 changing Core runtime-facing or ground-facing contract meaning
 presenting extension output as Core output
 inventing missing relationship or causal semantics
+rewriting Project Lock identity from mutable provider metadata
+promoting provider actor/uploader metadata to OrbitFabric publisher identity without evidence
 ```
 
 If an extension disagrees with Core output, it may emit an extension diagnostic. It must not replace the Core result.
 
-## 9. Integration execution boundary
+## 10. Integration execution boundary
 
-Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
+Core does not import ecosystem-specific adapter implementation code in-process.
 
-The generic execution model is:
+The generic integration contract remains external:
 
 ```text
-OrbitFabric Core CLI
+OrbitFabric Core
     -> coherent Core Integration Input Set
 
 external Integration Package
@@ -179,14 +231,34 @@ external Integration Package
     -> external adapter executable
 
 adapter invocation
-    -> orbitfabric.adapter_cli.v0
+    -> documented orbitfabric.adapter_cli contract
     -> Integration Result
     -> native target artifacts
 ```
 
-This preserves trust separation and keeps third-party integration dependencies out of Core.
+v1.3 Adapter Manager may install and launch that external entrypoint from a managed adapter environment. This is host-side out-of-process Integration Package execution, not third-party implementation loading into the Core process.
 
-## 10. Downstream consumers and Studio
+The candidate `orbitfabric.adapter_cli.v1` operation-input lane permits zero or one required file-backed operation input, initially including the generic `scenario` role. Target-specific scenario projection remains adapter-owned.
+
+## 11. Release Source attachment boundary
+
+Provider-specific acquisition occurs outside Core:
+
+```text
+Core exact Catalog selection
+    -> provider-specific Release Source
+    -> exact verified descriptor/artifact bytes
+    -> ResolvedAdapterRelease
+    -> Core Project Lock lifecycle
+```
+
+Core must not depend on GitHub REST, registry APIs or provider authentication merely to preserve this boundary.
+
+A satisfied exact Project Lock state remains satisfied without recontacting a provider.
+
+A future universal provider registration/dispatch mechanism requires separate evidence and architecture. It must not be inferred from the first provider product.
+
+## 12. Downstream consumers and Studio
 
 Downstream tools, including OrbitFabric Studio, consume explicit Core and integration records.
 
@@ -216,27 +288,27 @@ infer provenance from timestamps alone
 
 Studio-specific presentation requirements must not become Core semantic requirements.
 
-## 11. Plugin execution
+## 13. In-process plugin boundary
 
 The Core extensibility contract does not introduce:
 
 ```text
-plugin discovery
-plugin loading
-plugin execution
+in-process third-party plugin discovery
+in-process third-party plugin loading
 custom lint plugin execution
 custom generator plugin execution
-third-party code execution inside Core
 remote plugin registry
 plugin marketplace
-extension dependency resolution
+generic extension dependency resolution
 ```
 
-Any future Core execution model requires a separate architecture decision.
+Adapter Manager's documented out-of-process execution of an installed Integration Package does not change this rule.
+
+Any future in-process Core extension model requires a separate architecture decision.
 
 The existence of a target-aware Studio Integration Plugin API does not alter this Core rule. Studio plugin presentation and Core semantic authority remain separate concerns.
 
-## 12. Relationship semantics
+## 14. Relationship semantics
 
 Extensions and downstream consumers must not silently add relationships to a Core-owned Relationship Manifest.
 
@@ -244,7 +316,7 @@ A Core relationship family is admitted only when Core documents narrow semantics
 
 An extension may emit extension-owned relationship-like information only when ownership is explicit and it does not masquerade as Core data.
 
-## 13. Compatibility-sensitive governance changes
+## 15. Compatibility-sensitive governance changes
 
 The following are compatibility-sensitive:
 
@@ -254,10 +326,13 @@ The following are compatibility-sensitive:
 - changing extension ownership rules;
 - weakening provenance requirements;
 - changing the out-of-process adapter boundary;
-- introducing execution into Core without a separate accepted architecture decision;
-- treating extension diagnostics as Core diagnostics.
+- introducing third-party implementation loading into the Core process without a separate accepted architecture decision;
+- moving provider-specific acquisition into Core;
+- changing Project Lock or Source Coordinate identity ownership;
+- introducing provider dispatch/version-solving semantics without separate evidence and review;
+- treating extension diagnostics or provider facts as Core diagnostics/trust evidence.
 
-## 14. Explicit non-goals
+## 16. Explicit non-goals
 
 This contract does not introduce:
 
@@ -266,15 +341,19 @@ new Mission Model semantics
 new YAML fields
 relationship graph execution
 dependency graph execution
-runtime behavior
-ground behavior
-Core plugin execution
+flight runtime behavior
+ground runtime behavior
+in-process third-party Core plugin execution
+provider-specific acquisition inside Core
+provider-neutral provider dispatch/version solving
 Studio-specific semantic authority
-OpenOBSW/OpenSVF/YAMCS-specific Core semantics
+downstream-specific Core semantics
 ```
 
-## 15. Final statement
+## 17. Final statement
 
-v1.2.0 strengthens the extensibility boundary by stabilizing the coherent Core Integration Input Set while leaving target-specific Profile, Package and Result contracts external and candidate.
+v1.2.0 strengthened the extensibility boundary by stabilizing the coherent Core Integration Input Set while leaving target-specific Profile, Package and Result contracts external.
 
-Core remains the semantic authority. Extensions remain explicit consumers and producers at the edges. No extension gets permission to create a second OrbitFabric semantic model.
+v1.3.0 preserves that semantic boundary and adds a candidate provider-neutral Adapter Management lifecycle. Core may manage exact external adapter release identity and execute installed Integration Packages out-of-process, while provider-specific acquisition and target-specific semantics remain external.
+
+Core remains the semantic authority. Extensions and providers remain explicit consumers/producers at the edges. No extension or provider gets permission to create a second OrbitFabric semantic model.

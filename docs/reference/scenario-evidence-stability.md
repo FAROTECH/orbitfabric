@@ -1,12 +1,12 @@
 # Scenario Evidence Stability
 
-Status: Active v1.x reference through v1.2.0  
+Status: Active v1.x reference through v1.3.0  
 Scope: scenario input and evidence compatibility  
 Applies to: OrbitFabric scenario workflows from v1.0.0 onward
 
 OrbitFabric scenarios provide deterministic host-side evidence for Mission Data Contract behavior.
 
-v1.2.0 introduces no new scenario YAML semantics and no change to stable scenario result meaning. The additive structured expectation accounting introduced in v1.1 remains candidate.
+v1.3.0 introduces no new Core scenario YAML semantics and no change to stable scenario result meaning. The additive structured expectation accounting introduced in v1.1 remains candidate. The separate candidate operation-input integration lane may carry a scenario file to an external adapter, but it does not redefine Core scenario semantics.
 
 ## 1. Source of truth
 
@@ -34,6 +34,7 @@ Simulation JSON reports and plain-text logs are generated evidence outputs, not 
 | `failed_expectations` | Stable compatibility field | Legacy failed-expectation list. |
 | structured `expectations` object | Candidate additive v1.1 extension | Passed/failed structured accounting. |
 | data-flow evidence records | Stable | Contract-level data-flow evidence. |
+| operation-input `scenario` role | Candidate integration contract | File-backed external adapter input; does not redefine Core scenario semantics. |
 | plain-text simulation log | Human-oriented preview | Not a machine contract. |
 | scenario runner internals | Internal | Not a public compatibility surface. |
 
@@ -70,13 +71,13 @@ downstream inspection results
 
 Expectation semantics therefore remain compatibility-sensitive.
 
-Scenario expectations remain declarative host-side checks. They must not silently become flight runtime behavior, ground automation, onboard scheduling, command-dispatch implementation or plugin execution.
+Scenario expectations remain declarative host-side checks. They must not silently become flight runtime behavior, ground automation, onboard scheduling, command-dispatch implementation or in-process plugin execution.
 
 ## 5. Structured expectation accounting
 
 v1.1 added structured expectation accounting to simulation JSON reports.
 
-The addition is machine-readable and additive, but remains candidate after v1.2.
+The addition is machine-readable and additive, but remains candidate after v1.3.
 
 The stable legacy field remains:
 
@@ -105,7 +106,15 @@ This is contract-level host-side evidence.
 
 It is not an onboard storage implementation, downlink queue, contact scheduler, RF model or ground operations record.
 
-## 7. Simulation JSON stability
+## 7. Operation-input scenario role
+
+The candidate `orbitfabric.adapter_cli.v1` integration lane can carry one file-backed operation input whose first contract-defined role is `scenario`.
+
+That role transports an explicit scenario input to an external Integration Package. It does not make the external adapter a second authority for Core scenario YAML semantics, change `orbitfabric sim`, or promote adapter-specific scenario behavior into the stable Core scenario contract.
+
+Core scenario evidence and adapter-produced integration evidence remain separately owned.
+
+## 8. Simulation JSON stability
 
 Compatibility-sensitive changes include:
 
@@ -118,13 +127,13 @@ Compatibility-sensitive changes include:
 
 Compatibility-sensitive does not mean forbidden. It means the change must be explicit, reviewed and documented.
 
-## 8. Plain-text logs
+## 9. Plain-text logs
 
 Plain-text logs are intended for human review, demonstrations and debugging.
 
 They are not a strict machine compatibility contract. Downstream tools should consume simulation JSON instead of parsing log wording or formatting.
 
-## 9. Evolution rules
+## 10. Evolution rules
 
 Scenario and evidence evolution should:
 
@@ -133,9 +142,10 @@ Scenario and evidence evolution should:
 3. preserve deterministic execution for the same validated inputs;
 4. keep host-side evidence separate from operational runtime behavior;
 5. keep machine-readable evidence separate from human-oriented logs;
-6. document compatibility impact explicitly.
+6. keep Core scenario semantics separate from adapter operation-input transport;
+7. document compatibility impact explicitly.
 
-## 10. Downstream consumer rule
+## 11. Downstream consumer rule
 
 Downstream tools may consume documented simulation JSON fields.
 
@@ -151,9 +161,9 @@ private test helper names
 UI state
 ```
 
-For Mission Data Contract structure, consumers should use Core-owned structured surfaces. For scenario evidence, they should use the documented simulation JSON report.
+For Mission Data Contract structure, consumers should use Core-owned structured surfaces. For Core scenario evidence, they should use the documented simulation JSON report. External adapter results must remain distinguishable from Core scenario evidence.
 
-## 11. Current non-goals
+## 12. Current non-goals
 
 Scenario evidence does not introduce:
 
@@ -165,12 +175,12 @@ real contact scheduling
 RF or link-budget simulation
 onboard storage execution
 live command dispatch
-plugin execution
+in-process plugin execution
 relationship inference
 Studio-specific semantic authority
 ```
 
-## 12. Relationship to other references
+## 13. Relationship to other references
 
 This page complements:
 
@@ -179,10 +189,11 @@ This page complements:
 - JSON Report Compatibility;
 - CLI Contract v1;
 - Mission Model Stability Contract;
+- Integration Operation-Input Contract v1;
 - Stability and Compatibility Contract.
 
-## 13. Final statement
+## 14. Final statement
 
 The stable scenario contract remains the v1 host-side evidence mechanism.
 
-v1.2.0 changes no scenario semantics. The v1.1 structured expectation object remains a candidate additive extension inside the stable simulation report family.
+v1.3.0 changes no Core scenario semantics. The v1.1 structured expectation object and the operation-input scenario transport lane remain candidate additions with ownership separate from the stable Core scenario evidence contract.

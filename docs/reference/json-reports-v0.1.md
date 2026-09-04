@@ -1,22 +1,24 @@
 # JSON Reports and Core Structured Surfaces
 
-Status: Active v1.x reference through v1.2.0  
-Scope: machine-readable reports, Core-owned structured surfaces and integration input records  
+Status: Active v1.x reference through v1.3.0  
+Scope: machine-readable reports, Core-owned structured surfaces, integration input records and candidate Adapter Management JSON contracts  
 Applies to: OrbitFabric v1.x
 
-This page documents the current machine-readable JSON families produced by OrbitFabric Core and classifies their maturity.
+This page documents the current machine-readable JSON families produced or consumed by OrbitFabric Core and classifies their maturity.
 
 Current Core version:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-The Mission Model and scenario YAML inputs remain the sources from which these outputs are derived. JSON outputs are not editable replacements for those sources.
+The Mission Model and scenario YAML inputs remain the sources from which mission-data outputs are derived. JSON outputs are not editable replacements for those sources.
+
+Adapter Management JSON contracts have a different role: they describe exact adapter release identity, project desired state and provider-neutral release availability. They do not become a second Mission Model.
 
 ## 1. Why JSON surfaces exist
 
-OrbitFabric JSON outputs support:
+OrbitFabric JSON outputs and contracts support:
 
 - CI inspection;
 - automated validation;
@@ -25,7 +27,8 @@ OrbitFabric JSON outputs support:
 - entity and relationship navigation;
 - coherent external integration inputs;
 - downstream tools such as OrbitFabric Studio;
-- explicit provenance and compatibility checks.
+- explicit provenance and compatibility checks;
+- exact external adapter release identity and desired-state workflows.
 
 Machine-readable consumers should use documented JSON fields and surface identities instead of parsing terminal text or generated Markdown.
 
@@ -47,7 +50,7 @@ The Core Integration Input Set is a coherent multi-file boundary. Its machine-re
 
 ### Candidate Core-owned inspection surfaces
 
-The following v1.1 additions remain candidate after v1.2:
+The following v1.1 additions remain candidate after v1.3:
 
 ```text
 dashboard_summary.json
@@ -55,6 +58,20 @@ scenario_run_index.json
 coverage_summary.json
 simulation JSON structured expectation accounting
 ```
+
+### Candidate integration and Adapter Management contracts
+
+```text
+Integration Package Manifest 0.2-candidate
+Integration Result 0.2-candidate
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+Adapter Catalog 0.1-candidate
+```
+
+These are explicit machine-readable contracts, but their inclusion in Core v1.3.0 does not promote them to stable Mission Data Contract surfaces.
+
+Raw Installed Adapter Inventory persistence and backend receipts remain implementation-private unless separately documented.
 
 ### Public-preview generated manifests
 
@@ -82,16 +99,19 @@ snapshot_version
 input_set_version
 dashboard_version
 coverage_version
+release_version
+lock_version
+catalog_version
 ```
 
 The OrbitFabric tool/package version identifies the producer release.
 
-For example, a v1.2 lint report may contain:
+For example, a v1.3 lint report may contain:
 
 ```json
 {
   "tool": "orbitfabric-lint",
-  "version": "1.2.0"
+  "version": "1.3.0"
 }
 ```
 
@@ -105,6 +125,8 @@ The mission's own model version remains separate:
 ```
 
 A surface format token does not by itself state the release maturity class. In particular, stable v1.2 Mission Snapshot and Integration Input Set surfaces retain their existing `0.1-candidate` wire identifiers to avoid an artificial compatibility break.
+
+Likewise, Core package version `1.3.0` does not remove the `-candidate` maturity of the new Adapter Management contract formats.
 
 ## 4. Lint report
 
@@ -246,7 +268,7 @@ data_flow
 scenario_status
 ```
 
-Structured expectation accounting remains candidate after v1.2.0. It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
+Structured expectation accounting remains candidate after v1.3.0. It does not imply formal verification, proof coverage, runtime telemetry validation, live command execution or ground operations.
 
 ### Legacy failed-expectation compatibility
 
@@ -416,7 +438,90 @@ The simulation JSON `expectations` object provides additive passed/failed expect
 
 It remains candidate. The stable simulation result semantics and legacy `failed_expectations` compatibility list remain unchanged.
 
-## 13. Generated runtime and ground manifests
+## 13. Candidate operation-input integration contracts
+
+v1.3.0 includes the candidate operation-input contract lane:
+
+```text
+Integration Package Manifest 0.2-candidate
+orbitfabric.adapter_cli.v1
+Integration Result 0.2-candidate
+```
+
+These records describe external Integration Package invocation context and result evidence. They remain integration-extension contracts and do not redefine Mission Data Contract semantics.
+
+The first contract-defined operation-input role is `scenario`. The scenario file remains an input artifact; target-specific interpretation/projection remains adapter-owned.
+
+## 14. Candidate Adapter Release Descriptor
+
+The Adapter Release Descriptor identifies one exact published adapter release and its descriptor-owned artifacts.
+
+Current format:
+
+```text
+0.1-candidate
+```
+
+Core validates its schema and exact identity before installation. Artifact id, size and SHA-256 are descriptor-owned facts.
+
+A Release Descriptor is not a provider API response and does not encode mutable provider transport locations as semantic release identity.
+
+## 15. Candidate Adapter Project Lock
+
+Adapter Project Lock records project-scoped exact desired adapter state.
+
+Current format:
+
+```text
+0.1-candidate
+```
+
+An entry includes:
+
+```text
+Source Coordinate
+exact release version
+Release Descriptor SHA-256
+artifact id
+artifact SHA-256
+installation backend id
+```
+
+It does not include:
+
+```text
+local instance id
+installation path
+executable path
+mutable provider URL
+provider credentials
+```
+
+Installed Adapter State remains a separate user-scoped actual-state concern.
+
+## 16. Candidate Adapter Catalog
+
+Adapter Catalog records available exact adapter releases and provider source bindings using the Core-owned provider-neutral model.
+
+Current format:
+
+```text
+0.1-candidate
+```
+
+The exact release anchor is:
+
+```text
+Source Coordinate
++ exact release version
++ expected Release Descriptor SHA-256
+```
+
+Provider configuration and provider-owned release references remain opaque to Core. Catalog membership does not itself prove publisher trust, endorsement or operational suitability.
+
+The Catalog does not duplicate descriptor-owned artifact membership.
+
+## 17. Generated runtime and ground manifests
 
 `runtime_contract_manifest.json` and `ground_contract_manifest.json` are generated contract artifacts.
 
@@ -424,7 +529,7 @@ They are useful for integration and review, but they remain public-preview gener
 
 A runtime manifest does not make generated code flight software. A ground manifest does not make generated dictionaries a ground segment.
 
-## 14. Compatibility rules
+## 18. Compatibility rules
 
 Additive JSON evolution is preferred when it preserves existing meaning.
 
@@ -439,30 +544,37 @@ Consumers must:
 - tolerate unknown additive relationship types without guessing meaning;
 - keep Core diagnostics separate from integration diagnostics;
 - reject incompatible required Integration Input Set surfaces;
+- verify exact adapter release/lock/catalog identities according to their candidate contracts;
+- avoid substituting mutable provider metadata for Project Lock identity;
 - avoid parsing human-oriented terminal or Markdown output as a machine contract.
 
 Candidate surfaces may evolve before promotion, but their changes must still be explicit and documented.
 
-## 15. Explicit non-goals
+## 19. Explicit non-goals
 
-The JSON surface does not provide:
+The documented JSON surfaces and contracts do not provide:
 
 ```text
 an editable second Mission Model
 relationship inference
 relationship graph execution
 dependency graph execution
-plugin execution
-runtime behavior
-ground behavior
+in-process plugin execution
+provider-specific acquisition inside Core
+provider authentication proof
+automatic adapter version solving or upgrade policy
+flight runtime behavior
+ground runtime behavior
 Studio-specific semantic authority
-OpenOBSW/OpenSVF-specific Core semantics
+downstream-specific Core semantics
 ```
 
-## 16. Final statement
+## 20. Final statement
 
-v1.2.0 extends the stable machine-readable Core boundary with Mission Snapshot and the coherent Core Integration Input Set while preserving the original stable report families.
+v1.3.0 preserves the stable machine-readable Core boundary established through v1.2 Mission Snapshot and the coherent Core Integration Input Set.
 
 The v1.1 dashboard, scenario-index, coverage and structured-expectation additions remain candidate.
 
-Every JSON surface remains derived from Core-owned semantics rather than becoming an independent source of Mission Data Contract meaning.
+v1.3 adds separately classified candidate operation-input and Adapter Management JSON contracts for exact external integration and adapter lifecycle workflows. They remain distinct from stable Mission Data Contract semantics.
+
+Every mission-data JSON surface remains derived from Core-owned semantics rather than becoming an independent source of Mission Data Contract meaning.

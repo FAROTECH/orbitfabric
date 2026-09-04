@@ -1,8 +1,8 @@
 # OrbitFabric - Project Charter
 
-Version: 1.2.0 Core Integration Input Consolidation  
-Status: Stable Mission Data Contract with stable Core integration input boundary  
-Scope: Mission Data Contract foundation, Core-owned stable/candidate surfaces, external integration boundary, extensibility and compatibility governance
+Version: 1.3.0 Adapter Management Foundation  
+Status: Stable Mission Data Contract with stable Core integration input boundary and candidate Adapter Management foundation  
+Scope: Mission Data Contract foundation, Core-owned stable/candidate surfaces, external integration boundary, adapter lifecycle, extensibility and compatibility governance
 
 ---
 
@@ -12,9 +12,9 @@ OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 
 Its purpose is to let small spacecraft teams define mission data once, in a structured Mission Model, and reuse that contract across validation, documentation, testing, scenario evidence, runtime-facing bindings, ground-facing artifacts, Core-owned structured surfaces and downstream integration/inspection workflows.
 
-OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool, a payload runtime framework, a plugin execution platform or a visual modeling backend.
+OrbitFabric is not intended to be another flight software framework, another CubeSat tutorial, another ground segment tool, a payload runtime framework, an in-process plugin platform, a provider-specific package manager or a visual modeling backend.
 
-It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing integration, ground integration, external ecosystem integrations and downstream inspection tools.
+It is the contract layer between mission design, onboard software, simulation, testing, documentation, runtime-facing integration, ground integration, external ecosystem integrations and downstream inspection tools. From v1.3.0 it also owns a candidate provider-neutral lifecycle boundary for exact external adapter releases.
 
 The guiding principle is:
 
@@ -27,12 +27,12 @@ The guiding principle is:
 OrbitFabric is currently released at:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
 The stable Mission Data Contract commitment originated with `v1.0.0 - Stable Mission Data Contract`.
 
-v1.2.0 extends that stable boundary additively with:
+v1.2.0 extended that stable boundary additively with:
 
 ```text
 mission_snapshot.json
@@ -40,17 +40,29 @@ Core Integration Input Set
 seven additive stable-compatible FDIR Relationship Manifest families
 ```
 
-No Mission Model semantics are added, removed, renamed or redefined by this release.
+v1.3.0 preserves those stable semantics and adds candidate product capabilities:
+
+```text
+operation-input v1 integration contract lane
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral ResolvedAdapterRelease attachment
+Adapter Catalog 0.1-candidate and exact-selection CLI
+```
+
+No Mission Model semantics are added, removed, renamed or redefined by v1.3.0.
 
 The v1.1.0 dashboard summary, scenario run index, coverage summary and structured expectation additions remain candidate.
 
-The generic Projection Profile, Integration Result and Integration Package / Adapter Execution contracts remain independently versioned `0.1-candidate` extension contracts and do not become Core Mission Data Contract surfaces.
+Projection Profile, Integration Result and Integration Package / Adapter Execution remain candidate extension contracts. Provider-specific Release Sources remain separate products outside Core.
 
 ---
 
 ## 3. Core Definition
 
-OrbitFabric is a framework for defining and using a Mission Data Contract.
+OrbitFabric is a framework for defining and using a Mission Data Contract and for managing the exact lifecycle identity of external Integration Packages without absorbing their target-specific semantics.
 
 A Mission Data Contract describes, in a structured and machine-readable way:
 
@@ -79,6 +91,8 @@ A Mission Data Contract describes, in a structured and machine-readable way:
 
 The Mission Model is the semantic source of truth for all derived Core artifacts.
 
+Adapter Management is not a second semantic model. It tracks exact Integration Package release identity, project-scoped desired state, user-scoped installed state and lifecycle verification.
+
 ---
 
 ## 4. Problem Statement
@@ -91,7 +105,9 @@ This creates drift.
 
 A command may be accepted by a simulator but rejected onboard. A telemetry field may exist in flight software but be missing in documentation. A fault may be described in a document but implemented differently in code. A payload may produce data products that have no storage policy, retention rule or downlink path. A downstream integration may reconstruct Mission Data Contract semantics differently from Core if the machine-readable boundary is not explicit.
 
-OrbitFabric addresses this by making the Mission Data Contract explicit, validated, executable as host-side scenario evidence, documented, reusable, introspectable, indexable, relatable and compatibility-governed.
+External integrations create a second class of reproducibility problem: a project can know which adapter it needs but lose the exact release/artifact identity, conflate provider URLs with semantic identity, or rely on mutable local installation state without a portable desired-state declaration.
+
+OrbitFabric addresses the first problem through an explicit, validated, reusable Mission Data Contract. The v1.3 candidate Adapter Management foundation addresses the second through exact release identity, Project Lock desired state, Installed Adapter State, provider-neutral Catalog selection and a source-neutral release handoff.
 
 ---
 
@@ -108,7 +124,8 @@ The initial target users are:
 - space software architects who need a coherent contract between payload behavior, onboard data handling and ground-facing artifacts;
 - ground software engineers who need reviewable mission data dictionaries before integration starts;
 - downstream tool builders who need stable Core-owned surfaces instead of reconstructing semantics from raw YAML;
-- ecosystem integration authors who need a stable Core input boundary and explicit separation from target-specific semantics.
+- ecosystem integration authors who need a stable Core input boundary and explicit separation from target-specific semantics;
+- adapter maintainers and project integrators who need exact desired/installed release identity without coupling Core to one package provider.
 
 OrbitFabric must be accessible to students and power makers while retaining the architectural discipline expected from a serious open-source engineering framework.
 
@@ -128,9 +145,11 @@ OrbitFabric is a Mission Data Contract framework.
 
 It may feed other ecosystems through external Integration Packages, but it must not try to replace them or absorb their semantics into Core.
 
+Its Adapter Management layer manages Integration Package release identity and installation lifecycle. It is not a generic package registry, package index or provider-specific download client.
+
 The long-term role is:
 
-> OrbitFabric defines the mission data contract. Other systems may consume it through explicit, versioned boundaries.
+> OrbitFabric defines the mission data contract and the provider-neutral lifecycle boundaries by which external integration packages consume it. Other systems retain their own semantics and provider-specific behavior.
 
 ---
 
@@ -138,7 +157,7 @@ The long-term role is:
 
 ### 7.1 Mission Model First
 
-OrbitFabric starts from the Mission Model, not from onboard runtime, ground system, an integration package, plugin, generated file or visual tool.
+OrbitFabric starts from the Mission Model, not from onboard runtime, ground system, an integration package, provider, generated file or visual tool.
 
 The Mission Model remains the semantic source of truth.
 
@@ -190,7 +209,9 @@ Users must not place handwritten implementation code inside generated files.
 
 After v1.0.0, any change to a selected stable surface must include explicit compatibility or migration notes.
 
-A surface does not become stable merely because it exists. v1.2.0 is an explicit reviewed promotion of the Mission Snapshot and coherent Integration Input Set responsibilities.
+A surface does not become stable merely because it exists. v1.2.0 was an explicit reviewed promotion of the Mission Snapshot and coherent Integration Input Set responsibilities.
+
+Likewise, inclusion of Adapter Management in Core v1.3.0 does not automatically promote its candidate contracts into the stable Mission Data Contract.
 
 Additive relationship types must remain explicitly documented compatibility additions and must not be silently treated as a permanently closed enumeration.
 
@@ -199,6 +220,30 @@ Additive relationship types must remain explicitly documented compatibility addi
 Operational scenarios are first-class artifacts.
 
 The simulator validates deterministic host-side contract behavior. It is not a real-time onboard runtime or a spacecraft dynamics simulator.
+
+### 7.7 Provider-Specific Acquisition Remains Outside Core
+
+Core owns exact adapter identity, desired/actual state, Catalog exact selection and lifecycle semantics.
+
+A provider-specific Release Source owns provider lookup, authentication where applicable, acquisition and verified local materialization.
+
+The handoff is:
+
+```text
+provider-specific Release Source
+    -> ResolvedAdapterRelease
+    -> Core Adapter Manager lifecycle
+```
+
+A provider URL, mirror or cache location is not Project Lock identity.
+
+### 7.8 Desired State and Actual State Are Separate
+
+Adapter Project Lock is project-scoped exact desired state.
+
+Installed Adapter State is user-scoped actual state.
+
+The lock must remain portable and must not contain local instance ids, installation paths, executable paths or mutable provider locators.
 
 ---
 
@@ -227,9 +272,9 @@ The Mission Snapshot and Integration Input Set retain their already reference-pr
 
 ---
 
-## 9. Candidate Core Inspection and Extension Contracts
+## 9. Candidate Core Inspection, Integration and Adapter Management Surfaces
 
-The following Core-owned inspection surfaces remain candidate after v1.2.0:
+The following Core-owned inspection surfaces remain candidate after v1.3.0:
 
 ```text
 dashboard_summary.json
@@ -238,21 +283,34 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-The following extension contracts also remain independently versioned `0.1-candidate` contracts:
+The Integration Framework candidate surfaces include:
 
 ```text
 Projection Profile
 Integration Result
 Integration Package / Adapter Execution
+operation-input v1 lane
 ```
 
-The latter define how target-specific integrations sit beside Core; they are not target semantics inside Core.
+The v1.3 Adapter Management candidate surfaces include:
+
+```text
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral ResolvedAdapterRelease attachment
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+These define reviewed boundaries but do not become stable Mission Data Contract semantics merely because they ship in the Core package.
 
 ---
 
 ## 10. Stable External Integration Boundary
 
-The stable v1.2 input direction is:
+The stable input direction introduced in v1.2 is:
 
 ```text
 Mission Model
@@ -266,15 +324,37 @@ external Integration Package / Adapter
 Projection Profile + target-native artifacts + Integration Result
 ```
 
-Core does not dynamically discover, load or execute ecosystem-specific adapters in-process.
+Core does not import ecosystem-specific adapter implementation code in-process.
 
 An external adapter must negotiate documented surface kind/version identities, verify exact digests and set coherence, and reject missing/incompatible required surfaces.
 
 Raw-YAML semantic fallback is forbidden.
 
+Adapter Manager may execute an installed Integration Package through the documented external execution contract and environment-local entrypoint; this does not move target-specific semantics into the Core process.
+
 ---
 
-## 11. Non-Goals
+## 11. Adapter Management Boundary
+
+The candidate v1.3 lifecycle is:
+
+```text
+Adapter Project Lock
+    -> provider-neutral exact Adapter Catalog selection
+    -> provider-specific Release Source outside Core
+    -> verified ResolvedAdapterRelease
+    -> Core installation lifecycle
+    -> Installed Adapter State
+    -> verify / execute / remove
+```
+
+Core must remain provider-neutral.
+
+The current absence of a one-command provider-neutral install-from-Catalog UX is deliberate. A universal provider registration/dispatch abstraction must not be invented from only one provider implementation.
+
+---
+
+## 12. Non-Goals
 
 OrbitFabric Core must not become:
 
@@ -293,7 +373,9 @@ OrbitFabric Core must not become:
 - a relationship graph engine;
 - a dependency graph engine;
 - an in-process ecosystem adapter runtime;
-- a plugin execution framework;
+- a generic in-process plugin execution framework;
+- a GitHub/registry-specific package manager;
+- a provider-neutral dispatch/version-solving system without separate evidence and architecture;
 - a Studio-specific backend API;
 - a security enforcement framework.
 
@@ -301,7 +383,7 @@ These may be valid adjacent or future projects only after separate architecture,
 
 ---
 
-## 12. Golden Signature Boundary
+## 13. Golden Signature Boundary
 
 Selected golden signatures protect contract-significant fields of stable Core-owned structured surfaces.
 
@@ -315,7 +397,7 @@ Golden signatures do not freeze complete generated JSON files, absolute paths, c
 
 ---
 
-## 13. Demo and Integration Evidence Chain
+## 14. Demo and Integration Evidence Chain
 
 The stable demo evidence chain includes:
 
@@ -337,25 +419,19 @@ payload.start_acquisition
         -> selected stable-surface golden signatures
 ```
 
-The integration evidence additionally demonstrates:
+The generic integration evidence additionally demonstrates real external Integration Packages consuming the coherent Core Integration Input Set without raw-YAML semantic reconstruction.
 
-```text
-real Mission Model
-    -> Core coherent Integration Input Set
-    -> external OpenOBSW/OpenSVF reference adapter
-    -> candidate Projection Profile / Integration Result contracts
-    -> independent OrbitFabric Studio consumption
-```
+The v1.3 Adapter Management evidence demonstrates a real public adapter release moving through exact Catalog selection, provider-specific resolution, Project Lock install, verification, acquisition cleanup and idempotent `MATCH -> NOOP` behavior.
 
-This proves architectural contract continuity, not flight readiness, ground readiness, protocol compliance or operational completeness.
+These prove architectural contract continuity and lifecycle reproducibility, not flight readiness, ground readiness, downstream protocol compliance or operational completeness.
 
 ---
 
-## 14. Final Charter Statement
+## 15. Final Charter Statement
 
 OrbitFabric must remain excellent at one thing:
 
-> defining, validating, simulating, documenting, introspecting, indexing, relating and exporting explicit contract-facing surfaces from a Mission Data Contract for a small spacecraft.
+> defining, validating, simulating, documenting, introspecting, indexing, relating and exporting explicit contract-facing surfaces from a Mission Data Contract, while managing external adapter release identity through narrow provider-neutral lifecycle boundaries.
 
 The narrowness of the charter is intentional.
 

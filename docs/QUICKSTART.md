@@ -7,7 +7,7 @@ OrbitFabric is a model-first Mission Data Fabric for small spacecraft.
 The current public release is:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
 The stable Mission Data Contract commitment originated with:
@@ -16,9 +16,9 @@ The stable Mission Data Contract commitment originated with:
 v1.0.0 - Stable Mission Data Contract
 ```
 
-v1.2.0 extends that stable boundary additively with the Mission Snapshot and coherent Core Integration Input Set, without changing Mission Model semantics.
+v1.2.0 extended that stable boundary additively with the Mission Snapshot and coherent Core Integration Input Set, without changing Mission Model semantics. v1.3.0 preserves those stable semantics and adds candidate operation-input and provider-neutral Adapter Management capabilities.
 
-The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate unless separately promoted.
+The v1.1.0 dashboard, scenario-run, coverage and structured-expectation surfaces remain candidate unless separately promoted. The v1.3 Adapter Management contracts and CLI surfaces also remain candidate unless separately promoted.
 
 OrbitFabric is not a flight software framework, not a ground segment and not a spacecraft dynamics simulator.
 
@@ -26,7 +26,7 @@ Generated runtime-facing contract bindings are not flight software.
 
 Generated ground integration artifacts are not ground software.
 
-Core-owned structured surfaces are not plugin APIs, graph engines or Studio-specific APIs.
+Core-owned structured surfaces are not graph engines or Studio-specific APIs. Adapter Manager does not turn Core into an in-process plugin host or a provider-specific package manager.
 
 ---
 
@@ -89,12 +89,13 @@ python -m pip install -e ".[dev]"
 ```bash
 orbitfabric --version
 orbitfabric --help
+orbitfabric adapter --help
 ```
 
 Expected current package version:
 
 ```text
-orbitfabric 1.2.0
+orbitfabric 1.3.0
 ```
 
 ---
@@ -165,7 +166,7 @@ The explicit path is preserved exactly as provided.
 
 ## 10. Export the stable Mission Snapshot
 
-Export the complete loaded Mission Model through the v1.2 stable Mission Snapshot surface:
+Export the complete loaded Mission Model through the stable Mission Snapshot surface introduced in v1.2:
 
 ```bash
 orbitfabric export mission-snapshot examples/demo-3u/mission/ \
@@ -274,11 +275,44 @@ examples/demo-3u/generated/reports/coverage_summary.json
 
 `scenario_run_index.json` is emitted to the explicit `--json` path shown above.
 
-These v1.1.0 surfaces remain Core-owned candidate inspection surfaces after v1.2.0.
+These v1.1.0 surfaces remain Core-owned candidate inspection surfaces after v1.3.0.
 
 ---
 
-## 14. Review stable and candidate references
+## 14. Inspect the candidate Adapter Management CLI
+
+v1.3.0 adds a provider-neutral candidate Adapter Management surface to Core.
+
+Start by inspecting the available commands:
+
+```bash
+orbitfabric adapter --help
+orbitfabric adapter lock --help
+orbitfabric adapter catalog --help
+```
+
+The Core-owned Catalog commands operate on a local Catalog file:
+
+```text
+orbitfabric adapter catalog validate <catalog.json>
+orbitfabric adapter catalog list <catalog.json>
+orbitfabric adapter catalog select <catalog.json> <SOURCE_COORDINATE> --version <EXACT_VERSION>
+```
+
+Core does not fetch a remote Catalog or dispatch provider implementations. Provider-specific acquisition is handled by separate Release Source products, which hand a verified `ResolvedAdapterRelease` into the Core lifecycle.
+
+The exact desired/actual state split is:
+
+```text
+Adapter Project Lock     project-scoped exact desired state
+Installed Adapter State user-scoped actual state
+```
+
+See the Adapter Manager, Adapter Project Lock, explicit-source install-from-lock and Adapter Catalog reference pages before using these candidate surfaces in production workflows.
+
+---
+
+## 15. Review stable and candidate references
 
 Key references include:
 
@@ -298,18 +332,23 @@ Relationship Manifest Surface
 Projection Profile Contract
 Integration Result Contract
 Integration Package and Adapter Execution Contract
+Integration Operation-Input Contract v1
+Adapter Manager M0
+Adapter Project Lock M1
+Explicit-Source Install from Adapter Project Lock
+Adapter Catalog CLI
 Dashboard Summary Surface
 Scenario Run Index Surface
 Coverage Summary Surface
 ```
 
-These references separate stable Core-owned contracts from candidate Core inspection surfaces and candidate extension-owned integration contracts.
+These references separate stable Core-owned contracts from candidate Core inspection, integration-extension and Adapter Management surfaces.
 
-They do not introduce runtime behavior, ground behavior or Core plugin execution.
+They do not introduce flight runtime behavior, ground runtime behavior, provider-specific acquisition inside Core or in-process third-party adapter loading.
 
 ---
 
-## 15. Generate mission documentation
+## 16. Generate mission documentation
 
 ```bash
 orbitfabric gen docs examples/demo-3u/mission/
@@ -328,7 +367,7 @@ Do not edit generated files manually.
 
 ---
 
-## 16. Generate runtime-facing contract bindings
+## 17. Generate runtime-facing contract bindings
 
 ```bash
 orbitfabric gen runtime examples/demo-3u/mission/
@@ -340,7 +379,7 @@ They do not implement onboard behavior.
 
 ---
 
-## 17. Validate the generated C++17 host-build smoke target
+## 18. Validate the generated C++17 host-build smoke target
 
 ```bash
 cmake -S examples/demo-3u/generated/runtime/cpp17 -B examples/demo-3u/generated/runtime/cpp17/build
@@ -357,7 +396,7 @@ This confirms that the generated contract-binding surface is syntactically valid
 
 ---
 
-## 18. Generate ground integration artifacts
+## 19. Generate ground integration artifacts
 
 ```bash
 orbitfabric gen ground examples/demo-3u/mission/
@@ -369,7 +408,7 @@ They do not implement a live ground segment, decoder, telemetry archive, databas
 
 ---
 
-## 19. Run demo scenarios
+## 20. Run demo scenarios
 
 ```bash
 orbitfabric sim examples/demo-3u/scenarios/battery_low_during_payload.yaml
@@ -404,9 +443,9 @@ The v1.1.0 simulation JSON structured expectation accounting remains additive an
 
 ---
 
-## 20. What this proves
+## 21. What this proves
 
-The current repository baseline proves that OrbitFabric can:
+The current repository baseline proves that OrbitFabric Core can:
 
 - load a multi-file YAML Mission Model;
 - validate Mission Model structure;
@@ -422,15 +461,17 @@ The current repository baseline proves that OrbitFabric can:
 - generate runtime-facing contract bindings;
 - validate generated C++17 bindings with a host-build smoke target;
 - generate ground-facing contract artifacts;
+- validate candidate operation-input integration contracts;
+- manage exact adapter desired/actual state through candidate provider-neutral Adapter Management contracts;
 - protect selected Core-owned structured surface fields with golden signatures.
 
-The broader Integration Framework is also reference-proven through an external OpenOBSW/OpenSVF Integration Package and an independent Studio consumer, while target-specific contracts remain extension-owned.
+The broader Integration Framework is reference-proven through external adapter repositories and an independent Studio consumer, while target-specific contracts remain extension-owned. Provider-specific Catalog acquisition proofs also live outside Core.
 
 ---
 
-## 21. What this does not prove
+## 22. What this does not prove
 
-The current demo does not prove:
+The built-in demo does not itself prove:
 
 - flight readiness;
 - real-time behavior;
@@ -440,14 +481,15 @@ The current demo does not prove:
 - orbit propagation;
 - RF link budget simulation;
 - CCSDS, PUS or CFDP compliance;
-- generic compatibility with cFS, F Prime, Yamcs or OpenC3;
+- compatibility with any particular downstream framework solely from this Core demo;
 - XTCE compliance;
 - binary decoder or encoder behavior;
 - command uplink behavior;
 - telemetry archive/database/operator-console behavior;
 - HAL or RTOS integration;
 - relationship or dependency graph behavior;
-- Core plugin discovery/loading/execution;
+- Core in-process third-party adapter discovery/loading/execution;
+- provider-neutral provider dispatch, version-range solving or automatic adapter upgrades;
 - qualification for operational spacecraft use.
 
-Those are intentionally outside the current Core scope.
+Downstream-specific compatibility is demonstrated and maintained in the corresponding external adapter/integration repositories, not inferred from this Core demo.

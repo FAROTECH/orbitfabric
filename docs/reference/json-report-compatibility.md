@@ -1,12 +1,12 @@
 # JSON Report Compatibility
 
-Status: Active v1.x reference through v1.2.0  
+Status: Active v1.x reference through v1.3.0  
 Scope: compatibility classification for machine-readable Core reports and structured surfaces  
 Applies to: OrbitFabric JSON outputs from v1.0.0 onward
 
 This page defines compatibility expectations for OrbitFabric machine-readable outputs.
 
-It documents existing behavior. It does not introduce new CLI behavior, Mission Model semantics, plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
+It documents existing behavior. It does not introduce new CLI behavior, Mission Model semantics, in-process plugin execution, runtime behavior, ground behavior or Studio-specific APIs.
 
 ## 1. Source of truth
 
@@ -34,6 +34,8 @@ Downstream tools may consume JSON surfaces for automation and inspection, but th
 | `coverage_summary.json` | Candidate | v1.1 limited coverage surface. |
 | `runtime_contract_manifest.json` | Public preview | Generated runtime-facing contract manifest. |
 | `ground_contract_manifest.json` | Public preview | Generated ground-facing contract manifest. |
+
+The v1.3 Adapter Release Descriptor, Project Lock and Adapter Catalog are separate candidate lifecycle contracts. They are not JSON report families and do not change the classification of the Mission Data Contract-derived surfaces above.
 
 ## 3. Report identity
 
@@ -172,7 +174,7 @@ The input set does not make Projection Profile, Integration Result or Integratio
 
 ## 10. Candidate v1.1 surfaces
 
-The following remain candidate:
+The following remain candidate after v1.3.0:
 
 ```text
 dashboard_summary.json
@@ -181,7 +183,7 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-They are Core-owned read-only outputs, but they are not silently promoted by v1.2.
+They are Core-owned read-only outputs, but they are not silently promoted by the v1.3 Adapter Management release.
 
 Their changes must be explicit because downstream tools may already consume them, even though their compatibility commitment is weaker than the stable v1 surface.
 
@@ -242,13 +244,13 @@ schema migration tooling
 JSON Schema publication for Core reports
 runtime behavior
 ground behavior
-plugin execution
+in-process plugin execution
 Studio-specific semantic authority
 OpenOBSW/OpenSVF-specific Core generation
 ```
 
 ## 14. Final statement
 
-v1.2.0 extends the stable Core machine-readable boundary with Mission Snapshot and the coherent Integration Input Set while preserving the v1.0 stable report families and the v1.1 candidate inspection surfaces.
+v1.3.0 preserves the stable Core machine-readable boundary established through v1.2.0. The Adapter Management foundation is additive and candidate, and does not reclassify existing JSON report or structured-surface families.
 
 Every compatibility decision remains explicit. No consumer should infer maturity from a format token alone or infer missing semantics from unstructured data.
