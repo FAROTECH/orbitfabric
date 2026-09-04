@@ -6,6 +6,7 @@ from typing import Annotated, Any
 
 import typer
 
+from orbitfabric.adapter_catalog_commands import catalog_app
 from orbitfabric.adapter_manager import (
     AdapterManager,
     AdapterManagerError,
@@ -22,6 +23,7 @@ lock_app = typer.Typer(
     help="Validate, compare and satisfy project-scoped exact adapter state.",
     no_args_is_help=True,
 )
+adapter_app.add_typer(catalog_app, name="catalog")
 adapter_app.add_typer(lock_app, name="lock")
 
 
