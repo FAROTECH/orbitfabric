@@ -1,6 +1,6 @@
 # Golden Output and Regression Confidence Policy
 
-Status: Active v1.x policy through v1.2.0  
+Status: Active v1.x policy through v1.3.0  
 Scope: regression confidence and selected golden-signature protection  
 Applies to: stable and candidate structured surfaces, reports and generated artifacts after v1.0.0
 
@@ -156,7 +156,31 @@ no raw-YAML semantic fallback in the reference integration
 
 A full generated input-set directory is not committed as a byte-for-byte golden because producer provenance and complete surface payloads can contain more detail than should be frozen by one release signature.
 
-## 8. Future golden candidates
+## 8. v1.3 Adapter Management regression posture
+
+v1.3.0 adds candidate Adapter Management capabilities, but does not automatically justify new committed golden files.
+
+The high-value protections for this candidate lifecycle are behavioral and contract-oriented:
+
+```text
+Adapter Release Descriptor conformance
+Adapter Project Lock exact identity comparison
+MISSING / MATCH / MISMATCH state transitions
+pre-materialization identity and digest gates
+transaction ordering and inventory coherence
+installed-distribution manifest discovery
+source-neutral ResolvedAdapterRelease attachment
+provider-neutral Catalog exact selection
+fail-closed ambiguity handling
+idempotent MATCH -> NOOP behavior
+verification after acquisition workspace removal
+```
+
+These properties are protected by tests rather than by freezing user-scoped inventory files, managed-environment paths, installation receipts, instance identifiers or provider transport metadata.
+
+Those implementation details are not public compatibility goldens.
+
+## 9. Future golden candidates
 
 Potential future golden targets include:
 
@@ -167,6 +191,9 @@ Potential future golden targets include:
 | candidate dashboard summary | Candidate | Review only after a clearer promotion decision. |
 | candidate scenario run index | Candidate | Review only after a clearer promotion decision. |
 | candidate coverage summary | Candidate | Review only after a clearer promotion decision. |
+| Adapter Release Descriptor | Candidate | Prefer schema/conformance fixtures until maturity increases. |
+| Adapter Project Lock | Candidate | Prefer schema and lifecycle fixtures until maturity increases. |
+| Adapter Catalog | Candidate | Prefer exact-selection fixtures and fail-closed tests until maturity increases. |
 | runtime contract manifest | Public preview | Possible selective candidate. |
 | ground contract manifest | Public preview | Possible selective candidate. |
 | generated Markdown | Human-oriented | Weak candidate. |
@@ -176,7 +203,7 @@ Potential future golden targets include:
 
 A future PR should add a golden baseline only when the protected compatibility promise is clear.
 
-## 9. What deserves protection
+## 10. What deserves protection
 
 High-value targets include:
 
@@ -192,6 +219,8 @@ failure-state distinctions
 manifest compatibility records
 stable provenance algorithms
 scenario evidence meaning
+exact release identity gates
+provider-neutral selection semantics
 ```
 
 Low-value targets include:
@@ -204,11 +233,14 @@ absolute paths
 terminal formatting
 plain-text logs
 example narrative wording
+local instance ids
+managed-environment paths
+provider transport URLs
 ```
 
 Protect meaning first.
 
-## 10. Golden acceptance criteria
+## 11. Golden acceptance criteria
 
 Before adding or changing a committed golden, a PR should answer:
 
@@ -226,7 +258,7 @@ What compatibility class applies if the signature changes?
 
 A golden change must explain whether it is corrective, clarifying, additive, compatibility-sensitive or breaking.
 
-## 11. Downstream consumer rule
+## 12. Downstream consumer rule
 
 Downstream tools should rely on documented Core-owned structured surfaces, not on CI artifact locations or test fixture filenames.
 
@@ -238,15 +270,17 @@ entity_index.json
 relationship_manifest.json
 ```
 
-For external integration the preferred boundary is:
+For external mission-data integration the preferred boundary is:
 
 ```text
 Core Integration Input Set
 ```
 
-Golden signatures protect selected meaning inside those contracts. They do not become a runtime API or source of mission truth.
+For Adapter Management, consumers should rely on the documented Release Descriptor, Project Lock, Catalog and installed-state lifecycle contracts rather than internal persistence layouts or golden fixtures.
 
-## 12. Non-goals
+Golden signatures protect selected meaning inside contracts. They do not become a runtime API or source of mission truth.
+
+## 13. Non-goals
 
 This policy does not introduce:
 
@@ -254,15 +288,15 @@ This policy does not introduce:
 new Mission Model semantics
 new JSON report fields
 new generated surfaces
-plugin execution
+in-process plugin execution
 runtime behavior
 ground behavior
 schema migration tooling
 Studio-specific semantic authority
 ```
 
-## 13. Final statement
+## 14. Final statement
 
 OrbitFabric uses selective golden signatures when a narrow stable compatibility promise deserves explicit regression protection.
 
-v1.2.0 extends that strategy to Mission Snapshot while retaining the original v1 Core surface goldens unchanged and using dedicated tests for additive FDIR relationship families and Integration Input Set behavior.
+v1.3.0 preserves the v1 and v1.2 golden strategy. Candidate Adapter Management capabilities are protected through schemas, fixtures and behavioral regression tests without freezing implementation-private installed-state or provider-acquisition details.

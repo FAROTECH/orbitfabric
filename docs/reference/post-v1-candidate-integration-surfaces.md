@@ -1,9 +1,9 @@
 # Post-v1 Integration Surface Classification
 
-Status: Active compatibility inventory through v1.2.0  
-Scope: Core-owned structured surfaces introduced after `v1.0.0 - Stable Mission Data Contract`
+Status: Active compatibility inventory through v1.3.0  
+Scope: Core-owned structured and integration lifecycle surfaces introduced after `v1.0.0 - Stable Mission Data Contract`
 
-This page preserves the classification history of post-v1 Core-owned surfaces and records the v1.2 promotion decision.
+This page preserves the classification history of post-v1 Core-owned surfaces, records the v1.2 promotion decision and classifies the candidate Adapter Management foundation added in v1.3.0.
 
 Candidate surfaces are not automatically stable. Promotion requires an explicit reviewed compatibility decision and appropriate regression protection.
 
@@ -23,7 +23,7 @@ These remain stable. The Mission Model remains the source of truth.
 
 ## 2. v1.1.0 candidate surfaces
 
-The following were consolidated as candidate Core-owned surfaces in v1.1.0 and remain candidate after v1.2.0:
+The following were consolidated as candidate Core-owned surfaces in v1.1.0 and remain candidate after v1.3.0:
 
 ```text
 dashboard_summary.json
@@ -32,7 +32,7 @@ coverage_summary.json
 simulation JSON structured expectation accounting
 ```
 
-They support downstream inspection but are not silently promoted by the v1.2 Core Integration Input decision.
+They support downstream inspection but are not silently promoted by either the v1.2 Core Integration Input decision or the v1.3 Adapter Management release.
 
 ---
 
@@ -74,9 +74,44 @@ The original v1 Relationship Manifest golden remains fixed; dedicated regression
 
 ---
 
-## 4. Current classification inventory
+## 4. v1.3.0 candidate Adapter Management foundation
 
-| Surface | Classification after v1.2.0 | Purpose |
+v1.3.0 adds product capabilities without expanding the stable Mission Data Contract.
+
+Candidate integration and lifecycle additions include:
+
+```text
+operation-input v1 integration contract lane
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral ResolvedAdapterRelease attachment seam
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+The provider-neutral lifecycle is:
+
+```text
+Adapter Source Coordinate
+    -> exact Catalog release selection
+    -> provider-specific Release Source outside Core
+    -> exact descriptor + artifact verification
+    -> ResolvedAdapterRelease
+    -> Core Project Lock / Adapter Manager lifecycle
+    -> Installed Adapter State
+```
+
+Core owns exact release identity, candidate lifecycle contracts and installed-state orchestration. Provider-specific network acquisition, provider authentication and provider dispatch remain outside Core.
+
+The first provider-specific implementation does not define a universal provider plugin protocol.
+
+---
+
+## 5. Current classification inventory
+
+| Surface | Classification after v1.3.0 | Purpose |
 |---|---|---|
 | `model_summary.json` | Stable | Domain/count summary |
 | `entity_index.json` | Stable | Canonical entity inventory |
@@ -88,12 +123,19 @@ The original v1 Relationship Manifest golden remains fixed; dedicated regression
 | `scenario_run_index.json` | Candidate | Index of simulation JSON report runs |
 | `coverage_summary.json` | Candidate | Limited coverage derived from Core outputs |
 | simulation JSON structured `expectations` | Candidate additive extension | Structured expectation accounting |
+| operation-input v1 lane | Candidate | File-backed external adapter operation input |
+| Adapter Release Descriptor | Candidate | Exact adapter release and artifact membership |
+| Adapter Project Lock | Candidate | Project-scoped exact desired adapter state |
+| Adapter Manager lifecycle | Candidate | Installed adapter lifecycle and verification |
+| `ResolvedAdapterRelease` handoff | Candidate Core seam | Source-neutral exact resolved-release attachment |
+| Adapter Catalog | Candidate | Provider-neutral exact release availability and source binding references |
+| Adapter Catalog CLI | Candidate | Local validation/list/exact selection |
 
 ---
 
-## 5. Extension-owned integration contracts
+## 6. Extension-owned integration contracts
 
-The Integration Framework additionally defines these separately versioned extension contracts:
+The Integration Framework additionally defines separately versioned extension contracts:
 
 ```text
 Projection Profile
@@ -101,17 +143,17 @@ Integration Result
 Integration Package / Adapter Execution
 ```
 
-They remain `0.1-candidate` after v1.2.0.
+The original v0 lane remains independently versioned candidate material. The v1.3 operation-input lane uses the candidate Manifest `0.2-candidate`, `orbitfabric.adapter_cli.v1` and Result `0.2-candidate` contract family.
 
-They are not Core Mission Data Contract surfaces and do not move target-specific semantics into Core.
+These are not stable Core Mission Data Contract surfaces and do not move target-specific semantics into Core.
 
 ---
 
-## 6. Compatibility posture
+## 7. Compatibility posture
 
-The v1.2 release does not change Mission Model semantics.
+The v1.3 release does not change Mission Model semantics.
 
-Compatible consumers must:
+Compatible Mission Data Contract consumers must:
 
 - check Core surface kind/version identifiers;
 - tolerate unknown additive fields where the relevant contract permits them;
@@ -120,33 +162,64 @@ Compatible consumers must:
 - distinguish Core load/lint diagnostics from integration diagnostics;
 - never use raw YAML, filenames, timestamps or UI state as semantic fallbacks.
 
+Adapter lifecycle consumers must additionally:
+
+- keep Source Coordinate, exact release version and exact digest anchors explicit;
+- resolve one exact Catalog release before acquisition;
+- keep provider locators separate from Project Lock identity;
+- fail closed on missing or ambiguous exact selection;
+- distinguish provider acquisition evidence from Core trust/acceptance semantics;
+- keep installed local state separate from project desired state.
+
 ---
 
-## 7. Ownership boundary
+## 8. Ownership boundary
 
 ```text
 Core defines Mission Data Contract semantics.
 Core emits stable and candidate structured surfaces.
+Core owns provider-neutral exact adapter lifecycle contracts.
 Projection Profiles own authored target-specific projection intent.
 External adapters own target-specific validation and generation.
+Provider-specific Release Sources own remote acquisition outside Core.
 Studio and other downstream tools consume and compose explicit records.
 ```
 
-Core is not a dashboard backend, flight software framework, ground segment, runtime framework, graph engine, plugin execution platform or OpenOBSW/OpenSVF-specific generator.
+Core is not a dashboard backend, flight software framework, ground segment, target-specific integration implementation, graph engine, in-process plugin execution platform or provider-specific registry client.
 
 ---
 
-## 8. Explicit non-goals
+## 9. Explicit non-goals
 
-The post-v1 integration surfaces do not introduce:
+The post-v1 integration and Adapter Management surfaces do not introduce:
 
 ```text
-OpenOBSW/OpenSVF/YAMCS-specific Core semantics
+OpenOBSW/OpenSVF/YAMCS/F Prime-specific Core semantics
 CCSDS/PUS/CFDP implementation
 runtime telemetry behavior
 ground execution behavior
 relationship graph behavior
 dependency graph behavior
-Core plugin discovery/loading/execution
-Studio-specific APIs
+third-party adapter import/execution inside the Core Python process
+provider-specific acquisition inside Core
+universal provider plugin protocol
+latest/channel/version-range solving
+Studio-specific semantic authority
 ```
+
+Adapter Manager may execute an installed external adapter through its documented out-of-process execution contract. That lifecycle capability does not make target-specific code part of Core semantic authority.
+
+---
+
+## 10. Final statement
+
+The post-v1 history is deliberately cumulative but maturity remains explicit:
+
+```text
+v1.0.0  stable narrow Mission Data Contract
+v1.1.0  candidate inspection additions
+v1.2.0  stable Mission Snapshot + Core Integration Input boundary
+v1.3.0  candidate provider-neutral Adapter Management foundation
+```
+
+A stable Core package release does not automatically promote candidate product surfaces. Every promotion remains an explicit architectural and compatibility decision.

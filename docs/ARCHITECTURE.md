@@ -1,8 +1,8 @@
 # OrbitFabric - Architecture
 
-Version: 1.2.0 Core Integration Input Consolidation  
-Status: Stable Mission Data Contract with stable Core integration input boundary  
-Scope: Mission Data Contract architecture, Core-owned structured surfaces, external integration boundary and extensibility governance
+Version: 1.3.0 Adapter Management Foundation  
+Status: Stable Mission Data Contract with stable Core integration input boundary and candidate Adapter Management lifecycle  
+Scope: Mission Data Contract architecture, Core-owned structured surfaces, external integration boundary, Adapter Management and extensibility governance
 
 ---
 
@@ -21,16 +21,16 @@ OrbitFabric validates that model, executes deterministic host-side scenario evid
 The current release is:
 
 ```text
-v1.2.0 - Core Integration Input Consolidation
+v1.3.0 - Adapter Management Foundation
 ```
 
-v1.2.0 introduces no new Mission Model semantics. It makes the already reference-proven Core integration input side a stable compatibility boundary.
+v1.3.0 introduces no new Mission Model semantics. It preserves the stable v1.2 Core integration input boundary and adds a candidate provider-neutral lifecycle for exact external adapter releases.
 
 ---
 
 ## 2. Architectural Role
 
-OrbitFabric is the contract layer between:
+OrbitFabric is the contract and lifecycle layer between:
 
 ```text
 mission design
@@ -41,6 +41,7 @@ documentation
 runtime-facing integration
 ground integration
 external ecosystem integrations
+external adapter release lifecycle
 downstream inspection tools
 ```
 
@@ -58,13 +59,14 @@ CCSDS/PUS/CFDP implementation
 hardware abstraction layer
 visual modeling tool
 Studio-specific backend API
-plugin discovery/loading/execution platform
+in-process plugin discovery/loading/execution platform
+provider-specific package registry client
 security enforcement framework
 schema migration engine
 tool-specific integration implementation
 ```
 
-Its role is to define, validate, exercise, document, introspect, index, relate and export one Mission Data Contract through explicit compatibility boundaries.
+Its role is to define, validate, exercise, document, introspect, index, relate and export one Mission Data Contract through explicit compatibility boundaries, and to manage exact external adapter releases through provider-neutral lifecycle semantics.
 
 ---
 
@@ -81,6 +83,8 @@ Core-owned surfaces and generated artifacts derive from the loaded Mission Model
 OrbitFabric does not implement flight or ground runtime behavior.
 
 Generated runtime-facing artifacts are contract bindings, not onboard behavior. Generated ground-facing artifacts are contract exports, not a ground segment.
+
+External adapter execution is a host-side integration operation through a documented installed adapter entrypoint. It does not make OrbitFabric a flight or ground runtime framework.
 
 ### 3.3 Core Surfaces Before External Semantics
 
@@ -123,7 +127,7 @@ The Mission Snapshot `model` payload is a faithful JSON serialization of the loa
 
 Stable classification does not require rewriting an already supported format identifier.
 
-The v1.2 stable Core input boundary retains:
+The stable Core input boundary introduced in v1.2 retains:
 
 ```text
 Mission Snapshot snapshot_version       = 0.1-candidate
@@ -133,9 +137,36 @@ Relationship Manifest manifest_version  = 0.1-candidate
 
 Changing those identifiers solely to remove the word `candidate` would create needless consumer incompatibility.
 
+The same principle applies to new v1.3 candidate Adapter Management contracts: package release version and contract maturity are separate concepts.
+
 ### 3.6 Generated Artifacts Are Disposable Unless Classified Otherwise
 
 Generated Markdown, runtime bindings, ground dictionaries and human-oriented logs remain reproducible outputs unless explicitly promoted through compatibility governance.
+
+### 3.7 Provider-Specific Acquisition Stays Outside Core
+
+Core owns adapter identity, desired state, installed state, lifecycle semantics and exact provider-neutral Catalog selection.
+
+Provider-specific Release Sources own acquisition.
+
+The canonical handoff is:
+
+```text
+provider-specific Release Source
+    -> verified exact local release bytes
+    -> ResolvedAdapterRelease
+    -> Core lifecycle
+```
+
+GitHub, registry, mirror or future provider behavior must not leak into Project Lock identity or Core semantics.
+
+### 3.8 Desired State and Actual State Remain Separate
+
+Adapter Project Lock is project-scoped exact desired state.
+
+Installed Adapter State is user-scoped actual state.
+
+The lock does not contain machine-local instance ids, install paths, executable paths or mutable provider locators.
 
 ---
 
@@ -173,11 +204,64 @@ Core diagnostic != integration diagnostic != external evidence
 Integration Package != Studio Integration Plugin
 ```
 
-Core does not dynamically discover, load or execute ecosystem adapters in-process.
+Core does not import ecosystem adapters in-process.
+
+Adapter Manager may execute an installed external adapter through the documented `orbitfabric.adapter_cli.v1` execution boundary and an environment-local entrypoint. Target-specific implementation remains outside Core.
 
 ---
 
-## 5. Stable and Candidate Surface Classification
+## 5. Adapter Management Ownership Model
+
+The v1.3 candidate lifecycle is:
+
+```text
+Adapter Project Lock
+    ↓ exact desired identity
+Adapter Catalog exact selection
+    ↓ exact Source Coordinate + release version + descriptor digest
+provider-specific Release Source outside Core
+    ↓ acquire and verify exact release bytes
+ResolvedAdapterRelease
+    ↓ Core-owned handoff
+Adapter Manager
+    ↓ install / verify / execute / remove
+Installed Adapter State
+```
+
+Core owns:
+
+```text
+Source Coordinate semantics
+Adapter Release Descriptor conformance
+Adapter Project Lock semantics
+Installed Adapter State semantics
+installation transaction
+installation backend verification
+ResolvedAdapterRelease handoff contract
+Adapter Catalog model and exact selection
+acceptance-policy interpretation
+```
+
+Core does not own:
+
+```text
+GitHub REST behavior
+registry APIs
+provider authentication
+provider discovery/dispatch
+version range solving
+latest/stable channel semantics
+automatic upgrades
+mutable provider locators as lock identity
+```
+
+The first backend is `python-wheel-managed-env`. Backend-specific materialization is internal to the lifecycle implementation and does not change Project Lock identity semantics.
+
+A `MATCH` lock entry is idempotent and requires no remote resolution. A mismatching installed release is not automatically destroyed.
+
+---
+
+## 6. Stable and Candidate Surface Classification
 
 ### Stable Core-owned surfaces
 
@@ -200,7 +284,7 @@ The seven FDIR relationship families added after v1.1 are admitted additive stab
 
 ### Candidate Core-owned inspection surfaces
 
-These remain candidate after v1.2:
+These remain candidate after v1.3:
 
 ```text
 dashboard_summary.json
@@ -209,21 +293,44 @@ coverage_summary.json
 simulation JSON structured expectation accounting additions
 ```
 
-### Candidate extension contracts
+### Candidate integration extension contracts
 
-These remain independently versioned `0.1-candidate` extension contracts:
+The candidate Integration Framework includes:
 
 ```text
 Projection Profile
 Integration Result
 Integration Package / Adapter Execution
+operation-input v1 contract lane
 ```
 
-Their documentation in the Core repository defines the integration boundary but does not make target-specific semantics Core-owned.
+The operation-input v1 lane uses:
+
+```text
+Integration Package Manifest 0.2-candidate
+orbitfabric.adapter_cli.v1
+Integration Result 0.2-candidate
+```
+
+### Candidate Adapter Management surfaces
+
+v1.3 adds:
+
+```text
+Adapter Manager lifecycle
+Adapter Release Descriptor 0.1-candidate
+Adapter Project Lock 0.1-candidate
+explicit-source install-from-lock
+source-neutral resolved-release attachment seam
+Adapter Catalog 0.1-candidate
+Adapter Catalog CLI
+```
+
+Their inclusion in Core 1.3.0 does not promote them into the stable Mission Data Contract.
 
 ---
 
-## 6. High-Level System View
+## 7. High-Level System View
 
 ```text
 OrbitFabric
@@ -247,16 +354,24 @@ OrbitFabric
 ├── Stable Integration Input Boundary
 │   └── integration_input_manifest.json + coherent Core surfaces
 │
+├── Candidate Adapter Management
+│   ├── Adapter Project Lock
+│   ├── Adapter Catalog exact selection
+│   ├── ResolvedAdapterRelease handoff
+│   ├── Adapter Manager lifecycle
+│   └── Installed Adapter State
+│
 └── External Integration Layer
     ├── Projection Profile
     ├── Integration Package / Adapter
+    ├── provider-specific Release Source
     ├── target-native artifacts
     └── Integration Result
 ```
 
 ---
 
-## 7. Compatibility Rules
+## 8. Compatibility Rules
 
 After v1.0.0, changes to stable surfaces are compatibility-sensitive and must be explicit, reviewed and documented.
 
@@ -268,11 +383,13 @@ Compatible consumers must:
 - tolerate unknown additive relationship families without guessing meaning;
 - reject missing or incompatible required Integration Input Set surfaces;
 - distinguish structural load state, lint state and adapter compatibility state;
-- preserve diagnostic ownership.
+- preserve diagnostic ownership;
+- treat candidate Adapter Management contracts as independently versioned compatibility surfaces;
+- preserve exact lock and release identity instead of substituting mutable provider metadata.
 
 ---
 
-## 8. Regression Strategy
+## 9. Regression Strategy
 
 The v1 stable golden signatures protect selected contract-significant fields of model summary, entity index and original Relationship Manifest families.
 
@@ -282,11 +399,26 @@ The original Relationship Manifest golden remains fixed so additive relationship
 
 Integration Input Set tests protect coherence, exact surface digests, deterministic fingerprinting, failure states and manifest-last publication semantics.
 
+v1.3 Adapter Management regression coverage protects:
+
+```text
+Release Descriptor conformance
+Project Lock conformance and exact comparison
+lifecycle transaction ordering
+installed-state drift detection
+managed Python backend materialization
+source-neutral resolved-release handoff
+Catalog exact selection and ambiguity rejection
+Catalog CLI fail-closed behavior
+```
+
+Cross-repository acceptance additionally proves a real public adapter release through Catalog selection, provider resolution, Core install, verification, acquisition cleanup and repeat `NOOP`.
+
 ---
 
-## 9. Explicit Non-Goals
+## 10. Explicit Non-Goals
 
-The v1.2 architecture does not introduce:
+The v1.3 architecture does not introduce:
 
 ```text
 flight runtime behavior
@@ -296,14 +428,19 @@ relationship graph engine
 dependency graph engine
 Core in-process adapter execution
 Core plugin discovery/loading/execution
+provider-specific acquisition inside Core
+provider registration/dispatch protocol
+remote Catalog default/fetch policy
+latest/stable/range version solving
+automatic adapter upgrades
 Studio-specific API
-OpenOBSW/OpenSVF/YAMCS-specific Core semantics
+OpenOBSW/OpenSVF/YAMCS/F Prime-specific Core semantics
 formal verification engine
 ```
 
 ---
 
-## 10. Final Architecture Boundary
+## 11. Final Architecture Boundary
 
 The stable architectural statement is:
 
@@ -314,9 +451,11 @@ Exercise scenario evidence.
 Generate review and contract-facing artifacts.
 Export Core-owned structured surfaces.
 Publish one coherent Core Integration Input Set for external consumers.
-Keep target-specific projection and execution outside Core.
+Keep target-specific projection outside Core.
+Manage exact external adapter identity and lifecycle through provider-neutral Core contracts.
+Keep provider-specific acquisition outside Core.
 Protect selected stable contract fields with regression signatures.
 Keep the Mission Model as the semantic source of truth.
 ```
 
-OrbitFabric must not drift into flight software, a ground segment, a simulator platform, a plugin execution framework, a graph engine or a Studio backend.
+OrbitFabric must not drift into flight software, a ground segment, a simulator platform, an in-process plugin framework, a provider-specific package manager, a graph engine or a Studio backend.
