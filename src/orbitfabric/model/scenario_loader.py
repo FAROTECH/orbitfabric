@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +36,7 @@ class ScenarioLoader:
                 ]
             )
 
-        raw = self._load_yaml_file(scenario_file, diagnostics)
+        raw, scenario_sha256 = self._load_yaml_file(scenario_file, diagnostics)
         if diagnostics:
             raise MissionModelError(diagnostics)
 
@@ -72,6 +73,7 @@ class ScenarioLoader:
             scenario=scenario,
             mission_model=mission_model,
             scenario_file=scenario_file,
+            scenario_sha256=scenario_sha256,
             mission_path=mission_path,
         )
 
@@ -253,10 +255,13 @@ class ScenarioLoader:
         self,
         scenario_file: Path,
         diagnostics: list[ModelDiagnostic],
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], str]:
+        raw_bytes = scenario_file.read_bytes()
+        scenario_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+        text = raw_bytes.decode("utf-8")
+
         try:
-            with scenario_file.open("r", encoding="utf-8") as handle:
-                loaded = yaml.safe_load(handle)
+            loaded = yaml.safe_load(text)
         except yaml.YAMLError as exc:
             diagnostics.append(
                 ModelDiagnostic(
@@ -267,7 +272,7 @@ class ScenarioLoader:
                     suggestion="Fix scenario YAML syntax.",
                 )
             )
-            return {}
+            return {}, scenario_sha256
 
         if loaded is None:
             diagnostics.append(
@@ -279,7 +284,7 @@ class ScenarioLoader:
                     suggestion="Add scenario content.",
                 )
             )
-            return {}
+            return {}, scenario_sha256
 
         if not isinstance(loaded, dict):
             diagnostics.append(
@@ -291,9 +296,9 @@ class ScenarioLoader:
                     suggestion="Use a YAML mapping at the top level.",
                 )
             )
-            return {}
+            return {}, scenario_sha256
 
-        return loaded
+        return loaded, scenario_sha256
 
     def _validate_top_level_keys(
         self,
