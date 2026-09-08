@@ -129,13 +129,25 @@ def test_record_ids_must_be_unique_within_one_set() -> None:
         validate_manifest(manifest)
 
 
-@pytest.mark.parametrize("path", ["../outside.txt", "a/../outside.txt", "/absolute.txt", "a//b.txt"])
+@pytest.mark.parametrize(
+    "path",
+    [
+        "../outside.txt",
+        "a/../outside.txt",
+        "/absolute.txt",
+        "a//b.txt",
+        "C:/absolute.txt",
+    ],
+)
 def test_content_path_must_be_normalized_and_bundle_relative(path: str) -> None:
     manifest = _manifest(
         [_record(record_id="evidence-1", path=path, sha256=SHA_A)]
     )
 
-    with pytest.raises(EvidenceSetContractError, match="bundle-relative|normalized contained"):
+    with pytest.raises(
+        EvidenceSetContractError,
+        match="bundle-relative|normalized contained",
+    ):
         validate_manifest(manifest)
 
 
