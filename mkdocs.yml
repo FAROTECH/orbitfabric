@@ -63,6 +63,7 @@ nav:
       - Integration Package and Adapter Execution Contract v0: reference/integration-package-adapter-execution-contract.md
       - Integration Operation-Input Contract v1: reference/integration-contract-v1.md
       - Integration Contract Compatibility Matrix: reference/integration-contract-compatibility-matrix.md
+      - Evidence Set Manifest Contract: reference/evidence-set-manifest-contract.md
       - Adapter Manager M0: reference/adapter-manager-m0.md
       - Adapter Project Lock M1: reference/adapter-project-lock-m1.md
       - Adapter Catalog CLI: reference/adapter-catalog-cli.md
