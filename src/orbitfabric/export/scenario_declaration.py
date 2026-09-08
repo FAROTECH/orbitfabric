@@ -316,7 +316,13 @@ def _normalize_step(
         )
 
     if "payload_lifecycle" in expect:
-        records.append(_normalize_payload_lifecycle(loaded, expect["payload_lifecycle"], step_index))
+        records.append(
+            _normalize_payload_lifecycle(
+                loaded,
+                expect["payload_lifecycle"],
+                step_index,
+            )
+        )
 
     if "data_flow" in expect:
         records.append(_normalize_data_flow(loaded, expect["data_flow"], step_index))
