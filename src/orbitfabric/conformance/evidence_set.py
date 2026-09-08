@@ -40,6 +40,7 @@ def load_json(path: str | Path) -> dict[str, Any]:
 def validate_manifest(manifest: dict[str, Any]) -> None:
     """Validate the generic Evidence Set wire contract and local semantic constraints."""
     schema = load_json(_schema_path())
+    Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)
     errors = sorted(
         validator.iter_errors(manifest),
@@ -107,7 +108,7 @@ def verify_bundle(manifest: dict[str, Any], bundle_root: str | Path) -> dict[str
 
 
 def _validate_bundle_relative_path(value: str) -> None:
-    if value.startswith("/"):
+    if value.startswith("/") or _looks_like_windows_absolute_path(value):
         raise EvidenceSetContractError(
             f"Evidence content path must be bundle-relative: {value!r}"
         )
@@ -117,6 +118,10 @@ def _validate_bundle_relative_path(value: str) -> None:
         raise EvidenceSetContractError(
             f"Evidence content path must be a normalized contained path: {value!r}"
         )
+
+
+def _looks_like_windows_absolute_path(value: str) -> bool:
+    return len(value) >= 2 and value[0].isalpha() and value[1] == ":"
 
 
 def _parser() -> argparse.ArgumentParser:
