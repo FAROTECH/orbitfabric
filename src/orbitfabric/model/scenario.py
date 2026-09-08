@@ -85,4 +85,5 @@ class LoadedScenario(StrictScenarioModel):
     scenario: ScenarioModel
     mission_model: MissionModel
     scenario_file: Path
+    scenario_sha256: str
     mission_path: Path
