@@ -24,10 +24,6 @@
       "type": "string",
       "minLength": 1
     },
-    "nullableNonEmptyString": {
-      "type": ["string", "null"],
-      "minLength": 1
-    },
     "logicalIdentity": {
       "type": "object",
       "additionalProperties": false,
@@ -39,34 +35,34 @@
     "productIdentity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "version", "revision"],
+      "required": ["id"],
       "properties": {
         "id": {"$ref": "#/$defs/nonEmptyString"},
-        "version": {"$ref": "#/$defs/nullableNonEmptyString"},
-        "revision": {"$ref": "#/$defs/nullableNonEmptyString"}
+        "version": {"$ref": "#/$defs/nonEmptyString"},
+        "revision": {"$ref": "#/$defs/nonEmptyString"}
       }
     },
     "contentReference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "media_type", "sha256"],
+      "required": ["path", "sha256"],
       "properties": {
         "path": {
           "type": "string",
           "minLength": 1,
           "pattern": "^[^\\\\]+$"
         },
-        "media_type": {"$ref": "#/$defs/nullableNonEmptyString"},
+        "media_type": {"$ref": "#/$defs/nonEmptyString"},
         "sha256": {"$ref": "#/$defs/sha256"}
       }
     },
     "contentDescriptor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "format_version", "producer", "reference"],
+      "required": ["kind", "producer", "reference"],
       "properties": {
         "kind": {"$ref": "#/$defs/nonEmptyString"},
-        "format_version": {"$ref": "#/$defs/nullableNonEmptyString"},
+        "format_version": {"$ref": "#/$defs/nonEmptyString"},
         "producer": {"$ref": "#/$defs/productIdentity"},
         "reference": {"$ref": "#/$defs/contentReference"}
       }
