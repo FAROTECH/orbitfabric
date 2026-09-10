@@ -1,0 +1,63 @@
+{
+  "kind": "orbitfabric.scenario_projection_accounting",
+  "accounting_version": "0.1-candidate",
+  "scenario": {
+    "id": "payload_stop_acquisition_verification",
+    "sha256": "b19ff6e1cf3c45cdb81e239d30aad97e8b6f037703c06f27102b762e69a1146a"
+  },
+  "completeness": "complete",
+  "records": [
+    {
+      "atom_id": "atom-0001",
+      "disposition": "projected",
+      "mapping_ids": [],
+      "reason": null
+    },
+    {
+      "atom_id": "atom-0002",
+      "disposition": "not_projected",
+      "mapping_ids": [],
+      "reason": "Initial mode is Core host-side Scenario state; no COSMOS initialization or observation policy is defined in the initial adapter scope."
+    },
+    {
+      "atom_id": "atom-0003",
+      "disposition": "not_projected",
+      "mapping_ids": [],
+      "reason": "Initial telemetry is Core host-side Scenario state; the initial adapter scope does not project target initialization."
+    },
+    {
+      "atom_id": "atom-0004",
+      "disposition": "projected",
+      "mapping_ids": [
+        "mapping.op-0001"
+      ],
+      "reason": null
+    },
+    {
+      "atom_id": "atom-0005",
+      "disposition": "not_projected",
+      "mapping_ids": [],
+      "reason": "No explicit Core event to OpenC3 COSMOS observation binding is defined in the initial adapter scope."
+    },
+    {
+      "atom_id": "atom-0006",
+      "disposition": "projected",
+      "mapping_ids": [
+        "mapping.op-0002"
+      ],
+      "reason": null
+    },
+    {
+      "atom_id": "atom-0007",
+      "disposition": "not_projected",
+      "mapping_ids": [],
+      "reason": "No explicit payload lifecycle observability contract is defined for OpenC3 COSMOS."
+    },
+    {
+      "atom_id": "atom-0008",
+      "disposition": "not_projected",
+      "mapping_ids": [],
+      "reason": "OrbitFabric scenario_status is aggregate Core host-side state, not a target runtime observation."
+    }
+  ]
+}

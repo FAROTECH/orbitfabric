@@ -210,6 +210,8 @@ Read:
 - [Integration Package and Adapter Execution Contract](reference/integration-package-adapter-execution-contract.md)
 - [Integration Operation-Input Contract v1](reference/integration-contract-v1.md)
 - [Integration Result Contract](reference/integration-result-contract.md)
+- [Scenario Projection Accounting Contract](reference/scenario-projection-accounting-contract.md)
+- [ADR-0022 Result-Owned Scenario Projection Accounting](adr/ADR-0022-scenario-projection-accounting.md)
 
 The Core input boundary is stable from v1.2. The Profile, Package, operation-input and Result contracts remain candidate extension contracts.
 

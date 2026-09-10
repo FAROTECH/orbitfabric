@@ -11,6 +11,15 @@ Status: Candidate extension contract
 
 Only coherent rows are supported.
 
+## Result-owned generic artifacts
+
+| Parent Result | Artifact kind | Payload version | Requirement |
+|---|---|---|---|
+| `0.2-candidate` | `orbitfabric.scenario_projection_accounting` | `0.1-candidate` | exact available Scenario input |
+
+The artifact is optional. Its absence means atom projection disposition is
+unavailable. Unknown payload versions are not decoded by shape.
+
 ## Incompatible combinations
 
 ```text
@@ -41,4 +50,3 @@ resources are outside this revision.
 A dual-lane consumer may normalize v0 internally as having no additional
 requirements or provenance. This knowledge comes from the v0 contract. It
 must not rewrite v0 JSON or infer semantics from an unknown manifest version.
-
