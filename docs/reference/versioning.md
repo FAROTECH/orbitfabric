@@ -165,9 +165,14 @@ v1.3.0 also includes the candidate operation-input execution lane:
 Integration Package Manifest 0.2-candidate
 orbitfabric.adapter_cli.v1
 Integration Result 0.2-candidate
+Scenario Projection Accounting 0.1-candidate
 ```
 
 The Projection Profile remains independently versioned and target-specific intent remains extension-owned.
+
+Scenario Projection Accounting is also independently versioned. Its
+`0.1-candidate` payload can be registered by a Result `0.2-candidate`
+without changing the Result envelope version.
 
 These contracts are not stable Core Mission Data Contract surfaces.
 

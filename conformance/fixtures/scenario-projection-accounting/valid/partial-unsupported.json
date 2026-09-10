@@ -1,0 +1,18 @@
+{
+  "kind": "orbitfabric.scenario_projection_accounting",
+  "accounting_version": "0.1-candidate",
+  "scenario": {
+    "id": "payload_stop_acquisition_verification",
+    "sha256": "b19ff6e1cf3c45cdb81e239d30aad97e8b6f037703c06f27102b762e69a1146a"
+  },
+  "completeness": "partial",
+  "records": [
+    {
+      "atom_id": "atom-0006",
+      "disposition": "unsupported",
+      "mapping_ids": [],
+      "reason": "Synthetic producer declaration: the selected projection contract cannot represent this atom."
+    }
+  ],
+  "reason": "Synthetic contract test: only one unsupported atom was accounted for."
+}

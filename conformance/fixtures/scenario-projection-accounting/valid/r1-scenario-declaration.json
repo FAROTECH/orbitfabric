@@ -1,0 +1,184 @@
+{
+  "atom_count": 8,
+  "atoms": [
+    {
+      "declaration": {
+        "description": "Verify the mission-level stop-acquisition contract from an already active payload state. The command completes the acquisition, reports the payload inactive, and returns the payload lifecycle to READY without asserting a post-recovery spacecraft mode.\n",
+        "id": "payload_stop_acquisition_verification",
+        "name": "Payload stop acquisition verification"
+      },
+      "id": "atom-0001",
+      "kind": "scenario_metadata",
+      "references": [],
+      "role": "metadata",
+      "scenario_time_s": null,
+      "step_index": null,
+      "within_step_ordinal": null
+    },
+    {
+      "declaration": {
+        "value": "PAYLOAD_ACTIVE"
+      },
+      "id": "atom-0002",
+      "kind": "initial_mode",
+      "references": [
+        {
+          "entity": {
+            "domain": "modes",
+            "id": "PAYLOAD_ACTIVE"
+          },
+          "role": "mode"
+        }
+      ],
+      "role": "initial_state",
+      "scenario_time_s": null,
+      "step_index": null,
+      "within_step_ordinal": null
+    },
+    {
+      "declaration": {
+        "value": true
+      },
+      "id": "atom-0003",
+      "kind": "initial_telemetry",
+      "references": [
+        {
+          "entity": {
+            "domain": "telemetry",
+            "id": "radiation_payload.acquisition_active"
+          },
+          "role": "telemetry"
+        }
+      ],
+      "role": "initial_state",
+      "scenario_time_s": null,
+      "step_index": null,
+      "within_step_ordinal": null
+    },
+    {
+      "declaration": {
+        "arguments": {}
+      },
+      "id": "atom-0004",
+      "kind": "command",
+      "references": [
+        {
+          "entity": {
+            "domain": "commands",
+            "id": "payload.stop_acquisition"
+          },
+          "role": "command"
+        }
+      ],
+      "role": "action",
+      "scenario_time_s": 1,
+      "step_index": 0,
+      "within_step_ordinal": 0
+    },
+    {
+      "declaration": {
+        "expected": true
+      },
+      "id": "atom-0005",
+      "kind": "expect_event",
+      "references": [
+        {
+          "entity": {
+            "domain": "events",
+            "id": "payload.acquisition_completed"
+          },
+          "role": "event"
+        }
+      ],
+      "role": "expectation",
+      "scenario_time_s": 2,
+      "step_index": 1,
+      "within_step_ordinal": 0
+    },
+    {
+      "declaration": {
+        "expected": false
+      },
+      "id": "atom-0006",
+      "kind": "expect_telemetry",
+      "references": [
+        {
+          "entity": {
+            "domain": "telemetry",
+            "id": "radiation_payload.acquisition_active"
+          },
+          "role": "telemetry"
+        }
+      ],
+      "role": "expectation",
+      "scenario_time_s": 3,
+      "step_index": 2,
+      "within_step_ordinal": 0
+    },
+    {
+      "declaration": {
+        "payload": "radiation_event_payload",
+        "state": "READY"
+      },
+      "id": "atom-0007",
+      "kind": "expect_payload_lifecycle",
+      "references": [
+        {
+          "entity": {
+            "domain": "payloads",
+            "id": "radiation_event_payload"
+          },
+          "role": "payload"
+        }
+      ],
+      "role": "expectation",
+      "scenario_time_s": 4,
+      "step_index": 3,
+      "within_step_ordinal": 0
+    },
+    {
+      "declaration": {
+        "expected": "PASSED"
+      },
+      "id": "atom-0008",
+      "kind": "expect_scenario_status",
+      "references": [],
+      "role": "expectation",
+      "scenario_time_s": 5,
+      "step_index": 4,
+      "within_step_ordinal": 0
+    }
+  ],
+  "boundaries": {
+    "contains_complete_atom_accounting": true,
+    "contains_declared_scenario": true,
+    "contains_ground_behavior": false,
+    "contains_plugin_api": false,
+    "contains_runtime_behavior": false,
+    "contains_simulation_evidence": false,
+    "contains_structured_diagnostics": true,
+    "contains_studio_api": false,
+    "contains_target_projection": false,
+    "contains_yaml_ast": false,
+    "core_derived_report": true,
+    "read_only": true,
+    "source_of_truth": "scenario_yaml"
+  },
+  "declaration_version": "0.1-candidate",
+  "diagnostics": [],
+  "kind": "orbitfabric.scenario_declaration",
+  "mission": {
+    "id": "of-rm-1",
+    "model_version": "0.1.0-reference-skeleton"
+  },
+  "orbitfabric_version": "1.3.0",
+  "result": "loaded",
+  "scenario": {
+    "description": "Verify the mission-level stop-acquisition contract from an already active payload state. The command completes the acquisition, reports the payload inactive, and returns the payload lifecycle to READY without asserting a post-recovery spacecraft mode.\n",
+    "id": "payload_stop_acquisition_verification",
+    "name": "Payload stop acquisition verification"
+  },
+  "source": {
+    "scenario_sha256": "b19ff6e1cf3c45cdb81e239d30aad97e8b6f037703c06f27102b762e69a1146a"
+  }
+}

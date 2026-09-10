@@ -255,6 +255,12 @@ Result 0.2-candidate
 
 The v1 lane keeps IISS and Projection Profile as common context and allows zero or one required file-backed operation input. The first contract-defined role is `scenario`. Core publishes JSON Schemas, positive/negative fixtures and a reusable conformance checker. This remains an extension contract and does not move adapter execution or target semantics into Core.
 
+Core also publishes the independently versioned
+`orbitfabric.scenario_projection_accounting` `0.1-candidate` artifact
+contract. A Scenario-consuming adapter can use it to declare complete or
+explicitly partial disposition for exact Scenario atoms, with parent-local
+mapping references and exact Result/artifact/source provenance.
+
 Core does not import ecosystem-specific adapter code in-process. Adapter execution, when requested through Adapter Manager, uses the documented external adapter execution contract and an installed environment-local entrypoint.
 
 The OpenOBSW/OpenSVF reference integration was used as an early forcing function for this architecture without moving OpenOBSW, OpenSVF, YAMCS, PUS or other target-specific semantics into Core.
