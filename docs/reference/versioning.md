@@ -52,6 +52,18 @@ It is provenance/support information. It is not the sole compatibility key for s
 
 ---
 
+## Core Interface Manifest identity
+
+The mission-independent Core Interface Manifest is available through:
+
+```bash
+orbitfabric export core-interface --json core_interface.json
+```
+
+It reports the package version as provenance and separately reports `interface_sha256`, derived from the canonical declared capability set. The fingerprint excludes the product version and environment/repository facts. Consumers must compare required capability ids and contract kinds/versions; fingerprint comparison does not replace that negotiation.
+
+---
+
 ## Mission Model version
 
 The Mission Model version is declared inside the mission YAML, currently under `spacecraft.yaml`.
