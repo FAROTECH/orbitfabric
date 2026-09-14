@@ -90,7 +90,9 @@ def test_interface_change_changes_fingerprint(
     )
 
 
-def test_product_version_is_provenance_not_interface_identity(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_product_version_is_not_interface_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = core_interface_to_dict()
     monkeypatch.setattr(core_interface, "__version__", "9.9.9")
     changed_product = core_interface_to_dict()
