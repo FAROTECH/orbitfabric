@@ -140,3 +140,57 @@ jobs:
           name: orbitfabric-distributions
           path: dist/
           if-no-files-found: error
+
+  core-interface-regression:
+    name: Core interface historical regression
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+
+      - name: Checkout public v1.3.0 release commit
+        uses: actions/checkout@v4
+        with:
+          ref: a25917e81c90396df2b189834e83cf852fa4da5f
+          path: historical-core
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prove same product version and different interface availability
+        run: |
+          H4_HISTORICAL_ENV="$(mktemp -d)/historical"
+          H4_CANDIDATE_ENV="$(mktemp -d)/candidate"
+          python -m venv "$H4_HISTORICAL_ENV"
+          python -m venv "$H4_CANDIDATE_ENV"
+          "$H4_HISTORICAL_ENV/bin/python" -m pip install ./historical-core
+          "$H4_CANDIDATE_ENV/bin/python" -m pip install .
+
+          test "$("$H4_HISTORICAL_ENV/bin/orbitfabric" --version)" = "orbitfabric 1.3.0"
+          test "$("$H4_CANDIDATE_ENV/bin/orbitfabric" --version)" = "orbitfabric 1.3.0"
+
+          if "$H4_HISTORICAL_ENV/bin/orbitfabric" export core-interface --json /tmp/h4-historical.json; then
+            echo "Historical v1.3.0 unexpectedly exposed the Core Interface Manifest"
+            exit 1
+          fi
+          test ! -e /tmp/h4-historical.json
+
+          "$H4_CANDIDATE_ENV/bin/orbitfabric" export core-interface --json /tmp/h4-candidate.json
+          "$H4_CANDIDATE_ENV/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("/tmp/h4-candidate.json").read_text(encoding="utf-8"))
+          assert manifest["kind"] == "orbitfabric.core_interface"
+          assert manifest["interface_version"] == "0.1-candidate"
+          assert manifest["orbitfabric_version"] == "1.3.0"
+          capabilities = {item["id"]: item for item in manifest["capabilities"]}
+          assert capabilities["scenario_declaration"] == {
+              "id": "scenario_declaration",
+              "contract_kind": "orbitfabric.scenario_declaration",
+              "contract_version": "0.1-candidate",
+          }
+          PY

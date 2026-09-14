@@ -8,7 +8,8 @@ This project follows a lightweight changelog style for the Mission Model, contra
 
 ## [Unreleased]
 
-No unreleased changes are currently classified beyond the v1.3.0 release baseline.
+- Added the candidate mission-independent Core Interface Manifest with deterministic capability ordering and RFC 8785/JCS SHA-256 identity.
+- Preserved product version `1.3.0` as provenance separate from structured-interface identity.
 
 ## [v1.3.0] - 2026-09-04
 

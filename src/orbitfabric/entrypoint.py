@@ -9,11 +9,39 @@ import typer
 from orbitfabric import __version__
 from orbitfabric.adapter_commands import adapter_app
 from orbitfabric.cli import _mission_workspace_default_path, app, export_app
+from orbitfabric.export.core_interface import write_core_interface
 from orbitfabric.export.integration_input_set import write_integration_input_set
 from orbitfabric.export.scenario_declaration import write_scenario_declaration
 
 app.add_typer(adapter_app, name="adapter")
 
+
+@export_app.command("core-interface")
+def export_core_interface(
+    json_output: Annotated[
+        Path,
+        typer.Option(
+            "--json",
+            help="Write the Core Interface Manifest to this JSON file.",
+        ),
+    ],
+) -> None:
+    """Export the mission-independent Core Interface Manifest."""
+    typer.echo(f"OrbitFabric Core Interface Export {__version__}")
+
+    try:
+        written_file = write_core_interface(json_output)
+    except (OSError, ValueError) as exc:
+        typer.echo(f"\nError: unable to write Core Interface Manifest: {exc}")
+        typer.echo("\nResult: FAILED")
+        raise typer.Exit(code=1) from exc
+
+    payload = json.loads(written_file.read_text(encoding="utf-8"))
+    typer.echo(f"\nInterface version: {payload['interface_version']}")
+    typer.echo(f"Interface SHA-256: {payload['interface_sha256']}")
+    typer.echo(f"Capabilities: {len(payload['capabilities'])}")
+    typer.echo(f"JSON report written to: {written_file}")
+    typer.echo("\nResult: PASSED")
 
 @export_app.command("integration-input-set")
 def export_integration_input_set(
